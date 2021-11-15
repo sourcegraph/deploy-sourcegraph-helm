@@ -1,3 +1,23 @@
+# cAdvisor
+
+[cAdvisor](https://github.com/google/cadvisor) provides container users an understanding of the resource usage and performance characteristics of their running containers. It is a running daemon that collects, aggregates, processes, and exports information about running containers.
+
+cAdvisor is part of the default Sourcegraph cluster installation, and deployed as a [Kubernetes DaemonSet](https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/). This setup is based on the [official cAdvisor Kubernetes Daemonset configuration](https://github.com/google/cadvisor/tree/master/deploy/kubernetes). We use our own cAdvisor deployment over the built-in metrics exported by Kubernetes because the latter is often outdated and needs to be kept in sync with our [Docker-Compose deployments](https://docs.sourcegraph.com/admin/install/docker-compose). This setup allows us to have standard dashboards across all Sourcegraph deployments.
+
+Note that the `sourcegraph/cadvisor` Docker images come with a set of default flags to help reduce memory usage and load on Prometheus - see [our Dockerfile](https://github.com/sourcegraph/sourcegraph/blob/master/docker-images/cadvisor/Dockerfile) for more details.
+
+## Namespaces
+
+If you are deploying Sourcegraph to a non-default namespace, you'll have to change the namespace specified in
+[cadvisor.ClusterRoleBinding.yaml](cadvisor.ClusterRoleBinding.yaml) to the one that you created. You can do this by editing the namespace directly, or by using the [namespaced overlay](../../configure/../overlays/namespaced/README.md).
+
+# Grafana
+
+[Grafana](https://https://grafana.com/) is an open-source analytics dashboard application.
+
+A Grafana instance is part of the default Sourcegraph cluster installation.
+Learn more about Grafana in the [metrics and dashboards guide](https://docs.sourcegraph.com/admin/observability/metrics).
+
 # Prometheus
 
 [Prometheus](https://prometheus.io/) is an open-source application monitoring system and time series database.
@@ -120,3 +140,4 @@ Additional rules and alerts can be defined in `extra_rules.yml` - see [Prometheu
 ## Metrics
 
 See [metrics and dashboards](https://docs.sourcegraph.com/admin/observability/metrics).
+
