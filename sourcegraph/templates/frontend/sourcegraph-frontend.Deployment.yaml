@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: index.docker.io/sourcegraph/frontend:insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9
+        image: {{ include "sourcegraph.image" (list . "frontend") }}
         args:
         - serve
         env:

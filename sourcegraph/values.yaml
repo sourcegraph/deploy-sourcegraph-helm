@@ -1,10 +1,21 @@
+### Common Configuration ###
+#sourcegraph:
+
 replicaCount: 1
 
 image:
-  repository: nginx
+  repository: index.docker.io/sourcegraph
   pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  tag: "{{ .Chart.AppVersion }}"
+
+frontend:
+  # image: {} to use global default
+  image:
+    tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
+
+gitserver:
+  image:
+    tag: "insiders@sha256:37f04a63676a2496bfb87f55442e574dc20dcba66a8ebd636c7f7212fef2e0d4"
 
 imagePullSecrets: []
 nameOverride: ""

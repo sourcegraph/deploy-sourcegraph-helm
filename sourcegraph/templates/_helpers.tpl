@@ -60,3 +60,12 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Create the image name and allow it to be overridden on a per-service basis
+*/}}
+{{- define "sourcegraph.image" -}}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- $top.Values.image.repository }}/{{ default $service (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.image.tag $top) (index $top.Values $service "image" "tag") }}
+{{- end }}
