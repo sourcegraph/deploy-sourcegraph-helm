@@ -1,5 +1,6 @@
 ### Common Configuration ###
-#sourcegraph:
+sourcegraph:
+  labels: {}
 
 replicaCount: 1
 
@@ -16,6 +17,7 @@ frontend:
 gitserver:
   image:
     tag: "insiders@sha256:37f04a63676a2496bfb87f55442e574dc20dcba66a8ebd636c7f7212fef2e0d4"
+  labels: {}
 
 imagePullSecrets: []
 nameOverride: ""

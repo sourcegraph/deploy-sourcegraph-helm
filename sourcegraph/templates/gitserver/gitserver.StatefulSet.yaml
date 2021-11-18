@@ -5,6 +5,11 @@ metadata:
     description: Stores clones of repositories to perform Git operations.
     kubectl.kubernetes.io/default-container: gitserver
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.gitserver.labels }}
+      {{- toYaml .Values.gitserver.labels | nindent 4 }}
+    {{- end }}
+    # FIXME: Reduce duplication
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: gitserver
@@ -14,6 +19,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: gitserver
   serviceName: gitserver
   template:
