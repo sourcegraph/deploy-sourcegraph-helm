@@ -2,6 +2,10 @@
 sourcegraph:
   labels: {}
 
+# Generic application configuration options
+# app:
+#   replicaCount: 1
+
 replicaCount: 1
 
 image:

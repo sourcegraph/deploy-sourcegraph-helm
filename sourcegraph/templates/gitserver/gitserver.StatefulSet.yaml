@@ -15,8 +15,8 @@ metadata:
     app.kubernetes.io/component: gitserver
   name: gitserver
 spec:
-  replicas: 1
   revisionHistoryLimit: 10
+  replicas: {{ default 1 .Values.gitserver.replicaCount }}
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
