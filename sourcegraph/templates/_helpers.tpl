@@ -58,11 +58,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "sourcegraph.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "sourcegraph.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- default $service (index $top.Values $service "serviceAccount" "name") }}
 {{- end }}
 
 {{/*
@@ -71,5 +69,5 @@ Create the image name and allow it to be overridden on a per-service basis
 {{- define "sourcegraph.image" -}}
 {{- $top := index . 0 }}
 {{- $service := index . 1 }}
-{{- $top.Values.image.repository }}/{{ default $service (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.image.tag $top) (index $top.Values $service "image" "tag") }}
+{{- $top.Values.sourcegraph.image.repository }}/{{ default $service (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.sourcegraph.image.tag $top) (index $top.Values $service "image" "tag") }}
 {{- end }}

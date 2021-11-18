@@ -1,29 +1,60 @@
 ### Common Configuration ###
 sourcegraph:
   labels: {}
+  image:
+    repository: index.docker.io/sourcegraph
+    pullPolicy: IfNotPresent
+    tag: "{{ .Chart.AppVersion }}"
+  imagePullSecrets: []
+  revisionHistoryLimit: 10
 
 # Generic application configuration options
 # app:
 #   replicaCount: 1
+#   image: {}
 
-replicaCount: 1
-
-image:
-  repository: index.docker.io/sourcegraph
-  pullPolicy: IfNotPresent
-  tag: "{{ .Chart.AppVersion }}"
 
 frontend:
-  # image: {} to use global default
   image:
     tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
 
 gitserver:
   image:
     tag: "insiders@sha256:37f04a63676a2496bfb87f55442e574dc20dcba66a8ebd636c7f7212fef2e0d4"
+  replicaCount: 1
+  storageSize: "200Gi"
+  resources:
+    limits:
+      cpu: "4"
+      memory: 8G
+    requests:
+      cpu: "4"
+      memory: 8G
+  podSecurityContext:
+    runAsUser: 0
+
   labels: {}
 
 imagePullSecrets: []
+tracing:
+  enabled: true
+  image:
+    name: jaeger-agent
+    tag: "insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab"
+  resources:
+    limits:
+      cpu: "1"
+      memory: 500M
+    requests:
+      cpu: 100m
+      memory: 100M
+
+storageClass:
+  create: true # Disable if you have your own existing storage class
+  name: sourcegraph # Customize to the existing storage class name
+  provisioner: kubernetes.io/gce-pd
+  type: pd-ssd
+
 nameOverride: ""
 fullnameOverride: ""
 
