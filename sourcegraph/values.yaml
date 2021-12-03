@@ -18,6 +18,20 @@ frontend:
   image:
     tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
 
+githubProxy:
+  image:
+    tag: "insiders@sha256:efd6d9b1093d18202323cf9bca788df146d155ccb117d6488066beb867ac4e2e"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 100m
+      memory: 250M
+  podSecurityContext:
+    runAsUser: 0
+
 gitserver:
   image:
     tag: "insiders@sha256:37f04a63676a2496bfb87f55442e574dc20dcba66a8ebd636c7f7212fef2e0d4"
