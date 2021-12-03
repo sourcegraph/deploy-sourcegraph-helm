@@ -1,19 +1,22 @@
+{{- if .Values.frontend.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1beta1
 kind: Ingress
 metadata:
   annotations:
+    {{- if .Values.frontend.ingress.annotations}}
+    {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
+    {{- end }}
     kubernetes.io/ingress.class: "nginx"
-    # We can upload large files (extensions)
     nginx.ingress.kubernetes.io/proxy-body-size: "150m"
-    # See
-    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/annotations/
-    # for more nginx annotations.
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: frontend
-  name: sourcegraph-frontend
+    {{- if .Values.frontend.ingress.labels}}
+      {{- toYaml .Values.frontend.ingress.labels | nindent 4 }}
+    {{- end }}
+  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
 spec:
   # See the customization guide (../../../docs/configure.md) for information
   # about configuring TLS
@@ -26,8 +29,9 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: sourcegraph-frontend
+          serviceName: {{ default "sourcegraph-frontend" .Values.frontend.name }}
           servicePort: 30080
     # If you're using TLS/SSL, uncomment the following line and replace 'sourcegraph.example.com' with the real
     # domain that you want to use for your Sourcegraph instance.
     # host: sourcegraph.example.com
+{{- end }}

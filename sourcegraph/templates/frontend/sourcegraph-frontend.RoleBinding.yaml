@@ -2,15 +2,16 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     category: rbac
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: frontend
-  name: sourcegraph-frontend
+  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
 roleRef:
   apiGroup: "rbac.authorization.k8s.io"
   kind: Role
-  name: sourcegraph-frontend
+  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
 subjects:
 - kind: ServiceAccount
-  name: sourcegraph-frontend
+  name: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
