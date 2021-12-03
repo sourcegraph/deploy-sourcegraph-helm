@@ -32,6 +32,8 @@ frontend:
   serviceAccount:
     create: true
     name: "sourcegraph-frontend"
+  ingress:
+    enabled: true
 
 githubProxy:
   image:
