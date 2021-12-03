@@ -5,6 +5,7 @@ Expand the name of the chart.
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
+// FIXME: Review the helm labels
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
@@ -40,6 +41,9 @@ helm.sh/chart: {{ include "sourcegraph.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
+{{- if .Values.sourcegraph.labels }}
+{{ toYaml .Values.sourcegraph.labels }}
+{{- end }}
 {{- end }}
 
 {{/*
@@ -54,9 +58,16 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Create the name of the service account to use
 */}}
 {{- define "sourcegraph.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "sourcegraph.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- default $service (index $top.Values $service "serviceAccount" "name") }}
 {{- end }}
+
+{{/*
+Create the image name and allow it to be overridden on a per-service basis
+*/}}
+{{- define "sourcegraph.image" -}}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- $top.Values.sourcegraph.image.repository }}/{{ default $service (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.sourcegraph.image.tag $top) (index $top.Values $service "image" "tag") }}
 {{- end }}
