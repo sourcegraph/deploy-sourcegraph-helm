@@ -69,5 +69,7 @@ Create the image name and allow it to be overridden on a per-service basis
 {{- define "sourcegraph.image" -}}
 {{- $top := index . 0 }}
 {{- $service := index . 1 }}
-{{- $top.Values.sourcegraph.image.repository }}/{{ default $service (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.sourcegraph.image.tag $top) (index $top.Values $service "image" "tag") }}
+{{- $imageName := $service }}
+{{- if ge (len .) 3 }}{{ $imageName = index . 2 }}{{ end }}
+{{- $top.Values.sourcegraph.image.repository }}/{{ default $imageName (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.sourcegraph.image.tag $top) (index $top.Values $service "image" "tag") }}
 {{- end }}
