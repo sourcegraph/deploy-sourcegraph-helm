@@ -17,6 +17,21 @@ sourcegraph:
 frontend:
   image:
     tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "2"
+      ephemeral-storage: "8Gi"
+      memory: 4G
+    requests:
+      cpu: "2"
+      ephemeral-storage: "4Gi"
+      memory: 2G
+  podSecurityContext:
+    runAsUser: 0
+  serviceAccount:
+    create: true
+    name: "sourcegraph-frontend"
 
 githubProxy:
   image:
