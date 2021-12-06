@@ -4,16 +4,25 @@ metadata:
   annotations:
     description: Manages background processes.
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.worker.labels }}
+      {{- toYaml .Values.worker.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: worker
-  name: worker
+  name: {{ default "worker" .Values.worker.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.worker.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: worker
   strategy:
     rollingUpdate:
@@ -22,7 +31,20 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.podAnnotations }}
+      {{- toYaml .Values.worker.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.worker.podLabels }}
+      {{- toYaml .Values.worker.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: worker
     spec:
@@ -33,7 +55,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/worker:insiders@sha256:f23c47ec08a7e31bad546b967fd7e7cb9811c4e7a1147f79a59944cd9e24be40
+        image: {{ include "sourcegraph.image" (list . "worker" ) }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -55,11 +78,21 @@ spec:
         - containerPort: 6060
           name: debug
         resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 500m
-            memory: 2G
+        {{- toYaml .Values.worker.resources | nindent 10 }}
+      {{- if .Values.worker.extraContainers }}
+        {{- toYaml .Values.worker.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.worker.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

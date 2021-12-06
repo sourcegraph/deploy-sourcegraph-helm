@@ -4,17 +4,24 @@ metadata:
   annotations:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.queryRunner.serviceAnnotations }}
+    {{- toYaml .Values.queryRunner.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: query-runner
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: query-runner
-  name: query-runner
+    {{- if .Values.queryRunner.serviceLabels }}
+      {{- toYaml .Values.queryRunner.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "query-runner" .Values.queryRunner.name }}
 spec:
   ports:
   - name: http
     port: 80
     targetPort: http
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: query-runner
   type: ClusterIP

@@ -5,17 +5,24 @@ metadata:
     prometheus.io/port: "9000"
     prometheus.io/path: "/minio/prometheus/metrics"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.minio.serviceAnnotations }}
+    {{- toYaml .Values.minio.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: minio
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: minio
-  name: minio
+    {{- if .Values.minio.serviceLabels }}
+      {{- toYaml .Values.minio.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "minio" .Values.minio.name }}
 spec:
   ports:
   - name: minio
     port: 9000
     targetPort: minio
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: minio
   type: ClusterIP

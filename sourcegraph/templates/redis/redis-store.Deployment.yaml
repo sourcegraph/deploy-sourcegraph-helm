@@ -4,28 +4,45 @@ metadata:
   annotations:
     description: Redis for storing semi-persistent data like user sessions.
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.redisStore.labels }}
+      {{- toYaml .Values.redisStore.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: redis
-  name: redis-store
+  name: {{ default "redis-store" .Values.redisStore.name }}
 spec:
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.redisStore.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: redis-store
   strategy:
     type: Recreate
   template:
     metadata:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.redisStore.podAnnotations }}
+      {{- toYaml .Values.redisStore.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.redisStore.podLabels }}
+      {{- toYaml .Values.redisStore.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: redis-store
     spec:
       containers:
       - name: redis-store
-        image: index.docker.io/sourcegraph/redis-store:insiders@sha256:bd1035f2407901ad6c954933e41f5d555786a20b7cb2bafd6649cecd16522602
+        image: {{ include "sourcegraph.image" (list . "redisStore" "redis-store") }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
@@ -39,31 +56,36 @@ spec:
           tcpSocket:
             port: redis
         resources:
-          limits:
-            cpu: "1"
-            memory: 7Gi
-          requests:
-            cpu: "1"
-            memory: 7Gi
+        {{- toYaml .Values.redisStore.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
-      - name: redis-exporter    
-        image: index.docker.io/sourcegraph/redis_exporter:84464_2021-01-15_c2e4c28@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+      - name: redis-exporter
+        image: {{ include "sourcegraph.image" (list . "redisExporter" "redis_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 9121
           name: redisexp
         resources:
-          limits:
-            cpu: 10m
-            memory: 100Mi
-          requests:
-            cpu: 10m
-            memory: 100Mi
+        {{- toYaml .Values.redisExporter.resources | nindent 10 }}
+      {{- if .Values.redisStore.extraContainers }}
+        {{- toYaml .Values.redisStore.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.redisStore.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: redis-data
         persistentVolumeClaim:
-          claimName: redis-store
+          claimName: {{ default "redis-store" .Values.redisStore.name }}

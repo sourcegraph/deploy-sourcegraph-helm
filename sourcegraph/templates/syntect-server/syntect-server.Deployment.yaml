@@ -4,16 +4,25 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.syntectServer.labels }}
+      {{- toYaml .Values.syntectServer.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: syntect-server
-  name: syntect-server
+  name: {{ default "syntect-server" .Values.syntectServer.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.syntectServer.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: syntect-server
   strategy:
     rollingUpdate:
@@ -22,14 +31,28 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.syntectServer.podAnnotations }}
+      {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.syntectServer.podLabels }}
+      {{- toYaml .Values.syntectServer.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: syntect-server
     spec:
       containers:
       - name: syntect-server
         env:
-        image: index.docker.io/sourcegraph/syntax-highlighter:insiders@sha256:f15a5dcc88ab8574049e37c9985750d0a4aa3d1ec665ec8345f85206155364fb
+        image: {{ include "sourcegraph.image" (list . "syntectServer" "syntax-highlighter") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -45,11 +68,21 @@ spec:
           tcpSocket:
             port: http
         resources:
-          limits:
-            cpu: "4"
-            memory: 6G
-          requests:
-            cpu: 250m
-            memory: 2G
+        {{- toYaml .Values.syntectServer.resources | nindent 10 }}
+      {{- if .Values.syntectServer.extraContainers }}
+        {{- toYaml .Values.syntectServer.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.syntectServer.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

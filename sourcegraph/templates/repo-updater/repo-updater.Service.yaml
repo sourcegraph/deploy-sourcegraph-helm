@@ -4,17 +4,24 @@ metadata:
   annotations:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.repoUpdater.serviceAnnotations }}
+    {{- toYaml .Values.repoUpdater.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: repo-updater
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: repo-updater
-  name: repo-updater
+    {{- if .Values.repoUpdater.serviceLabels }}
+      {{- toYaml .Values.repoUpdater.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "repo-updater" .Values.repoUpdater.name }}
 spec:
   ports:
   - name: http
     port: 3182
     targetPort: http
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: repo-updater
   type: ClusterIP

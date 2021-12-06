@@ -7,23 +7,44 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: indexed-search
-  name: indexed-search
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.indexedSearch.labels }}
+      {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
+    {{- end }}
+  name: {{ default "indexed-search" .Values.indexedSearch.name }}
 spec:
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.indexedSearch.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: indexed-search
   serviceName: indexed-search
   template:
     metadata:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.indexedSearch.podAnnotations }}
+      {{- toYaml .Values.indexedSearch.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.indexedSearch.podLabels }}
+      {{- toYaml .Values.indexedSearch.podLabels | nindent 8 }}
+      {{- end }}
         app: indexed-search
         deploy: sourcegraph
     spec:
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: zoekt-webserver
-        image: index.docker.io/sourcegraph/indexed-searcher:insiders@sha256:5168403765834c6fd064fc7004efd6530104430868712a1ebd3a47ab5e2be031
+        image: {{ include "sourcegraph.image" (list . "indexedSearch" "indexed-searcher") }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 6070
@@ -37,37 +58,49 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 5
         resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 500m
-            memory: 2G
+        {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
+        {{- if .Values.indexedSearch.extraVolumeMounts }}
+        {{- toYaml .Values.indexedSearch.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       - name: zoekt-indexserver
-        image: index.docker.io/sourcegraph/search-indexer:insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd
+        image: {{ include "sourcegraph.image" (list . "searchIndexer" "search-indexer") }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 6072
           name: index-http
         resources:
-          # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-          # lower lag between a new commit and it being indexed for search.
-          limits:
-            cpu: "8"
-            memory: 8G
-          requests:
-            cpu: "4"
-            memory: 4G
+        {{- toYaml .Values.searchIndexer.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
+        {{- if .Values.searchIndexer.extraVolumeMounts }}
+        {{- toYaml .Values.searchIndexer.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.indexedSearch.extraContainers }}
+        {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: data
+      {{- if .Values.indexedSearch.extraVolumes }}
+      {{- toYaml .Values.indexedSearch.extraVolumes | nindent 6 }}
+      {{- end }}
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
@@ -80,7 +113,5 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          # The size of disk to used for search indexes.
-          # This should typically be gitserver disk size multipled by the number of gitserver shards.
-          storage: 200Gi
-      storageClassName: sourcegraph
+          storage: {{ .Values.indexedSearch.storageSize }}
+      storageClassName: {{ .Values.storageClass.name }}
