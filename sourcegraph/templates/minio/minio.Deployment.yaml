@@ -5,22 +5,44 @@ metadata:
     description: MinIO for storing LSIF uploads.
     kubectl.kubernetes.io/default-container: minio
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.minio.labels }}
+      {{- toYaml .Values.minio.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: minio
-  name: minio
+  name: {{ default "minio" .Values.minio.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.minio.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: minio
   strategy:
     type: Recreate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.minio.podAnnotations }}
+      {{- toYaml .Values.minio.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.minio.podLabels }}
+      {{- toYaml .Values.minio.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: minio
     spec:
@@ -31,7 +53,8 @@ spec:
           value: AKIAIOSFODNN7EXAMPLE
         - name: MINIO_SECRET_KEY
           value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
-        image: index.docker.io/sourcegraph/minio:insiders@sha256:fccfad6cbd7b717472c7f200cdd65807ff742f883fe1d08986fc09ff3bd7df5e
+        image: {{ include "sourcegraph.image" (list . "minio") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: ['minio', 'server', '/data']
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
@@ -52,18 +75,34 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 5
         resources:
-          limits:
-            cpu: "1"
-            memory: 500M
-          requests:
-            cpu: "1"
-            memory: 500M
+      {{- toYaml .Values.minio.resources | nindent 10 }}
+      {{- if .Values.minio.extraContainers }}
+        {{- toYaml .Values.minio.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.minio.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
         volumeMounts:
         - mountPath: /data
           name: minio-data
-      securityContext:
-        runAsUser: 0
+        {{- if .Values.minio.extraVolumeMounts }}
+        {{- toYaml .Values.minio.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       volumes:
       - name: minio-data
         persistentVolumeClaim:
           claimName: minio
+      {{- if .Values.minio.extraVolumes }}
+      {{- toYaml .Values.minio.extraVolumes | nindent 6 }}
+      {{- end }}

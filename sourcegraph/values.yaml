@@ -99,6 +99,21 @@ indexedSearch:
   podSecurityContext:
     runAsUser: 0
 
+minio:
+  replicaCount: 1
+  storageSize: "100Gi"
+  image:
+    tag: "insiders@sha256:fccfad6cbd7b717472c7f200cdd65807ff742f883fe1d08986fc09ff3bd7df5e"
+  resources:
+    limits:
+      cpu: "1"
+      memory: 500M
+    requests:
+      cpu: "1"
+      memory: 500M
+  podSecurityContext:
+    runAsUser: 0
+
 searchIndexer:
   image:
     tag: "insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd"
