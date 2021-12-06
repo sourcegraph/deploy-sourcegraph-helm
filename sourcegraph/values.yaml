@@ -99,8 +99,6 @@ indexedSearch:
   podSecurityContext:
     runAsUser: 0
 
-  labels: {}
-
 searchIndexer:
   image:
     tag: "insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd"
@@ -113,6 +111,20 @@ searchIndexer:
     requests:
       cpu: "4"
       memory: 4G
+
+preciseCodeIntel:
+  image:
+    tag: "insiders@sha256:c1690021447dc6f9b50d520df9284d594b24f09f3acadc27a407b31f7592fc0f"
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
+  podSecurityContext:
+    runAsUser: 0
 
 prometheus: {}
 

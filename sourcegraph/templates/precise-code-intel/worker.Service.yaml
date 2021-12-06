@@ -4,12 +4,18 @@ metadata:
   annotations:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.preciseCodeIntel.serviceAnnotations }}
+    {{- toYaml .Values.preciseCodeIntel.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: precise-code-intel-worker
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: precise-code-intel
-  name: precise-code-intel-worker
+    {{- if .Values.preciseCodeIntel.serviceLabels }}
+      {{- toYaml .Values.preciseCodeIntel.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "precise-code-intel-worker" .Values.preciseCodeIntel.name }}
 spec:
   ports:
   - name: http
@@ -19,5 +25,6 @@ spec:
     port: 6060
     targetPort: debug
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: precise-code-intel-worker
   type: ClusterIP

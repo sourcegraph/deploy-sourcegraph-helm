@@ -4,16 +4,25 @@ metadata:
   annotations:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.preciseCodeIntel.labels }}
+      {{- toYaml .Values.preciseCodeIntel.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: precise-code-intel
-  name: precise-code-intel-worker
+  name: {{ default "precise-code-intel-worker" .Values.preciseCodeIntel.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 2
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.preciseCodeIntel.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: precise-code-intel-worker
   strategy:
     rollingUpdate:
@@ -22,7 +31,20 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.preciseCodeIntel.podAnnotations }}
+      {{- toYaml .Values.preciseCodeIntel.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.preciseCodeIntel.podLabels }}
+      {{- toYaml .Values.preciseCodeIntel.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: precise-code-intel-worker
     spec:
@@ -35,7 +57,8 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        image: index.docker.io/sourcegraph/precise-code-intel-worker:insiders@sha256:c1690021447dc6f9b50d520df9284d594b24f09f3acadc27a407b31f7592fc0f
+        image: {{ include "sourcegraph.image" (list . "preciseCodeIntel" "precise-code-intel-worker") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -57,11 +80,21 @@ spec:
         - containerPort: 6060
           name: debug
         resources:
-          limits:
-            cpu: "2"
-            memory: 4G
-          requests:
-            cpu: 500m
-            memory: 2G
+        {{- toYaml .Values.preciseCodeIntel.resources | nindent 10 }}
+      {{- if .Values.preciseCodeIntel.extraContainers }}
+        {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
