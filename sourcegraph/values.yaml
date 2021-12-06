@@ -140,6 +140,47 @@ queryRunner:
   podSecurityContext:
     runAsUser: 0
 
+redisCache:
+  image:
+    tag: "insiders@sha256:3c83d172a9c320ef4a5a236a76df7611d7f8f76021eb3bf22b28200ce764acce"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 7Gi
+    requests:
+      cpu: "1"
+      memory: 7Gi
+  storageSize: "100Gi"
+  podSecurityContext:
+    runAsUser: 0
+
+redisExporter:
+  image:
+    tag: "84464_2021-01-15_c2e4c28@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 100Mi
+
+redisStore:
+  image:
+    tag: "insiders@sha256:bd1035f2407901ad6c954933e41f5d555786a20b7cb2bafd6649cecd16522602"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 7Gi
+    requests:
+      cpu: "1"
+      memory: 7Gi
+  storageSize: "100Gi"
+  podSecurityContext:
+    runAsUser: 0
+
 repoUpdater:
   image:
     tag: "insiders@sha256:7a54d944125aae8e985ec5c607ec1435d7410687f26b7c705e8baa9f94a41191"

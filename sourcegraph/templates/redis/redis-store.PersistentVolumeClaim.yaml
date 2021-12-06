@@ -5,11 +5,11 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: redis
-  name: redis-store
+  name: {{ default "redis-store" .Values.redisStore.name }}
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 100Gi
-  storageClassName: sourcegraph
+      storage: {{ .Values.redisStore.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}
