@@ -5,13 +5,17 @@ metadata:
     description: Metrics/monitoring dashboards and alerts.
     kubectl.kubernetes.io/default-container: grafana
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.grafana.labels }}
+      {{- toYaml .Values.grafana.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: grafana
-  name: grafana
+  name: {{ default "grafana" .Values.grafana.name }}
 spec:
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.grafana.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: grafana
@@ -20,13 +24,29 @@ spec:
      type: RollingUpdate
   template:
     metadata:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.grafana.podAnnotations }}
+      {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.grafana.podLabels }}
+      {{- toYaml .Values.grafana.podLabels | nindent 8 }}
+      {{- end }}
         app: grafana
         deploy: sourcegraph
     spec:
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: grafana
-        image: index.docker.io/sourcegraph/grafana:insiders@sha256:1331577ff6080e4a9ac6ec32074815a6eabe7e6abbe8042aa6f05a25eb742a39
+        image: {{ include "sourcegraph.image" (list . "grafana") }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3370
@@ -40,21 +60,37 @@ spec:
         # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
         # memory to perform its job reliably and prevent conflicts with other pods on the same
         # host node.
+        {{- if .Values.grafana.extraVolumeMounts }}
+        {{- toYaml .Values.grafana.extraVolumeMounts | nindent 8 }}
+        {{- end }}
         resources:
-          limits:
-            cpu: "1"
-            memory: 512Mi
-          requests:
-            cpu: 100m
-            memory: 512Mi
+        {{- toYaml .Values.grafana.resources | nindent 10 }}
       serviceAccountName: grafana
+      {{- if .Values.grafana.extraContainers }}
+        {{- toYaml .Values.grafana.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.grafana.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: config
         configMap:
           defaultMode: 0777
           name: grafana
+      {{- if .Values.grafana.extraVolumes }}
+      {{- toYaml .Values.grafana.extraVolumes | nindent 6 }}
+      {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: grafana-data
@@ -62,5 +98,6 @@ spec:
       accessModes: [ "ReadWriteOnce"]
       resources:
         requests:
-          storage: 2Gi
-      storageClassName: sourcegraph
+          storage: {{ .Values.grafana.storageSize }}
+      storageClassName: {{ .Values.storageClass.name }}
+

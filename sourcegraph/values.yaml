@@ -13,7 +13,6 @@ sourcegraph:
 #   replicaCount: 1
 #   image: {}
 
-
 frontend:
   image:
     tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
@@ -65,6 +64,25 @@ gitserver:
     runAsUser: 0
 
   labels: {}
+
+grafana:
+  image:
+    tag: "insiders@sha256:1331577ff6080e4a9ac6ec32074815a6eabe7e6abbe8042aa6f05a25eb742a39"
+  replicaCount: 1
+  storageSize: "2Gi"
+  resources:
+    limits:
+      cpu: "1"
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+  podSecurityContext:
+    runAsUser: 0
+  serviceAccount:
+    create: true
+
+prometheus: {}
 
 tracing:
   enabled: true

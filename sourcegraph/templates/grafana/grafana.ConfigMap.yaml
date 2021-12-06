@@ -7,7 +7,7 @@ data:
       - name: Prometheus
         type: prometheus
         access: proxy
-        url: http://prometheus:30090
+        url: http://{{ default "prometheus" .Values.prometheus.name }}:30090
         isDefault: true
         editable: false
       - name: Jaeger
@@ -20,4 +20,4 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: grafana
-  name: grafana
+  name: {{ default "grafana" .Values.grafana.name }}
