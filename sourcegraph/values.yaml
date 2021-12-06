@@ -140,6 +140,80 @@ queryRunner:
   podSecurityContext:
     runAsUser: 0
 
+repoUpdater:
+  image:
+    tag: "insiders@sha256:7a54d944125aae8e985ec5c607ec1435d7410687f26b7c705e8baa9f94a41191"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: "1"
+      memory: 500Mi
+  podSecurityContext:
+    runAsUser: 0
+
+searcher:
+  image:
+    tag: "insiders@sha256:bde5e1eaaf73adf6e915ec47a788bdee96b72d617b89acb0e350001addc08d28"
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "2"
+      ephemeral-storage: "26G"
+      memory: 2G
+    requests:
+      cpu: 500m
+      ephemeral-storage: "25G"
+      memory: 500M
+  podSecurityContext:
+    runAsUser: 0
+
+symbols:
+  image:
+    tag: "insiders@sha256:468ce5a77133f508f1ef5f4010b7676c4db7f6795137f768e36fc46ee5c6c072"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "2"
+      ephemeral-storage: "12G"
+      memory: 2G
+    requests:
+      cpu: 500m
+      ephemeral-storage: "10G"
+      memory: 500M
+  podSecurityContext:
+    runAsUser: 0
+
+syntectServer:
+  image:
+    tag: "insiders@sha256:f15a5dcc88ab8574049e37c9985750d0a4aa3d1ec665ec8345f85206155364fb"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 6G
+    requests:
+      cpu: 250m
+      memory: 2G
+  podSecurityContext:
+    runAsUser: 0
+
+worker:
+  image:
+    tag: "insiders@sha256:f23c47ec08a7e31bad546b967fd7e7cb9811c4e7a1147f79a59944cd9e24be40"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
+  podSecurityContext:
+    runAsUser: 0
+
 prometheus: {}
 
 tracing:

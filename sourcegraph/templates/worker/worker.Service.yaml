@@ -4,12 +4,18 @@ metadata:
   annotations:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.worker.serviceAnnotations }}
+    {{- toYaml .Values.worker.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: worker
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: worker
-  name: worker
+    {{- if .Values.worker.serviceLabels }}
+      {{- toYaml .Values.worker.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "worker" .Values.worker.name }}
 spec:
   ports:
   - name: http
@@ -19,5 +25,6 @@ spec:
     port: 6060
     targetPort: debug
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: worker
   type: ClusterIP
