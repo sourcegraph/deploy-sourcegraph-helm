@@ -126,6 +126,20 @@ preciseCodeIntel:
   podSecurityContext:
     runAsUser: 0
 
+queryRunner:
+  image:
+    tag: "insiders@sha256:cb6285b7021f0fe3953846e58006f82816cba046cbe6892cebff667905ab5a50"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 500m
+      memory: 1G
+  podSecurityContext:
+    runAsUser: 0
+
 prometheus: {}
 
 tracing:
