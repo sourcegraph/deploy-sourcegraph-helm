@@ -6,17 +6,24 @@ metadata:
       indexed-search stateful set.
     sourcegraph.prometheus/scrape: "true"
     prometheus.io/port: "6072"
+    {{- if .Values.indexedSearch.serviceAnnotations }}
+    {{- toYaml .Values.indexedSearch.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: indexed-search-indexer
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: indexed-search
-  name: indexed-search-indexer
+    {{- if .Values.indexedSearch.serviceLabels }}
+      {{- toYaml .Values.indexedSearch.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "indexed-search-indexer" .Values.indexedSearch.indexerName }}
 spec:
   clusterIP: None
   ports:
     - port: 6072
       targetPort: 6072
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: indexed-search
   type: ClusterIP
