@@ -13,6 +13,63 @@ sourcegraph:
 #   replicaCount: 1
 #   image: {}
 
+alpine:
+  image:
+    tag: "insiders@sha256:670237bcaea9f8055d8986b5d992970f3f22c6f2f2e855d441b1ec074ebc6ff2"
+  resources:
+    limits:
+      cpu: "10m"
+      memory: "50Mi"
+    requests:
+      cpu: "10m"
+      memory: "50Mi"
+  podSecurityContext:
+    runAsUser: 0
+
+cadvisor:
+  image:
+    tag: "insiders@sha256:9d274f2cb48b2bd7df24e02e81da96b28e297a5671ccabbdf5cbf733605293a1"
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 150m
+    limits:
+      memory: 2000Mi
+      cpu: 300m
+  serviceAccount:
+    create: true
+    name: "cadvisor"
+
+codeInsightsDB:
+  image:
+    tag: "insiders@sha256:dfd916b6456ffbeb6ba2d05f92aa2bd77273e617d80142d76bfb23fa255e5e21"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 2Gi
+    requests:
+      cpu: "4"
+      memory: 2Gi
+  storageSize: "200Gi"
+  podSecurityContext:
+    runAsUser: 0
+
+codeIntelDB:
+  image:
+    tag: "insiders@sha256:d42cefb7dfa69c08361ad4aba37c20ae36dfdcf2ca6ed05e2d85b2bfa7305f57"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "4"
+      memory: 4Gi
+  storageSize: "200Gi"
+  podSecurityContext:
+    runAsUser: 0
+
 frontend:
   image:
     tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
@@ -126,6 +183,32 @@ searchIndexer:
     requests:
       cpu: "4"
       memory: 4G
+
+pgsql:
+  image:
+    tag: "insiders@sha256:98d134adbc3e29c7125b541a58771f4a6d818876c47bc385ef4ab889d8633a2a"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "4"
+      memory: 4Gi
+  podSecurityContext:
+    runAsUser: 0
+  storageSize: "200Gi"
+
+postgresExporter:
+  image:
+    tag: "insiders@sha256:ed49696495575ef26dd51997eac9fcc92be9023bc7762b56f045e8615595e61e"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
 
 preciseCodeIntel:
   image:
@@ -270,7 +353,46 @@ worker:
   podSecurityContext:
     runAsUser: 0
 
-prometheus: {}
+prometheus:
+  image:
+    tag: "insiders@sha256:525fe0479ea043e1c154f656f187d825f40b57c6a38fcbf2b2eb98d4a1f8d8c8"
+  replicaCount: 1
+  # Prometheus is relied upon to monitor services for sending alerts to site admins when
+  # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+  # guarantee it has enough memory to perform its job reliably and prevent conflicts with
+  # other pods on the same host node.
+  #
+  # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+  # of traffic.
+  resources:
+    limits:
+      cpu: "2"
+      memory: 6G
+    requests:
+      cpu: 500m
+      memory: 6G
+  podSecurityContext:
+    runAsUser: 0
+  serviceAccount:
+    create: true
+  storageSize: "200Gi"
+
+jaeger:
+  image:
+    tag: "insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 500m
+      memory: 500M
+  podSecurityContext:
+    runAsUser: 0
+  query: {}
+  collector: {}
+
 
 tracing:
   enabled: true

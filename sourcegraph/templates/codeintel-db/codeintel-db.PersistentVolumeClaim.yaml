@@ -5,11 +5,11 @@ metadata:
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: codeintel-db
+  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 200Gi
-  storageClassName: sourcegraph
+      storage: {{ .Values.codeIntelDB.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}

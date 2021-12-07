@@ -24,6 +24,7 @@ spec:
      type: RollingUpdate
   template:
     metadata:
+      annotations:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

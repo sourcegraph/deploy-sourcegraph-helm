@@ -1,13 +1,20 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: jaeger-query
+  annotations:
+  {{- if .Values.jaeger.query.serviceAnnotations }}
+  {{- toYaml .Values.jaeger.query.serviceAnnotations | nindent 4 }}
+  {{- end }}
   labels:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: jaeger
     app: jaeger
     app.kubernetes.io/name: jaeger
+    {{- if .Values.jaeger.query.serviceLabels }}
+      {{- toYaml .Values.jaeger.query.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "jaeger-query" .Values.jaeger.query.name }}
 spec:
   ports:
     - name: query-http
@@ -15,6 +22,7 @@ spec:
       protocol: TCP
       targetPort: 16686
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: all-in-one
   type: ClusterIP

@@ -4,17 +4,24 @@ metadata:
   annotations:
     prometheus.io/port: "9187"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.codeInsightsDB.serviceAnnotations }}
+    {{- toYaml .Values.codeInsightsDB.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app.kubernetes.io/component: codeinsights-db
     app: codeinsights-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: codeinsights-db
+    {{- if .Values.codeInsightsDB.serviceLabels }}
+      {{- toYaml .Values.codeInsightsDB.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
 spec:
   ports:
   - name: timescaledb
     port: 5432
     targetPort: timescaledb
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeinsights-db
   type: ClusterIP

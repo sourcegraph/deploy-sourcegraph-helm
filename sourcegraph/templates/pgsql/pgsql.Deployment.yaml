@@ -8,42 +8,60 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: pgsql
-  name: pgsql
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.pgsql.labels }}
+      {{- toYaml .Values.pgsql.labels | nindent 4 }}
+    {{- end }}
+  name: {{ default "pgsql" .Values.pgsql.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.pgsql.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: pgsql
   strategy:
     type: Recreate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pgsql.podAnnotations }}
+      {{- toYaml .Values.pgsql.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.pgsql.podLabels }}
+      {{- toYaml .Values.pgsql.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: pgsql
         group: backend
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.12:insiders@sha256:670237bcaea9f8055d8986b5d992970f3f22c6f2f2e855d441b1ec074ebc6ff2
+        image: {{ include "sourcegraph.image" (list . "alpine" "alpine-3.12") }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
           name: disk
         securityContext:
-          runAsUser: 0
+        {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
         resources:
-          limits:
-            cpu: "10m"
-            memory: "50Mi"
-          requests:
-            cpu: "10m"
-            memory: "50Mi"
+        {{- toYaml .Values.alpine.resources | nindent 10 }}
       containers:
       - env:
-        image: index.docker.io/sourcegraph/postgres-12.6-alpine:insiders@sha256:98d134adbc3e29c7125b541a58771f4a6d818876c47bc385ef4ab889d8633a2a
+        image: {{ include "sourcegraph.image" (list . "pgsql" "postgres-12.6-alpine") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -59,12 +77,7 @@ spec:
         - containerPort: 5432
           name: pgsql
         resources:
-          limits:
-            cpu: "4"
-            memory: 4Gi
-          requests:
-            cpu: "4"
-            memory: 4Gi
+        {{- toYaml .Values.pgsql.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -72,24 +85,37 @@ spec:
           name: pgsql-conf
         - mountPath: /dev/shm
           name: dshm
+        {{- if .Values.pgsql.extraVolumeMounts }}
+        {{- toYaml .Values.pgsql.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.pgsql.extraContainers }}
+        {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
+      {{- end }}
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:ed49696495575ef26dd51997eac9fcc92be9023bc7762b56f045e8615595e61e
+        image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
-          limits:
-            cpu: 10m
-            memory: 50Mi
-          requests:
-            cpu: 10m
-            memory: 50Mi
+        {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: disk
         persistentVolumeClaim:
@@ -98,7 +124,10 @@ spec:
         configMap:
           defaultMode: 0777
           name: pgsql-conf
-      - name: dshm # Allocate shared memory to match the shared_buffers value  
+      - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory
           sizeLimit: 1G
+      {{- if .Values.pgsql.extraVolumes }}
+      {{- toYaml .Values.pgsql.extraVolumes | nindent 6 }}
+      {{- end }}

@@ -4,29 +4,52 @@ metadata:
   annotations:
     description: Code Insights TimescaleDB instance.
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.codeInsightsDB.labels }}
+      {{- toYaml .Values.codeInsightsDB.labels | nindent 4 }}
+    {{- end }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: codeinsights-db
+  name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.codeInsightsDB.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: codeinsights-db
   strategy:
     type: Recreate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.codeInsightsDB.podAnnotations }}
+      {{- toYaml .Values.codeInsightsDB.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.codeInsightsDB.podLabels }}
+      {{- toYaml .Values.codeInsightsDB.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: codeinsights-db
         group: backend
     spec:
       containers:
       - name: timescaledb
-        image: index.docker.io/sourcegraph/codeinsights-db:insiders@sha256:dfd916b6456ffbeb6ba2d05f92aa2bd77273e617d80142d76bfb23fa255e5e21
+        image: {{ include "sourcegraph.image" (list . "codeInsightsDB" "codeinsights-db") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         env:
         - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
           value: password
@@ -39,20 +62,33 @@ spec:
         - containerPort: 5432
           name: timescaledb
         resources:
-          limits:
-            cpu: "4"
-            memory: 2Gi
-          requests:
-            cpu: "4"
-            memory: 2Gi
+        {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
           name: timescaledb-conf
-      terminationGracePeriodSeconds: 120
+        {{- if .Values.codeInsightsDB.extraVolumeMounts }}
+        {{- toYaml .Values.codeInsightsDB.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.codeInsightsDB.extraContainers }}
+        {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: 120
       volumes:
       - name: disk
         persistentVolumeClaim:
@@ -60,4 +96,7 @@ spec:
       - name: timescaledb-conf
         configMap:
           defaultMode: 0777
-          name: codeinsights-db-conf
+          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.name }}
+      {{- if .Values.codeInsightsDB.extraVolumes }}
+      {{- toYaml .Values.codeInsightsDB.extraVolumes | nindent 6 }}
+      {{- end }}

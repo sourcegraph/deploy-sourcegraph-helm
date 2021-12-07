@@ -6,12 +6,12 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: prometheus
-  name: prometheus
+  name: {{ default "prometheus" .Values.prometheus.name }}
 roleRef:
   apiGroup: "rbac.authorization.k8s.io"
   kind: ClusterRole
-  name: prometheus
+  name: {{ default "prometheus" .Values.prometheus.name }}
 subjects:
 - kind: ServiceAccount
-  name: prometheus
-  namespace: default
+  name: {{ default "prometheus" .Values.prometheus.name }}
+  namespace: {{ .Release.Namespace }}
