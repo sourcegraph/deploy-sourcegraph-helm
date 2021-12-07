@@ -26,6 +26,20 @@ alpine:
   podSecurityContext:
     runAsUser: 0
 
+cadvisor:
+  image:
+    tag: "insiders@sha256:9d274f2cb48b2bd7df24e02e81da96b28e297a5671ccabbdf5cbf733605293a1"
+  resources:
+    requests:
+      memory: 200Mi
+      cpu: 150m
+    limits:
+      memory: 2000Mi
+      cpu: 300m
+  serviceAccount:
+    create: true
+    name: "cadvisor"
+
 codeInsightsDB:
   image:
     tag: "insiders@sha256:dfd916b6456ffbeb6ba2d05f92aa2bd77273e617d80142d76bfb23fa255e5e21"
@@ -339,7 +353,46 @@ worker:
   podSecurityContext:
     runAsUser: 0
 
-prometheus: {}
+prometheus:
+  image:
+    tag: "insiders@sha256:525fe0479ea043e1c154f656f187d825f40b57c6a38fcbf2b2eb98d4a1f8d8c8"
+  replicaCount: 1
+  # Prometheus is relied upon to monitor services for sending alerts to site admins when
+  # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
+  # guarantee it has enough memory to perform its job reliably and prevent conflicts with
+  # other pods on the same host node.
+  #
+  # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
+  # of traffic.
+  resources:
+    limits:
+      cpu: "2"
+      memory: 6G
+    requests:
+      cpu: 500m
+      memory: 6G
+  podSecurityContext:
+    runAsUser: 0
+  serviceAccount:
+    create: true
+  storageSize: "200Gi"
+
+jaeger:
+  image:
+    tag: "insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 500m
+      memory: 500M
+  podSecurityContext:
+    runAsUser: 0
+  query: {}
+  collector: {}
+
 
 tracing:
   enabled: true

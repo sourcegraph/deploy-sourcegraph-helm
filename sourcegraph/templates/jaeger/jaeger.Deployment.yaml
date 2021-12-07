@@ -3,13 +3,18 @@ kind: Deployment
 metadata:
   name: jaeger
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.jaeger.labels }}
+      {{- toYaml .Values.jaeger.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: jaeger
     app: jaeger
     app.kubernetes.io/name: jaeger
 spec:
-  replicas: 1
+  replicas: {{ .Values.jaeger.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
       app: jaeger
@@ -19,43 +24,69 @@ spec:
     type: Recreate
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "16686"
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jaeger.podAnnotations }}
+      {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.jaeger.podLabels }}
+      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
+      {{- end }}
         app: jaeger
         deploy: sourcegraph
         app.kubernetes.io/name: jaeger
         app.kubernetes.io/component: all-in-one
-      annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "16686"
     spec:
-        containers:
-        - name: jaeger
-          image: index.docker.io/sourcegraph/jaeger-all-in-one:insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e
-          args: ["--memory.max-traces=20000"]
-          ports:
-            - containerPort: 5775
-              protocol: UDP
-            - containerPort: 6831
-              protocol: UDP
-            - containerPort: 6832
-              protocol: UDP
-            - containerPort: 5778
-              protocol: TCP
-            - containerPort: 16686
-              protocol: TCP
-            - containerPort: 14250
-              protocol: TCP
-          readinessProbe:
-            httpGet:
-              path: "/"
-              port: 14269
-            initialDelaySeconds: 5
-          resources:
-            limits:
-              cpu: "1"
-              memory: 1G
-            requests:
-              cpu: 500m
-              memory: 500M
-        securityContext:
-          runAsUser: 0
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+      - name: jaeger
+        image: {{ include "sourcegraph.image" (list . "jaeger" "jaeger-all-in-one") }}
+        args: ["--memory.max-traces=20000"]
+        ports:
+          - containerPort: 5775
+            protocol: UDP
+          - containerPort: 6831
+            protocol: UDP
+          - containerPort: 6832
+            protocol: UDP
+          - containerPort: 5778
+            protocol: TCP
+          - containerPort: 16686
+            protocol: TCP
+          - containerPort: 14250
+            protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: "/"
+            port: 14269
+          initialDelaySeconds: 5
+        resources:
+        {{- toYaml .Values.jaeger.resources | nindent 10 }}
+      {{- if .Values.jaeger.extraContainers }}
+        {{- toYaml .Values.jaeger.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.queryRunner.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

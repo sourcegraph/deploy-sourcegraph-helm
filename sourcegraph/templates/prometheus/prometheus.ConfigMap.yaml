@@ -276,4 +276,4 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: prometheus
-  name: prometheus
+  name: {{ default "prometheus" .Values.prometheus.name }}
