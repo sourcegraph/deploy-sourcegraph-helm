@@ -5,45 +5,63 @@ metadata:
     description: Postgres database for various data.
     kubectl.kubernetes.io/default-container: pgsql
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.codeIntelDB.labels }}
+      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
+    {{- end }}
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: codeintel-db
+  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
+  {{- with .Values.sourcegraph.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   minReadySeconds: 10
-  replicas: 1
-  revisionHistoryLimit: 10
+  replicas: {{ .Values.codeIntelDB.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: codeintel-db
   strategy:
     type: Recreate
   template:
     metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.codeIntelDB.podAnnotations }}
+      {{- toYaml .Values.codeIntelDB.podAnnotations | nindent 8 }}
+      {{- end }}
       labels:
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.codeIntelDB.podLabels }}
+      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
+      {{- end }}
         deploy: sourcegraph
         app: codeintel-db
         group: backend
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: index.docker.io/sourcegraph/alpine-3.12:insiders@sha256:670237bcaea9f8055d8986b5d992970f3f22c6f2f2e855d441b1ec074ebc6ff2
+        image: {{ include "sourcegraph.image" (list . "alpine" "alpine-3.12") }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
           name: disk
         securityContext:
-          runAsUser: 0
+        {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
         resources:
-          limits:
-            cpu: "10m"
-            memory: "50Mi"
-          requests:
-            cpu: "10m"
-            memory: "50Mi"
+        {{- toYaml .Values.alpine.resources | nindent 10 }}
       containers:
       - name: pgsql
-        image: index.docker.io/sourcegraph/codeintel-db:insiders@sha256:d42cefb7dfa69c08361ad4aba37c20ae36dfdcf2ca6ed05e2d85b2bfa7305f57
+        image: {{ include "sourcegraph.image" (list . "codeIntelDB" "codeintel-db") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -58,35 +76,43 @@ spec:
         - containerPort: 5432
           name: pgsql
         resources:
-          limits:
-            cpu: "4"
-            memory: 4Gi
-          requests:
-            cpu: "4"
-            memory: 4Gi
+        {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
         - mountPath: /conf
           name: pgsql-conf
+        {{- if .Values.codeIntelDB.extraVolumeMounts }}
+        {{- toYaml .Values.codeIntelDB.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.codeIntelDB.extraContainers }}
+        {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
+      {{- end }}
       - env:
         - name: DATA_SOURCE_NAME
           value: postgres://sg:@localhost:5432/?sslmode=disable
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
-        image: index.docker.io/sourcegraph/postgres_exporter:insiders@sha256:ed49696495575ef26dd51997eac9fcc92be9023bc7762b56f045e8615595e61e
+        image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         resources:
-          limits:
-            cpu: 10m
-            memory: 50Mi
-          requests:
-            cpu: 10m
-            memory: 50Mi
+        {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        runAsUser: 0
+        {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
       - name: disk
         persistentVolumeClaim:
@@ -94,4 +120,7 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: codeintel-db-conf
+          name: {{ default "codeintel-db-conf" .Values.codeIntelDB.name }}
+      {{- if .Values.codeIntelDB.extraVolumes }}
+      {{- toYaml .Values.codeIntelDB.extraVolumes | nindent 6 }}
+      {{- end }}

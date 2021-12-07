@@ -5,11 +5,11 @@ metadata:
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: pgsql
-  name: pgsql
+  name: {{ default "pgsql" .Values.pgsql.name }}
 spec:
   accessModes:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 200Gi
-  storageClassName: sourcegraph
+      storage: {{ .Values.pgsql.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}

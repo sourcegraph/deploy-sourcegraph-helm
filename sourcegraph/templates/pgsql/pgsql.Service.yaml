@@ -4,17 +4,24 @@ metadata:
   annotations:
     prometheus.io/port: "9187"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.pgsql.serviceAnnotations }}
+    {{- toYaml .Values.pgsql.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: pgsql
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: pgsql
-  name: pgsql
+    {{- if .Values.pgsql.serviceLabels }}
+      {{- toYaml .Values.pgsql.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "pgsql" .Values.pgsql.name }}
 spec:
   ports:
   - name: pgsql
     port: 5432
     targetPort: pgsql
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: pgsql
   type: ClusterIP

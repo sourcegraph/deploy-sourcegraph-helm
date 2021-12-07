@@ -4,17 +4,24 @@ metadata:
   annotations:
     prometheus.io/port: "9187"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.codeIntelDB.serviceAnnotations }}
+    {{- toYaml .Values.codeIntelDB.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app.kubernetes.io/component: codeintel-db
     app: codeintel-db
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
-  name: codeintel-db
+    {{- if .Values.codeIntelDB.serviceLabels }}
+      {{- toYaml .Values.codeIntelDB.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   ports:
   - name: pgsql
     port: 5432
     targetPort: pgsql
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeintel-db
   type: ClusterIP

@@ -13,6 +13,49 @@ sourcegraph:
 #   replicaCount: 1
 #   image: {}
 
+alpine:
+  image:
+    tag: "insiders@sha256:670237bcaea9f8055d8986b5d992970f3f22c6f2f2e855d441b1ec074ebc6ff2"
+  resources:
+    limits:
+      cpu: "10m"
+      memory: "50Mi"
+    requests:
+      cpu: "10m"
+      memory: "50Mi"
+  podSecurityContext:
+    runAsUser: 0
+
+codeInsightsDB:
+  image:
+    tag: "insiders@sha256:dfd916b6456ffbeb6ba2d05f92aa2bd77273e617d80142d76bfb23fa255e5e21"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 2Gi
+    requests:
+      cpu: "4"
+      memory: 2Gi
+  storageSize: "200Gi"
+  podSecurityContext:
+    runAsUser: 0
+
+codeIntelDB:
+  image:
+    tag: "insiders@sha256:d42cefb7dfa69c08361ad4aba37c20ae36dfdcf2ca6ed05e2d85b2bfa7305f57"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "4"
+      memory: 4Gi
+  storageSize: "200Gi"
+  podSecurityContext:
+    runAsUser: 0
+
 frontend:
   image:
     tag: "insiders@sha256:cc01a2f65e5bb9ef8d762eaa973cf1287507c74d5d4c76b3e00d278c40b356a9"
@@ -126,6 +169,32 @@ searchIndexer:
     requests:
       cpu: "4"
       memory: 4G
+
+pgsql:
+  image:
+    tag: "insiders@sha256:98d134adbc3e29c7125b541a58771f4a6d818876c47bc385ef4ab889d8633a2a"
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "4"
+      memory: 4Gi
+  podSecurityContext:
+    runAsUser: 0
+  storageSize: "200Gi"
+
+postgresExporter:
+  image:
+    tag: "insiders@sha256:ed49696495575ef26dd51997eac9fcc92be9023bc7762b56f045e8615595e61e"
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
 
 preciseCodeIntel:
   image:
