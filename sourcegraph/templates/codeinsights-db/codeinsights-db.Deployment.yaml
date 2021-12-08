@@ -35,6 +35,7 @@ spec:
       {{- toYaml .Values.codeInsightsDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

@@ -39,13 +39,13 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
       {{- if .Values.searcher.podLabels }}
       {{- toYaml .Values.searcher.podLabels | nindent 8 }}
       {{- end }}
-      labels:
         deploy: sourcegraph
         app: searcher
     spec:
