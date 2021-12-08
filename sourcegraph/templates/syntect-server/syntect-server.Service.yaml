@@ -8,7 +8,6 @@ metadata:
   labels:
     app: syntect-server
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: syntect-server
     {{- if .Values.syntectServer.serviceLabels }}
       {{- toYaml .Values.syntectServer.serviceLabels | nindent 4 }}

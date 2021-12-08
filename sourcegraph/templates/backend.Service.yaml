@@ -6,7 +6,6 @@ metadata:
       the same node if possible.
   labels:
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     group: backend
   name: backend
 spec:

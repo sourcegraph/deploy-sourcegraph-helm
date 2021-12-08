@@ -12,7 +12,6 @@ metadata:
   labels:
     app: indexed-search
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: indexed-search
     {{- if .Values.indexedSearch.serviceLabels }}
       {{- toYaml .Values.indexedSearch.serviceLabels | nindent 4 }}

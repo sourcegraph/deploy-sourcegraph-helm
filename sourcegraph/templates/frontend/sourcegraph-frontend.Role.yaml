@@ -5,7 +5,6 @@ metadata:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     category: rbac
     deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: frontend
   name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
 rules:

@@ -274,6 +274,5 @@ kind: ConfigMap
 metadata:
   labels:
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: prometheus
   name: {{ default "prometheus" .Values.prometheus.name }}

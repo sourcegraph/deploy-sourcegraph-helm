@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.symbols.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: symbols
   name: {{ default "symbols" .Values.symbols.name }}
 spec:
@@ -40,13 +39,13 @@ spec:
       {{- toYaml .Values.symbols.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
       {{- if .Values.symbols.podLabels }}
       {{- toYaml .Values.symbols.podLabels | nindent 8 }}
       {{- end }}
-      labels:
         deploy: sourcegraph
         app: symbols
     spec:

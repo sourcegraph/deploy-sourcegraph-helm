@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.searcher.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: searcher
   name: {{ default "searcher" .Values.searcher.name }}
 spec:
@@ -40,13 +39,13 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
       {{- if .Values.searcher.podLabels }}
       {{- toYaml .Values.searcher.podLabels | nindent 8 }}
       {{- end }}
-      labels:
         deploy: sourcegraph
         app: searcher
     spec:

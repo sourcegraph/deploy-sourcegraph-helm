@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.githubProxy.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: github-proxy
   name: {{ default "github-proxy" .Values.githubProxy.name }}
 spec:
@@ -40,6 +39,7 @@ spec:
       {{- toYaml .Values.githubProxy.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

@@ -6,7 +6,6 @@ metadata:
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
   name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.name }}
 data:
   postgresql.conf: |

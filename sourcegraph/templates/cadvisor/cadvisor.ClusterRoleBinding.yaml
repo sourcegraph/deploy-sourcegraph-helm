@@ -5,7 +5,6 @@ metadata:
     app: cadvisor
     category: rbac
     deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: cadvisor
   name: {{ default "cadvisor" .Values.cadvisor.name }}
 roleRef:

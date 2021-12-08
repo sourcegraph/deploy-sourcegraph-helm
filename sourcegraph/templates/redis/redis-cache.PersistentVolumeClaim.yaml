@@ -3,7 +3,6 @@ kind: PersistentVolumeClaim
 metadata:
   labels:
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: redis
   name: {{ default "redis-cache" .Values.redisCache.name }}
 spec:

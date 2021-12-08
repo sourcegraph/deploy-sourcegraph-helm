@@ -4,7 +4,6 @@ metadata:
   labels:
     category: rbac
     deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: prometheus
   name: {{ default "prometheus" .Values.prometheus.name }}
 rules:

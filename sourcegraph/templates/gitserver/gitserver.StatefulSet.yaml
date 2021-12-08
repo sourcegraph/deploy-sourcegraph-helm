@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.gitserver.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: gitserver
   name: {{ default "gitserver" .Values.gitserver.name }}
 spec:
@@ -31,6 +30,7 @@ spec:
       {{- toYaml .Values.gitserver.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

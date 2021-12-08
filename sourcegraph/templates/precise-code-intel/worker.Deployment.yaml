@@ -9,7 +9,6 @@ metadata:
       {{- toYaml .Values.preciseCodeIntel.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: precise-code-intel
   name: {{ default "precise-code-intel-worker" .Values.preciseCodeIntel.name }}
 spec:
@@ -39,6 +38,7 @@ spec:
       {{- toYaml .Values.preciseCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

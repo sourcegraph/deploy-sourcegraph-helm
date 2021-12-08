@@ -10,7 +10,6 @@ metadata:
   labels:
     app: repo-updater
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: repo-updater
     {{- if .Values.repoUpdater.serviceLabels }}
       {{- toYaml .Values.repoUpdater.serviceLabels | nindent 4 }}

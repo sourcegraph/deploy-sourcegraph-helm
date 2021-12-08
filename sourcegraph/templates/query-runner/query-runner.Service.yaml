@@ -10,7 +10,6 @@ metadata:
   labels:
     app: query-runner
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: query-runner
     {{- if .Values.queryRunner.serviceLabels }}
       {{- toYaml .Values.queryRunner.serviceLabels | nindent 4 }}
