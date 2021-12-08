@@ -49,10 +49,10 @@ spec:
       containers:
       - name: minio
         env:
-        - name: MINIO_ACCESS_KEY
-          value: AKIAIOSFODNN7EXAMPLE
-        - name: MINIO_SECRET_KEY
-          value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+        {{- range $name, $item := .Values.minio.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         image: {{ include "sourcegraph.image" (list . "minio") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: ['minio', 'server', '/data']

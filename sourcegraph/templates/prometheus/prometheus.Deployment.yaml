@@ -45,6 +45,11 @@ spec:
       - name: prometheus
         image: {{ include "sourcegraph.image" (list . "prometheus") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.prometheus.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         readinessProbe:
           httpGet:
             path: /-/ready

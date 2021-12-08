@@ -57,6 +57,11 @@ spec:
         - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
         # it is safe to uncomment this option if you use docker as your container runtime to reduce noise
         # - --docker_only
+        env:
+        {{- range $name, $item := .Values.cadvisor.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         resources:
         {{- toYaml .Values.cadvisor.resources | nindent 10 }}
         volumeMounts:

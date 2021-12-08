@@ -51,6 +51,11 @@ spec:
           initialDelaySeconds: 30
           tcpSocket:
             port: redis
+        env:
+        {{- range $name, $item := .Values.redisCache.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 6379
           name: redis
@@ -66,6 +71,10 @@ spec:
       - name: redis-exporter
         image: {{ include "sourcegraph.image" (list . "redisExporter" "redis_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        {{- range $name, $item := .Values.redisExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 9121
           name: redisexp

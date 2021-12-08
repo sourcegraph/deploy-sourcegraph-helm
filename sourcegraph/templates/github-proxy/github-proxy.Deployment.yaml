@@ -54,6 +54,11 @@ spec:
         image: {{ include "sourcegraph.image" (list . "githubProxy" "github-proxy") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.githubProxy.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 3180
           name: http

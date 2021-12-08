@@ -51,8 +51,10 @@ spec:
       containers:
       - name: precise-code-intel-worker
         env:
-        - name: NUM_WORKERS
-          value: '4'
+        {{- range $name, $item := .Values.preciseCodeIntel.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:

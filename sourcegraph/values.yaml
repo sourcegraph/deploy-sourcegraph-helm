@@ -41,6 +41,9 @@ cadvisor:
     name: "cadvisor"
 
 codeInsightsDB:
+  env:
+    POSTGRES_PASSWORD: # Accessible by Sourcegraph applications on the network only, so password auth is not used.
+      value: password
   image:
     tag: "insiders@sha256:dfd916b6456ffbeb6ba2d05f92aa2bd77273e617d80142d76bfb23fa255e5e21"
   replicaCount: 1
@@ -67,6 +70,10 @@ codeIntelDB:
       cpu: "4"
       memory: 4Gi
   storageSize: "200Gi"
+  postgresExporter:
+    env:
+      DATA_SOURCE_NAME:
+        value: postgres://sg:@localhost:5432/?sslmode=disable
   podSecurityContext:
     runAsUser: 0
 
@@ -90,6 +97,31 @@ frontend:
     name: "sourcegraph-frontend"
   ingress:
     enabled: true
+  env:
+    PGDATABASE:
+      value: sg
+    PGHOST:
+      value: pgsql
+    PGUSER:
+      value: sg
+    CODEINSIGHTS_PGDATASOURCE:
+      value: postgres://postgres:password@codeinsights-db:5432/postgres
+    CODEINTEL_PGDATABASE:
+      value: sg
+    CODEINTEL_PGHOST:
+      value: codeintel-db
+    CODEINTEL_PGPORT:
+      value: "5432"
+    CODEINTEL_PGSSLMODE:
+      value: disable
+    CODEINTEL_PGUSER:
+      value: sg
+    GRAFANA_SERVER_URL:
+      value: http://grafana:30070
+    JAEGER_SERVER_URL:
+      value: http://jaeger-query:16686
+    PROMETHEUS_URL:
+      value: http://prometheus:30090
 
 githubProxy:
   image:
@@ -170,6 +202,11 @@ minio:
       memory: 500M
   podSecurityContext:
     runAsUser: 0
+  env:
+    MINIO_ACCESS_KEY:
+      value: AKIAIOSFODNN7EXAMPLE
+    MINIO_SECRET_KEY:
+      value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 searchIndexer:
   image:
@@ -198,6 +235,11 @@ pgsql:
   podSecurityContext:
     runAsUser: 0
   storageSize: "200Gi"
+  env:
+    DATA_SOURCE_NAME:
+      value: postgres://sg:@localhost:5432/?sslmode=disable
+    PG_EXPORTER_EXTEND_QUERY_PATH:
+      value: /config/queries.yaml
 
 postgresExporter:
   image:
@@ -223,6 +265,9 @@ preciseCodeIntel:
       memory: 2G
   podSecurityContext:
     runAsUser: 0
+  env:
+    NUM_WORKERS:
+      value: '4'
 
 queryRunner:
   image:

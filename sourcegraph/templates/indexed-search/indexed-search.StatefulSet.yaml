@@ -46,6 +46,11 @@ spec:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch" "indexed-searcher") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.indexedSearch.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 6070
           name: http
@@ -68,6 +73,11 @@ spec:
       - name: zoekt-indexserver
         image: {{ include "sourcegraph.image" (list . "searchIndexer" "search-indexer") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.searchIndexer.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 6072
           name: index-http

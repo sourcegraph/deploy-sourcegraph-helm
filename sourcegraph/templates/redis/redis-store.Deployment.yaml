@@ -45,6 +45,11 @@ spec:
       - name: redis-store
         image: {{ include "sourcegraph.image" (list . "redisStore" "redis-store") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.redisStore.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         livenessProbe:
           initialDelaySeconds: 30
           tcpSocket:
@@ -64,6 +69,11 @@ spec:
       - name: redis-exporter
         image: {{ include "sourcegraph.image" (list . "redisExporter" "redis_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.redisExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 9121
           name: redisexp

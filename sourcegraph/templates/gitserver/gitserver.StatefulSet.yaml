@@ -51,6 +51,11 @@ spec:
         args: ["run"]
         image: {{ include "sourcegraph.image" (list . "gitserver") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        env:
+        {{- range $name, $item := .Values.gitserver.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5

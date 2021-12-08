@@ -59,8 +59,7 @@ spec:
         resources:
         {{- toYaml .Values.alpine.resources | nindent 10 }}
       containers:
-      - env:
-        image: {{ include "sourcegraph.image" (list . "pgsql" "postgres-12.6-alpine") }}
+      - image: {{ include "sourcegraph.image" (list . "pgsql" "postgres-12.6-alpine") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
@@ -73,6 +72,11 @@ spec:
             command:
               - /liveness.sh
         name: pgsql
+        env:
+        {{- range $name, $item := .Values.pgsql.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 5432
           name: pgsql
@@ -92,10 +96,10 @@ spec:
         {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
       {{- end }}
       - env:
-        - name: DATA_SOURCE_NAME
-          value: postgres://sg:@localhost:5432/?sslmode=disable
-        - name: PG_EXPORTER_EXTEND_QUERY_PATH
-          value: /config/queries.yaml
+        {{- range $name, $item := .Values.postgresExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
