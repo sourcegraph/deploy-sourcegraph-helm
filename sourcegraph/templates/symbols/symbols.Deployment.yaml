@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.symbols.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: symbols
   name: {{ default "symbols" .Values.symbols.name }}
 spec:

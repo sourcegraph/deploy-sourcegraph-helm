@@ -4,7 +4,6 @@ metadata:
   labels:
     app: cadvisor
     deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: cadvisor
   name: {{ default "cadvisor" .Values.cadvisor.name }}
 spec:

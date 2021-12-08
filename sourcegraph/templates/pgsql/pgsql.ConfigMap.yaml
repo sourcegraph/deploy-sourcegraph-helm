@@ -5,7 +5,6 @@ metadata:
     description: Configuration for PostgreSQL
   labels:
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: pgsql
   name: {{ default "pgsql-conf" .Values.pgsql.name }}
 data:

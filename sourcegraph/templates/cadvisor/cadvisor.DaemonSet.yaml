@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.cadvisor.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
     app.kubernetes.io/component: cadvisor
   name: {{ default "cadvisor" .Values.cadvisor.name }}
 spec:

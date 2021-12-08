@@ -10,7 +10,6 @@ metadata:
   labels:
     app: worker
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: worker
     {{- if .Values.worker.serviceLabels }}
       {{- toYaml .Values.worker.serviceLabels | nindent 4 }}

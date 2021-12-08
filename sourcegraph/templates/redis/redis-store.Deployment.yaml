@@ -9,7 +9,6 @@ metadata:
       {{- toYaml .Values.redisStore.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: redis
   name: {{ default "redis-store" .Values.redisStore.name }}
 spec:

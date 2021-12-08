@@ -9,7 +9,6 @@ metadata:
       {{- toYaml .Values.worker.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: worker
   name: {{ default "worker" .Values.worker.name }}
 spec:

@@ -10,7 +10,6 @@ metadata:
     {{- end }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
   name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
 spec:
   {{- with .Values.sourcegraph.imagePullSecrets }}

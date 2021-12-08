@@ -10,7 +10,6 @@ metadata:
   labels:
     app: precise-code-intel-worker
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: precise-code-intel
     {{- if .Values.preciseCodeIntel.serviceLabels }}
       {{- toYaml .Values.preciseCodeIntel.serviceLabels | nindent 4 }}

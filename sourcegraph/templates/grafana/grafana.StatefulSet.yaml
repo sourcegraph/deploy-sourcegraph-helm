@@ -10,7 +10,6 @@ metadata:
       {{- toYaml .Values.grafana.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: grafana
   name: {{ default "grafana" .Values.grafana.name }}
 spec:

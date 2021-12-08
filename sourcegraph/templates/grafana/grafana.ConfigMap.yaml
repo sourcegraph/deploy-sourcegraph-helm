@@ -18,6 +18,5 @@ kind: ConfigMap
 metadata:
   labels:
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: grafana
   name: {{ default "grafana" .Values.grafana.name }}

@@ -6,7 +6,6 @@ metadata:
   labels:
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
   name: {{ default "codeintel-db-conf" .Values.codeIntelDB.name }}
 data:
   postgresql.conf: |

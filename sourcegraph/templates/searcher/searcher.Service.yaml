@@ -10,7 +10,6 @@ metadata:
   labels:
     app: searcher
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: searcher
     {{- if .Values.searcher.serviceLabels }}
       {{- toYaml .Values.searcher.serviceLabels | nindent 4 }}

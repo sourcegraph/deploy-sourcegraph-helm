@@ -11,7 +11,6 @@ metadata:
       {{- toYaml .Values.repoUpdater.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: repo-updater
   name: {{ default "repo-updater" .Values.repoUpdater.name }}
 spec:

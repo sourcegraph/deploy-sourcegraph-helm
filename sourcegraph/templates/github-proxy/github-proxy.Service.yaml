@@ -10,7 +10,6 @@ metadata:
   labels:
     app: github-proxy
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: github-proxy
     {{- if .Values.githubProxy.serviceLabels }}
       {{- toYaml .Values.githubProxy.serviceLabels | nindent 4 }}

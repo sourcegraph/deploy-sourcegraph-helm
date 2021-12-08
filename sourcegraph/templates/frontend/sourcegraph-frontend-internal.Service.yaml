@@ -8,7 +8,6 @@ metadata:
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
     app.kubernetes.io/component: frontend
     {{- if .Values.frontend.serviceLabels }}
       {{- toYaml .Values.frontend.serviceLabels | nindent 4 }}
