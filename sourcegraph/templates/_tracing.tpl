@@ -5,6 +5,10 @@ Define the tracing sidecar
 - name: jaeger-agent
   image: {{ include "sourcegraph.image" (list . "tracing") }}
   env:
+  {{- range $name, $item := .Values.tracing.env}}
+    - name: {{ $name }}
+    {{- $item | toYaml | nindent 4 }}
+  {{- end }}
     - name: POD_NAME
       valueFrom:
         fieldRef:

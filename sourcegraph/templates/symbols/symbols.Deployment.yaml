@@ -53,6 +53,10 @@ spec:
       containers:
       - name: symbols
         env:
+        {{- range $name, $item := .Values.symbols.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         - name: SYMBOLS_CACHE_SIZE_MB
           valueFrom:
             resourceFieldRef:

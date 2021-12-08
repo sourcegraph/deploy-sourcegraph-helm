@@ -63,6 +63,11 @@ spec:
         image: {{ include "sourcegraph.image" (list . "codeIntelDB" "codeintel-db") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.codeIntelDB.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         readinessProbe:
           exec:
             command:
@@ -89,8 +94,10 @@ spec:
         {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
       {{- end }}
       - env:
-        - name: DATA_SOURCE_NAME
-          value: postgres://sg:@localhost:5432/?sslmode=disable
+        {{- range $name, $item := .Values.codeIntelDB.postgresExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
         image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}

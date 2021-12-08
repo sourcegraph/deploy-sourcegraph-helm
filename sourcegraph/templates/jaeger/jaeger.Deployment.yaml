@@ -53,6 +53,11 @@ spec:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "jaeger" "jaeger-all-in-one") }}
         args: ["--memory.max-traces=20000"]
+        env:
+        {{- range $name, $item := .Values.jaeger.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
           - containerPort: 5775
             protocol: UDP

@@ -51,6 +51,10 @@ spec:
       containers:
       - name: syntect-server
         env:
+        {{- range $name, $item := .Values.syntectServer.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         image: {{ include "sourcegraph.image" (list . "syntectServer" "syntax-highlighter") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError

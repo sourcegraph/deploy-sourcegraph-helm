@@ -51,8 +51,10 @@ spec:
         image: {{ include "sourcegraph.image" (list . "codeInsightsDB" "codeinsights-db") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         env:
-        - name: POSTGRES_PASSWORD # Accessible by Sourcegraph applications on the network only, so password auth is not used.
-          value: password
+        {{- range $name, $item := .Values.codeInsightsDB.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         - name: PGDATA
           value: /var/lib/postgresql/data/pgdata
         - name: POSTGRESQL_CONF_DIR

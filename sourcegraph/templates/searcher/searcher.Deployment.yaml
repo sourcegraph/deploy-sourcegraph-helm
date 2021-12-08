@@ -53,6 +53,10 @@ spec:
       containers:
       - name: searcher
         env:
+        {{- range $name, $item := .Values.searcher.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         - name: SEARCHER_CACHE_SIZE_MB
           valueFrom:
             resourceFieldRef:

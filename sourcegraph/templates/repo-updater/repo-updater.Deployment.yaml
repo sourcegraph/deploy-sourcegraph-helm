@@ -50,6 +50,10 @@ spec:
       - name: repo-updater
         image: {{ include "sourcegraph.image" (list . "repoUpdater" "repo-updater") }}
         env:
+        {{- range $name, $item := .Values.repoUpdater.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3182

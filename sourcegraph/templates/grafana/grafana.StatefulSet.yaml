@@ -49,6 +49,11 @@ spec:
       - name: grafana
         image: {{ include "sourcegraph.image" (list . "grafana") }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.grafana.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 3370
           name: http

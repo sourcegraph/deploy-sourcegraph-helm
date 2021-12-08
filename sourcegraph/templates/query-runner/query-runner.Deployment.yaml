@@ -54,6 +54,11 @@ spec:
         image: {{ include "sourcegraph.image" (list . "queryRunner" "query-runner") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.queryRunner.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         ports:
         - containerPort: 3183
           name: http
