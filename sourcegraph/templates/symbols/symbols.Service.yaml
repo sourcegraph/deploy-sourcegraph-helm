@@ -4,11 +4,17 @@ metadata:
   annotations:
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.symbols.serviceAnnotations }}
+    {{- toYaml .Values.symbols.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     app: symbols
     deploy: sourcegraph
     app.kubernetes.io/component: symbols
-  name: symbols
+    {{- if .Values.symbols.serviceLabels }}
+      {{- toYaml .Values.symbols.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ default "symbols" .Values.symbols.name }}
 spec:
   ports:
   - name: http
@@ -18,5 +24,6 @@ spec:
     port: 6060
     targetPort: debug
   selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: symbols
   type: ClusterIP
