@@ -1,3 +1,4 @@
+{{- if .Values.pgsql.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -135,3 +136,4 @@ spec:
       {{- if .Values.pgsql.extraVolumes }}
       {{- toYaml .Values.pgsql.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

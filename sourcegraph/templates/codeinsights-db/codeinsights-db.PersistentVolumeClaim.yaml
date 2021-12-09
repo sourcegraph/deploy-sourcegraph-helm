@@ -1,3 +1,4 @@
+{{- if .Values.codeInsightsDB.enabled -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,3 +13,4 @@ spec:
     requests:
       storage: {{ .Values.codeInsightsDB.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+{{- end }}

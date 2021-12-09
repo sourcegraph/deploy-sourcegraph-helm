@@ -1,3 +1,4 @@
+{{- if .Values.codeInsightsDB.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -24,3 +25,4 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeinsights-db
   type: ClusterIP
+{{- end }}

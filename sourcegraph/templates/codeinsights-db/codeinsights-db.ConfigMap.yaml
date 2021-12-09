@@ -1,3 +1,4 @@
+{{- if .Values.codeInsightsDB.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -770,3 +771,4 @@ data:
     timescaledb.max_background_workers = 8
     timescaledb.last_tuned = '2021-02-16T03:10:41Z'
     timescaledb.last_tuned_version = '0.10.0'
+{{- end }}

@@ -1,3 +1,4 @@
+{{- if .Values.codeInsightsDB.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -102,3 +103,4 @@ spec:
       {{- if .Values.codeInsightsDB.extraVolumes }}
       {{- toYaml .Values.codeInsightsDB.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

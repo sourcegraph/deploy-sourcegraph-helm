@@ -41,6 +41,7 @@ cadvisor:
     name: "cadvisor"
 
 codeInsightsDB:
+  enabled: true
   env:
     POSTGRES_PASSWORD: # Accessible by Sourcegraph applications on the network only, so password auth is not used.
       value: password
@@ -59,6 +60,7 @@ codeInsightsDB:
     runAsUser: 0
 
 codeIntelDB:
+  enabled: true
   image:
     tag: "insiders@sha256:d42cefb7dfa69c08361ad4aba37c20ae36dfdcf2ca6ed05e2d85b2bfa7305f57"
   replicaCount: 1
@@ -222,6 +224,7 @@ searchIndexer:
       memory: 4G
 
 pgsql:
+  enabled: true
   image:
     tag: "insiders@sha256:98d134adbc3e29c7125b541a58771f4a6d818876c47bc385ef4ab889d8633a2a"
   replicaCount: 1
