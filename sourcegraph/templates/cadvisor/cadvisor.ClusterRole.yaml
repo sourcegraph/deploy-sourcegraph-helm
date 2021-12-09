@@ -1,3 +1,4 @@
+{{- if .Values.cadvisor.enabled -}}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
@@ -13,3 +14,4 @@ rules:
     verbs:     ['use']
     resourceNames:
     - {{ default "cadvisor" .Values.cadvisor.name }}
+{{- end }}

@@ -27,6 +27,7 @@ alpine:
     runAsUser: 0
 
 cadvisor:
+  enabled: true
   image:
     tag: "insiders@sha256:9d274f2cb48b2bd7df24e02e81da96b28e297a5671ccabbdf5cbf733605293a1"
   resources:
@@ -157,6 +158,7 @@ gitserver:
   labels: {}
 
 grafana:
+  enabled: true
   image:
     tag: "insiders@sha256:1331577ff6080e4a9ac6ec32074815a6eabe7e6abbe8042aa6f05a25eb742a39"
   replicaCount: 1
@@ -191,6 +193,7 @@ indexedSearch:
     runAsUser: 0
 
 minio:
+  enabled: true
   replicaCount: 1
   storageSize: "100Gi"
   image:
@@ -287,6 +290,7 @@ queryRunner:
     runAsUser: 0
 
 redisCache:
+  enabled: true
   image:
     tag: "insiders@sha256:3c83d172a9c320ef4a5a236a76df7611d7f8f76021eb3bf22b28200ce764acce"
   replicaCount: 1
@@ -313,6 +317,7 @@ redisExporter:
       memory: 100Mi
 
 redisStore:
+  enabled: true
   image:
     tag: "insiders@sha256:bd1035f2407901ad6c954933e41f5d555786a20b7cb2bafd6649cecd16522602"
   replicaCount: 1
@@ -402,6 +407,7 @@ worker:
     runAsUser: 0
 
 prometheus:
+  enabled: true
   image:
     tag: "insiders@sha256:525fe0479ea043e1c154f656f187d825f40b57c6a38fcbf2b2eb98d4a1f8d8c8"
   replicaCount: 1
@@ -426,6 +432,7 @@ prometheus:
   storageSize: "200Gi"
 
 jaeger:
+  enabled: true
   image:
     tag: "insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e"
   replicaCount: 1

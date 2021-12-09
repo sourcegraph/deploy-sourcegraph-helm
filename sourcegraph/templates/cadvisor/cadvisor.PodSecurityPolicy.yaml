@@ -1,3 +1,4 @@
+{{- if .Values.cadvisor.enabled -}}
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
@@ -23,3 +24,4 @@ spec:
   - pathPrefix: "/sys"
   - pathPrefix: "/var/lib/docker"
   - pathPrefix: "/dev/disk"
+{{- end }}
