@@ -93,6 +93,6 @@ spec:
           claimName: prometheus
       - configMap:
           defaultMode: 0777
-          name: prometheus
+          name: {{ default "prometheus" .Values.prometheus.existingConfig .Values.prometheus.name }}
         name: config
 {{- end }}

@@ -1,4 +1,4 @@
-{{- if .Values.prometheus.enabled -}}
+{{- if and .Values.prometheus.enabled (not .Values.prometheus.existingConfig) -}}
 apiVersion: v1
 data:
   prometheus.yml: |

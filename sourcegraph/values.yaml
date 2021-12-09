@@ -59,6 +59,7 @@ codeInsightsDB:
   storageSize: "200Gi"
   podSecurityContext:
     runAsUser: 0
+  existingConfig: "" # Name of an existing configmap
 
 codeIntelDB:
   enabled: true
@@ -79,6 +80,7 @@ codeIntelDB:
         value: postgres://sg:@localhost:5432/?sslmode=disable
   podSecurityContext:
     runAsUser: 0
+  existingConfig: "" # Name of an existing configmap
 
 frontend:
   image:
@@ -174,6 +176,7 @@ grafana:
     runAsUser: 0
   serviceAccount:
     create: true
+  existingConfig: "" # Name of an existing configmap
 
 indexedSearch:
   image:
@@ -246,6 +249,7 @@ pgsql:
       value: postgres://sg:@localhost:5432/?sslmode=disable
     PG_EXPORTER_EXTEND_QUERY_PATH:
       value: /config/queries.yaml
+  existingConfig: "" # Name of an existing configmap
 
 postgresExporter:
   image:
@@ -430,6 +434,7 @@ prometheus:
   serviceAccount:
     create: true
   storageSize: "200Gi"
+  existingConfig: "" # Name of an existing configmap
 
 jaeger:
   enabled: true
@@ -447,7 +452,6 @@ jaeger:
     runAsUser: 0
   query: {}
   collector: {}
-
 
 tracing:
   enabled: true

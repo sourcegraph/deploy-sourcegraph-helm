@@ -94,7 +94,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0777
-          name: grafana
+          name: {{ default "grafana" .Values.grafana.existingConfig .Values.grafana.name }}
       {{- if .Values.grafana.extraVolumes }}
       {{- toYaml .Values.grafana.extraVolumes | nindent 6 }}
       {{- end }}

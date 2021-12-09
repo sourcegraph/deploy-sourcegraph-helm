@@ -1,4 +1,4 @@
-{{- if .Values.pgsql.enabled -}}
+{{- if and .Values.pgsql.enabled (not .Values.pgsql.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

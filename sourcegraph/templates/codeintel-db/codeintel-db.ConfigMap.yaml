@@ -1,4 +1,4 @@
-{{- if .Values.codeIntelDB.enabled -}}
+{{- if and .Values.codeIntelDB.enabled (not .Values.codeIntelDB.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

@@ -1,4 +1,4 @@
-{{- if .Values.grafana.enabled -}}
+{{- if and .Values.grafana.enabled (not .Values.grafana.existingConfig) -}}
 apiVersion: v1
 data:
   datasources.yml: |
