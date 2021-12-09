@@ -1,3 +1,4 @@
+{{- if .Values.cadvisor.enabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -125,3 +126,4 @@ spec:
       {{- if .Values.cadvisor.extraVolumes }}
       {{- toYaml .Values.cadvisor.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

@@ -1,3 +1,4 @@
+{{- if .Values.codeInsightsDB.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -98,7 +99,8 @@ spec:
       - name: timescaledb-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.name }}
+          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig .Values.codeInsightsDB.name }}
       {{- if .Values.codeInsightsDB.extraVolumes }}
       {{- toYaml .Values.codeInsightsDB.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

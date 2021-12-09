@@ -1,3 +1,4 @@
+{{- if .Values.codeIntelDB.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -127,7 +128,8 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeintel-db-conf" .Values.codeIntelDB.name }}
+          name: {{ default "codeintel-db-conf" .Values.codeIntelDB.existingConfig .Values.codeIntelDB.name }}
       {{- if .Values.codeIntelDB.extraVolumes }}
       {{- toYaml .Values.codeIntelDB.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

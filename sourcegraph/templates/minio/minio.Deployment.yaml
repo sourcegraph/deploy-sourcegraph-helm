@@ -1,3 +1,4 @@
+{{- if .Values.minio.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -106,3 +107,4 @@ spec:
       {{- if .Values.minio.extraVolumes }}
       {{- toYaml .Values.minio.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

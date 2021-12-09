@@ -2,6 +2,7 @@
 Define the tracing sidecar
 */}}
 {{- define "sourcegraph.tracing" -}}
+{{- if .Values.tracing.enabled -}}
 - name: jaeger-agent
   image: {{ include "sourcegraph.image" (list . "tracing") }}
   env:
@@ -28,4 +29,5 @@ Define the tracing sidecar
   args:
     - --reporter.grpc.host-port=jaeger-collector:14250
     - --reporter.type=grpc
+{{- end }}
 {{- end }}

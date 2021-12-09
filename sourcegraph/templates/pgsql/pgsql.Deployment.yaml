@@ -1,3 +1,4 @@
+{{- if .Values.pgsql.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -127,7 +128,7 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: pgsql-conf
+          name: {{ default "pgsql-conf" .Values.pgsql.existingConfig .Values.pgsql.name }}
       - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory
@@ -135,3 +136,4 @@ spec:
       {{- if .Values.pgsql.extraVolumes }}
       {{- toYaml .Values.pgsql.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

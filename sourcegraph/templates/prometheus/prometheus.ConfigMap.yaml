@@ -1,3 +1,4 @@
+{{- if and .Values.prometheus.enabled (not .Values.prometheus.existingConfig) -}}
 apiVersion: v1
 data:
   prometheus.yml: |
@@ -276,3 +277,4 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
   name: {{ default "prometheus" .Values.prometheus.name }}
+{{- end }}

@@ -1,3 +1,4 @@
+{{- if and .Values.codeIntelDB.enabled (not .Values.codeIntelDB.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -701,3 +702,4 @@ data:
     #------------------------------------------------------------------------------
 
     # Add settings for extensions here
+{{- end }}

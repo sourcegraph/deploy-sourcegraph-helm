@@ -1,3 +1,4 @@
+{{- if .Values.prometheus.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -92,5 +93,6 @@ spec:
           claimName: prometheus
       - configMap:
           defaultMode: 0777
-          name: prometheus
+          name: {{ default "prometheus" .Values.prometheus.existingConfig .Values.prometheus.name }}
         name: config
+{{- end }}

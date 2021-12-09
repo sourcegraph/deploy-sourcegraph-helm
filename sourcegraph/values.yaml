@@ -27,6 +27,7 @@ alpine:
     runAsUser: 0
 
 cadvisor:
+  enabled: true
   image:
     tag: "insiders@sha256:9d274f2cb48b2bd7df24e02e81da96b28e297a5671ccabbdf5cbf733605293a1"
   resources:
@@ -41,6 +42,7 @@ cadvisor:
     name: "cadvisor"
 
 codeInsightsDB:
+  enabled: true
   env:
     POSTGRES_PASSWORD: # Accessible by Sourcegraph applications on the network only, so password auth is not used.
       value: password
@@ -57,8 +59,10 @@ codeInsightsDB:
   storageSize: "200Gi"
   podSecurityContext:
     runAsUser: 0
+  existingConfig: "" # Name of an existing configmap
 
 codeIntelDB:
+  enabled: true
   image:
     tag: "insiders@sha256:d42cefb7dfa69c08361ad4aba37c20ae36dfdcf2ca6ed05e2d85b2bfa7305f57"
   replicaCount: 1
@@ -76,6 +80,7 @@ codeIntelDB:
         value: postgres://sg:@localhost:5432/?sslmode=disable
   podSecurityContext:
     runAsUser: 0
+  existingConfig: "" # Name of an existing configmap
 
 frontend:
   image:
@@ -155,6 +160,7 @@ gitserver:
   labels: {}
 
 grafana:
+  enabled: true
   image:
     tag: "insiders@sha256:1331577ff6080e4a9ac6ec32074815a6eabe7e6abbe8042aa6f05a25eb742a39"
   replicaCount: 1
@@ -170,6 +176,7 @@ grafana:
     runAsUser: 0
   serviceAccount:
     create: true
+  existingConfig: "" # Name of an existing configmap
 
 indexedSearch:
   image:
@@ -189,6 +196,7 @@ indexedSearch:
     runAsUser: 0
 
 minio:
+  enabled: true
   replicaCount: 1
   storageSize: "100Gi"
   image:
@@ -222,6 +230,7 @@ searchIndexer:
       memory: 4G
 
 pgsql:
+  enabled: true
   image:
     tag: "insiders@sha256:98d134adbc3e29c7125b541a58771f4a6d818876c47bc385ef4ab889d8633a2a"
   replicaCount: 1
@@ -240,6 +249,7 @@ pgsql:
       value: postgres://sg:@localhost:5432/?sslmode=disable
     PG_EXPORTER_EXTEND_QUERY_PATH:
       value: /config/queries.yaml
+  existingConfig: "" # Name of an existing configmap
 
 postgresExporter:
   image:
@@ -284,6 +294,7 @@ queryRunner:
     runAsUser: 0
 
 redisCache:
+  enabled: true
   image:
     tag: "insiders@sha256:3c83d172a9c320ef4a5a236a76df7611d7f8f76021eb3bf22b28200ce764acce"
   replicaCount: 1
@@ -310,6 +321,7 @@ redisExporter:
       memory: 100Mi
 
 redisStore:
+  enabled: true
   image:
     tag: "insiders@sha256:bd1035f2407901ad6c954933e41f5d555786a20b7cb2bafd6649cecd16522602"
   replicaCount: 1
@@ -399,6 +411,7 @@ worker:
     runAsUser: 0
 
 prometheus:
+  enabled: true
   image:
     tag: "insiders@sha256:525fe0479ea043e1c154f656f187d825f40b57c6a38fcbf2b2eb98d4a1f8d8c8"
   replicaCount: 1
@@ -421,8 +434,10 @@ prometheus:
   serviceAccount:
     create: true
   storageSize: "200Gi"
+  existingConfig: "" # Name of an existing configmap
 
 jaeger:
+  enabled: true
   image:
     tag: "insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e"
   replicaCount: 1
@@ -437,7 +452,6 @@ jaeger:
     runAsUser: 0
   query: {}
   collector: {}
-
 
 tracing:
   enabled: true
