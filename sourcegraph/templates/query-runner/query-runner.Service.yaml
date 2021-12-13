@@ -23,4 +23,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: query-runner
-  type: ClusterIP
+  type: {{ .Values.queryRunner.serviceType | default "ClusterIP" }}

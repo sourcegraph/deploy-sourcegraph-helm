@@ -28,4 +28,4 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: gitserver
     type: gitserver
-  type: ClusterIP
+  type: {{ .Values.gitserver.serviceType | default "ClusterIP" }}
