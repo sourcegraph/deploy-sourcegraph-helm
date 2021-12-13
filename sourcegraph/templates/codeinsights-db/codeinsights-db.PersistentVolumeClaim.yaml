@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.codeInsightsDB.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.codeInsightsDB.volumeName }}
+  volumeName: {{ .Values.codeInsightsDB.volumeName }}
+  {{- end }}
 {{- end }}

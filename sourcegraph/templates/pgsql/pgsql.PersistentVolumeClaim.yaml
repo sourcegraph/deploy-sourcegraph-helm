@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.pgsql.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.pgsql.volumeName }}
+  volumeName: {{ .Values.pgsql.volumeName }}
+  {{- end }}
 {{- end }}

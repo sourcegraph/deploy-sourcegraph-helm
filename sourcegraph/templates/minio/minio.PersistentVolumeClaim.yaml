@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.minio.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.minio.volumeName }}
+  volumeName: {{ .Values.minio.volumeName }}
+  {{- end }}
 {{- end }}

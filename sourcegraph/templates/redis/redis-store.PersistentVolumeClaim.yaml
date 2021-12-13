@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.redisStore.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.redisStore.volumeName }}
+  volumeName: {{ .Values.redisStore.volumeName }}
+  {{- end }}
 {{- end }}
