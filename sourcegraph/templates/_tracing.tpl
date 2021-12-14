@@ -30,4 +30,6 @@ Define the tracing sidecar
     - --reporter.grpc.host-port=jaeger-collector:14250
     - --reporter.type=grpc
 {{- end }}
+  securityContext:
+    {{- toYaml .Values.tracing.podSecurityContext | nindent 4 }}
 {{- end }}
