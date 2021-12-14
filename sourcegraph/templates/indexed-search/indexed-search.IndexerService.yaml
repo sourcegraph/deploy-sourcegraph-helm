@@ -25,4 +25,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: indexed-search
-  type: ClusterIP
+  type: {{ .Values.indexedSearch.serviceType | default "ClusterIP" }}

@@ -23,4 +23,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: repo-updater
-  type: ClusterIP
+  type: {{ .Values.repoUpdater.serviceType | default "ClusterIP" }}

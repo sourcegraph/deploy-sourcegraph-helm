@@ -23,4 +23,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: sourcegraph-frontend
-  type: ClusterIP
+  type: {{ .Values.frontend.serviceType | default "ClusterIP" }}

@@ -33,5 +33,5 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: all-in-one
-  type: ClusterIP
+  type: {{ .Values.jaeger.serviceType | default "ClusterIP" }}
 {{- end }}

@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.redisCache.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.redisCache.volumeName }}
+  volumeName: {{ .Values.redisCache.volumeName }}
+  {{- end }}
 {{- end }}

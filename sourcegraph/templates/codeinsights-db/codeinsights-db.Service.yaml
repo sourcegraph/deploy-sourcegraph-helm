@@ -24,5 +24,5 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeinsights-db
-  type: ClusterIP
+  type: {{ .Values.codeInsightsDB.serviceType | default "ClusterIP" }}
 {{- end }}

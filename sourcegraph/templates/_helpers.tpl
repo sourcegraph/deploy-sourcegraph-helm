@@ -65,11 +65,17 @@ Create the name of the service account to use
 
 {{/*
 Create the image name and allow it to be overridden on a per-service basis
+Default tags are toggled between a global and service-specific setting by the
+useGlobalTagAsDefault configuration
 */}}
 {{- define "sourcegraph.image" -}}
 {{- $top := index . 0 }}
 {{- $service := index . 1 }}
 {{- $imageName := $service }}
 {{- if ge (len .) 3 }}{{ $imageName = index . 2 }}{{ end }}
-{{- $top.Values.sourcegraph.image.repository }}/{{ default $imageName (index $top.Values $service "image" "name") }}:{{ default (tpl $top.Values.sourcegraph.image.tag $top) (index $top.Values $service "image" "tag") }}
+
+{{- $defaultTag := (index $top.Values $service "image" "defaultTag")}}
+{{- if $top.Values.sourcegraph.image.useGlobalTagAsDefault }}{{ $defaultTag = (tpl $top.Values.sourcegraph.image.defaultTag $top) }}{{ end }}
+
+{{- $top.Values.sourcegraph.image.repository }}/{{ default $imageName (index $top.Values $service "image" "name") }}:{{ default $defaultTag (index $top.Values $service "image" "tag") }}
 {{- end }}

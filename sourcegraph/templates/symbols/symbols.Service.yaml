@@ -26,4 +26,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: symbols
-  type: ClusterIP
+  type: {{ .Values.symbols.serviceType | default "ClusterIP" }}

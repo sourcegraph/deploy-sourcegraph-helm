@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.codeIntelDB.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.codeIntelDB.volumeName }}
+  volumeName: {{ .Values.codeIntelDB.volumeName }}
+  {{- end }}
 {{- end }}

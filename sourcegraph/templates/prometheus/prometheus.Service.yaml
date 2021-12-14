@@ -22,5 +22,5 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: prometheus
-  type: ClusterIP
+  type: {{ .Values.prometheus.serviceType | default "ClusterIP" }}
 {{- end }}

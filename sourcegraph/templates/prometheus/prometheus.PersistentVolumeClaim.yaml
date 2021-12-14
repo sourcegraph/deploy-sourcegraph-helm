@@ -13,4 +13,7 @@ spec:
     requests:
       storage: {{ .Values.prometheus.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.prometheus.volumeName }}
+  volumeName: {{ .Values.prometheus.volumeName }}
+  {{- end }}
 {{- end }}

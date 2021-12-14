@@ -24,5 +24,5 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: redis-cache
-  type: ClusterIP
+  type: {{ .Values.redisCache.serviceType | default "ClusterIP" }}
 {{- end }}
