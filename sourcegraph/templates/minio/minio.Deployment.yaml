@@ -80,8 +80,10 @@ spec:
         securityContext:
           {{- toYaml .Values.minio.podSecurityContext | nindent 10 }}
         volumeMounts:
-        - mountPath: /data
-          name: minio-data
+        - name: minio-data
+          mountPath: /data
+        - name: minio
+          mountPath: /minio
         {{- if .Values.minio.extraVolumeMounts }}
         {{- toYaml .Values.minio.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -106,6 +108,8 @@ spec:
       - name: minio-data
         persistentVolumeClaim:
           claimName: minio
+      - name: minio
+        emptyDir: {}
       {{- if .Values.minio.extraVolumes }}
       {{- toYaml .Values.minio.extraVolumes | nindent 6 }}
       {{- end }}

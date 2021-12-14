@@ -14,3 +14,4 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
+  namespace: {{ .Release.Namespace }}
