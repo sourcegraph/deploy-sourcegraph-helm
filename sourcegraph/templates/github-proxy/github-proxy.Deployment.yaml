@@ -64,12 +64,14 @@ spec:
           name: http
         resources:
         {{- toYaml .Values.githubProxy.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.githubProxy.podSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.githubProxy.extraContainers }}
         {{- toYaml .Values.githubProxy.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.githubProxy.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.githubProxy.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -73,11 +73,13 @@ spec:
             port: http
         resources:
         {{- toYaml .Values.syntectServer.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.syntectServer.podSecurityContext | nindent 10 }}
       {{- if .Values.syntectServer.extraContainers }}
         {{- toYaml .Values.syntectServer.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.syntectServer.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.syntectServer.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

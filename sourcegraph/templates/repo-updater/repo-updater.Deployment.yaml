@@ -78,12 +78,14 @@ spec:
           timeoutSeconds: 5
         resources:
         {{- toYaml .Values.repoUpdater.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.repoUpdater.extraContainers }}
         {{- toYaml .Values.repoUpdater.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.repoUpdater.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

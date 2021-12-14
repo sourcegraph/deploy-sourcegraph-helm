@@ -83,11 +83,13 @@ spec:
           name: debug
         resources:
         {{- toYaml .Values.worker.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.worker.podSecurityContext | nindent 10 }}
       {{- if .Values.worker.extraContainers }}
         {{- toYaml .Values.worker.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.worker.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.worker.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

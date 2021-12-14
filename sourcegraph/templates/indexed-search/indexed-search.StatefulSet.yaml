@@ -64,6 +64,8 @@ spec:
           timeoutSeconds: 5
         resources:
         {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
@@ -83,6 +85,8 @@ spec:
           name: index-http
         resources:
         {{- toYaml .Values.searchIndexer.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.searchIndexer.podSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
@@ -93,7 +97,7 @@ spec:
         {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.indexedSearch.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

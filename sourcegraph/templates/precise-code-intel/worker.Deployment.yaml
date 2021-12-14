@@ -83,11 +83,13 @@ spec:
           name: debug
         resources:
         {{- toYaml .Values.preciseCodeIntel.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 10 }}
       {{- if .Values.preciseCodeIntel.extraContainers }}
         {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.preciseCodeIntel.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

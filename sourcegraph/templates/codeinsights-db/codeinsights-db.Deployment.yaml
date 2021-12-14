@@ -66,6 +66,8 @@ spec:
           name: timescaledb
         resources:
         {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
@@ -78,7 +80,7 @@ spec:
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.codeInsightsDB.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

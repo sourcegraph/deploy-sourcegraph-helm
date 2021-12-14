@@ -64,12 +64,14 @@ spec:
           name: http
         resources:
         {{- toYaml .Values.queryRunner.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.queryRunner.securityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.queryRunner.extraContainers }}
         {{- toYaml .Values.queryRunner.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.queryRunner.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.queryRunner.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
