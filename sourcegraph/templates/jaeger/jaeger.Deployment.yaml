@@ -79,11 +79,13 @@ spec:
           initialDelaySeconds: 5
         resources:
         {{- toYaml .Values.jaeger.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.jaeger.podSecurityContext | nindent 10 }}
       {{- if .Values.jaeger.extraContainers }}
         {{- toYaml .Values.jaeger.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.queryRunner.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.jaeger.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

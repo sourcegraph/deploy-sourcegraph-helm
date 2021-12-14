@@ -95,12 +95,14 @@ spec:
           name: cache-ssd
         resources:
         {{- toYaml .Values.symbols.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.symbols.podSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.symbols.extraContainers }}
         {{- toYaml .Values.symbols.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.symbols.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.symbols.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

@@ -68,12 +68,14 @@ spec:
           name: config
         resources:
         {{- toYaml .Values.prometheus.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.prometheus.podSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       {{- if .Values.prometheus.extraContainers }}
         {{- toYaml .Values.prometheus.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.prometheus.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.prometheus.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

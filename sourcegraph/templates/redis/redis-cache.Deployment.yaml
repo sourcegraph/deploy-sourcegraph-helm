@@ -65,6 +65,8 @@ spec:
             port: redis
         resources:
         {{- toYaml .Values.redisCache.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.redisCache.podSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
@@ -80,11 +82,13 @@ spec:
           name: redisexp
         resources:
         {{- toYaml .Values.redisExporter.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.redisExporter.podSecurityContext | nindent 10 }}
       {{- if .Values.redisCache.extraContainers }}
         {{- toYaml .Values.redisCache.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.redisCache.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.redisCache.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

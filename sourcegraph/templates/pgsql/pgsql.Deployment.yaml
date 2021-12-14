@@ -83,6 +83,8 @@ spec:
           name: pgsql
         resources:
         {{- toYaml .Values.pgsql.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.pgsql.podSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -106,9 +108,11 @@ spec:
         name: pgsql-exporter
         resources:
         {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.postgresExporter.podSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.pgsql.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

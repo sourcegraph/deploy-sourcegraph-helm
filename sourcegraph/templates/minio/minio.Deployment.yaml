@@ -76,12 +76,20 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 5
         resources:
-      {{- toYaml .Values.minio.resources | nindent 10 }}
+        {{- toYaml .Values.minio.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.minio.podSecurityContext | nindent 10 }}
+        volumeMounts:
+        - mountPath: /data
+          name: minio-data
+        {{- if .Values.minio.extraVolumeMounts }}
+        {{- toYaml .Values.minio.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       {{- if .Values.minio.extraContainers }}
         {{- toYaml .Values.minio.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.minio.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.minio.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -94,12 +102,6 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-        volumeMounts:
-        - mountPath: /data
-          name: minio-data
-        {{- if .Values.minio.extraVolumeMounts }}
-        {{- toYaml .Values.minio.extraVolumeMounts | nindent 8 }}
-        {{- end }}
       volumes:
       - name: minio-data
         persistentVolumeClaim:
