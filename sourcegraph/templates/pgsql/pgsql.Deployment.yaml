@@ -92,6 +92,8 @@ spec:
           name: pgsql-conf
         - mountPath: /dev/shm
           name: dshm
+        - mountPath: /var/run/postgresql
+          name: lockdir
         {{- if .Values.pgsql.extraVolumeMounts }}
         {{- toYaml .Values.pgsql.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -137,6 +139,8 @@ spec:
         emptyDir:
           medium: Memory
           sizeLimit: 1G
+      - name: lockdir
+        emptyDir: {}
       {{- if .Values.pgsql.extraVolumes }}
       {{- toYaml .Values.pgsql.extraVolumes | nindent 6 }}
       {{- end }}

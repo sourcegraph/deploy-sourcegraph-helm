@@ -73,6 +73,8 @@ spec:
           name: disk
         - mountPath: /conf
           name: timescaledb-conf
+        - mountPath: /var/run/postgresql
+          name: lockdir
         {{- if .Values.codeInsightsDB.extraVolumeMounts }}
         {{- toYaml .Values.codeInsightsDB.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -102,6 +104,8 @@ spec:
         configMap:
           defaultMode: 0777
           name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig .Values.codeInsightsDB.name }}
+      - name: lockdir
+        emptyDir: {}
       {{- if .Values.codeInsightsDB.extraVolumes }}
       {{- toYaml .Values.codeInsightsDB.extraVolumes | nindent 6 }}
       {{- end }}

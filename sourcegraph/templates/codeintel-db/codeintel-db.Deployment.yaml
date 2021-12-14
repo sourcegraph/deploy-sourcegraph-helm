@@ -90,6 +90,8 @@ spec:
           name: disk
         - mountPath: /conf
           name: pgsql-conf
+        - mountPath: /var/run/postgresql
+          name: lockdir
         {{- if .Values.codeIntelDB.extraVolumeMounts }}
         {{- toYaml .Values.codeIntelDB.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -131,6 +133,8 @@ spec:
         configMap:
           defaultMode: 0777
           name: {{ default "codeintel-db-conf" .Values.codeIntelDB.existingConfig .Values.codeIntelDB.name }}
+      - name: lockdir
+        emptyDir: {}
       {{- if .Values.codeIntelDB.extraVolumes }}
       {{- toYaml .Values.codeIntelDB.extraVolumes | nindent 6 }}
       {{- end }}
