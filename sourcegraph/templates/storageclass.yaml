@@ -6,7 +6,17 @@ metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     deploy: sourcegraph-storage
+  annotations:
+    {{- if .Values.storageClass.annotations}}
+    {{- toYaml .Values.storageClass.annotations | nindent 4 }}
+    {{- end }}
 provisioner: {{ .Values.storageClass.provisioner }}
 parameters:
   type: {{ .Values.storageClass.type }}
+  {{- if .Values.storageClass.parameters}}
+  {{- toYaml .Values.storageClass.parameters| nindent 4 }}
+  {{- end }}
+allowVolumeExpansion: {{ default true .Values.storageClass.allowVolumeExpansion }}
+reclaimPolicy: {{ default "Retain" .Values.storageClass.reclaimPolicy }}
+volumeBindingMode: {{ default "Immediate" .Values.storageClass.volumeBindingMode }}
 {{- end -}}
