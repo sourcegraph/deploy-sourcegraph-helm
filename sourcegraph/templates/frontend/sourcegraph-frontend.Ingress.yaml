@@ -25,9 +25,12 @@ spec:
   - http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: {{ default "sourcegraph-frontend" .Values.frontend.name }}
-          servicePort: 30080
+          service:
+            name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
+            port:
+              number: 30080
     # If you're using TLS/SSL, uncomment the following line and replace 'sourcegraph.example.com' with the real
     # domain that you want to use for your Sourcegraph instance.
     # host: sourcegraph.example.com
