@@ -1,6 +1,6 @@
-{{- if and .Values.prometheus.enabled .Values.prometheus.privileged -}}
+{{- if and .Values.prometheus.enabled (not .Values.prometheus.privileged) -}}
 apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
+kind: RoleBinding
 metadata:
   labels:
     category: rbac
@@ -8,9 +8,9 @@ metadata:
     app.kubernetes.io/component: prometheus
   name: {{ default "prometheus" .Values.prometheus.name }}
 roleRef:
-  apiGroup: "rbac.authorization.k8s.io"
+  apiGroup: ""
   kind: ClusterRole
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: view
 subjects:
 - kind: ServiceAccount
   name: {{ default "prometheus" .Values.prometheus.name }}
