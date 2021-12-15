@@ -8,9 +8,15 @@ metadata:
     app.kubernetes.io/component: frontend
   name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
 roleRef:
+{{- if .Values.frontend.privileged }}
   apiGroup: "rbac.authorization.k8s.io"
   kind: Role
   name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
+{{- else }}
+  apiGroup: ""
+  kind: ClusterRole
+  name: view
+{{- end }}
 subjects:
 - kind: ServiceAccount
   name: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}

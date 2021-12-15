@@ -142,6 +142,7 @@ frontend:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  privileged: true # Creates Role instead of using existing roles
   replicaCount: 2
   resources:
     limits:
