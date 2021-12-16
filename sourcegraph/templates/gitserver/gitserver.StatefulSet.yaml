@@ -72,6 +72,10 @@ spec:
         volumeMounts:
         - mountPath: /data/repos
           name: repos
+        {{- if .Values.gitserver.sshSecret }}
+        - mountPath: /home/sourcegraph/.ssh
+          name: ssh
+        {{- end }}
         {{- if .Values.gitserver.extraVolumeMounts }}
         {{- toYaml .Values.gitserver.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -95,6 +99,12 @@ spec:
       {{- end }}
       volumes:
       - name: repos
+      {{- if .Values.gitserver.sshSecret }}
+      - name: ssh
+        secret:
+          defaultMode: 0644
+          secretName: {{ .Values.gitserver.sshSecret }}
+      {{- end }}
       {{- if .Values.gitserver.extraVolumes }}
       {{- toYaml .Values.gitserver.extraVolumes | nindent 6 }}
       {{- end }}
