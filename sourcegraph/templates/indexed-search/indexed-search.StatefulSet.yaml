@@ -73,10 +73,10 @@ spec:
         {{- toYaml .Values.indexedSearch.extraVolumeMounts | nindent 8 }}
         {{- end }}
       - name: zoekt-indexserver
-        image: {{ include "sourcegraph.image" (list . "searchIndexer" "search-indexer") }}
+        image: {{ include "sourcegraph.image" (list . "indexedSearchIndexer" "search-indexer") }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
-        {{- range $name, $item := .Values.searchIndexer.env}}
+        {{- range $name, $item := .Values.indexedSearchIndexer.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
@@ -84,14 +84,14 @@ spec:
         - containerPort: 6072
           name: index-http
         resources:
-        {{- toYaml .Values.searchIndexer.resources | nindent 10 }}
+        {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}
         securityContext:
-          {{- toYaml .Values.searchIndexer.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.indexedSearchIndexer.podSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
-        {{- if .Values.searchIndexer.extraVolumeMounts }}
-        {{- toYaml .Values.searchIndexer.extraVolumeMounts | nindent 8 }}
+        {{- if .Values.indexedSearchIndexer.extraVolumeMounts }}
+        {{- toYaml .Values.indexedSearchIndexer.extraVolumeMounts | nindent 8 }}
         {{- end }}
       {{- if .Values.indexedSearch.extraContainers }}
         {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}

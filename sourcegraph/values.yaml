@@ -248,6 +248,24 @@ indexedSearch:
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
   storageSize: 200Gi
 
+indexedSearchIndexer:
+  image:
+    defaultTag: insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd
+  podSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  resources:
+    # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+    # lower lag between a new commit and it being indexed for search.
+    limits:
+      cpu: "8"
+      memory: 8G
+    requests:
+      cpu: "4"
+      memory: 4G
+
 minio:
   enabled: true
   env:
@@ -464,24 +482,6 @@ repoUpdater:
     requests:
       cpu: "1"
       memory: 500Mi
-
-searchIndexer:
-  image:
-    defaultTag: insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  resources:
-    # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-    # lower lag between a new commit and it being indexed for search.
-    limits:
-      cpu: "8"
-      memory: 8G
-    requests:
-      cpu: "4"
-      memory: 4G
 
 searcher:
   image:
