@@ -57,8 +57,10 @@ spec:
           name: disk
         securityContext:
         {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.alpine.resources | nindent 10 }}
+          {{- toYaml .Values.alpine.resources | nindent 8 }}
+        {{- end }}
       containers:
       - name: pgsql
         image: {{ include "sourcegraph.image" (list . "codeIntelDB" "codeintel-db") }}
@@ -81,8 +83,10 @@ spec:
         ports:
         - containerPort: 5432
           name: pgsql
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
+          {{- toYaml .Values.codeIntelDB.resources | nindent 8 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 10 }}
         volumeMounts:
@@ -108,8 +112,10 @@ spec:
         image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
+          {{- toYaml .Values.postgresExporter.resources | nindent 8 }}
+        {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.codeIntelDB.securityContext | nindent 8 }}

@@ -66,8 +66,10 @@ spec:
           name: data
         - mountPath: /sg_prometheus_add_ons
           name: config
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.prometheus.resources | nindent 10 }}
+          {{- toYaml .Values.prometheus.resources | nindent 8 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.prometheus.podSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120

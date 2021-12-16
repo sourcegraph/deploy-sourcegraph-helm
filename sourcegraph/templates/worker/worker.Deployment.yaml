@@ -81,8 +81,10 @@ spec:
           name: http
         - containerPort: 6060
           name: debug
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.worker.resources | nindent 10 }}
+          {{- toYaml .Values.worker.resources | nindent 8 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.worker.podSecurityContext | nindent 10 }}
       {{- if .Values.worker.extraContainers }}

@@ -70,8 +70,10 @@ spec:
         {{- if .Values.grafana.extraVolumeMounts }}
         {{- toYaml .Values.grafana.extraVolumeMounts | nindent 8 }}
         {{- end }}
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.grafana.resources | nindent 10 }}
+          {{- toYaml .Values.grafana.resources | nindent 8 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.grafana.podSecurityContext | nindent 10 }}
       serviceAccountName: grafana

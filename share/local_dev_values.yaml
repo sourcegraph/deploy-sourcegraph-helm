@@ -8,7 +8,7 @@ sourcegraph:
   imagePullSecrets: []
   labels: {}
   revisionHistoryLimit: 10
-  localDevMode: false # When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
+  localDevMode: true
 
 fullnameOverride: ""
 nameOverride: ""
@@ -19,7 +19,7 @@ nameOverride: ""
 #   replicaCount: 1
 #   image: {}
 
-alpine: # Used in init containers
+alpine:
   image:
     defaultTag: insiders@sha256:670237bcaea9f8055d8986b5d992970f3f22c6f2f2e855d441b1ec074ebc6ff2
   podSecurityContext:
@@ -27,25 +27,11 @@ alpine: # Used in init containers
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
-  resources:
-    limits:
-      cpu: 10m
-      memory: 50Mi
-    requests:
-      cpu: 10m
-      memory: 50Mi
 
 cadvisor:
-  enabled: true
+  enabled: false 
   image:
     defaultTag: insiders@sha256:9d274f2cb48b2bd7df24e02e81da96b28e297a5671ccabbdf5cbf733605293a1
-  resources:
-    limits:
-      cpu: 300m
-      memory: 2000Mi
-    requests:
-      cpu: 150m
-      memory: 200Mi
   serviceAccount:
     create: true
     name: cadvisor
@@ -64,18 +50,11 @@ codeInsightsDB:
     runAsGroup: 70
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "4"
-      memory: 2Gi
-    requests:
-      cpu: "4"
-      memory: 2Gi
   securityContext:
     runAsUser: 70
     fsGroup: 70
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 200Gi
+  storageSize: 2Gi
 
 codeIntelDB:
   enabled: true
@@ -92,18 +71,11 @@ codeIntelDB:
       DATA_SOURCE_NAME:
         value: postgres://sg:@localhost:5432/?sslmode=disable
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "4"
-      memory: 4Gi
-    requests:
-      cpu: "4"
-      memory: 4Gi
   securityContext:
     runAsUser: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 200Gi
+  storageSize: 2Gi
 
 frontend:
   env:
@@ -143,17 +115,7 @@ frontend:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  privileged: true # Creates Role instead of using existing roles
-  replicaCount: 2
-  resources:
-    limits:
-      cpu: "2"
-      ephemeral-storage: 8Gi
-      memory: 4G
-    requests:
-      cpu: "2"
-      ephemeral-storage: 4Gi
-      memory: 2G
+  replicaCount: 1
   serviceAccount:
     create: true
     name: sourcegraph-frontend
@@ -167,13 +129,6 @@ githubProxy:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1G
-    requests:
-      cpu: 100m
-      memory: 250M
 
 gitserver:
   image:
@@ -185,19 +140,12 @@ gitserver:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "4"
-      memory: 8G
-    requests:
-      cpu: "4"
-      memory: 8G
   securityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 200Gi
+  storageSize: 2Gi
 
 grafana:
   enabled: true
@@ -210,13 +158,6 @@ grafana:
     runAsGroup: 472
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 512Mi
-    requests:
-      cpu: 100m
-      memory: 512Mi
   securityContext:
     runAsUser: 472
     runAsGroup: 472
@@ -235,37 +176,25 @@ indexedSearch:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "2"
-      memory: 4G
-    requests:
-      cpu: 500m
-      memory: 2G
   securityContext:
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
   # The size of disk to used for search indexes.
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
-  storageSize: 200Gi
+  storageSize: 2Gi
 
-indexedSearchIndexer:
+jaeger:
+  collector: {}
+  enabled: true
   image:
-    defaultTag: insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd
+    defaultTag: insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  resources:
-    # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-    # lower lag between a new commit and it being indexed for search.
-    limits:
-      cpu: "8"
-      memory: 8G
-    requests:
-      cpu: "4"
-      memory: 4G
+  query: {}
+  replicaCount: 1
 
 minio:
   enabled: true
@@ -281,19 +210,12 @@ minio:
     runAsUser: 100
     runAsGroup: 101
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 500M
-    requests:
-      cpu: "1"
-      memory: 500M
   securityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 100Gi
+  storageSize: 1Gi
 
 pgsql:
   enabled: true
@@ -311,36 +233,22 @@ pgsql:
     runAsGroup: 999
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "4"
-      memory: 4Gi
-    requests:
-      cpu: "4"
-      memory: 4Gi
   securityContext:
     # Required to prevent escalations to root.
     runAsUser: 999
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 200Gi
+  storageSize: 2Gi
 
 postgresExporter:
   image:
     defaultTag: insiders@sha256:ed49696495575ef26dd51997eac9fcc92be9023bc7762b56f045e8615595e61e
-  resources:
-    limits:
-      cpu: 10m
-      memory: 50Mi
-    requests:
-      cpu: 10m
-      memory: 50Mi
 
 preciseCodeIntel:
   env:
     NUM_WORKERS:
-      value: "4"
+      value: "2"
   image:
     defaultTag: insiders@sha256:c1690021447dc6f9b50d520df9284d594b24f09f3acadc27a407b31f7592fc0f
   podSecurityContext:
@@ -348,14 +256,7 @@ preciseCodeIntel:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  replicaCount: 2
-  resources:
-    limits:
-      cpu: "2"
-      memory: 4G
-    requests:
-      cpu: 500m
-      memory: 2G
+  replicaCount: 1
 
 prometheus:
   enabled: true
@@ -367,7 +268,6 @@ prometheus:
     runAsUser: 100
     runAsGroup: 100
     readOnlyRootFilesystem: true
-  privileged: true
   replicaCount: 1
   # Prometheus is relied upon to monitor services for sending alerts to site admins when
   # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
@@ -376,19 +276,12 @@ prometheus:
   #
   # The limit chosen here is based on what works reliably on Sourcegraph.com with lots
   # of traffic.
-  resources:
-    limits:
-      cpu: "2"
-      memory: 6G
-    requests:
-      cpu: 500m
-      memory: 6G
   securityContext:
     fsGroup: 100
     fsGroupChangePolicy: "OnRootMismatch"
   serviceAccount:
     create: true
-  storageSize: 200Gi
+  storageSize: 2Gi
 
 queryRunner:
   image:
@@ -399,13 +292,6 @@ queryRunner:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1G
-    requests:
-      cpu: 500m
-      memory: 1G
 
 redisCache:
   enabled: true
@@ -417,17 +303,10 @@ redisCache:
     runAsGroup: 1000
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 7Gi
-    requests:
-      cpu: "1"
-      memory: 7Gi
   securityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 100Gi
+  storageSize: 1Gi
 
 redisExporter:
   image:
@@ -437,13 +316,6 @@ redisExporter:
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
-  resources:
-    limits:
-      cpu: 10m
-      memory: 100Mi
-    requests:
-      cpu: 10m
-      memory: 100Mi
 
 redisStore:
   enabled: true
@@ -455,17 +327,10 @@ redisStore:
     runAsGroup: 1000
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 7Gi
-    requests:
-      cpu: "1"
-      memory: 7Gi
   securityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
-  storageSize: 100Gi
+  storageSize: 1Gi
 
 repoUpdater:
   image:
@@ -476,13 +341,15 @@ repoUpdater:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 2Gi
-    requests:
-      cpu: "1"
-      memory: 500Mi
+
+searchIndexer:
+  image:
+    defaultTag: insiders@sha256:2d0b691e5495a6bcc154e2c9d17a2721e3b2358a71a88cb9f84f284f7980d1dd
+  podSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
 
 searcher:
   image:
@@ -492,22 +359,12 @@ searcher:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  replicaCount: 2
-  resources:
-    limits:
-      cpu: "2"
-      ephemeral-storage: 26G
-      memory: 2G
-    requests:
-      cpu: 500m
-      ephemeral-storage: 25G
-      memory: 500M
+  replicaCount: 1
 
 storageClass:
-  create: true # Disable if you have your own existing storage class
-  name: sourcegraph # Customize to the existing storage class name
-  provisioner: kubernetes.io/gce-pd
-  type: pd-ssd
+  create: false # Disable if you have your own existing storage class
+  name: standard # Customize to the existing storage class name
+  provisioner: rancher.io/local-path
 
 symbols:
   image:
@@ -518,15 +375,6 @@ symbols:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "2"
-      ephemeral-storage: 12G
-      memory: 2G
-    requests:
-      cpu: 500m
-      ephemeral-storage: 10G
-      memory: 500M
 
 syntectServer:
   image:
@@ -537,50 +385,17 @@ syntectServer:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "4"
-      memory: 6G
-    requests:
-      cpu: 250m
-      memory: 2G
 
 tracing:
-  collector: {}
-  enabled: true
-  image:
-    defaultTag: insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  query: {}
-  replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1G
-    requests:
-      cpu: 500m
-      memory: 500M
-
-tracingAgent:
   enabled: true
   image:
     defaultTag: insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab
+    name: jaeger-agent
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  resources:
-    limits:
-      cpu: "1"
-      memory: 500M
-    requests:
-      cpu: 100m
-      memory: 100M
 
 worker:
   image:
@@ -591,10 +406,3 @@ worker:
     runAsGroup: 101
     readOnlyRootFilesystem: true
   replicaCount: 1
-  resources:
-    limits:
-      cpu: "2"
-      memory: 4G
-    requests:
-      cpu: 500m
-      memory: 2G

@@ -65,8 +65,10 @@ spec:
         ports:
         - containerPort: 3178
           name: rpc
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.gitserver.resources | nindent 10 }}
+          {{- toYaml .Values.gitserver.resources | nindent 8 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.gitserver.podSecurityContext | nindent 10 }}
         volumeMounts:
