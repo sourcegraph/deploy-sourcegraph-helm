@@ -2,11 +2,11 @@
 Define the tracing sidecar
 */}}
 {{- define "sourcegraph.tracing" -}}
-{{- if .Values.tracing.enabled -}}
+{{- if .Values.tracingAgent.enabled -}}
 - name: jaeger-agent
-  image: {{ include "sourcegraph.image" (list . "tracing") }}
+  image: {{ include "sourcegraph.image" (list . "tracingAgent" "jaeger-agent") }}
   env:
-  {{- range $name, $item := .Values.tracing.env}}
+  {{- range $name, $item := .Values.tracingAgent.env}}
     - name: {{ $name }}
     {{- $item | toYaml | nindent 4 }}
   {{- end }}
@@ -25,11 +25,11 @@ Define the tracing sidecar
   - containerPort: 6832
     protocol: UDP
   resources:
-{{- toYaml .Values.tracing.resources | nindent 4 }}
+{{- toYaml .Values.tracingAgent.resources | nindent 4 }}
   args:
-    - --reporter.grpc.host-port=jaeger-collector:14250
+    - --reporter.grpc.host-port={{ default "jaeger-collector" .Values.tracing.collector.name }}:14250
     - --reporter.type=grpc
 {{- end }}
   securityContext:
-    {{- toYaml .Values.tracing.podSecurityContext | nindent 4 }}
+    {{- toYaml .Values.tracingAgent.podSecurityContext | nindent 4 }}
 {{- end }}

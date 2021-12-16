@@ -248,26 +248,6 @@ indexedSearch:
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
   storageSize: 200Gi
 
-jaeger:
-  collector: {}
-  enabled: true
-  image:
-    defaultTag: insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  query: {}
-  replicaCount: 1
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1G
-    requests:
-      cpu: 500m
-      memory: 500M
-
 minio:
   enabled: true
   env:
@@ -565,10 +545,29 @@ syntectServer:
       memory: 2G
 
 tracing:
+  collector: {}
+  enabled: true
+  image:
+    defaultTag: insiders@sha256:abcbae9cb113f1ff2b0ad77583b23ea144a481bb2fa1a982d770b49dcd3f784e
+  podSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  query: {}
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 500m
+      memory: 500M
+
+tracingAgent:
   enabled: true
   image:
     defaultTag: insiders@sha256:b980c65f7675a83c2181ba9b5d98efd257709dec1c261d1f93197238076249ab
-    name: jaeger-agent
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
