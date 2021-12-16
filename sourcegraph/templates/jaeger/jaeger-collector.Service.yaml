@@ -1,20 +1,20 @@
-{{- if .Values.jaeger.enabled -}}
+{{- if .Values.tracing.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-  {{- if .Values.jaeger.collector.serviceAnnotations }}
-  {{- toYaml .Values.jaeger.collector.serviceAnnotations | nindent 4 }}
+  {{- if .Values.tracing.collector.serviceAnnotations }}
+  {{- toYaml .Values.tracing.collector.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: jaeger
     app: jaeger
     app.kubernetes.io/name: jaeger
-    {{- if .Values.jaeger.collector.serviceLabels }}
-      {{- toYaml .Values.jaeger.collector.serviceLabels | nindent 4 }}
+    {{- if .Values.tracing.collector.serviceLabels }}
+      {{- toYaml .Values.tracing.collector.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "jaeger-collector" .Values.jaeger.collector.name }}
+  name: {{ default "jaeger-collector" .Values.tracing.collector.name }}
 spec:
   ports:
   - name: jaeger-collector-tchannel
@@ -33,5 +33,5 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/name: jaeger
     app.kubernetes.io/component: all-in-one
-  type: {{ .Values.jaeger.serviceType | default "ClusterIP" }}
+  type: {{ .Values.tracing.collector.serviceType | default "ClusterIP" }}
 {{- end }}

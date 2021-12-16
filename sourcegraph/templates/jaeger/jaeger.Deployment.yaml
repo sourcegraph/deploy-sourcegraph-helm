@@ -1,19 +1,19 @@
-{{- if .Values.jaeger.enabled -}}
+{{- if .Values.tracing.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: jaeger
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.jaeger.labels }}
-      {{- toYaml .Values.jaeger.labels | nindent 4 }}
+    {{- if .Values.tracing.labels }}
+      {{- toYaml .Values.tracing.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: jaeger
     app: jaeger
     app.kubernetes.io/name: jaeger
 spec:
-  replicas: {{ .Values.jaeger.replicaCount }}
+  replicas: {{ .Values.tracing.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -30,16 +30,16 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.jaeger.podAnnotations }}
-      {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
+      {{- if .Values.tracing.podAnnotations }}
+      {{- toYaml .Values.tracing.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.jaeger.podLabels }}
-      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
+      {{- if .Values.tracing.podLabels }}
+      {{- toYaml .Values.tracing.podLabels | nindent 8 }}
       {{- end }}
         app: jaeger
         deploy: sourcegraph
@@ -52,10 +52,10 @@ spec:
       {{- end }}
       containers:
       - name: jaeger
-        image: {{ include "sourcegraph.image" (list . "jaeger" "jaeger-all-in-one") }}
+        image: {{ include "sourcegraph.image" (list . "tracing" "jaeger-all-in-one") }}
         args: ["--memory.max-traces=20000"]
         env:
-        {{- range $name, $item := .Values.jaeger.env}}
+        {{- range $name, $item := .Values.tracing.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
@@ -78,14 +78,14 @@ spec:
             port: 14269
           initialDelaySeconds: 5
         resources:
-        {{- toYaml .Values.jaeger.resources | nindent 10 }}
+        {{- toYaml .Values.tracing.resources | nindent 10 }}
         securityContext:
-          {{- toYaml .Values.jaeger.podSecurityContext | nindent 10 }}
-      {{- if .Values.jaeger.extraContainers }}
-        {{- toYaml .Values.jaeger.extraContainers | nindent 6 }}
+          {{- toYaml .Values.tracing.podSecurityContext | nindent 10 }}
+      {{- if .Values.tracing.extraContainers }}
+        {{- toYaml .Values.tracing.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.jaeger.securityContext | nindent 8 }}
+        {{- toYaml .Values.tracing.securityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
