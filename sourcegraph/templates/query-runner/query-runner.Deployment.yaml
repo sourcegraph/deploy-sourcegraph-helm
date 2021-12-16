@@ -64,7 +64,7 @@ spec:
           name: http
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.queryRunner.resources | nindent 8 }}
+          {{- toYaml .Values.queryRunner.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.queryRunner.securityContext | nindent 10 }}

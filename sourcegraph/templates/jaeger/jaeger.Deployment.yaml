@@ -79,7 +79,7 @@ spec:
           initialDelaySeconds: 5
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.tracing.resources | nindent 8 }}
+          {{- toYaml .Values.tracing.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.tracing.podSecurityContext | nindent 10 }}

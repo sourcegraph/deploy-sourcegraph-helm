@@ -73,7 +73,7 @@ spec:
             port: http
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.syntectServer.resources | nindent 8 }}
+          {{- toYaml .Values.syntectServer.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.syntectServer.podSecurityContext | nindent 10 }}

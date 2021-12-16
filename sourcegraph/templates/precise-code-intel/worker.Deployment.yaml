@@ -83,7 +83,7 @@ spec:
           name: debug
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.preciseCodeIntel.resources | nindent 8 }}
+          {{- toYaml .Values.preciseCodeIntel.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 10 }}

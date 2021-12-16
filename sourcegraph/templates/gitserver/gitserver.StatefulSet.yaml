@@ -67,7 +67,7 @@ spec:
           name: rpc
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.gitserver.resources | nindent 8 }}
+          {{- toYaml .Values.gitserver.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.gitserver.podSecurityContext | nindent 10 }}

@@ -65,7 +65,7 @@ spec:
             port: redis
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.redisCache.resources | nindent 8 }}
+          {{- toYaml .Values.redisCache.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.redisCache.podSecurityContext | nindent 10 }}
@@ -84,7 +84,7 @@ spec:
           name: redisexp
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.redisExporter.resources | nindent 8 }}
+          {{- toYaml .Values.redisExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.redisExporter.podSecurityContext | nindent 10 }}

@@ -72,7 +72,7 @@ spec:
         {{- end }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.grafana.resources | nindent 8 }}
+          {{- toYaml .Values.grafana.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.grafana.podSecurityContext | nindent 10 }}

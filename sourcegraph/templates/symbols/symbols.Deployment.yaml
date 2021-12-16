@@ -95,7 +95,7 @@ spec:
           name: cache-ssd
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.symbols.resources | nindent 8 }}
+          {{- toYaml .Values.symbols.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.symbols.podSecurityContext | nindent 10 }}

@@ -65,7 +65,7 @@ spec:
         {{- end }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.cadvisor.resources | nindent 8 }}
+          {{- toYaml .Values.cadvisor.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.cadvisor.podSecurityContext | nindent 10 }}

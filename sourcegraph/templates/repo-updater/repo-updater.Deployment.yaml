@@ -78,7 +78,7 @@ spec:
           timeoutSeconds: 5
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.repoUpdater.resources | nindent 8 }}
+          {{- toYaml .Values.repoUpdater.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 10 }}
