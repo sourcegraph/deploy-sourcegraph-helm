@@ -18,7 +18,7 @@ nameOverride: ""
 #   replicaCount: 1
 #   image: {}
 
-alpine:
+alpine: # Used in init containers
   image:
     defaultTag: insiders@sha256:670237bcaea9f8055d8986b5d992970f3f22c6f2f2e855d441b1ec074ebc6ff2
   podSecurityContext:
@@ -142,6 +142,7 @@ frontend:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  privileged: true # Creates Role instead of using existing roles
   replicaCount: 2
   resources:
     limits:
@@ -367,6 +368,7 @@ prometheus:
     runAsUser: 100
     runAsGroup: 100
     readOnlyRootFilesystem: true
+  privileged: true
   replicaCount: 1
   # Prometheus is relied upon to monitor services for sending alerts to site admins when
   # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
