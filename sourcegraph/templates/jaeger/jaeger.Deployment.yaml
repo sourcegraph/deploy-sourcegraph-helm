@@ -77,8 +77,10 @@ spec:
             path: "/"
             port: 14269
           initialDelaySeconds: 5
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.tracing.resources | nindent 10 }}
+          {{- toYaml .Values.tracing.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.tracing.podSecurityContext | nindent 10 }}
       {{- if .Values.tracing.extraContainers }}

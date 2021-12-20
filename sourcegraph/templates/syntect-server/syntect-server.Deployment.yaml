@@ -71,8 +71,10 @@ spec:
         readinessProbe:
           tcpSocket:
             port: http
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.syntectServer.resources | nindent 10 }}
+          {{- toYaml .Values.syntectServer.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.syntectServer.podSecurityContext | nindent 10 }}
       {{- if .Values.syntectServer.extraContainers }}

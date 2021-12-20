@@ -75,8 +75,10 @@ spec:
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.minio.resources | nindent 10 }}
+          {{- toYaml .Values.minio.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.minio.podSecurityContext | nindent 10 }}
         volumeMounts:

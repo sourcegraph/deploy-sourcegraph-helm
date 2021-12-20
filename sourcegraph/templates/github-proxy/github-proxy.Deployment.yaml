@@ -62,8 +62,10 @@ spec:
         ports:
         - containerPort: 3180
           name: http
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.githubProxy.resources | nindent 10 }}
+          {{- toYaml .Values.githubProxy.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.githubProxy.podSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}

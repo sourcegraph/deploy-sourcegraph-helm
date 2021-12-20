@@ -62,8 +62,10 @@ spec:
         ports:
         - containerPort: 3183
           name: http
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.queryRunner.resources | nindent 10 }}
+          {{- toYaml .Values.queryRunner.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.queryRunner.securityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}

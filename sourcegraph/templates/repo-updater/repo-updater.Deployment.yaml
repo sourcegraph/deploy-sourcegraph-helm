@@ -76,8 +76,10 @@ spec:
             scheme: HTTP
           periodSeconds: 1
           timeoutSeconds: 5
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.repoUpdater.resources | nindent 10 }}
+          {{- toYaml .Values.repoUpdater.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}

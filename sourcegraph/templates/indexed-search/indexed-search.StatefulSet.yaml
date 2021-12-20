@@ -62,8 +62,10 @@ spec:
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
+          {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 10 }}
         volumeMounts:
@@ -83,8 +85,10 @@ spec:
         ports:
         - containerPort: 6072
           name: index-http
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}
+          {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.indexedSearchIndexer.podSecurityContext | nindent 10 }}
         volumeMounts:

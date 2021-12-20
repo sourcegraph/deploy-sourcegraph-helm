@@ -87,8 +87,10 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
+        {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-        {{- toYaml .Values.searcher.resources | nindent 10 }}
+          {{- toYaml .Values.searcher.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.searcher.podSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
