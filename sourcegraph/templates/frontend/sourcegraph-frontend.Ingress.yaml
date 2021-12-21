@@ -15,12 +15,12 @@ metadata:
     {{- end }}
   name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
 spec:
-  # See the customization guide (../../../docs/configure.md) for information
-  # about configuring TLS
-  # tls:
-  # - hosts:
-  #   - sourcegraph.example.com
-  #   secretName: sourcegraph-tls
+  {{- if .Values.frontend.ingress.host }}
+  tls:
+  - hosts:
+    - sourcegraph.example.com
+    secretName: {{ .Values.frontend.ingress.tlsSecret }}
+  {{- end }}
   rules:
   - http:
       paths:
@@ -31,7 +31,7 @@ spec:
             name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
             port:
               number: 30080
-    # If you're using TLS/SSL, uncomment the following line and replace 'sourcegraph.example.com' with the real
-    # domain that you want to use for your Sourcegraph instance.
-    # host: sourcegraph.example.com
+  {{- if .Values.frontend.ingress.host}}
+    host: {{ .Values.frontend.ingress.host }}
+  {{- end }}
 {{- end }}
