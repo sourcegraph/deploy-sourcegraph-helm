@@ -55,7 +55,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        image: {{ include "sourcegraph.image" (list . "syntectServer" "syntax-highlighter") }}
+        image: {{ include "sourcegraph.image" (list . "syntectServer") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:

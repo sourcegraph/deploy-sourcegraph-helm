@@ -51,7 +51,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: {{ include "sourcegraph.image" (list . "frontend" ) }}
+        image: {{ include "sourcegraph.image" (list . "frontend") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args:
         - serve

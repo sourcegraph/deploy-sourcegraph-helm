@@ -45,7 +45,7 @@ spec:
     spec:
       containers:
       - name: redis-cache
-        image: {{ include "sourcegraph.image" (list . "redisCache" "redis-cache") }}
+        image: {{ include "sourcegraph.image" (list . "redisCache") }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
@@ -73,7 +73,7 @@ spec:
         - mountPath: /redis-data
           name: redis-data
       - name: redis-exporter
-        image: {{ include "sourcegraph.image" (list . "redisExporter" "redis_exporter") }}
+        image: {{ include "sourcegraph.image" (list . "redisExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         {{- range $name, $item := .Values.redisExporter.env}}
         - name: {{ $name }}

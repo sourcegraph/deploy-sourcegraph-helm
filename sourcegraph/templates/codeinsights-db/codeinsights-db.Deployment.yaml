@@ -49,7 +49,7 @@ spec:
     spec:
       containers:
       - name: timescaledb
-        image: {{ include "sourcegraph.image" (list . "codeInsightsDB" "codeinsights-db") }}
+        image: {{ include "sourcegraph.image" (list . "codeInsightsDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         env:
         {{- range $name, $item := .Values.codeInsightsDB.env}}
