@@ -18,7 +18,7 @@ spec:
   {{- if .Values.frontend.ingress.host }}
   tls:
   - hosts:
-    - sourcegraph.example.com
+    - {{ .Values.frontend.ingress.host }}
     secretName: {{ .Values.frontend.ingress.tlsSecret }}
   {{- end }}
   rules:
