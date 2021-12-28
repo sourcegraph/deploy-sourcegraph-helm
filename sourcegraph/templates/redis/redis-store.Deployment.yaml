@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
       - name: redis-store
-        image: {{ include "sourcegraph.image" (list . "redisStore" "redis-store") }}
+        image: {{ include "sourcegraph.image" (list . "redisStore") }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.redisStore.env}}
@@ -72,7 +72,7 @@ spec:
         - mountPath: /redis-data
           name: redis-data
       - name: redis-exporter
-        image: {{ include "sourcegraph.image" (list . "redisExporter" "redis_exporter") }}
+        image: {{ include "sourcegraph.image" (list . "redisExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.redisExporter.env}}

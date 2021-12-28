@@ -52,7 +52,7 @@ spec:
       {{- end }}
       containers:
       - name: jaeger
-        image: {{ include "sourcegraph.image" (list . "tracing" "jaeger-all-in-one") }}
+        image: {{ include "sourcegraph.image" (list . "tracing") }}
         args: ["--memory.max-traces=20000"]
         env:
         {{- range $name, $item := .Values.tracing.env}}

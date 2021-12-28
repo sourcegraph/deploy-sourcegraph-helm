@@ -44,7 +44,7 @@ spec:
       {{- end }}
       containers:
       - name: zoekt-webserver
-        image: {{ include "sourcegraph.image" (list . "indexedSearch" "indexed-searcher") }}
+        image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.indexedSearch.env}}
@@ -75,7 +75,7 @@ spec:
         {{- toYaml .Values.indexedSearch.extraVolumeMounts | nindent 8 }}
         {{- end }}
       - name: zoekt-indexserver
-        image: {{ include "sourcegraph.image" (list . "indexedSearchIndexer" "search-indexer") }}
+        image: {{ include "sourcegraph.image" (list . "indexedSearchIndexer") }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.indexedSearchIndexer.env}}

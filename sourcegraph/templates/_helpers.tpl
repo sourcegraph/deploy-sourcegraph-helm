@@ -63,18 +63,16 @@ Create the name of the service account to use
 {{- end }}
 
 {{/*
-Create the image name and allow it to be overridden on a per-service basis
+Create the docker image reference and allow it to be overridden on a per-service basis
 Default tags are toggled between a global and service-specific setting by the
 useGlobalTagAsDefault configuration
 */}}
 {{- define "sourcegraph.image" -}}
 {{- $top := index . 0 }}
 {{- $service := index . 1 }}
-{{- $imageName := $service }}
-{{- if ge (len .) 3 }}{{ $imageName = index . 2 }}{{ end }}
-
+{{- $imageName := (index $top.Values $service "image" "name")}}
 {{- $defaultTag := (index $top.Values $service "image" "defaultTag")}}
 {{- if $top.Values.sourcegraph.image.useGlobalTagAsDefault }}{{ $defaultTag = (tpl $top.Values.sourcegraph.image.defaultTag $top) }}{{ end }}
 
-{{- $top.Values.sourcegraph.image.repository }}/{{ default $imageName (index $top.Values $service "image" "name") }}:{{ default $defaultTag (index $top.Values $service "image" "tag") }}
+{{- $top.Values.sourcegraph.image.repository }}/{{ $imageName }}:{{ default $defaultTag (index $top.Values $service "image" "tag") }}
 {{- end }}

@@ -50,7 +50,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: {{ include "sourcegraph.image" (list . "alpine" "alpine-3.12") }}
+        image: {{ include "sourcegraph.image" (list . "alpine") }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
@@ -62,7 +62,7 @@ spec:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
         {{- end }}
       containers:
-      - image: {{ include "sourcegraph.image" (list . "pgsql" "postgres-12.6-alpine") }}
+      - image: {{ include "sourcegraph.image" (list . "pgsql") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
@@ -109,7 +109,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}
+        image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         {{- if not .Values.sourcegraph.localDevMode }}

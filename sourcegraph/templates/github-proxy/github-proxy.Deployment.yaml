@@ -51,7 +51,7 @@ spec:
     spec:
       containers:
       - name: github-proxy
-        image: {{ include "sourcegraph.image" (list . "githubProxy" "github-proxy") }}
+        image: {{ include "sourcegraph.image" (list . "githubProxy") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:

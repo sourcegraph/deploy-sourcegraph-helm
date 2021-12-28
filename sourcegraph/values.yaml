@@ -22,6 +22,7 @@ nameOverride: ""
 alpine: # Used in init containers
   image:
     defaultTag: insiders@sha256:b5716faa7c5d40542132176960ae2d5708a20a8dd5dcd1e63d41af4c27a1b0c4
+    name: "alpine-3.12"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
@@ -39,6 +40,7 @@ cadvisor:
   enabled: true
   image:
     defaultTag: insiders@sha256:5c8cf42cbbc029d07b6f97b1543ed3d41fcd5f8c4c47693f3682b0ac48d03adb
+    name: "cadvisor"
   resources:
     limits:
       cpu: 300m
@@ -58,6 +60,7 @@ codeInsightsDB:
   existingConfig: "" # Name of an existing configmap
   image:
     defaultTag: insiders@sha256:aab2e4a00ccda36b3ecaf536c53ba5f57b909ada763094245da18a328531bc44
+    name: "codeinsights-db"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 70
@@ -82,6 +85,7 @@ codeIntelDB:
   existingConfig: "" # Name of an existing configmap
   image:
     defaultTag: insiders@sha256:f5f40a0ea69dccc1c877b396ea4177ab06cf5c5090de0c88ca50460a192fdae8
+    name: "codeintel-db"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
@@ -133,6 +137,7 @@ frontend:
       value: http://prometheus:30090
   image:
     defaultTag: insiders@sha256:f6b962027b6cdb4a1cdea2573d9dfd89f353e2efb5ac2c485bf086bfa01e7a93
+    name: "frontend"
   ingress:
     annotations:
       kubernetes.io/ingress.class: nginx
@@ -161,6 +166,7 @@ frontend:
 githubProxy:
   image:
     defaultTag: insiders@sha256:b69f5523ff8540afb132db98f7577d220889728bf1054b65e2f679abb26d27f2
+    name: "github-proxy"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -178,6 +184,7 @@ githubProxy:
 gitserver:
   image:
     defaultTag: insiders@sha256:c84868f42e832e7af5b56e68dedd49ade60c093de589ed3231b9f807b841073f
+    name: "gitserver"
   labels: {}
   podSecurityContext:
     allowPrivilegeEscalation: false
@@ -204,6 +211,7 @@ grafana:
   existingConfig: "" # Name of an existing configmap
   image:
     defaultTag: insiders@sha256:91adc7bf41b971b0c6e88eec5a2884d05531ee73cde3edd94f737f276d072d9d
+    name: "grafana"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 472
@@ -229,6 +237,7 @@ grafana:
 indexedSearch:
   image:
     defaultTag: insiders@sha256:1e220469361143daaa16f07cf4a3b0b40f2b311917c260e3b883beff7ed89d49
+    name: "indexed-searcher"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -252,6 +261,7 @@ indexedSearch:
 indexedSearchIndexer:
   image:
     defaultTag: insiders@sha256:32b46de3caa2fa37bb880ba6152d37bfe6b6efeb73cf36db4ae70c45d9b19f18
+    name: "search-indexer"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -276,6 +286,7 @@ minio:
       value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   image:
     defaultTag: insiders@sha256:66925bab722ed11584e1135687b5c1e00a13c550e38d954a56048c90f17edc53
+    name: "minio"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -305,6 +316,7 @@ pgsql:
   existingConfig: "" # Name of an existing configmap
   image:
     defaultTag: insiders@sha256:e4927ccbf208ec95ea463225936575b68dc4b547c4e61ff81818bf60db77f121
+    name: "postgres-12.6-alpine"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
@@ -329,6 +341,7 @@ pgsql:
 postgresExporter:
   image:
     defaultTag: insiders@sha256:bae17598220d76969bfe9df40a6f27ec239c059ff5c24befa367bae2b2343f07
+    name: "postgres_exporter"
   resources:
     limits:
       cpu: 10m
@@ -343,6 +356,7 @@ preciseCodeIntel:
       value: "4"
   image:
     defaultTag: insiders@sha256:dd740c860b59a6d66fdb9546463696a342fe92563efc19e053a2002bedfa9ef8
+    name: "precise-code-intel-worker"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -362,6 +376,7 @@ prometheus:
   existingConfig: "" # Name of an existing configmap
   image:
     defaultTag: insiders@sha256:6c73e4c2197d8ad2a4a5e74a6ba167aef9c45f16134aee48c727f4ae30b85a51
+    name: "prometheus"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -394,6 +409,7 @@ redisCache:
   enabled: true
   image:
     defaultTag: insiders@sha256:a95a78f542be9f847457346c932fa38fbf0bd7267d7c66add4c76f058cdb544f
+    name: "redis-cache"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
@@ -415,6 +431,7 @@ redisCache:
 redisExporter:
   image:
     defaultTag: 84464_2021-01-15_c2e4c28@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+    name: "redis_exporter"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
@@ -432,6 +449,7 @@ redisStore:
   enabled: true
   image:
     defaultTag: insiders@sha256:17efaaf6eec605f412698a57527af694da20ae0b02853ea63a7393d8ec254bfc
+    name: "redis-store"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
@@ -453,6 +471,7 @@ redisStore:
 repoUpdater:
   image:
     defaultTag: insiders@sha256:17f485f5ea2c6e744ad4c3c94edca3e534952e118a1b210f91ce062a17cc8084
+    name: "repo-updater"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -470,6 +489,7 @@ repoUpdater:
 searcher:
   image:
     defaultTag: insiders@sha256:70093b5a262a58c0ee0adc0d2281a4dde559e2e63517cc3abc4cf13cbf3e2c3b
+    name: "searcher"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -495,6 +515,7 @@ storageClass:
 symbols:
   image:
     defaultTag: insiders@sha256:05c0919114aa5daf23f33ab35719317864fbbeb66875ca2125accb11f388762f
+    name: "symbols"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -514,6 +535,7 @@ symbols:
 syntectServer:
   image:
     defaultTag: insiders@sha256:79d1f2386fab9e8d67333e7153a1f5b080b17d9a0b076a2b5e7cfc6ea3e1347b
+    name: "syntax-highlighter"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -533,6 +555,7 @@ tracing:
   enabled: true
   image:
     defaultTag: insiders@sha256:c0ac810023f675de10c0b3a9032d221ef43317d550bdf66b65c2642f4abb9d1b
+    name: "jaeger-all-in-one"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -552,6 +575,7 @@ tracingAgent:
   enabled: true
   image:
     defaultTag: insiders@sha256:7f89e86a138d1f9a6967fb7ec04a1ea6464d1c417265445c8e5858e87616e012
+    name: "jaeger-agent"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -568,6 +592,7 @@ tracingAgent:
 worker:
   image:
     defaultTag: insiders@sha256:147174fe1b99979f318105b6d23c9717444fe654e423b9e937ba26f4c12fde01
+    name: "worker"
   podSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100

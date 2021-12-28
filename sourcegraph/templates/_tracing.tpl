@@ -4,7 +4,7 @@ Define the tracing sidecar
 {{- define "sourcegraph.tracing" -}}
 {{- if .Values.tracingAgent.enabled -}}
 - name: jaeger-agent
-  image: {{ include "sourcegraph.image" (list . "tracingAgent" "jaeger-agent") }}
+  image: {{ include "sourcegraph.image" (list . "tracingAgent") }}
   env:
   {{- range $name, $item := .Values.tracingAgent.env}}
     - name: {{ $name }}

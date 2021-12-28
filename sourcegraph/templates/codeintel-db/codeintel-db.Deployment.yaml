@@ -50,7 +50,7 @@ spec:
     spec:
       initContainers:
       - name: correct-data-dir-permissions
-        image: {{ include "sourcegraph.image" (list . "alpine" "alpine-3.12") }}
+        image: {{ include "sourcegraph.image" (list . "alpine") }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
@@ -63,7 +63,7 @@ spec:
         {{- end }}
       containers:
       - name: pgsql
-        image: {{ include "sourcegraph.image" (list . "codeIntelDB" "codeintel-db") }}
+        image: {{ include "sourcegraph.image" (list . "codeIntelDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
@@ -109,7 +109,7 @@ spec:
         {{- end }}
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
-        image: {{ include "sourcegraph.image" (list . "postgresExporter" "postgres_exporter") }}
+        image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
         {{- if not .Values.sourcegraph.localDevMode }}

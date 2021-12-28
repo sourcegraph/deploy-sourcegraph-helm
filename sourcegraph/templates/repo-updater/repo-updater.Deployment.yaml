@@ -48,7 +48,7 @@ spec:
     spec:
       containers:
       - name: repo-updater
-        image: {{ include "sourcegraph.image" (list . "repoUpdater" "repo-updater") }}
+        image: {{ include "sourcegraph.image" (list . "repoUpdater") }}
         env:
         {{- range $name, $item := .Values.repoUpdater.env}}
         - name: {{ $name }}
