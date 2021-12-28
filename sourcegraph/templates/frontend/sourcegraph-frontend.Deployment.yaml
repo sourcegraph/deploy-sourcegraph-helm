@@ -100,6 +100,8 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
+        - mountPath: /home/sourcegraph
+          name: home-dir
         {{- if .Values.frontend.extraVolumeMounts }}
         {{- toYaml .Values.frontend.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -125,6 +127,8 @@ spec:
       volumes:
       - emptyDir: {}
         name: cache-ssd
+      - emptyDir: {}
+        name: home-dir
       {{- if .Values.frontend.extraVolumes }}
       {{- toYaml .Values.frontend.extraVolumes | nindent 6 }}
       {{- end }}
