@@ -10,7 +10,6 @@ sourcegraph:
   revisionHistoryLimit: 10
   localDevMode: false # When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
 
-fullnameOverride: ""
 nameOverride: ""
 
 #
