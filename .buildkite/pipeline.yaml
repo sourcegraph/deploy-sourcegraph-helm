@@ -8,3 +8,8 @@ steps:
     commands: 
       - "scripts/ci/install-helm-env.sh"
       - "scripts/ci/validate-schema.sh"
+
+  - label: ":mag: Lint"
+    commands: 
+      - "scripts/ci/install-helm-env.sh"
+      - "scripts/ci/lint.sh"

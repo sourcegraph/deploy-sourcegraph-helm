@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -euf -o pipefail
 
 ### Install Helm
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
