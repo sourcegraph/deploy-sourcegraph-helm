@@ -13,3 +13,5 @@ steps:
     commands: 
       - "scripts/ci/install-helm-env.sh"
       - "scripts/ci/lint.sh"
+    soft_fail:
+      - exit_status: 255
