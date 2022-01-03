@@ -1,3 +1,10 @@
 steps:
   - label: ":test_tube: Unit Tests"
-    command: "scripts/ci/helm-unittest.sh"
+    commands: 
+      - "scripts/ci/install-helm-env.sh"
+      - "scripts/ci/helm-unittest.sh"
+
+  - label: ":database: Schema Validation"
+    commands: 
+      - "scripts/ci/install-helm-env.sh"
+      - "scripts/ci/validate-schema.sh"
