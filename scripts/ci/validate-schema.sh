@@ -8,4 +8,4 @@ sudo cp kubeval /usr/local/bin
 
 # Run kubeval, validate k8s schema
 helm template sourcegraph-helm-default ./sourcegraph > sourcegraph-helm-default.yaml
-kubeval sourcegraph-helm-default.yaml
+kubeval --strict --schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/ sourcegraph-helm-default.yaml
