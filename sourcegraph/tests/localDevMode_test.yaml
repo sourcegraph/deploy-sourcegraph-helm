@@ -1,0 +1,17 @@
+suite: localDevMode
+templates:
+  - frontend/sourcegraph-frontend.Deployment.yaml
+tests:
+  - it: should not have a resource block when localDevMode=true
+    set:
+      sourcegraph.localDevMode: true
+    asserts:
+      - isEmpty:
+          path: spec.template.spec.containers[0].resources
+
+  - it: should have a resource block when localDevMode=false
+    set:
+      sourcegraph.localDevMode: false
+    asserts:
+      - isNotEmpty:
+          path: spec.template.spec.containers[0].resources

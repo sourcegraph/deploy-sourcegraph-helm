@@ -1,0 +1,17 @@
+steps:
+  - label: ":test_tube: Unit Tests"
+    commands: 
+      - "scripts/ci/install-helm-env.sh"
+      - "scripts/ci/helm-unittest.sh"
+
+  - label: ":database: Schema Validation"
+    commands: 
+      - "scripts/ci/install-helm-env.sh"
+      - "scripts/ci/validate-schema.sh"
+
+  - label: ":mag: Lint"
+    commands: 
+      - "scripts/ci/install-helm-env.sh"
+      - "scripts/ci/lint.sh"
+    soft_fail:
+      - exit_status: 255
