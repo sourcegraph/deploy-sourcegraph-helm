@@ -1,3 +1,6 @@
+## Demonstrates how to create a subchart of the Sourcegraph helm chart
+## in order to add additional custom resources
+
 customValue: 3
 
 sg: # Matches dependency name in Chart.yaml
@@ -6,5 +9,4 @@ sg: # Matches dependency name in Chart.yaml
       new-label: "custom" # Added to all pods
 
   pgsql:
-    existingConfig: "pgsql-conf" # Provide a custom config file
-
+    existingConfig: "pgsql-conf" # Provide a custom config file, defined in the templates/ subdirectory

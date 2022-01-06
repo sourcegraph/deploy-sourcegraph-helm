@@ -6,7 +6,7 @@ data:
   postgresql.conf: |
     listen_addresses = '*'
     max_connections = 450 # CUSTOM - increased connection limit
-    shared_buffers = 1GB
+    shared_buffers = {{.Values.customValue}}GB # Custom value, auto-calculates from values.yaml settings
     work_mem = 5M
     maintenance_work_mem = 250MB
     dynamic_shared_memory_type = posix
