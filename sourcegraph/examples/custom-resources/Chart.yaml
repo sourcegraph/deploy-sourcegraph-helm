@@ -1,0 +1,10 @@
+apiVersion: v2
+name: sourcegraph-subchart
+description: Customer-owned chart that inherits from Sourcegraph
+type: application
+version: 1.0.0
+
+dependencies:
+- name: sg
+  version: 0.1.0
+  repository: "https://sourcegraph.github.io/deploy-sourcegraph-helm/sourcegraph"

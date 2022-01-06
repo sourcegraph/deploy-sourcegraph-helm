@@ -1,0 +1,15 @@
+# Example chart showing ways to customize security contexts for deployments
+# By default, Sourcegraph will run with non-root access and limited permissions,
+# which should be acceptable for most clusters.
+# Changes to these settings should only be done if your Kubernetes cluster has specific requirements
+
+pgsql:
+  podSecurityContext:
+    readOnlyRootFilesystem: false # Override default setting and allow root file system writes
+
+frontend:
+  podSecurityContext:
+    allowPrivilegeEscalation: true
+    runAsUser: 1
+    runAsGroup: 1
+    readOnlyRootFilesystem: false
