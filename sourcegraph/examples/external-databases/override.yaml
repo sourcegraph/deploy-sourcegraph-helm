@@ -1,0 +1,17 @@
+# Demonstrate using an external database for the main Sourcegraph database
+# Disables deployment of the Postgres docker container
+# Optionally, reference a Kubernetes Secret that contains credentials to the external database
+
+frontend:
+  env:
+    PGHOST:
+      value: external-database-dns # external database host
+
+    PGPASSWORD:
+      valueFrom:
+        secretKeyRef: # Pre-existing secret, not created by this chart
+          name: postgres-sourcegraph
+          key: password
+
+pgsql:
+  enabled: false

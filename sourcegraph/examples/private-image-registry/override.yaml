@@ -1,0 +1,27 @@
+## Override file demonstrating the use of a private docker image registry and custom image names
+#
+# Original image reference:
+# image: index.docker.io/sourcegraph/frontend:3.35.1@sha256:69dc2fff40d2d2c8bd0ef2a8fe0744395c5784f1d380ac50917b485ffa5f70dd
+#
+# Using override:
+# image: custom-repo.ecr.us-east-1.amazonaws.com/sourcegraph/frontend:3.35.1
+#
+# Original image reference:
+# image: index.docker.io/sourcegraph/alpine-3.12:3.35.1@sha256:a26a8820b8794c2d85c67f7b61b00b4d468af722047b8093235a827c08ea878a
+#
+# Using override, with custom image name:
+# image: custom-repo.ecr.us-east-1.amazonaws.com/sourcegraph/alpine:3.12
+
+sourcegraph:
+  image:
+    repository: custom-repo.ecr.us-east-1.amazonaws.com/sourcegraph
+    useGlobalTagAsDefault: true # Every image will use the Sourcegraph version tag (e.g. 3.35.1) instead of an individual sha-based reference
+
+  # Registry credentials: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry
+  imagePullSecrets:
+  - name: regcred # Pre-existing secret that contains the credentials needed to pull from the image registry
+
+alpine:
+  image:
+    name: alpine # Use a custom name instead of the Sourcegraph name - i.e. alpine-3.12
+    tag: 3.12 # Use a custom tag instead of the default - i.e. 3.35.1

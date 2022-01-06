@@ -1,0 +1,77 @@
+# Simple override file adjusting resources, replica count, and adding environment variables
+
+frontend:
+  replicas: 2
+
+gitServer:
+  replicas: 2
+  resources:
+    limits:
+      cpu: "8"
+      memory: 8G
+    requests:
+      cpu: "4"
+      memory: 4G
+  storageSize: "1Ti"
+  env:
+    SRC_LOG_LEVEL:
+      value: "warn"
+
+grafana:
+  storageSize: "10Gi"
+
+indexedSearch:
+  replicas: 2
+  storageSize: "100Gi"
+  webserver:
+    resources:
+      limits:
+        cpu: "2"
+        memory: 16G
+      requests:
+        cpu: "1"
+        memory: 16G
+  indexserver:
+    resources:
+      limits:
+        cpu: "4"
+        memory: 16G
+      requests:
+        cpu: "4"
+        memory: 8G
+
+minio:
+  resources:
+    limits:
+      cpu: "1"
+      memory: "500M"
+    requests:
+      cpu: "1"
+      memory: "500M"
+  storageSize: "100Gi"
+
+pgsql:
+  storageSize: "250Gi"
+
+prometheus:
+  storageSize: "50Gi"
+
+searcher:
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 1G
+
+symbols:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4G
+      ephemeral-storage: "10G"
+    requests:
+      cpu: "1"
+      memory: 1G
+      ephemeral-storage: "10G"
