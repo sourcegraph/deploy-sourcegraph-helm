@@ -6,4 +6,4 @@ set -euf -o pipefail
 helm plugin install https://github.com/quintush/helm-unittest
 
 ### Run the helm tests
-helm unittest -3q charts/*
+helm unittest -3q charts/sourcegraph
