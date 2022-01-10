@@ -91,6 +91,8 @@ cadvisor:
   image:
     defaultTag: 3.35.1@sha256:1a1b07c91ee0bd32240a75370998d7a990dc5ebe34d1aa4b19f331adb9017034
     name: "cadvisor"
+  podSecurityPolicy:
+    enabled: false
   resources:
     limits:
       cpu: 300m

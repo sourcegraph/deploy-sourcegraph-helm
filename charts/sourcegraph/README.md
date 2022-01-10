@@ -74,8 +74,6 @@ To upgrade to a new version of the helm chart:
 Search for available versions by running:
 `helm search repo sourcegraph --versions`
 
-TODO: define versioning scheme
-
 ## Third-party resources
 
 ### cAdvisor
