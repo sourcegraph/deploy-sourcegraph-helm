@@ -10,6 +10,6 @@ sudo cp kubeconform /usr/local/bin
 
 ### Run kubeconform, validate k8s schema
 echo "Generating template output..."
-helm template sourcegraph-helm-default ./sourcegraph >sourcegraph-helm-default.yaml
+helm template sourcegraph-helm-default ./charts/sourcegraph >sourcegraph-helm-default.yaml
 
 kubeconform -verbose -summary -strict -schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/ sourcegraph-helm-default.yaml
