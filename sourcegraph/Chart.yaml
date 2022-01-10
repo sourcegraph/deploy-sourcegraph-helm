@@ -8,4 +8,4 @@ type: application
 version: 0.1.0
 
 # Version of Sourcegraph release
-appVersion: "3.33.0"
+appVersion: "3.35.1"
