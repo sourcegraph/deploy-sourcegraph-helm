@@ -34,4 +34,7 @@ spec:
   {{- if .Values.frontend.ingress.host}}
     host: {{ .Values.frontend.ingress.host }}
   {{- end }}
+  {{- if .Values.frontend.ingress.ingressClassName}}
+  ingressClassName: {{ .Values.frontend.ingress.ingressClassName }}
+  {{- end }}
 {{- end }}

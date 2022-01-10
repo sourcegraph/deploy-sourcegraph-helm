@@ -1,0 +1,11 @@
+# Demonstrates how to disable or customize ingress annotations
+# and use the ingressClassName definition (available in Kubernetes 1.18+)
+# https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation
+
+frontend:
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: custom-value # Changes value of annotation
+      nginx.ingress.kubernetes.io/proxy-body-size: null # Disables annotation
+      custom-annotation: custom # Adds a new annotation
+    ingressClassName: nginx # Sets the ingressClassname

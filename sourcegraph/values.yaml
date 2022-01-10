@@ -194,6 +194,7 @@ frontend:
       nginx.ingress.kubernetes.io/proxy-body-size: 150m
     enabled: true
     host: "" # External host name for SSL
+    ingressClassName: null # Available in Kubernetes 1.18+
     tlsSecret: "" # Secret containing SSL cert
   podSecurityContext:
     allowPrivilegeEscalation: false
