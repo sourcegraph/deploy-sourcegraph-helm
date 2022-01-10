@@ -27,4 +27,4 @@ jobs:
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.2.1
         env:
-          CR_TOKEN: "${{ secrets.GH_PROJECTS_ACTION_TOKEN }}"
+          CR_TOKEN: "${{ secrets.CR_PUBLISH_TOKEN }}"
