@@ -3,7 +3,7 @@
 set -euf -o pipefail
 
 ### Run the helm tests
-LINT_OUTPUT=$(helm lint sourcegraph)
+LINT_OUTPUT=$(helm lint charts/sourcegraph)
 ORG_STATUS=$?
 
 printf "\n\n===== Lint Output =====\n$LINT_OUTPUT\n"
