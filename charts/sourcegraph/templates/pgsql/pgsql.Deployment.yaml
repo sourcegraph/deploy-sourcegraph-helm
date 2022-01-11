@@ -105,10 +105,12 @@ spec:
         {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
       {{- end }}
       - env:
-        {{- range $name, $item := .Values.postgresExporter.env}}
+        {{- range $name, $item := .Values.pgsql.postgresExporter.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/queries.yaml
         image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
