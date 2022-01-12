@@ -7,7 +7,7 @@
 
 ## Installation
 
-* Add the Sourcegraph charts repo:
+* Add the Sourcegraph charts repo to Helm:
 `helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/`
 
 * Install the chart using default values:
@@ -15,19 +15,20 @@
 
 ## Usage
 
-To customize configuration settings, create an empty yaml file and configure
-overrides according to the chart below. The install command would then be:
+Helm customizations can be applied using an override file. Using an override file allows customizations to persist through upgrades without needing to manage merge conflicts.
 
+To customize configuration settings with an override file, create an empty yaml file (with any name) and configure
+overrides - example overrides can be found in the [examples](examples) folder.
+
+The install command would then be:
 `helm install -f <your-override-file.yaml> sourcegraph/sourcegraph`
-
-Using an override file allows customizations to persist through upgrades without needing to manage merge conflicts.
-
-Example overrides can be found in the [examples](examples) folder.
 
 ### Setting a namespace
 
 By default, helm installs the chart into your active namespace. To install to a separate namespace, use the `--namespace` flag. For example:
 `helm install --namespace new-namespace sourcegraph/sourcegraph`
+Or if using an override file:
+`helm install --namespace new-namespace -f <your-override-file.yaml> sourcegraph/sourcegraph`
 
 If the namespace does not already exist, add the `--create-namespace` flag to create it during installation.
 
@@ -45,6 +46,12 @@ The `helm template` command can be used to render manifests for review and compa
 
 The [Helm Diff plugin](https://github.com/databus23/helm-diff) can also provide a diff against a deployed chart.
 
+## Rendering manifests for kubectl deployment
+
+Manifests rendered using the `helm template` command can be used for direct deployment using `kubectl`.
+
+See [the kubectl documentation](https://kubernetes.io/docs/reference/kubectl/) for more information on using kubectl.
+
 ## Configuration Options
 
 Reference the values.yaml file for available configuration parameters.
@@ -58,15 +65,15 @@ Before upgrading, review the CHANGELOG for the helm chart. If you are upgrading 
 
 To upgrade to a new version of the helm chart:
 
-* Update the repo list of charts to retrieve the updated list of versions:
+1. Update the repo list of charts to retrieve the updated list of versions:<br>
 `helm repo update sourcegraph`
 
-* (Optional) View available versions:
+1. (Optional) View available versions:<br>
 `helm search repo sourcegraph --versions`
 
-* (Optional) Review the changes that will be applied (`helm template` or `helm diff`, see [Reviewing changes](#reviewing-changes))
+1. (Optional) Review the changes that will be applied (`helm template` or `helm diff`, see [Reviewing changes](#reviewing-changes))
 
-* Install the new version:
+1.  Install the new version:<br>
 `helm upgrade --install -f <your-override-file.yaml> --version <version> sourcegraph/sourcegraph`
 
 ## Versioning
