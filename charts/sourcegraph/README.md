@@ -46,9 +46,9 @@ The `helm template` command can be used to render manifests for review and compa
 
 The [Helm Diff plugin](https://github.com/databus23/helm-diff) can also provide a diff against a deployed chart.
 
-## Redering manifests for kubectl deployment
+## Rendering manifests for kubectl deployment
 
-Manifests renered using the `helm template` command can be used for direct deployment using `kubectl`.
+Manifests rendered using the `helm template` command can be used for direct deployment using `kubectl`.
 
 See [the kubectl documentation](https://kubernetes.io/docs/reference/kubectl/) for more information on using kubectl.
 
