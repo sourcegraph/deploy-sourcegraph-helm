@@ -3,7 +3,7 @@
 
 customValue: 3
 
-sg: # Matches dependency name in Chart.yaml
+sg: # Matches alias name of the dependency in Chart.yaml
   sourcegraph: # Shown here to emphasize indentation
     podLabels:
       new-label: "custom" # Added to all pods
