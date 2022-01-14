@@ -1,3 +1,6 @@
+# To customize these values, it is recommended to use an override file
+# https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph-helm/-/blob/charts/sourcegraph/README.md#usage
+
 ### Common Configuration ###
 sourcegraph:
   affinity: {}
