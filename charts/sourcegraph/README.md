@@ -15,6 +15,8 @@
 
 ## Usage
 
+### Customizations
+
 Helm customizations can be applied using an override file. Using an override file allows customizations to persist through upgrades without needing to manage merge conflicts.
 
 To customize configuration settings with an override file, create an empty yaml file (with any name) and configure
