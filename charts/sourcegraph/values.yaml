@@ -1,5 +1,5 @@
-# To customize these values, it is recommended to use an override file
-# https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph-helm/-/blob/charts/sourcegraph/README.md#usage
+# To customize these values, use an override file:
+# https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph-helm/-/blob/charts/sourcegraph/README.md#customizations
 
 ### Common Configuration ###
 sourcegraph:
