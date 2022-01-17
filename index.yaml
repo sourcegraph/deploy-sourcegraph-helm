@@ -3,6 +3,16 @@ entries:
   sourcegraph:
   - apiVersion: v2
     appVersion: 3.35.1
+    created: "2022-01-17T17:07:41.55421958Z"
+    description: Chart for installing Sourcegraph
+    digest: c33b3596ab4c37df563a5870cb4d41286aaa170d9907bda0e8ada618c107d1dd
+    name: sourcegraph
+    type: application
+    urls:
+    - https://github.com/sourcegraph/deploy-sourcegraph-helm/releases/download/sourcegraph-0.1.3/sourcegraph-0.1.3.tgz
+    version: 0.1.3
+  - apiVersion: v2
+    appVersion: 3.35.1
     created: "2022-01-12T13:21:03.143723344Z"
     description: Chart for installing Sourcegraph
     digest: e6f21d162047b871a1b031802c710877a08d58492f30411420f0ebb84ecc5d20
@@ -31,4 +41,4 @@ entries:
     urls:
     - https://github.com/sourcegraph/deploy-sourcegraph-helm/releases/download/sourcegraph-0.1.0/sourcegraph-0.1.0.tgz
     version: 0.1.0
-generated: "2022-01-12T13:21:03.143731744Z"
+generated: "2022-01-17T17:07:41.554368782Z"
