@@ -46,10 +46,6 @@ spec:
         app.kubernetes.io/name: jaeger
         app.kubernetes.io/component: all-in-one
     spec:
-      {{- with .Values.sourcegraph.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "tracing") }}
@@ -98,6 +94,10 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 {{- end }}

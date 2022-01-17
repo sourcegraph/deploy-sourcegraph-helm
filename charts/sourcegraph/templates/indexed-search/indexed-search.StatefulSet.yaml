@@ -38,10 +38,6 @@ spec:
         app: indexed-search
         deploy: sourcegraph
     spec:
-      {{- with .Values.sourcegraph.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
       containers:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
@@ -112,6 +108,10 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
