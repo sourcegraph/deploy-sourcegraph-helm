@@ -14,10 +14,6 @@ metadata:
     app.kubernetes.io/component: cadvisor
   name: {{ default "cadvisor" .Values.cadvisor.name }}
 spec:
-  {{- with .Values.sourcegraph.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
@@ -109,6 +105,10 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:

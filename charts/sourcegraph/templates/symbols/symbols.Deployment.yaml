@@ -13,10 +13,6 @@ metadata:
     app.kubernetes.io/component: symbols
   name: {{ default "symbols" .Values.symbols.name }}
 spec:
-  {{- with .Values.sourcegraph.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   minReadySeconds: 10
   replicas: {{ .Values.symbols.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -115,6 +111,10 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:

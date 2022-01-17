@@ -12,10 +12,6 @@ metadata:
     app.kubernetes.io/component: syntect-server
   name: {{ default "syntect-server" .Values.syntectServer.name }}
 spec:
-  {{- with .Values.sourcegraph.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   minReadySeconds: 10
   replicas: {{ .Values.syntectServer.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -92,5 +88,9 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}

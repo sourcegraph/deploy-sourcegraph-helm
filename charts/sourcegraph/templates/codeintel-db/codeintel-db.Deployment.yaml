@@ -14,10 +14,6 @@ metadata:
     deploy: sourcegraph
   name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
-  {{- with .Values.sourcegraph.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   minReadySeconds: 10
   replicas: {{ .Values.codeIntelDB.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -129,6 +125,10 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:

@@ -12,10 +12,6 @@ metadata:
     app.kubernetes.io/component: worker
   name: {{ default "worker" .Values.worker.name }}
 spec:
-  {{- with .Values.sourcegraph.imagePullSecrets }}
-  imagePullSecrets:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
   minReadySeconds: 10
   replicas: {{ .Values.worker.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -102,5 +98,9 @@ spec:
       {{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
