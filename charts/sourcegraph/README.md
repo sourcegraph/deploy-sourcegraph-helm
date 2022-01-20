@@ -118,3 +118,61 @@ The Grafana deployment can be disabled by setting `grafana.enabled` to `false`. 
 A Prometheus instance is part of the default Sourcegraph cluster installation.
 
 The Prometheus deployment can be disabled by setting `prometheus.enabled` to `false`. This is not recommended, as it severely limits your ability to monitor the health of your instance and troubleshoot any issues. Instead, consider setting `prometheus.privileged` to `false`, which reduces the privileges required to deploy a Prometheus instance.
+
+## FAQ
+
+1. Q: What is Helm?
+<br>A: [Helm](https://helm.sh/) is a deployment and packaging tool for Kubernetes applications. It uses Go templating to allow end users to customize their deployments with a config (“values”) file.
+1. Q: Why are you adding it as a deployment method?
+<br>A:
+   1. Customers have requested it
+   1. Helm is widely adopted and can be considered an industry standard
+   1. It saves customers maintaining a fork of the deploy-sourcegraph repo and managing git conflicts when merging in the latest version.
+   1. Simplifies previously complex customizations for customers. For example, when using the existing [kustomize `namespaced` overlay](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph/-/tree/overlays/namespaced) to deploy Sourcegraph into a custom namespace, users need to set the namespace in multiple files. With helm, these files pull the correct namespace value without manual input.
+1. Q: Why should I care about it/use it?
+<br>A:
+   1. If you’re already using helm for other application deployments, it should be a familiar experience to customize and deploy. You may already have CI or other infrastructure in place to handle helm charts.
+   1. Easier to maintain - you won’t need to create a fork of the deploy-sourcegraph repository, all your customizations can be kept as separate files that are untouched during upgrades and so won’t conflict with the chart.
+   1. Take advantage of features we’ve built into the chart such as auto-updating references to namespaces, disabling deployment of an in-cluster database with a single configuration flag, and pulling images from a private docker registry.
+1. Q: Can I use it in production?
+<br>A:
+   1. We don’t recommend use in production as our use of Helm is in beta. There may be backwards incompatible changes during the beta period, which would create additional work for you to incorporate. We recommend evaluating the chart in a non-production environment.
+1. Q: How does it compare with Kustomize?
+<br>A:
+   1. Kustomize offers more control over making customizations, but at the expense of greater complexity for you. You have complete freedom to write overlays that modify any aspect of the base Kubernetes manifests, but it is non-trivial to write an overlay that doesn’t cause a maintenance burden.
+<br>By default, Helm is more restrictive because you are limited to customizations already built into the chart. This limitation is offset by the ease of use, widespread adoption of Helm and the fact that all changes built into the provided Helm chart have been tested and verified by Sourcegraph. If you encounter a feature that is missing in the Sourcegraph Helm chart, tell us about it so it can be added.
+   1. Easier to incorporate multiple customizations - with kustomize, you have to create a custom overlay in order to use multiple Sourcegraph-provided overlays. With Helm, all configuration is done in a single yaml file and features can be toggled independently.
+   1. Easier for Sourcegraph to make changes that can be adopted by customers - we can add features that are opt-in and disabled by default, or that auto-calculate based on other configured settings.
+   1. Automated calculations within Helm can be used to provide errors or advice to safeguard deployments of Sourcegraph - such as flagging up when one service is underprovisioned in comparison to another service that depends on it.
+1. Q: How does it compare with manually edited and deployed Kubernetes files?
+<br>A: 
+   1. Some customers choose to directly edit the base files provided by Sourcegraph and deploy those, rather than adopting kustomize and creating custom overlays. This is a quick way to get started and the changes are easy to understand, but creates a large maintenance burden for future upgrades. Merge conflicts are much more common in this scenario, and customizations are difficult to keep track of.
+   1. With helm, the customizations are managed in a separate file created by the customer. As a result, there are no merge conflicts to resolve, and auditing the customizations can be done more easily.
+   1. Using helm to deploy Sourcegraph offers several nice features including version tracking, an uninstall command and a full revision history.
+   1. Deploying via helm is optional - if desired, customers can use `helm template` to render Kubernetes manifests from the chart, and apply those using kubectl. In that case, there is no difference between the helm-generated, manually-deployed files and manually-deployed files.
+1. Q: Will upgrading be easier?
+<br>A: 
+   1. Yes - installing a new version of Sourcegraph can be as simple as a single command (helm upgrade –version <version number>). Some upgrades may include a new deployment, and you would want to review any configuration related to that and customize it as necessary.
+   1. In contrast, upgrading Sourcegraph using kustomize meant first merging the release changes from the upstream Sourcegraph repository and resolving any merge conflicts that occurred.
+1. Q: Can I fork your Helm chart?
+<br>A: 
+   1. Yes, although we hope you won’t need to. If you do fork the chart and make your own customizations, you’ll be responsible for keeping your fork in sync with the official chart and managing any merge conflicts. 
+   1. If you find that the Sourcegraph chart is missing functionality, please tell us about it (or submit a PR) so your feature can be added and you won’t need to maintain a separate chart yourself.
+1. Q: Can I output the manifest files from the Helm chart?
+<br>A: The `helm template` command can be used to render Kubernetes manifests from the chart. This output can then be inspected, checked into source control, or applied to the cluster via kubectl.
+1. Q: What are the limitations of using Helm?
+<br>A: You are limited to the configuration options built in to the chart by Sourcegraph. If you need an additional feature not included in the chart, you’ll need to request that we add it, create a fork of the chart and update it yourself, or do post-processing on the rendered manifests.
+1. Q: How do I convert Docker Compose/Kustomize/plain Kubernetes to use Helm?
+<br>A: 
+   1. For the beta, we don’t recommend converting an existing Sourcegraph cluster to use Helm. Instead, it should be used on a new installation. Full instructions to convert existing Sourcegraph deployments to helm will be provided after the beta.
+   1. Any customizations will need to be converted to a helm values file. The [sourcegraph/examples folder](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph-helm/-/tree/charts/sourcegraph/examples) in the deploy-sourcegraph-helm repo has some samples of commonly modified values which can be used as a starting point.
+1. Q: When will Sourcegraph be supporting it fully? / What’s the timeline for the Beta?
+<br>A: Likely early Feb - assuming all goes well with the Beta
+1. Q: What if I have problems or questions about Helm and Sourcegraph?
+<br>A: Please let 
+1. Q: Will you be deprecating Kustomize/Docker Compose?
+<br>A: There are no current plans to deprecate either deployment option. If that changes, there will be a generous deprecation timeline and support for the migration.
+1. Q: How do I apply customizations?
+<br>A: See [the documentation](https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph-helm/-/blob/charts/sourcegraph/README.md) in the deploy-sourcegraph-helm repo. Examples are available in the examples/ subfolder.
+1. Q: Have any of the Sourcegraph deployment defaults changed as part of the move to Helm?
+<br>A: Yes - with the helm deployment, the Sourcegraph cluster defaults to running as non-root users with a read-only root filesystem. This is similar to running with the non-privileged kustomize overlay. This default was changed to provide a smoother setup experience in Kubernetes clusters with restricted access and to follow best practices for security. The security context for each deployment can be customized to match any unique requirements for your cluster - see this example in the deploy-sourcegraph-helm repo.
