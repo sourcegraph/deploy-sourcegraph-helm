@@ -82,6 +82,10 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 10 }}
+        volumeMounts:
+        {{- if .Values.repoUpdater.extraVolumeMounts }}
+        {{- toYaml .Values.repoUpdater.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.repoUpdater.extraContainers }}
         {{- toYaml .Values.repoUpdater.extraContainers | nindent 6 }}
@@ -103,4 +107,8 @@ spec:
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      {{- if .Values.repoUpdater.extraVolumes }}
+      {{- toYaml .Values.repoUpdater.extraVolumes | nindent 6 }}
       {{- end }}

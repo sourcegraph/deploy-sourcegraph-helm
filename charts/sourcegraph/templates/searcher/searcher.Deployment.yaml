@@ -85,6 +85,9 @@ spec:
           name: cache-ssd
         - mountPath: /tmp
           name: tmpdir
+        {{- if .Values.searcher.extraVolumeMounts }}
+        {{- toYaml .Values.searcher.extraVolumeMounts | nindent 8 }}
+        {{- end }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.searcher.resources | nindent 10 }}
@@ -118,3 +121,6 @@ spec:
         name: cache-ssd
       - emptyDir: {}
         name: tmpdir
+      {{- if .Values.searcher.extraVolumes }}
+      {{- toYaml .Values.searcher.extraVolumes | nindent 6 }}
+      {{- end }}

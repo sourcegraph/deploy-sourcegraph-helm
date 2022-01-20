@@ -66,6 +66,9 @@ spec:
           name: data
         - mountPath: /sg_prometheus_add_ons
           name: config
+        {{- if .Values.prometheus.extraVolumeMounts }}
+        {{- toYaml .Values.prometheus.extraVolumeMounts | nindent 8 }}
+        {{- end }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.prometheus.resources | nindent 10 }}
@@ -103,4 +106,7 @@ spec:
           defaultMode: 0777
           name: {{ default "prometheus" .Values.prometheus.existingConfig .Values.prometheus.name }}
         name: config
+      {{- if .Values.prometheus.extraVolumes }}
+      {{- toYaml .Values.prometheus.extraVolumes | nindent 6 }}
+      {{- end }}
 {{- end }}

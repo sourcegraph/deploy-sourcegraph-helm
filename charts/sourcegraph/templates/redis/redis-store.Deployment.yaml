@@ -71,6 +71,9 @@ spec:
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
+        {{- if .Values.redisStore.extraVolumeMounts }}
+        {{- toYaml .Values.redisStore.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       - name: redis-exporter
         image: {{ include "sourcegraph.image" (list . "redisExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
@@ -113,4 +116,7 @@ spec:
       - name: redis-data
         persistentVolumeClaim:
           claimName: {{ default "redis-store" .Values.redisStore.name }}
+      {{- if .Values.redisStore.extraVolumes }}
+      {{- toYaml .Values.redisStore.extraVolumes | nindent 6 }}
+      {{- end }}
 {{- end }}
