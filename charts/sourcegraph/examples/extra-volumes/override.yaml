@@ -1,0 +1,9 @@
+# Demonstrate adding an additional volume to a deployment
+
+frontend:
+  extraVolumes:
+  - emptyDir: {}
+    name: tmpdir
+  extraVolumeMounts:
+  - mountPath: /tmp
+    name: tmpdir
