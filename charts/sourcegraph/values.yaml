@@ -221,6 +221,19 @@ frontend:
     create: true
     name: sourcegraph-frontend
 
+migrator:
+  enabled: true
+  image:
+    defaultTag: 3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815
+    name: "migrator"
+  env: {}
+  resources: {}
+  podSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+
 githubProxy:
   image:
     defaultTag: 3.37.0@sha256:3b173e36f958b68479ae829d784c63346701df417afa14d14ae657a84e630dd5

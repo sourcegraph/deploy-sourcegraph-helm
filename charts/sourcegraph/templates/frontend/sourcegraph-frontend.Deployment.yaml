@@ -45,6 +45,26 @@ spec:
         app: sourcegraph-frontend
         deploy: sourcegraph
     spec:
+      initContainers:
+      {{- if .Values.migrator.enabled }}
+      - name: migrator
+        image: {{ include "sourcegraph.image" (list . "migrator") }}
+        args:
+        - up
+        env:
+        {{- range $name, $item := .Values.frontend.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        {{- range $name, $item := .Values.migrator.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.migrator.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.migrator.podSecurityContext | nindent 10 }}
+      {{- end }}
       containers:
       - name: frontend
         image: {{ include "sourcegraph.image" (list . "frontend") }}
