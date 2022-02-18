@@ -1,0 +1,71 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  annotations:
+    description: Performs Sourcegraph database migrations.
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.migrator.labels }}
+      {{- toYaml .Values.migrator.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: migrator
+  name: {{ default "migrator" .Values.migrator.name }}-{{ randAlphaNum 5 | lower }}
+spec:
+  backoffLimit: 5
+  template:
+    metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.migrator.podAnnotations }}
+      {{- toYaml .Values.migrator.podAnnotations | nindent 8 }}
+      {{- end }}
+        kubectl.kubernetes.io/default-container: migrator
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.migrator.podLabels }}
+      {{- toYaml .Values.migrator.podLabels | nindent 8 }}
+      {{- end }}
+        job: migrator
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: migrator
+        image: {{ include "sourcegraph.image" (list . "migrator") }}
+        args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
+        env:
+        {{- range $name, $item := .Values.migrator.env }}
+        - name: {{ $name }}
+        {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.migrator.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.migrator.podSecurityContext | nindent 10 }}
+      {{- if .Values.migrator.extraContainers }}
+        {{- toYaml .Values.migrator.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.migrator.securityContext | nindent 8 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      restartPolicy: Never
