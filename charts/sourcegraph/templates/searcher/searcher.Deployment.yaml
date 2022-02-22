@@ -47,6 +47,10 @@ spec:
     spec:
       containers:
       - name: searcher
+        {{- with .Values.searcher.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         env:
         {{- range $name, $item := .Values.searcher.env}}
         - name: {{ $name }}

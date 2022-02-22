@@ -60,6 +60,10 @@ spec:
       containers:
       - image: {{ include "sourcegraph.image" (list . "pgsql") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.pgsql.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:

@@ -45,6 +45,10 @@ spec:
       containers:
       - name: redis-store
         image: {{ include "sourcegraph.image" (list . "redisStore") }}
+        {{- with .Values.redisStore.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.redisStore.env}}

@@ -44,7 +44,7 @@ spec:
     spec:
       containers:
       - name: gitserver
-        args: ["run"]
+        args: {{- default (list "run") .Values.gitserver.args | toYaml | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "gitserver") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         env:

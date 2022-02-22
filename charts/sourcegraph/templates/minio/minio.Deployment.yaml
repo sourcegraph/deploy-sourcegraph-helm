@@ -52,7 +52,7 @@ spec:
         {{- end }}
         image: {{ include "sourcegraph.image" (list . "minio") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args: ['minio', 'server', '/data']
+        args: {{- default (list "minio" "server" "/data") .Values.minio.args | toYaml | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 9000

@@ -49,8 +49,7 @@ spec:
       {{- if .Values.migrator.enabled }}
       - name: migrator
         image: {{ include "sourcegraph.image" (list . "migrator") }}
-        args:
-        - up
+        args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.frontend.env }}
         - name: {{ $name }}
@@ -69,8 +68,7 @@ spec:
       - name: frontend
         image: {{ include "sourcegraph.image" (list . "frontend") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args:
-        - serve
+        args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.frontend.env}}
         - name: {{ $name }}

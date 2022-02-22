@@ -57,6 +57,10 @@ spec:
               fieldPath: metadata.name
         image: {{ include "sourcegraph.image" (list . "preciseCodeIntel") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.preciseCodeIntel.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

@@ -41,6 +41,10 @@ spec:
       containers:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
+        {{- with .Values.indexedSearch.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.indexedSearch.env}}

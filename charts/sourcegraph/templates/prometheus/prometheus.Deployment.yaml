@@ -45,6 +45,10 @@ spec:
       containers:
       - name: prometheus
         image: {{ include "sourcegraph.image" (list . "prometheus") }}
+        {{- with .Values.prometheus.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.prometheus.env}}
