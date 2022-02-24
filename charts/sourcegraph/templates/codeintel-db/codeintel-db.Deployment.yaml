@@ -61,6 +61,10 @@ spec:
       - name: pgsql
         image: {{ include "sourcegraph.image" (list . "codeIntelDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.codeIntelDB.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.codeIntelDB.env}}

@@ -45,6 +45,10 @@ spec:
       containers:
       - name: grafana
         image: {{ include "sourcegraph.image" (list . "grafana") }}
+        {{- with .Values.grafana.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.grafana.env}}

@@ -47,6 +47,10 @@ spec:
       - name: timescaledb
         image: {{ include "sourcegraph.image" (list . "codeInsightsDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.codeInsightsDB.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         env:
         {{- range $name, $item := .Values.codeInsightsDB.env}}
         - name: {{ $name }}

@@ -49,6 +49,10 @@ spec:
       - name: github-proxy
         image: {{ include "sourcegraph.image" (list . "githubProxy") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.githubProxy.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.githubProxy.env}}

@@ -66,6 +66,10 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         image: {{ include "sourcegraph.image" (list . "symbols" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.symbols.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

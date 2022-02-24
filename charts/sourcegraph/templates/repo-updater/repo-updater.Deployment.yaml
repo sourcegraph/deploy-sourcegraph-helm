@@ -49,6 +49,10 @@ spec:
       containers:
       - name: repo-updater
         image: {{ include "sourcegraph.image" (list . "repoUpdater") }}
+        {{- with .Values.repoUpdater.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         env:
         {{- range $name, $item := .Values.repoUpdater.env}}
         - name: {{ $name }}
