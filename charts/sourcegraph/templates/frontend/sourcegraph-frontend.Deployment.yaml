@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubectl.kubernetes.io/default-container: frontend
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
@@ -28,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: frontend
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

@@ -4,7 +4,6 @@ kind: StatefulSet
 metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
-    kubectl.kubernetes.io/default-container: grafana
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.grafana.labels }}
@@ -25,6 +24,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: grafana
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

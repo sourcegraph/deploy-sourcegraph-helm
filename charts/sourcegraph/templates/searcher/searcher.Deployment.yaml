@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Backend for text search operations.
-    kubectl.kubernetes.io/default-container: searcher
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.searcher.labels }}
@@ -28,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: searcher
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
