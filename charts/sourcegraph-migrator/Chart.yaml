@@ -1,0 +1,11 @@
+apiVersion: v2
+name: sourcegraph-migrator
+description: Chart for running Sourcegraph migrator
+
+type: application
+
+# Chart version, separate from Sourcegraph
+version: 0.1.0
+
+# Version of Sourcegraph release
+appVersion: "3.37.0"

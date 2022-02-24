@@ -1,0 +1,104 @@
+# These values are dervied from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
+
+### Common Configuration ###
+sourcegraph:
+  affinity: {}
+  image:
+    defaultTag: '{{ .Chart.AppVersion }}'
+    pullPolicy: IfNotPresent
+    repository: index.docker.io/sourcegraph
+    # When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
+    useGlobalTagAsDefault: false
+  # Mount a named secret containing docker credentials
+  imagePullSecrets: []
+  # Add a global label to all resources
+  labels: {}
+  # Set a custom name for the app.kubernetes.io/name annotation
+  nameOverride: ""
+  nodeSelector: {}
+  podAnnotations: {}
+  podLabels: {}
+  tolerations: {}
+
+
+# Generic application configuration options, used by most applications below
+# app: # Generally matches directory name
+#   replicaCount: 1
+#
+#   image:
+#     # Application-specific default tag. Overrides the global tag. Do not modify - use tag instead
+#     defaultTag:
+#     # Override the default tag on a service-specific basis
+#     tag:
+#     # Override the default docker image name
+#     name:
+#
+#   # Add additional labels and annotations to various resources
+#   labels: {}
+#   podLabels: {}
+#   podAnnotations: {}
+#   serviceLabels: {}
+#   serviceAnnotations: {}
+#   # Override default service/deployment names
+#   name: ""
+#   # Provide custom environment variables
+#   env: {}
+#   # Set resource requests / limits
+#   resources: {}
+#   podSecurityContext: {}
+#   securityContext: {}
+#   # Add additional volumes and mounts to deployments
+#   extraVolumeMounts: {}
+#   extraVolumes: {}
+#   # Add sidecars
+#   extraContainers: {}
+#   # Toggle serviceAccount creation
+#   serviceAccount.create: true
+#   # Customize service account name
+#   serviceAccount.name: ""
+#   # Override service type (defaults to ClusterIP)
+#   serviceType: ""
+#   # Set disk size on PVC's for stateful deployments
+#   storageSize: ""
+#   # Optionally bind PVC's to an existing PV
+#   volumeName: ""
+#   # Use an existing configmap (specified by name) instead of creating one
+#   existingConfig: ""
+#   # Toggle deployment of applications on/off. Applies to databases and third-party applications
+#   enabled: true
+
+migrator:
+  image:
+    defaultTag: 3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815
+    name: "migrator"
+  env:
+    CODEINSIGHTS_PGDATASOURCE:
+      value: postgres://postgres:password@codeinsights-db:5432/postgres
+    CODEINTEL_PGDATABASE:
+      value: sg
+    CODEINTEL_PGHOST:
+      value: codeintel-db
+    CODEINTEL_PGPORT:
+      value: "5432"
+    CODEINTEL_PGSSLMODE:
+      value: disable
+    CODEINTEL_PGUSER:
+      value: sg
+    PGDATABASE:
+      value: sg
+    PGHOST:
+      value: pgsql
+    PGUSER:
+      value: sg
+  resources: {}
+  podSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  # Available commands can be found at
+  # https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
+  args:
+  - up
+  - -db=all
+
