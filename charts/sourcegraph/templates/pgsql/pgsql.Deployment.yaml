@@ -119,18 +119,9 @@ spec:
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.pgsql.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

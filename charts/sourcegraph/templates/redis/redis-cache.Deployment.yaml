@@ -96,18 +96,9 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.redisCache.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.nodeSelector" (list . "redisCache" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "redisCache" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "redisCache" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

@@ -115,18 +115,9 @@ spec:
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.codeIntelDB.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
