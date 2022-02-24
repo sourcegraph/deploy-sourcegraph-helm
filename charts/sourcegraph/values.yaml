@@ -23,7 +23,7 @@ sourcegraph:
   podLabels: {}
   revisionHistoryLimit: 10
   serviceLabels: {}
-  tolerations: {}
+  tolerations: []
 
 
 # Generic application configuration options, used by most applications below
