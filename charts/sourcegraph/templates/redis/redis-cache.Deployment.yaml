@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Redis for storing short-lived caches.
-    kubectl.kubernetes.io/default-container: redis-cache
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.redisCache.labels }}
@@ -26,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: redis-cache
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

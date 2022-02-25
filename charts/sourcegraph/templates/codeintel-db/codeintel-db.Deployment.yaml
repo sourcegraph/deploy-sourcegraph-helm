@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Postgres database for various data.
-    kubectl.kubernetes.io/default-container: pgsql
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.codeIntelDB.labels }}
@@ -26,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: pgsql
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

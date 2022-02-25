@@ -27,6 +27,7 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "16686"
+        kubectl.kubernetes.io/default-container: jaeger
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

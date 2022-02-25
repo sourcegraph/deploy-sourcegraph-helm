@@ -4,7 +4,6 @@ metadata:
   annotations:
     description: Handles repository metadata (not Git data) lookups and updates from
       external code hosts and other similar services.
-    kubectl.kubernetes.io/default-container: repo-updater
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.repoUpdater.labels }}
@@ -29,6 +28,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: repo-updater
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
