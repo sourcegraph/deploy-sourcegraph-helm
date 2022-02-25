@@ -23,14 +23,14 @@ To customize configuration settings with an override file, create an empty yaml 
 overrides - example overrides can be found in the [examples](examples) folder.
 
 The install command would then be:
-`helm install -f <your-override-file.yaml> sourcegraph/sourcegraph`
+`helm install -f <your-override-file.yaml> <name> sourcegraph/sourcegraph`
 
 ### Setting a namespace
 
 By default, helm installs the chart into your active namespace. To install to a separate namespace, use the `--namespace` flag. For example:
-`helm install --namespace new-namespace sourcegraph/sourcegraph`
+`helm install --namespace new-namespace <name> sourcegraph/sourcegraph`
 Or if using an override file:
-`helm install --namespace new-namespace -f <your-override-file.yaml> sourcegraph/sourcegraph`
+`helm install --namespace new-namespace -f <your-override-file.yaml> <name> sourcegraph/sourcegraph`
 
 If the namespace does not already exist, add the `--create-namespace` flag to create it during installation.
 
@@ -76,7 +76,7 @@ To upgrade to a new version of the helm chart:
 1. (Optional) Review the changes that will be applied (`helm template` or `helm diff`, see [Reviewing changes](#reviewing-changes))
 
 1.  Install the new version:<br>
-`helm upgrade --install -f <your-override-file.yaml> --version <version> sourcegraph/sourcegraph`
+`helm upgrade --install -f <your-override-file.yaml> <name> --version <version> sourcegraph/sourcegraph`
 
 ## Versioning
 
