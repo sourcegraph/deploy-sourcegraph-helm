@@ -66,7 +66,7 @@ spec:
           {{- toYaml .Values.gitserver.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.gitserver.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.gitserver.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data/repos
           name: repos
@@ -82,7 +82,7 @@ spec:
         {{- toYaml .Values.gitserver.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.gitserver.securityContext | nindent 8 }}
+        {{- toYaml .Values.gitserver.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "gitserver" ) | trim | nindent 6 }}

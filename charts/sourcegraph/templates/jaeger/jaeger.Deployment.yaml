@@ -79,7 +79,7 @@ spec:
           {{- toYaml .Values.tracing.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.tracing.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.tracing.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.tracing.extraVolumeMounts }}
         {{- toYaml .Values.tracing.extraVolumeMounts | nindent 8 }}
@@ -88,7 +88,7 @@ spec:
         {{- toYaml .Values.tracing.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.tracing.securityContext | nindent 8 }}
+        {{- toYaml .Values.tracing.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "tracing" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "tracing" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "tracing" ) | trim | nindent 6 }}

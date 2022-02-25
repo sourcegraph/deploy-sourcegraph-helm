@@ -76,7 +76,7 @@ spec:
           {{- toYaml .Values.minio.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.minio.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.minio.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - name: minio-data
           mountPath: /data
@@ -89,7 +89,7 @@ spec:
         {{- toYaml .Values.minio.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.minio.securityContext | nindent 8 }}
+        {{- toYaml .Values.minio.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "minio" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "minio" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "minio" ) | trim | nindent 6 }}

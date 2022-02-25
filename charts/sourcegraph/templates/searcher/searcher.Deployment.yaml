@@ -97,13 +97,13 @@ spec:
           {{- toYaml .Values.searcher.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.searcher.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.searcher.containerSecurityContext | nindent 10 }}
       {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.searcher.extraContainers }}
         {{- toYaml .Values.searcher.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.searcher.securityContext | nindent 8 }}
+        {{- toYaml .Values.searcher.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "searcher" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "searcher" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "searcher" ) | trim | nindent 6 }}

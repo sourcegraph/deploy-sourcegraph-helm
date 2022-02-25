@@ -67,7 +67,7 @@ spec:
           {{- toYaml .Values.githubProxy.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.githubProxy.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.githubProxy.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.githubProxy.extraVolumeMounts }}
         {{- toYaml .Values.githubProxy.extraVolumeMounts | nindent 8 }}
@@ -77,7 +77,7 @@ spec:
         {{- toYaml .Values.githubProxy.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.githubProxy.securityContext | nindent 8 }}
+        {{- toYaml .Values.githubProxy.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "githubProxy" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "githubProxy" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "githubProxy" ) | trim | nindent 6 }}

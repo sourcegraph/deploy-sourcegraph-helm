@@ -72,7 +72,7 @@ spec:
           {{- toYaml .Values.redisStore.resources | nindent 10 }}
         {{- end }}
         securityContext:
-        {{- toYaml .Values.redisStore.podSecurityContext | nindent 10 }}
+        {{- toYaml .Values.redisStore.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
@@ -95,12 +95,12 @@ spec:
           {{- toYaml .Values.redisExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.redisExporter.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.redisExporter.containerSecurityContext | nindent 10 }}
       {{- if .Values.redisStore.extraContainers }}
         {{- toYaml .Values.redisStore.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.redisStore.securityContext | nindent 8 }}
+        {{- toYaml .Values.redisStore.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "redisStore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "redisStore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "redisStore" ) | trim | nindent 6 }}

@@ -75,13 +75,13 @@ spec:
           {{- toYaml .Values.grafana.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.grafana.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.grafana.containerSecurityContext | nindent 10 }}
       serviceAccountName: grafana
       {{- if .Values.grafana.extraContainers }}
         {{- toYaml .Values.grafana.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.grafana.securityContext | nindent 8 }}
+        {{- toYaml .Values.grafana.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "grafana" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "grafana" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "grafana" ) | trim | nindent 6 }}

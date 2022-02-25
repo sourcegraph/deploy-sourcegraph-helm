@@ -85,7 +85,7 @@ spec:
           {{- toYaml .Values.repoUpdater.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.repoUpdater.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.repoUpdater.extraVolumeMounts }}
         {{- toYaml .Values.repoUpdater.extraVolumeMounts | nindent 8 }}
@@ -95,7 +95,7 @@ spec:
         {{- toYaml .Values.repoUpdater.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.repoUpdater.securityContext | nindent 8 }}
+        {{- toYaml .Values.repoUpdater.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "repoUpdater" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "repoUpdater" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "repoUpdater" ) | trim | nindent 6 }}
