@@ -2,23 +2,34 @@
 
 ### Common Configuration ###
 sourcegraph:
-  affinity: {}
   image:
+    # -- Global docker image tag
     defaultTag: '{{ .Chart.AppVersion }}'
+    # -- Global docker image pull policy
     pullPolicy: IfNotPresent
+    # -- Global docker image registry or prefix
     repository: index.docker.io/sourcegraph
-    # When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
+    # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
-  # Mount a named secret containing docker credentials
+  # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # Add a global label to all resources
+  # -- Add a global label to all resources
   labels: {}
-  # Set a custom name for the app.kubernetes.io/name annotation
+  # -- Set a custom name for the app.kubernetes.io/name annotation
   nameOverride: ""
+  # -- Affinity,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- NodeSelector,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: {}
+  # -- Tolerations,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []
+  # -- Add extra annotations to attach to all pods
   podAnnotations: {}
+  # -- Add extra labels to attach to all pods
   podLabels: {}
-  tolerations: {}
 
 
 # Generic application configuration options, used by most applications below
@@ -69,8 +80,12 @@ sourcegraph:
 
 migrator:
   image:
+    # -- Docker image tag for the `migrator` image
     defaultTag: 3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815
+    # -- Docker image name for the `migrator` image
     name: "migrator"
+  # -- Environment variables for the `migrator` container
+  # @default -- the chart will add some default environment values
   env:
     CODEINSIGHTS_PGDATASOURCE:
       value: postgres://postgres:password@codeinsights-db:5432/postgres
@@ -90,15 +105,19 @@ migrator:
       value: pgsql
     PGUSER:
       value: sg
+  # -- Resource requests & limits for the `migrator` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources: {}
+  # -- Security context for the `migrator` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override default `migrator` container args
   # Available commands can be found at
   # https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
   args:
   - up
   - -db=all
-

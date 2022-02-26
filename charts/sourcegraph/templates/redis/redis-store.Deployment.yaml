@@ -14,7 +14,7 @@ metadata:
   name: {{ default "redis-store" .Values.redisStore.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.redisStore.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:

@@ -14,7 +14,7 @@ metadata:
   name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.codeIntelDB.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:

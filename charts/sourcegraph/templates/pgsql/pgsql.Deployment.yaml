@@ -14,7 +14,7 @@ metadata:
   name: {{ default "pgsql" .Values.pgsql.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.pgsql.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
