@@ -49,6 +49,7 @@ spec:
       containers:
       - name: repo-updater
         image: {{ include "sourcegraph.image" (list . "repoUpdater") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.repoUpdater.args }}
         args:
           {{- toYaml . | nindent 8 }}

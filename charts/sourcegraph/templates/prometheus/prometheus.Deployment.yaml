@@ -46,6 +46,7 @@ spec:
       containers:
       - name: prometheus
         image: {{ include "sourcegraph.image" (list . "prometheus") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.prometheus.args }}
         args:
           {{- toYaml . | nindent 8 }}

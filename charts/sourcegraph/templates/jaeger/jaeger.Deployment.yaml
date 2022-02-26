@@ -50,6 +50,7 @@ spec:
       containers:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "tracing") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: {{- default (list "--memory.max-traces=20000") .Values.tracing.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.tracing.env}}

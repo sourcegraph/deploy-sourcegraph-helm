@@ -42,6 +42,7 @@ spec:
       containers:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.indexedSearch.args }}
         args:
           {{- toYaml . | nindent 8 }}
@@ -77,6 +78,7 @@ spec:
         {{- end }}
       - name: zoekt-indexserver
         image: {{ include "sourcegraph.image" (list . "indexedSearchIndexer") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.indexedSearchIndexer.env}}
