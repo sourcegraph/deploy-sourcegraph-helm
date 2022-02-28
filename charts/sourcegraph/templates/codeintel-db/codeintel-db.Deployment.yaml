@@ -47,6 +47,7 @@ spec:
       initContainers:
       - name: correct-data-dir-permissions
         image: {{ include "sourcegraph.image" (list . "alpine") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data

@@ -45,6 +45,7 @@ spec:
       containers:
       - name: grafana
         image: {{ include "sourcegraph.image" (list . "grafana") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.grafana.args }}
         args:
           {{- toYaml . | nindent 8 }}

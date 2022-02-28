@@ -46,6 +46,7 @@ spec:
       containers:
       - name: redis-cache
         image: {{ include "sourcegraph.image" (list . "redisCache") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.redisCache.args }}
         args:
           {{- toYaml . | nindent 8 }}
@@ -81,6 +82,7 @@ spec:
         {{- end }}
       - name: redis-exporter
         image: {{ include "sourcegraph.image" (list . "redisExporter") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.redisExporter.env}}
