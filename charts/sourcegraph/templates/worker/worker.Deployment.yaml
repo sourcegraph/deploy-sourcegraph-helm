@@ -87,7 +87,7 @@ spec:
           {{- toYaml .Values.worker.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.worker.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.worker.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.worker.extraVolumeMounts }}
         {{- toYaml .Values.worker.extraVolumeMounts | nindent 8 }}
@@ -96,7 +96,7 @@ spec:
         {{- toYaml .Values.worker.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.worker.securityContext | nindent 8 }}
+        {{- toYaml .Values.worker.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "worker" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "worker" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "worker" ) | trim | nindent 6 }}

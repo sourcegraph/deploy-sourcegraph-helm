@@ -79,13 +79,13 @@ spec:
           {{- toYaml .Values.prometheus.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.prometheus.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.prometheus.containerSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       {{- if .Values.prometheus.extraContainers }}
         {{- toYaml .Values.prometheus.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.prometheus.securityContext | nindent 8 }}
+        {{- toYaml .Values.prometheus.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "prometheus" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "prometheus" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "prometheus" ) | trim | nindent 6 }}

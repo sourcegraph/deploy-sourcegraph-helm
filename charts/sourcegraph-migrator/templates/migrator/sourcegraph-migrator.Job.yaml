@@ -46,12 +46,12 @@ spec:
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
         securityContext:
-          {{- toYaml .Values.migrator.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.migrator.containerSecurityContext | nindent 10 }}
       {{- if .Values.migrator.extraContainers }}
         {{- toYaml .Values.migrator.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.migrator.securityContext | nindent 8 }}
+        {{- toYaml .Values.migrator.podSecurityContext | nindent 8 }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

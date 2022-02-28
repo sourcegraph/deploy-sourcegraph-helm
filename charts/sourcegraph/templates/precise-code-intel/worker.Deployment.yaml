@@ -87,7 +87,7 @@ spec:
           {{- toYaml .Values.preciseCodeIntel.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.preciseCodeIntel.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.preciseCodeIntel.extraVolumeMounts }}
         {{- toYaml .Values.preciseCodeIntel.extraVolumeMounts | nindent 8 }}
@@ -96,7 +96,7 @@ spec:
         {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.preciseCodeIntel.securityContext | nindent 8 }}
+        {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "preciseCodeIntel" ) | trim | nindent 6 }}

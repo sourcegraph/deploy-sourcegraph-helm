@@ -52,7 +52,7 @@ spec:
         - mountPath: /data
           name: disk
         securityContext:
-        {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
+        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
@@ -88,7 +88,7 @@ spec:
           {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.codeIntelDB.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -118,7 +118,7 @@ spec:
         {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        {{- toYaml .Values.codeIntelDB.securityContext | nindent 8 }}
+        {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "codeIntelDB" ) | trim | nindent 6 }}

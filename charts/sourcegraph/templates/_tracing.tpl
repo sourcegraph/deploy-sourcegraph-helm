@@ -31,5 +31,5 @@ Define the tracing sidecar
     - --reporter.type=grpc
 {{- end }}
   securityContext:
-    {{- toYaml .Values.tracingAgent.podSecurityContext | nindent 4 }}
+    {{- toYaml .Values.tracingAgent.containerSecurityContext | nindent 4 }}
 {{- end }}

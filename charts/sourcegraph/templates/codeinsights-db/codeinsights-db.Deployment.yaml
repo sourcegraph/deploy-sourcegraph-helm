@@ -70,7 +70,7 @@ spec:
           {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.codeInsightsDB.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
@@ -85,7 +85,7 @@ spec:
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.codeInsightsDB.securityContext | nindent 8 }}
+        {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "codeInsightsDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeInsightsDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "codeInsightsDB" ) | trim | nindent 6 }}

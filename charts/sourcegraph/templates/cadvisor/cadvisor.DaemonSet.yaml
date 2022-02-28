@@ -65,7 +65,7 @@ spec:
           {{- toYaml .Values.cadvisor.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.cadvisor.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.cadvisor.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
@@ -95,7 +95,7 @@ spec:
         {{- toYaml .Values.cadvisor.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.cadvisor.securityContext | nindent 8 }}
+        {{- toYaml .Values.cadvisor.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "cadvisor" ) | trim | nindent 6 }}

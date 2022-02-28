@@ -50,8 +50,8 @@ sourcegraph:
 #   env: {}
 #   # Set resource requests / limits
 #   resources: {}
+#   containerSecurityContext: {}
 #   podSecurityContext: {}
-#   securityContext: {}
 #   # Add additional volumes and mounts to deployments
 #   extraVolumeMounts: {}
 #   extraVolumes: {}
@@ -76,7 +76,7 @@ alpine: # Used in init containers
   image:
     defaultTag: 3.37.0@sha256:946f83cf1d822434f242c522cf71717de6cf014a6fc226c9ed82f27ad7e17aa3
     name: "alpine-3.12"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
@@ -116,7 +116,7 @@ codeInsightsDB:
   image:
     defaultTag: 3.37.0@sha256:fa608333a6ca1aef148abd33e4ee14886d4f172e0db1e5c9ee6bac36adec0bf1
     name: "codeinsights-db"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 70
     runAsGroup: 70
@@ -129,7 +129,7 @@ codeInsightsDB:
     requests:
       cpu: "4"
       memory: 2Gi
-  securityContext:
+  podSecurityContext:
     runAsUser: 70
     fsGroup: 70
     fsGroupChangePolicy: "OnRootMismatch"
@@ -141,7 +141,7 @@ codeIntelDB:
   image:
     defaultTag: 3.37.0@sha256:fc2ab91482f85f77eb73c69a35a2a4cc5055a1b93ef1c1d0f183a7003e632082
     name: "codeintel-db"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
@@ -158,7 +158,7 @@ codeIntelDB:
     requests:
       cpu: "4"
       memory: 4Gi
-  securityContext:
+  podSecurityContext:
     runAsUser: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
@@ -201,7 +201,7 @@ frontend:
     host: "" # External host name for SSL
     ingressClassName: null # Available in Kubernetes 1.18+
     tlsSecret: "" # Secret containing SSL cert
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -228,7 +228,7 @@ migrator:
     name: "migrator"
   env: {}
   resources: {}
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -238,7 +238,7 @@ githubProxy:
   image:
     defaultTag: 3.37.0@sha256:3b173e36f958b68479ae829d784c63346701df417afa14d14ae657a84e630dd5
     name: "github-proxy"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -257,7 +257,7 @@ gitserver:
     defaultTag: 3.37.0@sha256:9d005ebd221b3e9e5f41ad2c91f8f1b06758a70c6ddbff11acbf037461f7f3d5
     name: "gitserver"
   labels: {}
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -270,7 +270,7 @@ gitserver:
     requests:
       cpu: "4"
       memory: 8G
-  securityContext:
+  podSecurityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
@@ -283,7 +283,7 @@ grafana:
   image:
     defaultTag: 3.37.0@sha256:a47fde087ee42864ed6108796e95045857b55b3d9327b2d74257321384f6bbd1
     name: "grafana"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 472
     runAsGroup: 472
@@ -296,7 +296,7 @@ grafana:
     requests:
       cpu: 100m
       memory: 512Mi
-  securityContext:
+  podSecurityContext:
     runAsUser: 472
     runAsGroup: 472
     fsGroup: 472
@@ -309,7 +309,7 @@ indexedSearch:
   image:
     defaultTag: 3.37.0@sha256:0f81c4d33c852fc0ee819d5139efa1c48d6cb10a5f86fa2d37ed698bb2a0a892
     name: "indexed-searcher"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -322,7 +322,7 @@ indexedSearch:
     requests:
       cpu: 500m
       memory: 2G
-  securityContext:
+  podSecurityContext:
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
   # The size of disk to used for search indexes.
@@ -333,7 +333,7 @@ indexedSearchIndexer:
   image:
     defaultTag: 3.37.0@sha256:2a85ddfc2533e525cd7a3a7327fd0174976dcb40d933db8aaafe21ae7ec209c5
     name: "search-indexer"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -358,7 +358,7 @@ minio:
   image:
     defaultTag: 3.37.0@sha256:66925bab722ed11584e1135687b5c1e00a13c550e38d954a56048c90f17edc53
     name: "minio"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -370,7 +370,7 @@ minio:
     requests:
       cpu: "1"
       memory: 500M
-  securityContext:
+  podSecurityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
@@ -383,7 +383,7 @@ pgsql:
   image:
     defaultTag: 3.37.0@sha256:af00a4465f435742df9980cc9d8a8bda49d6adea173558a371e276b476ea94ae
     name: "postgres-12.6-alpine"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
@@ -400,7 +400,7 @@ pgsql:
     requests:
       cpu: "4"
       memory: 4Gi
-  securityContext:
+  podSecurityContext:
     # Required to prevent escalations to root.
     runAsUser: 999
     runAsGroup: 999
@@ -427,7 +427,7 @@ preciseCodeIntel:
   image:
     defaultTag: 3.37.0@sha256:8435299294539b1144bb897541de7c2535bacae486d91bba4656178b2ecf4d9f
     name: "precise-code-intel-worker"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -447,7 +447,7 @@ prometheus:
   image:
     defaultTag: 3.37.0@sha256:b51ccc7c9f19eacfeaa22f888432415dda3bebad58e14b84c829e02b2c719e66
     name: "prometheus"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 100
@@ -468,7 +468,7 @@ prometheus:
     requests:
       cpu: 500m
       memory: 6G
-  securityContext:
+  podSecurityContext:
     fsGroup: 100
     fsGroupChangePolicy: "OnRootMismatch"
   serviceAccount:
@@ -480,7 +480,7 @@ redisCache:
   image:
     defaultTag: 3.37.0@sha256:ff28c3902b0ba142e3409e3bb905913aaabc821e7efdaa43458ea3bbe65b7e16
     name: "redis-cache"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
@@ -493,7 +493,7 @@ redisCache:
     requests:
       cpu: "1"
       memory: 7Gi
-  securityContext:
+  podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
   storageSize: 100Gi
@@ -502,7 +502,7 @@ redisExporter:
   image:
     defaultTag: 3.37.0@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
     name: "redis_exporter"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
@@ -520,7 +520,7 @@ redisStore:
   image:
     defaultTag: 3.37.0@sha256:e1cfaeb18367d76838fec0e5f52e2c7d85f2fb63537a3fe809014a986393c9c7
     name: "redis-store"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
@@ -533,7 +533,7 @@ redisStore:
     requests:
       cpu: "1"
       memory: 7Gi
-  securityContext:
+  podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
   storageSize: 100Gi
@@ -542,7 +542,7 @@ repoUpdater:
   image:
     defaultTag: 3.37.0@sha256:fd0562d9d3972d2e4f504b0de8803f485603b57fbc4dd77ac085b1f96dfacbe4
     name: "repo-updater"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -560,7 +560,7 @@ searcher:
   image:
     defaultTag: 3.37.0@sha256:f603c68f8ece63fb3b49cfe09df8a4e7407c713dd6e0267395ba781f1c6fc36c
     name: "searcher"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -586,7 +586,7 @@ symbols:
   image:
     defaultTag: 3.37.0@sha256:b0a3b576e7d61bc9c489fa1378ab0ead4b28fe5fb85d96ae8bf7cd5d9b3631c9
     name: "symbols"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -606,7 +606,7 @@ syntectServer:
   image:
     defaultTag: 3.37.0@sha256:4c371a925ce1b97f2ec7f44c582795409c0b19d073a41c7123b07be06e2ebd47
     name: "syntax-highlighter"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -626,7 +626,7 @@ tracing:
   image:
     defaultTag: 3.37.0@sha256:aece0527d8efcee8ca7ee013a834ba8c332c44666542a45f6b5451d6e7949b74
     name: "jaeger-all-in-one"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -646,7 +646,7 @@ tracingAgent:
   image:
     defaultTag: 3.37.0@sha256:04026339976f6107b6490dfe61c9d9b3a541594ba99ff5115667a54e4ec917ba
     name: "jaeger-agent"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
@@ -663,7 +663,7 @@ worker:
   image:
     defaultTag: 3.37.0@sha256:0b3a8d3a59a65c5aabfa4c5bb78cc6eea1c7926fa66ae7558e20f8ca6b11d629
     name: "worker"
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101

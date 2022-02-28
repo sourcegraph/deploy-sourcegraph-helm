@@ -91,7 +91,7 @@ migrator:
     PGUSER:
       value: sg
   resources: {}
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101

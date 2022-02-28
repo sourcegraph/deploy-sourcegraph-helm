@@ -52,7 +52,7 @@ spec:
         - mountPath: /data
           name: disk
         securityContext:
-        {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
+        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
@@ -88,7 +88,7 @@ spec:
           {{- toYaml .Values.pgsql.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.pgsql.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.pgsql.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -119,10 +119,10 @@ spec:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.postgresExporter.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        {{- toYaml .Values.pgsql.securityContext | nindent 8 }}
+        {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
