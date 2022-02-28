@@ -110,6 +110,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "redisCache") | trim | nindent 6 }}
       volumes:
       - name: redis-data
         persistentVolumeClaim:

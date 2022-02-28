@@ -41,7 +41,16 @@ Create the name of the service account to use
 {{- define "sourcegraph.serviceAccountName" -}}
 {{- $top := index . 0 }}
 {{- $service := index . 1 }}
-{{- default $service (index $top.Values $service "serviceAccount" "name") }}
+{{- $defaultServiceAccountName := ((snakecase $service) | replace "_" "-") }}
+{{- default $defaultServiceAccountName (index $top.Values $service "serviceAccount" "name") }}
+{{- end }}
+
+{{- define "sourcegraph.renderServiceAccountName" -}}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- if or (index $top.Values $service "serviceAccount" "create") (index $top.Values $service "serviceAccount" "name") }}
+serviceAccountName: {{ include "sourcegraph.serviceAccountName" (list $top $service) }}
+{{- end }}
 {{- end }}
 
 {{/*
