@@ -18,3 +18,9 @@ steps:
     soft_fail:
       - exit_status: 255
     agents: { queue: job }
+  
+  - label: ":book: Check helm-docs"
+    commands:
+      - "./scripts/helm-docs.sh"
+      - "[[ -z $(git status -s) ]]"
+    agents: { queue: job }
