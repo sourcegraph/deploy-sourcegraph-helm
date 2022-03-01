@@ -140,3 +140,59 @@ It is commonly used to track key performance metrics over time, such as the foll
 A Prometheus instance is part of the default Sourcegraph cluster installation.
 
 The Prometheus deployment can be disabled by setting `prometheus.enabled` to `false`. This is not recommended, as it severely limits your ability to monitor the health of your instance and troubleshoot any issues. Instead, consider setting `prometheus.privileged` to `false`, which reduces the privileges required to deploy a Prometheus instance.
+
+## Migrate an existing kustomize installation to Helm
+
+### Add neccessary labels and annotations
+
+You may be able to migrate an existing kustomize installation created from [sourcegraph/deploy-sourcegraph](https://github.com/sourcegraph/deploy-sourcegraph) to Helm. This can be done by adding `meta.helm.sh/release-name`, `meta.helm.sh/release-namespace` annotations and the `app.kubernetes.io/managed-by=Helm` label to all the resources managed by the sourcegraph Helm Chart.
+
+```sh
+# The helm release name
+export RELEASE_NAME=sourcegraph
+# This is the k8s namespace of your current sourcegraph deployment
+export RELEASE_NAMESPACE=sourcegraph
+```
+
+```sh
+kubectl get -n $RELEASE_NAMESPACE deploy,sts,cm,svc,pvc,sa,ds,role,rolebinding,ingress -o name | xargs -I % kubectl label -n $RELEASE_NAMESPACE % app.kubernetes.io/managed-by=Helm
+kubectl get -n $RELEASE_NAMESPACE deploy,sts,cm,svc,pvc,sa,ds,role,rolebinding,ingress -o name | xargs -I % kubectl annotate -n $RELEASE_NAMESPACE % meta.helm.sh/release-name=$RELEASE_NAME
+kubectl get -n $RELEASE_NAMESPACE deploy,sts,cm,svc,pvc,sa,ds,role,rolebinding,ingress -o name | xargs -I % kubectl annotate -n $RELEASE_NAMESPACE % meta.helm.sh/release-namespace=$RELEASE_NAMESPACE
+```
+
+```sh
+kubectl label -n $RELEASE_NAMESPACE clusterrole/cadvisor clusterrolebinding/cadvisor psp/cadvisor app.kubernetes.io/managed-by=Helm
+kubectl annotate -n $RELEASE_NAMESPACE clusterrole/cadvisor clusterrolebinding/cadvisor psp/cadvisor meta.helm.sh/release-name=$RELEASE_NAME
+kubectl annotate -n $RELEASE_NAMESPACE clusterrole/cadvisor clusterrolebinding/cadvisor psp/cadvisor meta.helm.sh/release-namespace=$RELEASE_NAMESPACE
+```
+
+```sh
+kubectl label -n $RELEASE_NAMESPACE clusterrole/prometheus clusterrolebinding/prometheus app.kubernetes.io/managed-by=Helm
+kubectl annotate -n $RELEASE_NAMESPACE clusterrole/prometheus clusterrolebinding/prometheus meta.helm.sh/release-name=$RELEASE_NAME
+kubectl annotate -n $RELEASE_NAMESPACE clusterrole/prometheus clusterrolebinding/prometheus meta.helm.sh/release-namespace=$RELEASE_NAMESPACE
+```
+
+You may run the command below to verify that helm-managed resources now have the correct labels and annotations
+
+```sh
+helm diff --allow-unreleased -n sourcegraph sourcegraph sourcegraph/sourcegraph
+```
+
+### Migrate customization to helm values
+
+Follow the [configuration options](#configuration-options) to create an `override.yaml` values file to include any customization you may have included, such as enviornment variables, ingress name, `imagePullSecrets`, and `replicas`.
+
+### Update deployment to use helm
+
+> This step will cause brief downtown to your deployment. 
+
+This helm chart introduced changes to the deployment label selectors that are not compatible with the kustomize deployment, [learn more](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#label-selector-updates). Thereforce, we will have to recreate all `Deployment` and `Statefulset`. Rest assured your data will not be lost since they are persisted in PVC.
+
+```bash
+kubectl -n $RELEASE_NAMESPACE delete sts --all
+kubectl -n $RELEASE_NAMESPACE delete deploy --all
+```
+
+```sh
+helm upgrade --install -n $RELEASE_NAMESPACE -f override.yaml $RELEASE_NAME sourcegraph/sourcegraph
+```
