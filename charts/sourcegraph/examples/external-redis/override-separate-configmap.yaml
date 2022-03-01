@@ -1,0 +1,86 @@
+# Demonstrate using external redis instance(s)
+# Disables deployment of the internal `redis-cache` and `redis-store` deployment
+
+frontend:
+  env:
+    REDIS_CACHE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_CACHE_ENDPOINT
+    REDIS_STORE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_STORE_ENDPOINT
+
+repoUpdater:
+  env:
+    REDIS_CACHE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_CACHE_ENDPOINT
+    REDIS_STORE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_STORE_ENDPOINT
+
+gitserver:
+  env:
+    REDIS_CACHE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_CACHE_ENDPOINT
+    REDIS_STORE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_STORE_ENDPOINT
+
+searcher:
+  env:
+    REDIS_CACHE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_CACHE_ENDPOINT
+    REDIS_STORE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_STORE_ENDPOINT
+
+symbols:
+  env:
+    REDIS_CACHE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_CACHE_ENDPOINT
+    REDIS_STORE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_STORE_ENDPOINT
+
+worker:
+  env:
+    REDIS_CACHE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_CACHE_ENDPOINT
+    REDIS_STORE_ENDPOINT:
+      valueFrom:
+        configMapKeyRef: # Pre-existing configmap, not created by this chart
+          name: sourcegraph-external-redis-credentials
+          key: REDIS_STORE_ENDPOINT
+
+redisCache:
+  enabled: false
+
+redisStore:
+  enabled: false
