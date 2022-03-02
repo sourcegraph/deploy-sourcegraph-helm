@@ -381,8 +381,8 @@ pgsql:
   enabled: true
   existingConfig: "" # Name of an existing configmap
   image:
-    defaultTag: 3.37.0@sha256:af00a4465f435742df9980cc9d8a8bda49d6adea173558a371e276b476ea94ae
-    name: "postgres-12.6-alpine"
+    defaultTag: latest
+    name: "postgres-12-alpine"
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
