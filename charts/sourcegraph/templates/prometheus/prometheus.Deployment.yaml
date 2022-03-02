@@ -94,7 +94,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: prometheus
+      {{- include "sourcegraph.renderServiceAccountName" (list . "prometheus") | trim | nindent 6 }}
       volumes:
       - name: data
         persistentVolumeClaim:

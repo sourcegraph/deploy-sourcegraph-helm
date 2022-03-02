@@ -132,7 +132,7 @@ cadvisor:
   serviceAccount:
     # -- Enable creation of ServiceAccount for `cadvisor`
     create: true
-    # -- Name of the ServiceAccount
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: cadvisor
 
 codeInsightsDB:
@@ -171,6 +171,11 @@ codeInsightsDB:
     runAsUser: 70
     fsGroup: 70
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `codeinsights-db`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `codeinsights-db` data volume
   storageSize: 200Gi
 
@@ -211,6 +216,11 @@ codeIntelDB:
     runAsUser: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `codeintel-db`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
 
@@ -288,7 +298,7 @@ frontend:
   serviceAccount:
     # -- Enable creation of ServiceAccount for `frontend`
     create: true
-    # -- Name of the ServiceAccount
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: sourcegraph-frontend
 
 migrator:
@@ -340,6 +350,11 @@ githubProxy:
     requests:
       cpu: 100m
       memory: 250M
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `github-proxy`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 gitserver:
   image:
@@ -372,6 +387,11 @@ gitserver:
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `gitserver`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `gitserver` data volume
   storageSize: 200Gi
 
@@ -413,6 +433,8 @@ grafana:
   serviceAccount:
     # -- Enable creation of ServiceAccount for `grafana`
     create: true
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: grafana
   # -- PVC Storage Request for `grafana` data volume
   storageSize: 2Gi
 
@@ -445,6 +467,11 @@ indexedSearch:
   podSecurityContext:
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `indexed-search`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `indexed-search` data volume
   # The size of disk to used for search indexes.
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
@@ -514,6 +541,11 @@ minio:
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `minio`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `minio` data volume
   storageSize: 100Gi
 
@@ -556,6 +588,11 @@ pgsql:
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `pgsql`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `pgsql` data volume
   storageSize: 200Gi
 
@@ -606,6 +643,11 @@ preciseCodeIntel:
     requests:
       cpu: 500m
       memory: 2G
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `precise-code-intel-worker`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 prometheus:
   # -- Enable `prometheus` (recommended)
@@ -652,6 +694,8 @@ prometheus:
   serviceAccount:
     # -- Enable creation of ServiceAccount
     create: true
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: prometheus
   # -- PVC Storage Request for `prometheus` data volume
   storageSize: 200Gi
 
@@ -684,6 +728,11 @@ redisCache:
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `redis-cache`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `redis-cache` data volume
   storageSize: 100Gi
 
@@ -739,6 +788,11 @@ redisStore:
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `redis-store`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
   # -- PVC Storage Request for `redis-store` data volume
   storageSize: 100Gi
 
@@ -769,6 +823,11 @@ repoUpdater:
     requests:
       cpu: "1"
       memory: 500Mi
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `repo-updater`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 searcher:
   image:
@@ -799,6 +858,11 @@ searcher:
       cpu: 500m
       ephemeral-storage: 25G
       memory: 500M
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `searcher`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -847,6 +911,11 @@ symbols:
       cpu: 500m
       ephemeral-storage: 10G
       memory: 500M
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `symbols`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 syntectServer:
   image:
@@ -875,6 +944,11 @@ syntectServer:
     requests:
       cpu: 250m
       memory: 2G
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `syntect-server`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 tracing:
   collector:
@@ -927,6 +1001,11 @@ tracing:
     requests:
       cpu: 500m
       memory: 500M
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `jaeger`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
 
 # Jaeger sidecar container
 tracingAgent:
@@ -980,3 +1059,8 @@ worker:
     requests:
       cpu: 500m
       memory: 2G
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `worker`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""

@@ -85,6 +85,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "githubProxy") | trim | nindent 6 }}
       volumes:
       {{- if .Values.githubProxy.extraVolumes }}
       {{- toYaml .Values.githubProxy.extraVolumes | nindent 6 }}
