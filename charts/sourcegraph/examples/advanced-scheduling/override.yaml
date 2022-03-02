@@ -1,0 +1,120 @@
+## Override file demonstrating 
+# - the use of advanced scheduling in Kubernetes, including
+#   - node selector
+#   - tolerations
+#   - affinity to scatter services across multi availability zones 
+# - the use of YAMl anchor and alias to keep your override.yaml DRY
+#
+# For scaling guide, you should refer to our official docs 
+# - https://docs.sourcegraph.com/admin/install/kubernetes/scale
+# - https://docs.sourcegraph.com/dev/background-information/architecture#diagram
+
+sourcegraph:
+  # Global node selector
+  nodeSelector: &commonNodeSelector
+    kubernetes.io/arch: amd64
+  # Global tolerations
+  tolerations:
+  - key: "some-key"
+    operator: "Equal"
+    value: "some-value"
+    effect: "NoSchedule"
+
+# Common select labels to select pods that belong to the current helm release
+selectorLabels: &commonSelectorLabels
+  app.kubernetes.io/name: '{{ include "sourcegraph.name" . }}'
+  app.kubernetes.io/instance: '{{ .Release.Name }}'
+
+frontend:
+  replicaCount: 3
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: frontend
+          weight: 100
+
+gitserver:
+  replicaCount: 3
+  nodeSelector:
+    <<: *commonNodeSelector
+    cloud.google.com/gke-boot-disk: pd-ssd
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: gitserver
+          weight: 100
+
+indexedSearch:
+  replicaCount: 10
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: indexed-search
+          weight: 100
+
+preciseCodeIntel:
+  replicaCount: 3
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: precise-code-intel-worker
+          weight: 100
+
+searcher:
+  replicaCount: 5
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: searcher
+          weight: 100
+
+symbols:
+  replicaCount: 3
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: symbols
+          weight: 100
+
+worker:
+  replicaCount: 3
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - podAffinityTerm:
+            topologyKey: topology.kubernetes.io/zone
+            labelSelector:
+              matchLabels:
+                <<: *commonSelectorLabels
+                app: worker
+          weight: 100
