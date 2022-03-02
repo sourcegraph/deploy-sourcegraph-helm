@@ -88,9 +88,9 @@ nodeSelector:
 {{- $serviceAffinity := (index $top.Values $service "affinity") }}
 affinity:
 {{- if $serviceAffinity }}
-{{- $serviceAffinity | toYaml | trim | nindent 2 }}
+{{- tpl ($serviceAffinity | toYaml) $top | trim | nindent 2 }}
 {{- else if $globalAffinity }}
-{{- $globalAffinity | toYaml | trim | nindent 2 }}
+{{- tpl ($globalAffinity | toYaml) $top | trim | nindent 2 }}
 {{- end }}
 {{- end }}
 

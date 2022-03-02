@@ -1,0 +1,64 @@
+suite: affinity
+templates:
+- frontend/sourcegraph-frontend.Deployment.yaml
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render affinity values that contain template
+  set:
+    frontend:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              topologyKey: topology.kubernetes.io/zone
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: '{{ include "sourcegraph.name" . }}'
+                  app.kubernetes.io/instance: '{{ .Release.Name }}'
+                  app: frontend
+            weight: 100
+  asserts:
+  - equal:
+      path: spec.template.spec.affinity
+      value:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              topologyKey: topology.kubernetes.io/zone
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: sourcegraph
+                  app.kubernetes.io/instance: sourcegraph
+                  app: frontend
+            weight: 100
+
+- it: should render affinity values that do not contain template
+  set:
+    frontend:
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              topologyKey: topology.kubernetes.io/zone
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: sourcegraph
+                  app.kubernetes.io/instance: sourcegraph
+                  app: frontend
+            weight: 100
+  asserts:
+  - equal:
+      path: spec.template.spec.affinity
+      value:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              topologyKey: topology.kubernetes.io/zone
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/name: sourcegraph
+                  app.kubernetes.io/instance: sourcegraph
+                  app: frontend
+            weight: 100
