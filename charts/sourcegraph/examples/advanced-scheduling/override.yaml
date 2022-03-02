@@ -2,7 +2,7 @@
 # - the use of advanced scheduling in Kubernetes, including
 #   - node selector
 #   - tolerations
-#   - affinity to scatter services across multi availability zones 
+#   - affinity to scatter services across multiple nodes
 # - the use of YAMl anchor and alias to keep your override.yaml DRY
 #
 # For scaling guide, you should refer to our official docs 
@@ -31,7 +31,7 @@ frontend:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
@@ -47,7 +47,7 @@ gitserver:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
@@ -60,7 +60,7 @@ indexedSearch:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
@@ -73,7 +73,7 @@ preciseCodeIntel:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
@@ -86,7 +86,7 @@ searcher:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
@@ -99,7 +99,7 @@ symbols:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
@@ -112,7 +112,7 @@ worker:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
         - podAffinityTerm:
-            topologyKey: topology.kubernetes.io/zone
+            topologyKey: kubernetes.io/hostname
             labelSelector:
               matchLabels:
                 <<: *commonSelectorLabels
