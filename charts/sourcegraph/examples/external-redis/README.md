@@ -17,7 +17,7 @@ When using external Redis instances, you’ll need to specify the corresponding 
 - [worker.Deployment.yaml](../../templates/worker/worker.Deployment.yaml)
 ## Option 1 - One shared external Redis instance
 
-Example values override: [override-shared.yaml](./override-shared.yaml), [override-shared-configmap.yaml](./override-shared-configmap.yaml)
+Example values override [override-shared.yaml](./override-shared.yaml)
 
 ### `REDIS_ENDPOINT`
 
@@ -25,7 +25,7 @@ The string must either have the format `$HOST:PORT` or follow the [IANA specific
 
 ## Option 2 - Two separate external Redis instances
 
-Example values override: [override-separate.yaml](./override-separate.yaml), [override-separate-configmap.yaml](./override-separate-configmap.yaml)
+Example values override [override-separate.yaml](./override-separate.yaml)
 
 ### `REDIS_CACHE_ENDPOINT`
 
@@ -60,7 +60,7 @@ data:
   REDIS_STORE_ENDPOINT: ""
 ```
 
-Optionally, if your external Redis instances do not required authentication, you may use a [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/)
+Optionally, if your external Redis instances do not required authentication, you may use a [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/). Learn more about [how to reference ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data).
 
 ```yaml
 apiVersion: v1
