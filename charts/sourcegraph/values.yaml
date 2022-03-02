@@ -3,27 +3,41 @@
 
 ### Common Configuration ###
 sourcegraph:
-  affinity: {}
   image:
+    # -- Global docker image tag
     defaultTag: '{{ .Chart.AppVersion }}'
+    # -- Global docker image pull policy
     pullPolicy: IfNotPresent
+    # -- Global docker image registry or prefix
     repository: index.docker.io/sourcegraph
-    # When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
+    # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
-  # Mount a named secret containing docker credentials
+  # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # Add a global label to all resources
+  # -- Add extra labels to all resources
   labels: {}
-  # When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
+  # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
-  # Set a custom name for the app.kubernetes.io/name annotation
+  # -- Set a custom name for the app.kubernetes.io/name annotation
   nameOverride: ""
+  # -- Global Affinity,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- Global NodeSelector,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: {}
-  podAnnotations: {}
-  podLabels: {}
-  revisionHistoryLimit: 10
-  serviceLabels: {}
+  # -- Global Tolerations,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
+  # -- Add extra annotations to attach to all pods
+  podAnnotations: {}
+  # -- Add extra labels to attach to all pods
+  podLabels: {}
+  # -- Global deployment clean up policy,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
+  revisionHistoryLimit: 10
+  # -- Add extra labels to all services
+  serviceLabels: {}
 
 
 # Generic application configuration options, used by most applications below
@@ -74,13 +88,19 @@ sourcegraph:
 
 alpine: # Used in init containers
   image:
+    # -- Docker image tag for the `alpine` image
     defaultTag: 3.37.0@sha256:946f83cf1d822434f242c522cf71717de6cf014a6fc226c9ed82f27ad7e17aa3
+    # -- Docker image name for the `alpine` image
     name: "alpine-3.12"
+  # -- Security context for the `alpine` initContainer,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
+  # -- Resource requests & limits for the `alpine` initContainer,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: 10m
@@ -90,12 +110,18 @@ alpine: # Used in init containers
       memory: 50Mi
 
 cadvisor:
+  # -- Enable `cadvisor`
   enabled: true
   image:
+    # -- Docker image tag for the `cadvisor` image
     defaultTag: 3.37.0@sha256:7b0c6953e54746c16f63bcd9029d8bb52e348cd3921261694696eb66b28daf76
+    # -- Docker image name for the `cadvisor` image
     name: "cadvisor"
   podSecurityPolicy:
+    # -- Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `cadvisor` pods
     enabled: false
+  # -- Resource requests & limits for the `cadvisor` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: 300m
@@ -104,24 +130,34 @@ cadvisor:
       cpu: 150m
       memory: 200Mi
   serviceAccount:
+    # -- Enable creation of ServiceAccount for `cadvisor`
     create: true
+    # -- Name of the ServiceAccount
     name: cadvisor
 
 codeInsightsDB:
+  # -- Enable `codeinsights-db` PostgreSQL server
   enabled: true
+  # -- Environment variables for the `codeinsights-db` container
   env:
     POSTGRES_PASSWORD: # Accessible by Sourcegraph applications on the network only, so password auth is not used.
       value: password
+  # -- Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key.
   existingConfig: "" # Name of an existing configmap
   image:
+    # -- Docker image tag for the `codeinsights-db` image
     defaultTag: 3.37.0@sha256:fa608333a6ca1aef148abd33e4ee14886d4f172e0db1e5c9ee6bac36adec0bf1
+    # -- Docker image name for the `codeinsights-db` image
     name: "codeinsights-db"
+  # -- Security context for the `codeinsights-db` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 70
     runAsGroup: 70
     readOnlyRootFilesystem: true
-  replicaCount: 1
+  # -- Resource requests & limits for the `codeinsights-db` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "4"
@@ -129,28 +165,39 @@ codeInsightsDB:
     requests:
       cpu: "4"
       memory: 2Gi
+  # -- Security context for the `codeinsights-db` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     runAsUser: 70
     fsGroup: 70
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `codeinsights-db` data volume
   storageSize: 200Gi
 
 codeIntelDB:
+  # -- Enable `codeintel-db` PostgreSQL server
   enabled: true
-  existingConfig: "" # Name of an existing configmap
+  # -- Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key
+  existingConfig: ""
   image:
+    # -- Docker image tag for the `codeintel-db` image
     defaultTag: 3.37.0@sha256:fc2ab91482f85f77eb73c69a35a2a4cc5055a1b93ef1c1d0f183a7003e632082
+    # -- Docker image name for the `codeintel-db` image
     name: "codeintel-db"
+  # -- Security context for the `codeintel-db` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
   postgresExporter:
+    # -- Environment variables for the `pgsql-exporter` sidecar container
     env:
       DATA_SOURCE_NAME:
         value: postgres://sg:@localhost:5432/?sslmode=disable
-  replicaCount: 1
+  # -- Resource requests & limits for the `codeintel-db` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "4"
@@ -158,13 +205,18 @@ codeIntelDB:
     requests:
       cpu: "4"
       memory: 4Gi
+  # -- Security context for the `codeintel-db` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     runAsUser: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
 
 frontend:
+  # -- Environment variables for the `frontend` container
+  # @default -- the chart will add some default environment values
   env:
     CODEINSIGHTS_PGDATASOURCE:
       value: postgres://postgres:password@codeinsights-db:5432/postgres
@@ -191,23 +243,39 @@ frontend:
     PROMETHEUS_URL:
       value: http://prometheus:30090
   image:
+    # -- Docker image tag for the `frontend` image
     defaultTag: 3.37.0@sha256:724ccb31e95237cbe12b51f3c8b8d22a7d0ac65a73ee8084614360c2018ce3ca
+    # -- Docker image name for the `frontend` image
     name: "frontend"
   ingress:
+    # -- Enable ingress for the Sourcegraph server
+    enabled: true
+    # -- Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/)
     annotations:
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/proxy-body-size: 150m
-    enabled: true
-    host: "" # External host name for SSL
-    ingressClassName: null # Available in Kubernetes 1.18+
-    tlsSecret: "" # Secret containing SSL cert
+    # -- External hostname for the Sourcegraph server ingress (SSL)
+    host: ""
+    # -- IngressClassName for the Ingress (Available in Kubernetes 1.18+)
+    ingressClassName: null
+    # -- Secret containing SSL cert
+    tlsSecret: ""
+  # -- Security context for the `frontend` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  privileged: true # Creates Role instead of using existing roles
+  # -- Security context for the `frontend` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Enable creation of Role and RoleBinding (RBAC). Uses [view](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) ClusterRole if set to false
+  privileged: true
+  # -- Number of `frontend` pod
   replicaCount: 2
+  # -- Resource requests & limits for the `frontend` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"
@@ -218,16 +286,27 @@ frontend:
       ephemeral-storage: 4Gi
       memory: 2G
   serviceAccount:
+    # -- Enable creation of ServiceAccount for `frontend`
     create: true
+    # -- Name of the ServiceAccount
     name: sourcegraph-frontend
 
 migrator:
+  # -- Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in
+  # `frontend` deployment to perform database migration
   enabled: true
   image:
+    # -- Docker image tag for the `migrator` image
     defaultTag: 3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815
+    # -- Docker image name for the `migrator` image
     name: "migrator"
+  # -- Environment variables for the `migrator` container
   env: {}
+  # -- Resource requests & limits for the `migrator` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources: {}
+  # -- Security context for the `migrator` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
@@ -236,14 +315,24 @@ migrator:
 
 githubProxy:
   image:
+    # -- Docker image tag for the `github-proxy` image
     defaultTag: 3.37.0@sha256:3b173e36f958b68479ae829d784c63346701df417afa14d14ae657a84e630dd5
+    # -- Docker image name for the `github-proxy` image
     name: "github-proxy"
+  # -- Security context for the `github-proxy` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `github-proxy` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `github-proxy` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `github-proxy` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -254,15 +343,21 @@ githubProxy:
 
 gitserver:
   image:
+    # -- Docker image tag for the `gitserver` image
     defaultTag: 3.37.0@sha256:9d005ebd221b3e9e5f41ad2c91f8f1b06758a70c6ddbff11acbf037461f7f3d5
+    # -- Docker image name for the `gitserver` image
     name: "gitserver"
-  labels: {}
+  # -- Security context for the `gitserver` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Number of `gitserver` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `gitserver` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "4"
@@ -270,25 +365,37 @@ gitserver:
     requests:
       cpu: "4"
       memory: 8G
+  # -- Security context for the `gitserver` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `gitserver` data volume
   storageSize: 200Gi
 
 grafana:
+  # -- Enable `grafana` dashboard (recommended)
   enabled: true
+  # -- Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key.
   existingConfig: "" # Name of an existing configmap
   image:
+    # -- Docker image tag for the `grafana` image
     defaultTag: 3.37.0@sha256:a47fde087ee42864ed6108796e95045857b55b3d9327b2d74257321384f6bbd1
+    # -- Docker image name for the `grafana` image
     name: "grafana"
+  # -- Security context for the `grafana` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 472
     runAsGroup: 472
     readOnlyRootFilesystem: true
+  # -- Number of `grafana` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `grafana` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -296,25 +403,36 @@ grafana:
     requests:
       cpu: 100m
       memory: 512Mi
+  # -- Security context for the `grafana` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     runAsUser: 472
     runAsGroup: 472
     fsGroup: 472
     fsGroupChangePolicy: "OnRootMismatch"
   serviceAccount:
+    # -- Enable creation of ServiceAccount for `grafana`
     create: true
+  # -- PVC Storage Request for `grafana` data volume
   storageSize: 2Gi
 
 indexedSearch:
   image:
+    # -- Docker image tag for the `zoekt-webserver` image
     defaultTag: 3.37.0@sha256:0f81c4d33c852fc0ee819d5139efa1c48d6cb10a5f86fa2d37ed698bb2a0a892
+    # -- Docker image name for the `zoekt-webserver` image
     name: "indexed-searcher"
+  # -- Security context for the `zoekt-webserver` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Number of `indexed-search` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `zoekt-webserver` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"
@@ -322,25 +440,34 @@ indexedSearch:
     requests:
       cpu: 500m
       memory: 2G
+  # -- Security context for the `indexed-search` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `indexed-search` data volume
   # The size of disk to used for search indexes.
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
   storageSize: 200Gi
 
 indexedSearchIndexer:
   image:
+    # -- Docker image tag for the `zoekt-indexserver` image
     defaultTag: 3.37.0@sha256:2a85ddfc2533e525cd7a3a7327fd0174976dcb40d933db8aaafe21ae7ec209c5
+    # -- Docker image name for the `zoekt-indexserver` image
     name: "search-indexer"
+  # -- Security context for the `zoekt-indexserver` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Resource requests & limits for the `zoekt-indexserver` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
+  # lower lag between a new commit and it being indexed for search.
   resources:
-    # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
-    # lower lag between a new commit and it being indexed for search.
     limits:
       cpu: "8"
       memory: 8G
@@ -349,20 +476,30 @@ indexedSearchIndexer:
       memory: 4G
 
 minio:
+  # -- Enable `minio` (S3 compatible storage)
   enabled: true
+  # -- Environment variables for the `minio` container
+  # You should change below variables in production
   env:
     MINIO_ACCESS_KEY:
       value: AKIAIOSFODNN7EXAMPLE
     MINIO_SECRET_KEY:
       value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
   image:
+    # -- Docker image tag for the `minio` image
     defaultTag: 3.37.0@sha256:66925bab722ed11584e1135687b5c1e00a13c550e38d954a56048c90f17edc53
+    # -- Docker image tag for the `minio` image
     name: "minio"
+  # -- Security context for the `minio` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
+  # -- Number of `minio` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `minio` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -370,29 +507,40 @@ minio:
     requests:
       cpu: "1"
       memory: 500M
+  # -- Security context for the `minio` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `minio` data volume
   storageSize: 100Gi
 
 pgsql:
+  # -- Enable `pgsql` PostgreSQL server
   enabled: true
+  # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
   existingConfig: "" # Name of an existing configmap
   image:
+    # -- Docker image tag for the `pgsql` image
     defaultTag: 3.37.0@sha256:af00a4465f435742df9980cc9d8a8bda49d6adea173558a371e276b476ea94ae
+    # -- Docker image name for the `pgsql` image
     name: "postgres-12.6-alpine"
+  # -- Security context for the `pgsql` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
   postgresExporter:
+    # -- Environment variables for the `pgsql-exporter` sidecar container
     env:
       DATA_SOURCE_NAME:
         value: postgres://sg:@localhost:5432/?sslmode=disable
-  replicaCount: 1
+  # -- Resource requests & limits for the `pgsql` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "4"
@@ -400,18 +548,25 @@ pgsql:
     requests:
       cpu: "4"
       memory: 4Gi
+  # -- Security context for the `pgsql` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     # Required to prevent escalations to root.
     runAsUser: 999
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `pgsql` data volume
   storageSize: 200Gi
 
 postgresExporter:
   image:
+    # -- Docker image tag for the `pgsql-exporter` image
     defaultTag: 3.37.0@sha256:20e58b62f064037ac3d901eba565f49d7e1daae2a237e6fa3d5351580d576dea
+    # -- Docker image name for the `pgsql-exporter` image
     name: "postgres_exporter"
+  # -- Resource requests & limits for the `pgsql-exporter` sidecar container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: 10m
@@ -421,18 +576,29 @@ postgresExporter:
       memory: 50Mi
 
 preciseCodeIntel:
+  # -- Environment variables for the `precise-code-intel-worker` container
   env:
     NUM_WORKERS:
       value: "4"
   image:
+    # -- Docker image tag for the `precise-code-intel-worker` image
     defaultTag: 3.37.0@sha256:8435299294539b1144bb897541de7c2535bacae486d91bba4656178b2ecf4d9f
+    # -- Docker image name for the `precise-code-intel-worker` image
     name: "precise-code-intel-worker"
+  # -- Security context for the `precise-code-intel-worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `precise-code-intel-worker` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `precise-code-intel-worker` pod
   replicaCount: 2
+  # -- Resource requests & limits for the `precise-code-intel-worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"
@@ -442,18 +608,28 @@ preciseCodeIntel:
       memory: 2G
 
 prometheus:
+  # -- Enable `prometheus` (recommended)
   enabled: true
+  # -- Name of existing ConfigMap for `pgsql`. It must contain a `prometheus.yml` key
   existingConfig: "" # Name of an existing configmap
   image:
+    # -- Docker image tag for the `prometheus` image
     defaultTag: 3.37.0@sha256:b51ccc7c9f19eacfeaa22f888432415dda3bebad58e14b84c829e02b2c719e66
+    # -- Docker image name for the `prometheus` image
     name: "prometheus"
+  # -- Security context for the `prometheus` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 100
     readOnlyRootFilesystem: true
+  # -- Enable RBAC for `prometheus`
   privileged: true
+  # -- Number of `prometheus` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `prometheus` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   # Prometheus is relied upon to monitor services for sending alerts to site admins when
   # something is wrong with Sourcegraph, thus its memory requests and limits are the same to
   # guarantee it has enough memory to perform its job reliably and prevent conflicts with
@@ -468,24 +644,34 @@ prometheus:
     requests:
       cpu: 500m
       memory: 6G
+  # -- Security context for the `prometheus` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     fsGroup: 100
     fsGroupChangePolicy: "OnRootMismatch"
   serviceAccount:
+    # -- Enable creation of ServiceAccount
     create: true
+  # -- PVC Storage Request for `prometheus` data volume
   storageSize: 200Gi
 
 redisCache:
+  # -- Enable `redis-cache` Redis server
   enabled: true
   image:
+    # -- Docker image tag for the `redis-cache` image
     defaultTag: 3.37.0@sha256:ff28c3902b0ba142e3409e3bb905913aaabc821e7efdaa43458ea3bbe65b7e16
+    # -- Docker image name for the `redis-cache` image
     name: "redis-cache"
+  # -- Security context for the `redis-cache` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
-  replicaCount: 1
+  # -- Resource requests & limits for the `redis-cache` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -493,20 +679,29 @@ redisCache:
     requests:
       cpu: "1"
       memory: 7Gi
+  # -- Security context for the `redis-cache` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `redis-cache` data volume
   storageSize: 100Gi
 
 redisExporter:
   image:
+    # -- Docker image tag for the `redis-exporter` image
     defaultTag: 3.37.0@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+    # -- Docker image name for the `redis-exporter` image
     name: "redis_exporter"
+  # -- Security context for the `redis-exporter` sidecar container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
+  # -- Resource requests & limits for the `redis-exporter` sidecar container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: 10m
@@ -516,16 +711,22 @@ redisExporter:
       memory: 100Mi
 
 redisStore:
+  # -- Enable `redis-store` Redis server
   enabled: true
   image:
+    # -- Docker image tag for the `redis-store` image
     defaultTag: 3.37.0@sha256:e1cfaeb18367d76838fec0e5f52e2c7d85f2fb63537a3fe809014a986393c9c7
+    # -- Docker image name for the `redis-store` image
     name: "redis-store"
+  # -- Security context for the `redis-store` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
-  replicaCount: 1
+  # -- Resource requests & limits for the `redis-store` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -533,21 +734,34 @@ redisStore:
     requests:
       cpu: "1"
       memory: 7Gi
+  # -- Security context for the `redis-store` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- PVC Storage Request for `redis-store` data volume
   storageSize: 100Gi
 
 repoUpdater:
   image:
+    # -- Docker image tag for the `repo-updater` image
     defaultTag: 3.37.0@sha256:fd0562d9d3972d2e4f504b0de8803f485603b57fbc4dd77ac085b1f96dfacbe4
+    # -- Docker image name for the `repo-updater` image
     name: "repo-updater"
+  # -- Security context for the `repo-updater` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `repo-updater` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `repo-updater` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `repo-updater` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -558,14 +772,24 @@ repoUpdater:
 
 searcher:
   image:
+    # -- Docker image tag for the `searcher` image
     defaultTag: 3.37.0@sha256:f603c68f8ece63fb3b49cfe09df8a4e7407c713dd6e0267395ba781f1c6fc36c
+    # -- Docker image name for the `searcher` image
     name: "searcher"
+  # -- Security context for the `searcher` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `searcher` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `searcher` pod
   replicaCount: 2
+  # -- Resource requests & limits for the `searcher` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"
@@ -577,21 +801,43 @@ searcher:
       memory: 500M
 
 storageClass:
-  create: true # Disable if you have your own existing storage class
-  name: sourcegraph # Customize to the existing storage class name
+  # -- Enable creation of storageClass.
+  # Disable if you have your own existing storage class
+  create: true
+  # -- Name of the storageClass.
+  # Use to customize to the existing storage class name
+  name: sourcegraph
+  # -- Name of the storageClass provisioner,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
+  # and consult your cloud provider persistent storage documentation
   provisioner: kubernetes.io/gce-pd
+  # -- Value of `type` key in storageClass `parameters`,
+  # consult your cloud provider persistent storage documentation
   type: pd-ssd
+  # -- Extra parameters of storageClass,
+  # consult your cloud provider persistent storage documentation
+  parameters: {}
 
 symbols:
   image:
+    # -- Docker image tag for the `symbols` image
     defaultTag: 3.37.0@sha256:b0a3b576e7d61bc9c489fa1378ab0ead4b28fe5fb85d96ae8bf7cd5d9b3631c9
+    # -- Docker image name for the `symbols` image
     name: "symbols"
+  # -- Security context for the `symbols` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `symbols` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `symbols` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `symbols` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"
@@ -604,14 +850,24 @@ symbols:
 
 syntectServer:
   image:
+    # -- Docker image tag for the `syntect-server` image
     defaultTag: 3.37.0@sha256:4c371a925ce1b97f2ec7f44c582795409c0b19d073a41c7123b07be06e2ebd47
+    # -- Docker image name for the `syntect-server` image
     name: "syntax-highlighter"
+  # -- Security context for the `syntect-server` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `syntect-server` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `syntect-server` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `syntect-server` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "4"
@@ -621,18 +877,49 @@ syntectServer:
       memory: 2G
 
 tracing:
-  collector: {}
+  collector:
+    # -- Name of jaeger `collector` service 
+    name: ""
+    # -- Add extra annotations to jaeger `collector` service
+    serviceAnnotations: {}
+    # -- Add extra labels to jaeger `collector` service
+    serviceLabels: {}
+    # -- Kubernetes service type of jaeger `collector` service,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+    # @default -- "ClusterIP"
+    serviceType: ""
+  # -- Enable `jaeger`
   enabled: true
   image:
+    # -- Docker image tag for the `jaeger` image
     defaultTag: 3.37.0@sha256:aece0527d8efcee8ca7ee013a834ba8c332c44666542a45f6b5451d6e7949b74
+    # -- Docker image name for the `jaeger` image
     name: "jaeger-all-in-one"
+  # -- Security context for the `jaeger` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  query: {}
+  # -- Security context for the `jaeger` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  query:
+    # -- Name of jaeger `query` service 
+    name: ""
+    # -- Add extra annotations to jaeger `query` service
+    serviceAnnotations: {}
+    # -- Add extra labels to jaeger `query` service
+    serviceLabels: {}
+    # -- Kubernetes service type of jaeger `query` service,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types)
+    # @default -- "ClusterIP"
+    serviceType: ""
+  # -- Number of `jaeger` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `jaeger` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -641,16 +928,23 @@ tracing:
       cpu: 500m
       memory: 500M
 
+# Jaeger sidecar container
 tracingAgent:
   enabled: true
   image:
+    # -- Docker image tag for the `jaeger-agent` image
     defaultTag: 3.37.0@sha256:04026339976f6107b6490dfe61c9d9b3a541594ba99ff5115667a54e4ec917ba
+    # -- Docker image name for the `jaeger-agent` image
     name: "jaeger-agent"
+  # -- Security context for the `jaeger-agent` sidecar container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Resource requests & limits for the `jaeger-agent` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "1"
@@ -661,14 +955,24 @@ tracingAgent:
 
 worker:
   image:
+    # -- Docker image tag for the `worker` image
     defaultTag: 3.37.0@sha256:0b3a8d3a59a65c5aabfa4c5bb78cc6eea1c7926fa66ae7558e20f8ca6b11d629
+    # -- Docker image name for the `worker` image
     name: "worker"
+  # -- Security context for the `worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Security context for the `worker` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `worker` pod
   replicaCount: 1
+  # -- Resource requests & limits for the `worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"

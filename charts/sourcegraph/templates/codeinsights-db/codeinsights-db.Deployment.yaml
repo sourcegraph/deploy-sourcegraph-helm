@@ -14,7 +14,7 @@ metadata:
   name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.codeInsightsDB.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
