@@ -26,7 +26,7 @@ All notable changes to Sourcegraph are documented in this file.
 
 -
 
-## 1.0.0
+## 0.4.0
 
 :bulb: We revamped the documentation of helm chart configuration options, [learn more](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/main/charts/sourcegraph#configuration-options)
 
