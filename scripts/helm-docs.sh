@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 # Copy from https://github.com/linkerd/linkerd2/blob/main/bin/helm-docs
 
 set -euf -o pipefail
