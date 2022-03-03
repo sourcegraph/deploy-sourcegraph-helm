@@ -4,7 +4,7 @@
 
 ## 1. Bump the `version` in `Chart.yaml`
 
-Doulbe check the `CHANGELOG.md` see if there is any `**BREAKING**:` changes and follow [semver] to bump chart `version` accordingly.
+Double check the `CHANGELOG.md` to see if there are any `**BREAKING**:` changes and follow [semver] to bump chart `version` accordingly. Increase the minor version for a breaking change or Sourcegraph upgrade, patch version for a backwards-compatible change.
 
 ## 2. Update autogen docs
 
