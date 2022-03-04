@@ -555,6 +555,10 @@ pgsql:
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
   existingConfig: "" # Name of an existing configmap
   image:
+    # -- Docker image name for the `pgsql` image
+    name: "postgres-12.6-alpine"
+    # -- Security context for the `pgsql` container,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
     defaultTag: 135107_2022-03-03_9498a8bd3366@sha256:e26b159dc7c0c47d136886390c899816e669a3c2c1ead689bdad0b610364e45e
     name: "postgres-12-alpine"
   containerSecurityContext:
