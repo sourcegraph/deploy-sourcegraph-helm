@@ -90,6 +90,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "gitserver") | trim | nindent 6 }}
       volumes:
       - name: repos
       {{- if .Values.gitserver.sshSecret }}

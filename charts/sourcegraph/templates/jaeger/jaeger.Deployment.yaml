@@ -96,6 +96,7 @@ spec:
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "tracing") | trim | nindent 6 }}
       {{- end }}
       volumes:
       {{- if .Values.tracing.extraVolumes }}

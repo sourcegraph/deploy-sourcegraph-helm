@@ -77,7 +77,7 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.grafana.containerSecurityContext | nindent 10 }}
-      serviceAccountName: grafana
+      {{- include "sourcegraph.renderServiceAccountName" (list . "grafana") | trim | nindent 6 }}
       {{- if .Values.grafana.extraContainers }}
         {{- toYaml .Values.grafana.extraContainers | nindent 6 }}
       {{- end }}

@@ -104,6 +104,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "repoUpdater") | trim | nindent 6 }}
       volumes:
       {{- if .Values.repoUpdater.extraVolumes }}
       {{- toYaml .Values.repoUpdater.extraVolumes | nindent 6 }}

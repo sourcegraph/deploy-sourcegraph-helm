@@ -14,7 +14,7 @@ metadata:
   name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.codeIntelDB.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -127,6 +127,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "codeIntelDB") | trim | nindent 6 }}
       volumes:
       - name: disk
         persistentVolumeClaim:

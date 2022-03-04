@@ -42,7 +42,7 @@ spec:
         deploy: sourcegraph
         app: cadvisor
     spec:
-      serviceAccountName: {{ include "sourcegraph.serviceAccountName" (list . "cadvisor") }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "cadvisor") | trim | nindent 6 }}
       containers:
       - name: cadvisor
         image: {{ include "sourcegraph.image" (list . "cadvisor" ) }}

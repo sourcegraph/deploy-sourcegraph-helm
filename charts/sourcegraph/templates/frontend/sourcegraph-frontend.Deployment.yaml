@@ -133,7 +133,7 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "frontend") | trim | nindent 6 }}
       volumes:
       - emptyDir: {}
         name: cache-ssd
