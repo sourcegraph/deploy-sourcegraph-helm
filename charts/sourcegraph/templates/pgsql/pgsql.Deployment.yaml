@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Postgres database for various data.
-    kubectl.kubernetes.io/default-container: pgsql
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql
@@ -15,7 +14,7 @@ metadata:
   name: {{ default "pgsql" .Values.pgsql.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.pgsql.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -26,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: pgsql
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -47,12 +47,13 @@ spec:
       initContainers:
       - name: correct-data-dir-permissions
         image: {{ include "sourcegraph.image" (list . "alpine") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
           name: disk
         securityContext:
-        {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
+        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
@@ -60,6 +61,10 @@ spec:
       containers:
       - image: {{ include "sourcegraph.image" (list . "pgsql") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.pgsql.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         readinessProbe:
           exec:
@@ -84,7 +89,7 @@ spec:
           {{- toYaml .Values.pgsql.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.pgsql.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.pgsql.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -115,26 +120,18 @@ spec:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.postgresExporter.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        {{- toYaml .Values.pgsql.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "pgsql") | trim | nindent 6 }}
       volumes:
       - name: disk
         persistentVolumeClaim:

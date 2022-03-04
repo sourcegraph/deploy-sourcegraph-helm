@@ -27,6 +27,7 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "16686"
+        kubectl.kubernetes.io/default-container: jaeger
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -49,7 +50,8 @@ spec:
       containers:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "tracing") }}
-        args: ["--memory.max-traces=20000"]
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        args: {{- default (list "--memory.max-traces=20000") .Values.tracing.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.tracing.env}}
         - name: {{ $name }}
@@ -78,7 +80,7 @@ spec:
           {{- toYaml .Values.tracing.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.tracing.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.tracing.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.tracing.extraVolumeMounts }}
         {{- toYaml .Values.tracing.extraVolumeMounts | nindent 8 }}
@@ -87,22 +89,14 @@ spec:
         {{- toYaml .Values.tracing.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.tracing.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.tracing.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "tracing" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "tracing" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "tracing" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "tracing") | trim | nindent 6 }}
       {{- end }}
       volumes:
       {{- if .Values.tracing.extraVolumes }}

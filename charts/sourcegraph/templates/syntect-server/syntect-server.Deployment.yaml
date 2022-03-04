@@ -27,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: syntect-server
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -53,6 +54,10 @@ spec:
         {{- end }}
         image: {{ include "sourcegraph.image" (list . "syntectServer") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.syntectServer.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -72,7 +77,7 @@ spec:
           {{- toYaml .Values.syntectServer.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.syntectServer.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.syntectServer.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.syntectServer.extraVolumeMounts }}
         {{- toYaml .Values.syntectServer.extraVolumeMounts | nindent 8 }}
@@ -81,23 +86,15 @@ spec:
         {{- toYaml .Values.syntectServer.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.syntectServer.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.syntectServer.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "syntectServer" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "syntectServer" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "syntectServer") | trim | nindent 6 }}
       volumes:
       {{- if .Values.syntectServer.extraVolumes }}
       {{- toYaml .Values.syntectServer.extraVolumes | nindent 6 }}

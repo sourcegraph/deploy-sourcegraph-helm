@@ -27,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: worker
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -57,6 +58,10 @@ spec:
               fieldPath: metadata.name
         image: {{ include "sourcegraph.image" (list . "worker" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.worker.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -82,7 +87,7 @@ spec:
           {{- toYaml .Values.worker.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.worker.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.worker.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.worker.extraVolumeMounts }}
         {{- toYaml .Values.worker.extraVolumeMounts | nindent 8 }}
@@ -91,23 +96,15 @@ spec:
         {{- toYaml .Values.worker.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.worker.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.worker.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "worker" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "worker" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "worker" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "worker") | trim | nindent 6 }}
       volumes:
       {{- if .Values.worker.extraVolumes }}
       {{- toYaml .Values.worker.extraVolumes | nindent 6 }}

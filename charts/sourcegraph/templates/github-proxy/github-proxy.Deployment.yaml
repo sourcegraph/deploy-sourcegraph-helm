@@ -3,7 +3,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Rate-limiting proxy for the GitHub API.
-    kubectl.kubernetes.io/default-container: github-proxy
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.githubProxy.labels }}
@@ -28,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: github-proxy
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -49,6 +49,10 @@ spec:
       - name: github-proxy
         image: {{ include "sourcegraph.image" (list . "githubProxy") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.githubProxy.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.githubProxy.env}}
@@ -63,7 +67,7 @@ spec:
           {{- toYaml .Values.githubProxy.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.githubProxy.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.githubProxy.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.githubProxy.extraVolumeMounts }}
         {{- toYaml .Values.githubProxy.extraVolumeMounts | nindent 8 }}
@@ -73,23 +77,15 @@ spec:
         {{- toYaml .Values.githubProxy.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.githubProxy.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.githubProxy.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "githubProxy" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "githubProxy" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "githubProxy" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "githubProxy") | trim | nindent 6 }}
       volumes:
       {{- if .Values.githubProxy.extraVolumes }}
       {{- toYaml .Values.githubProxy.extraVolumes | nindent 6 }}

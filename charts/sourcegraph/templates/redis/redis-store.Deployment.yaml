@@ -14,7 +14,7 @@ metadata:
   name: {{ default "redis-store" .Values.redisStore.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.redisStore.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: redis-store
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -45,6 +46,11 @@ spec:
       containers:
       - name: redis-store
         image: {{ include "sourcegraph.image" (list . "redisStore") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.redisStore.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.redisStore.env}}
@@ -67,7 +73,7 @@ spec:
           {{- toYaml .Values.redisStore.resources | nindent 10 }}
         {{- end }}
         securityContext:
-        {{- toYaml .Values.redisStore.podSecurityContext | nindent 10 }}
+        {{- toYaml .Values.redisStore.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
@@ -76,6 +82,7 @@ spec:
         {{- end }}
       - name: redis-exporter
         image: {{ include "sourcegraph.image" (list . "redisExporter") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.redisExporter.env}}
@@ -90,28 +97,20 @@ spec:
           {{- toYaml .Values.redisExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.redisExporter.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.redisExporter.containerSecurityContext | nindent 10 }}
       {{- if .Values.redisStore.extraContainers }}
         {{- toYaml .Values.redisStore.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.redisStore.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.redisStore.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "redisStore" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "redisStore" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "redisStore" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "redisStore") | trim | nindent 6 }}
       volumes:
       - name: redis-data
         persistentVolumeClaim:

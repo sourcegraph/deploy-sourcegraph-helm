@@ -1,0 +1,116 @@
+<!--
+  DO NOT EDIT README.md directly.
+  README.md is automatically generated from README.md.gotmpl
+-->
+
+# Sourcegraph Migrator Helm Chart
+
+This chart contains a single [Job] to run [migrator] operations. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart.
+
+Use cases:
+
+- Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
+- Perform database migrations prior to upgrading the Sourcegraph deployment
+- Troubleshoot a [dirty database]
+
+## Requirements
+
+* [Helm 3 CLI](https://helm.sh/docs/intro/install/)
+* Kubernetes 1.19 or greater
+
+## Installation
+
+Add the Sourcegraph charts repo to Helm:
+
+```sh
+helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/
+```
+
+## Usage
+
+> If you are not using external databases, the chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
+
+[sourcegraph/sourcegraph-migrator] chart requires the correct `PG*`, `CODEINTEL_PG*`, and `CODEINSIGHTS_PG*` environment variables to be configured at `migrator.env`. Learn more about [using your own PostgreSQL server]. `PG*` and `CODEINTEL_PG*` environment variables are compatible with the `frontend.env` values from the parent [sourcegraph/sourcegraph] chart.
+
+You should consult the list of available [migrator commands]. Below is some example usage.
+
+### Run database migration
+
+[`migrator up`](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#up)
+
+- Perform database migrations prior to upgrading the Sourcegraph deployment
+- Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
+
+```sh
+helm upgrade --install -f <your-override-file.yaml> sg-migrator sourcegraph/sourcegraph-migrator
+```
+
+### Add a migration log entry
+
+[`migrator add-log -db=frontend -version=1528395834`](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log)
+
+Add an entry to the migration log after a site administrator has explicitly applied the contents of a migration file, learn more about troubleshooting a [dirty database].
+
+```sh
+helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" sg-migrator sourcegraph/sourcegraph-migrator
+```
+
+## Rendering manifests for kubectl deployment
+
+Manifests rendered using the `helm template` command can be used for direct deployment using `kubectl`.
+
+## Configuration Options
+
+Reference the table below for available configuration parameters and consult [migrator] documentation.
+
+In addition to the documented values, the `migrator` service also supports the following values
+
+- `migrator.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+- `migrator.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+- `migrator.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+- `migrator.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `migrator.env` - consult `values.yaml` file
+
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| migrator.args | list | `["up","-db=all"]` | Override default `migrator` container args Available commands can be found at https://docs.sourcegraph.com/admin/how-to/manual_database_migrations |
+| migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| migrator.env | object | the chart will add some default environment values | Environment variables for the `migrator` container |
+| migrator.image.defaultTag | string | `"3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815"` | Docker image tag for the `migrator` image |
+| migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
+| migrator.resources | object | `{}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
+| sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
+| sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
+| sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
+| sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
+| sourcegraph.labels | object | `{}` | Add a global label to all resources |
+| sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
+| sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
+| sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+
+## Troubleshooting
+
+See a list of running migrator jobs
+
+```sh
+kubectl get jobs -l app.kubernetes.io/component=migrator
+```
+
+Check logs of the migrator job
+
+```sb
+kubectl logs -l job=migrator -c migrator
+```
+
+[sourcegraph/sourcegraph]: ../sourcegraph/
+[sourcegraph/sourcegraph-migrator]: ./
+[dirty database]: https://docs.sourcegraph.com/admin/how-to/dirty_database
+[migrator]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
+[migrator commands]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#commands
+[job]: https://kubernetes.io/docs/concepts/workloads/controllers/job/
+[add-log]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log
+[using your own postgresql server]: https://docs.sourcegraph.com/admin/external_services/postgres#instructions

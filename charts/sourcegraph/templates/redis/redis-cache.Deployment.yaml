@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Redis for storing short-lived caches.
-    kubectl.kubernetes.io/default-container: redis-cache
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.redisCache.labels }}
@@ -15,7 +14,7 @@ metadata:
   name: {{ default "redis-cache" .Values.redisCache.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.redisCache.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -26,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: redis-cache
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -46,6 +46,11 @@ spec:
       containers:
       - name: redis-cache
         image: {{ include "sourcegraph.image" (list . "redisCache") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.redisCache.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 30
@@ -68,7 +73,7 @@ spec:
           {{- toYaml .Values.redisCache.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.redisCache.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.redisCache.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
@@ -77,7 +82,9 @@ spec:
         {{- end }}
       - name: redis-exporter
         image: {{ include "sourcegraph.image" (list . "redisExporter") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
         {{- range $name, $item := .Values.redisExporter.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -90,28 +97,20 @@ spec:
           {{- toYaml .Values.redisExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.redisExporter.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.redisExporter.containerSecurityContext | nindent 10 }}
       {{- if .Values.redisCache.extraContainers }}
         {{- toYaml .Values.redisCache.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.redisCache.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.redisCache.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "redisCache" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "redisCache" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "redisCache" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "redisCache") | trim | nindent 6 }}
       volumes:
       - name: redis-data
         persistentVolumeClaim:

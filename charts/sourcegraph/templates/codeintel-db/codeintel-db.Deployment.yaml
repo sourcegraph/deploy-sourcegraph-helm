@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   annotations:
     description: Postgres database for various data.
-    kubectl.kubernetes.io/default-container: pgsql
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.codeIntelDB.labels }}
@@ -15,7 +14,7 @@ metadata:
   name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.codeIntelDB.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -26,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: pgsql
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -47,12 +47,13 @@ spec:
       initContainers:
       - name: correct-data-dir-permissions
         image: {{ include "sourcegraph.image" (list . "alpine") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
         volumeMounts:
         - mountPath: /data
           name: disk
         securityContext:
-        {{- toYaml .Values.alpine.podSecurityContext | nindent 10 }}
+        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
@@ -61,6 +62,10 @@ spec:
       - name: pgsql
         image: {{ include "sourcegraph.image" (list . "codeIntelDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.codeIntelDB.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.codeIntelDB.env}}
@@ -84,7 +89,7 @@ spec:
           {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.codeIntelDB.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -114,23 +119,15 @@ spec:
         {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        {{- toYaml .Values.codeIntelDB.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "codeIntelDB") | trim | nindent 6 }}
       volumes:
       - name: disk
         persistentVolumeClaim:

@@ -8,8 +8,12 @@ tar xf kubeconform-linux-amd64.tar.gz
 chmod +x kubeconform
 sudo cp kubeconform /usr/local/bin
 
-### Run kubeconform, validate k8s schema
-echo "Generating template output..."
-helm template sourcegraph-helm-default ./charts/sourcegraph >sourcegraph-helm-default.yaml
+function validate_schema() {
+  echo "Validating schema for $1"
+  echo "Generating template output..."
+  helm template sourcegraph-helm-default ./charts/$1 > $1-helm-default.yaml
+  kubeconform -verbose -summary -strict -schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/ $1-helm-default.yaml
+}
 
-kubeconform -verbose -summary -strict -schema-location https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/ sourcegraph-helm-default.yaml
+validate_schema "sourcegraph"
+validate_schema "sourcegraph-migrator"

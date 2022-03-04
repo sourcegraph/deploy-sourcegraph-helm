@@ -4,7 +4,6 @@ kind: StatefulSet
 metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
-    kubectl.kubernetes.io/default-container: grafana
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.grafana.labels }}
@@ -25,6 +24,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: grafana
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -45,6 +45,11 @@ spec:
       containers:
       - name: grafana
         image: {{ include "sourcegraph.image" (list . "grafana") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.grafana.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.grafana.env}}
@@ -71,25 +76,16 @@ spec:
           {{- toYaml .Values.grafana.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.grafana.podSecurityContext | nindent 10 }}
-      serviceAccountName: grafana
+          {{- toYaml .Values.grafana.containerSecurityContext | nindent 10 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "grafana") | trim | nindent 6 }}
       {{- if .Values.grafana.extraContainers }}
         {{- toYaml .Values.grafana.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.grafana.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.grafana.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "grafana" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "grafana" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "grafana" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

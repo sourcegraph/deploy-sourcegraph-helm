@@ -21,6 +21,7 @@ spec:
   serviceName: indexed-search
   template:
     metadata:
+      annotations:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -41,6 +42,11 @@ spec:
       containers:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.indexedSearch.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.indexedSearch.env}}
@@ -63,7 +69,7 @@ spec:
           {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.indexedSearch.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
@@ -72,6 +78,7 @@ spec:
         {{- end }}
       - name: zoekt-indexserver
         image: {{ include "sourcegraph.image" (list . "indexedSearchIndexer") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.indexedSearchIndexer.env}}
@@ -86,7 +93,7 @@ spec:
           {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.indexedSearchIndexer.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.indexedSearchIndexer.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: data
@@ -97,23 +104,15 @@ spec:
         {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.indexedSearch.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "indexedSearch" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "indexedSearch" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "indexedSearch") | trim | nindent 6 }}
       volumes:
       - name: data
       {{- if .Values.indexedSearch.extraVolumes }}

@@ -4,7 +4,6 @@ kind: Deployment
 metadata:
   annotations:
     description: MinIO for storing LSIF uploads.
-    kubectl.kubernetes.io/default-container: minio
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.minio.labels }}
@@ -26,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: minio
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -52,7 +52,7 @@ spec:
         {{- end }}
         image: {{ include "sourcegraph.image" (list . "minio") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args: ['minio', 'server', '/data']
+        args: {{- default (list "minio" "server" "/data") .Values.minio.args | toYaml | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 9000
@@ -76,7 +76,7 @@ spec:
           {{- toYaml .Values.minio.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.minio.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.minio.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - name: minio-data
           mountPath: /data
@@ -89,23 +89,15 @@ spec:
         {{- toYaml .Values.minio.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.minio.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.minio.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "minio" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "minio" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "minio" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "minio") | trim | nindent 6 }}
       volumes:
       - name: minio-data
         persistentVolumeClaim:

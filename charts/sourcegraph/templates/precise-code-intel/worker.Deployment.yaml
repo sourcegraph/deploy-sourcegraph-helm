@@ -27,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: precise-code-intel-worker
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -57,6 +58,10 @@ spec:
               fieldPath: metadata.name
         image: {{ include "sourcegraph.image" (list . "preciseCodeIntel") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.preciseCodeIntel.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
@@ -82,7 +87,7 @@ spec:
           {{- toYaml .Values.preciseCodeIntel.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.preciseCodeIntel.containerSecurityContext | nindent 10 }}
         volumeMounts:
         {{- if .Values.preciseCodeIntel.extraVolumeMounts }}
         {{- toYaml .Values.preciseCodeIntel.extraVolumeMounts | nindent 8 }}
@@ -91,23 +96,15 @@ spec:
         {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.preciseCodeIntel.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "preciseCodeIntel") | trim | nindent 6 }}
       volumes:
       {{- if .Values.preciseCodeIntel.extraVolumes }}
       {{- toYaml .Values.preciseCodeIntel.extraVolumes | nindent 6 }}

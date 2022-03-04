@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    kubectl.kubernetes.io/default-container: frontend
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
@@ -28,6 +27,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: frontend
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -45,12 +45,31 @@ spec:
         app: sourcegraph-frontend
         deploy: sourcegraph
     spec:
+      initContainers:
+      {{- if .Values.migrator.enabled }}
+      - name: migrator
+        image: {{ include "sourcegraph.image" (list . "migrator") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
+        env:
+        {{- range $name, $item := .Values.frontend.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        {{- range $name, $item := .Values.migrator.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.migrator.resources | nindent 10 }}
+        securityContext:
+          {{- toYaml .Values.migrator.containerSecurityContext | nindent 10 }}
+      {{- end }}
       containers:
       - name: frontend
         image: {{ include "sourcegraph.image" (list . "frontend") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args:
-        - serve
+        args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.frontend.env}}
         - name: {{ $name }}
@@ -92,7 +111,7 @@ spec:
           {{- toYaml .Values.frontend.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.frontend.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.frontend.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
@@ -106,24 +125,15 @@ spec:
         {{- toYaml .Values.frontend.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.frontend.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.frontend.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "frontend" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "frontend" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "frontend" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "frontend") | trim | nindent 6 }}
       volumes:
       - emptyDir: {}
         name: cache-ssd

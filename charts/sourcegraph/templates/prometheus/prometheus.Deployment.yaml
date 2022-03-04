@@ -25,6 +25,7 @@ spec:
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: prometheus
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -45,6 +46,11 @@ spec:
       containers:
       - name: prometheus
         image: {{ include "sourcegraph.image" (list . "prometheus") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.prometheus.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.prometheus.env}}
@@ -74,30 +80,21 @@ spec:
           {{- toYaml .Values.prometheus.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.prometheus.podSecurityContext | nindent 10 }}
+          {{- toYaml .Values.prometheus.containerSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       {{- if .Values.prometheus.extraContainers }}
         {{- toYaml .Values.prometheus.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.prometheus.securityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.prometheus.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "prometheus" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "prometheus" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "prometheus" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      serviceAccountName: prometheus
+      {{- include "sourcegraph.renderServiceAccountName" (list . "prometheus") | trim | nindent 6 }}
       volumes:
       - name: data
         persistentVolumeClaim:
