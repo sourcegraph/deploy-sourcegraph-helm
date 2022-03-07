@@ -107,7 +107,13 @@ migrator:
       value: sg
   # -- Resource requests & limits for the `migrator` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  resources: {}
+  resources:
+    limits:
+      cpu: 500m
+      memory: 100M
+    requests:
+      cpu: 100m
+      memory: 50M
   # -- Security context for the `migrator` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
