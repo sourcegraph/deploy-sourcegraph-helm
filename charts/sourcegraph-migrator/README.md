@@ -78,7 +78,7 @@ In addition to the documented values, the `migrator` service also supports the f
 | migrator.env | object | the chart will add some default environment values | Environment variables for the `migrator` container |
 | migrator.image.defaultTag | string | `"3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815"` | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
-| migrator.resources | object | `{}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
