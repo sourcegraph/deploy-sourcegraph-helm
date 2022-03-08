@@ -1,6 +1,6 @@
 # Sourcegraph Helm Chart Test Guide
 
-This is a temporary test guide before we have more throughout automated integration tests.
+This is a temporary test guide before we have more thorough automated integration tests.
 
 ## Lint
 
@@ -40,13 +40,26 @@ sourcegraph:
 # More values to be added in order to test your change
 ```
 
+Make sure you test both enabled and disabled toggles. For example, if you added a new values to conditional render some templates, turn it on and off in the `overrid.yaml` to make sure they both work. You can also include your `override.yaml` in the `Test plan` during PR review to help others understand your testing strategy.
+
+### Inspect the entire rendered template
+
 It's a good idea to inspect the rendered manifest to catch things that look off.
 
 ```sh
 helm template -f ./override.yaml sourcegraph charts/sourcegraph/.
 ```
 
-Deploy the chart
+### Inspect the diff
+
+Perform a diff of the rendered helm manifests before and after your change. There're many ways to produce the diff:
+
+- Run `helm template` before and after the change, then run `diff bundle.old.yaml bundle.new.yaml`.
+- Run `helm install` before the change, then run `helm diff` to inspecth the diff.
+
+### Deploy the chart
+
+You should make sure your change can be deployed
 
 ```sh
 helm upgrade --install --create-namespace -n sourcegraph -f ./override.yaml sourcegraph charts/sourcegraph/.

@@ -1,6 +1,6 @@
 ### Checklist
 
-- [ ] Follow [TEST](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/TEST.md) to perform testing
+- [ ] Follow the [manual testing process](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/TEST.md)
 
 ### Test plan
 
