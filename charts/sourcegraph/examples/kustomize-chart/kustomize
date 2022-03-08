@@ -2,6 +2,8 @@
 
 set -euf -o pipefail
 
+# Save the rendered manifests from STDIN to a temporary file
 cat <&0 > all.yaml
 
+# Apply kustomize on rendered manifests and remvoe the temporary file
 kustomize build . && rm all.yaml

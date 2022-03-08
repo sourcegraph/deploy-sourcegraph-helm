@@ -6,6 +6,8 @@ This example demonstrate the escape hatch whenever you encounter something that 
 
 In this example, we will change the `http` port of `sourcegraph-frontend.Service.yaml` and update the corresponding backend service port number in `sourcegraph-frontend.Ingress.yaml`.
 
+We will utilize the [post renderering] featue from Helm to integrate with [Kustomize]. The `./kustomize` script below will run `kustomize build` on the rendered manifests from helm and return the transformed manifests back to Helm.
+
 > Below command should be run within the current directory
 
 ```sh
@@ -15,3 +17,4 @@ helm upgrade --install --create-namespace -n sourcegraph sourcegraph sourcegraph
 [kustomize]: https://kustomize.io
 [strategic merge patch]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md
 [json patch]: https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment
+[post renderering]: https://helm.sh/docs/topics/advanced/#post-rendering
