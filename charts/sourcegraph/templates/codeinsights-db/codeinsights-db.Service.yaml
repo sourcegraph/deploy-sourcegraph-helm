@@ -15,7 +15,7 @@ metadata:
     {{- if .Values.codeInsightsDB.serviceLabels }}
       {{- toYaml .Values.codeInsightsDB.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
+  name: codeinsights-db
 spec:
   ports:
   - name: timescaledb

@@ -6,13 +6,13 @@ metadata:
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: prometheus
 roleRef:
   apiGroup: "rbac.authorization.k8s.io"
   kind: ClusterRole
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: prometheus
 subjects:
 - kind: ServiceAccount
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: {{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}
   namespace: {{ .Release.Namespace }}
 {{- end }}

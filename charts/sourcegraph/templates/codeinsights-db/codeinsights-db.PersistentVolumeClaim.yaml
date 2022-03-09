@@ -5,7 +5,7 @@ metadata:
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
-  name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
+  name: codeinsights-db
 spec:
   accessModes:
   - ReadWriteOnce

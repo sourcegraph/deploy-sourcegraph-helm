@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.symbols.serviceLabels }}
       {{- toYaml .Values.symbols.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "symbols" .Values.symbols.name }}
+  name: symbols
 spec:
   ports:
   - name: http
