@@ -14,7 +14,7 @@ metadata:
   name: {{ default "minio" .Values.minio.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.minio.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:

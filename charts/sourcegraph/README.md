@@ -184,7 +184,6 @@ In addition to the documented values, all services also support the following va
 | minio.image.defaultTag | string | `"3.37.0@sha256:66925bab722ed11584e1135687b5c1e00a13c550e38d954a56048c90f17edc53"` | Docker image tag for the `minio` image |
 | minio.image.name | string | `"minio"` | Docker image tag for the `minio` image |
 | minio.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `minio` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| minio.replicaCount | int | `1` | Number of `minio` pod |
 | minio.resources | object | `{"limits":{"cpu":"1","memory":"500M"},"requests":{"cpu":"1","memory":"500M"}}` | Resource requests & limits for the `minio` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | minio.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `minio` |
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -250,7 +249,6 @@ In addition to the documented values, all services also support the following va
 | repoUpdater.image.defaultTag | string | `"3.37.0@sha256:fd0562d9d3972d2e4f504b0de8803f485603b57fbc4dd77ac085b1f96dfacbe4"` | Docker image tag for the `repo-updater` image |
 | repoUpdater.image.name | string | `"repo-updater"` | Docker image name for the `repo-updater` image |
 | repoUpdater.podSecurityContext | object | `{}` | Security context for the `repo-updater` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| repoUpdater.replicaCount | int | `1` | Number of `repo-updater` pod |
 | repoUpdater.resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"1","memory":"500Mi"}}` | Resource requests & limits for the `repo-updater` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | repoUpdater.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `repo-updater` |
 | repoUpdater.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |

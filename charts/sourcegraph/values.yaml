@@ -529,8 +529,6 @@ minio:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
-  # -- Number of `minio` pod
-  replicaCount: 1
   # -- Resource requests & limits for the `minio` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -818,8 +816,6 @@ repoUpdater:
   # -- Security context for the `repo-updater` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
-  # -- Number of `repo-updater` pod
-  replicaCount: 1
   # -- Resource requests & limits for the `repo-updater` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
