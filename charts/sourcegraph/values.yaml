@@ -240,6 +240,8 @@ frontend:
       value: disable
     CODEINTEL_PGUSER:
       value: sg
+    DEPLOY_TYPE:
+      value: helm
     GRAFANA_SERVER_URL:
       value: http://grafana:30070
     JAEGER_SERVER_URL:
