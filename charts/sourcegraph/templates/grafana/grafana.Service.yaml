@@ -13,7 +13,7 @@ metadata:
     {{- if .Values.grafana.serviceLabels }}
       {{- toYaml .Values.grafana.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "grafana" .Values.grafana.name }}
+  name: grafana
 spec:
   ports:
   - name: http

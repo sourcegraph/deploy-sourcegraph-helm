@@ -5,7 +5,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: prometheus
 spec:
   accessModes:
   - ReadWriteOnce

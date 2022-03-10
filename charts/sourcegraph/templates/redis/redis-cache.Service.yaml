@@ -15,7 +15,7 @@ metadata:
     {{- if .Values.redisCache.serviceLabels }}
       {{- toYaml .Values.redisCache.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "redis-cache" .Values.redisCache.name }}
+  name: redis-cache
 spec:
   ports:
   - name: redis

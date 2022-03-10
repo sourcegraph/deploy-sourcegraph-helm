@@ -102,7 +102,7 @@ spec:
       - name: timescaledb-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig .Values.codeInsightsDB.name }}
+          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig }}
       - name: lockdir
         emptyDir: {}
       {{- if .Values.codeInsightsDB.extraVolumes }}

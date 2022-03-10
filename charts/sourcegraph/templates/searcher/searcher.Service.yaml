@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.searcher.serviceLabels }}
       {{- toYaml .Values.searcher.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "searcher" .Values.searcher.name }}
+  name: searcher
 spec:
   ports:
   - name: http

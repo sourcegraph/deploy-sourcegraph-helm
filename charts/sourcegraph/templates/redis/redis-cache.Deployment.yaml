@@ -114,7 +114,7 @@ spec:
       volumes:
       - name: redis-data
         persistentVolumeClaim:
-          claimName: {{ default "redis-cache" .Values.redisCache.name }}
+          claimName: redis-cache
       {{- if .Values.redisCache.extraVolumes }}
       {{- toYaml .Values.redisCache.extraVolumes | nindent 6 }}
       {{- end }}

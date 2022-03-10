@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: jaeger
+  name: {{ default "jaeger" .Values.tracing.name }}
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.tracing.labels }}
