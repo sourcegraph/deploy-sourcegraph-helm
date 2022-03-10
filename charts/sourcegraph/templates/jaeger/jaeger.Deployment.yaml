@@ -4,21 +4,20 @@ kind: Deployment
 metadata:
   name: {{ default "jaeger" .Values.tracing.name }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
     {{- if .Values.tracing.labels }}
       {{- toYaml .Values.tracing.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    app.kubernetes.io/component: jaeger
+    app.kubernetes.io/component: all-in-one
     app: jaeger
-    app.kubernetes.io/name: jaeger
 spec:
   replicas: {{ .Values.tracing.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 6 }}
       app: jaeger
-      app.kubernetes.io/name: jaeger
       app.kubernetes.io/component: all-in-one
   strategy:
     type: Recreate
@@ -35,16 +34,16 @@ spec:
       {{- toYaml .Values.tracing.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
       {{- if .Values.tracing.podLabels }}
       {{- toYaml .Values.tracing.podLabels | nindent 8 }}
       {{- end }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
         app: jaeger
         deploy: sourcegraph
-        app.kubernetes.io/name: jaeger
         app.kubernetes.io/component: all-in-one
     spec:
       containers:
