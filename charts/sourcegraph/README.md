@@ -135,7 +135,6 @@ In addition to the documented values, all services also support the following va
 | githubProxy.image.defaultTag | string | `"3.37.0@sha256:3b173e36f958b68479ae829d784c63346701df417afa14d14ae657a84e630dd5"` | Docker image tag for the `github-proxy` image |
 | githubProxy.image.name | string | `"github-proxy"` | Docker image name for the `github-proxy` image |
 | githubProxy.podSecurityContext | object | `{}` | Security context for the `github-proxy` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| githubProxy.replicaCount | int | `1` | Number of `github-proxy` pod |
 | githubProxy.resources | object | `{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"100m","memory":"250M"}}` | Resource requests & limits for the `github-proxy` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | githubProxy.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `github-proxy` |
 | githubProxy.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
