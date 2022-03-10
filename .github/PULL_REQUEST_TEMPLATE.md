@@ -1,6 +1,7 @@
 ### Checklist
 
 - [ ] Follow the [manual testing process](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/TEST.md)
+- [ ] If there is any change to [charts/sourcegraph/README.md](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/README.md), copy the updated content to [docsite](https://github.com/sourcegraph/sourcegraph/tree/main/doc/admin/install/kubernetes/helm.md)
 
 ### Test plan
 

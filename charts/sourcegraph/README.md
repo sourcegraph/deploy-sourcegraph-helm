@@ -1,6 +1,6 @@
 <!--
   DO NOT EDIT README.md directly.
-  README.md is automatically generated from README.md.gotmpl
+  README.md is automatically generated from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/README.md.gotmpl
 -->
 
 # Sourcegraph Helm Chart
@@ -31,7 +31,7 @@ helm install sg sourcegraph/sourcegraph
 Helm customizations can be applied using an override file. Using an override file allows customizations to persist through upgrades without needing to manage merge conflicts.
 
 To customize configuration settings with an override file, create an empty yaml file (with any name) and configure
-overrides - example overrides can be found in the [examples](examples) folder.
+overrides - example overrides can be found in the [examples](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/main/charts/sourcegraph/examples) folder.
 
 The install command would then be:
 `helm install -f <your-override-file.yaml> <name> sourcegraph/sourcegraph`
@@ -49,7 +49,7 @@ If the namespace does not already exist, add the `--create-namespace` flag to cr
 
 To deploy custom resources not provided by the chart, such as replacing the database configuration file or ingress resource, you can create your own helm chart and specify the Sourcegraph chart as a dependency. Any resources you place in the `templates` folder of your chart will be deployed, as well as the Sourcegraph resources, allowing you to extend the Sourcegraph chart without maintaining a fork.
 
-An example of a subchart is shown in the [examples/custom-resources](examples/custom-resources) folder.
+An example of a subchart is shown in the [examples/custom-resources](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/main/charts/sourcegraph/examples/custom-resources) folder.
 
 More details on how to create and configure a subchart can be found in the [helm documentation](https://helm.sh/docs/chart_template_guide/subcharts_and_globals/).
 
