@@ -1,27 +1,25 @@
-{{- if .Values.pgsql.enabled -}}
+{{- if .Values.codeIntelDB.enabled -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: pgsql
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.pgsql.labels }}
-      {{- toYaml .Values.pgsql.labels | nindent 4 }}
+    {{- if .Values.codeIntelDB.labels }}
+      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
     {{- end }}
-  name: {{ default "pgsql" .Values.pgsql.name }}
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: pgsql
-  strategy:
-    type: Recreate
+      app: codeintel-db
+  serviceName: codeintel-db
   template:
     metadata:
       annotations:
@@ -29,19 +27,19 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.pgsql.podAnnotations }}
-      {{- toYaml .Values.pgsql.podAnnotations | nindent 8 }}
+      {{- if .Values.codeIntelDB.podAnnotations }}
+      {{- toYaml .Values.codeIntelDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.pgsql.podLabels }}
-      {{- toYaml .Values.pgsql.podLabels | nindent 8 }}
+      {{- if .Values.codeIntelDB.podLabels }}
+      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
-        app: pgsql
+        app: codeintel-db
         group: backend
     spec:
       initContainers:
@@ -59,13 +57,19 @@ spec:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
         {{- end }}
       containers:
-      - image: {{ include "sourcegraph.image" (list . "pgsql") }}
+      - name: pgsql
+        image: {{ include "sourcegraph.image" (list . "codeIntelDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        {{- with .Values.pgsql.args }}
+        {{- with .Values.codeIntelDB.args }}
         args:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.codeIntelDB.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
         readinessProbe:
           exec:
             command:
@@ -75,43 +79,35 @@ spec:
           exec:
             command:
               - /liveness.sh
-        name: pgsql
-        env:
-        {{- range $name, $item := .Values.pgsql.env}}
-        - name: {{ $name }}
-          {{- $item | toYaml | nindent 10 }}
-        {{- end }}
         ports:
         - containerPort: 5432
           name: pgsql
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.pgsql.resources | nindent 10 }}
+          {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.pgsql.containerSecurityContext | nindent 10 }}
+          {{- toYaml .Values.codeIntelDB.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: disk
         - mountPath: /conf
           name: pgsql-conf
-        - mountPath: /dev/shm
-          name: dshm
         - mountPath: /var/run/postgresql
           name: lockdir
-        {{- if .Values.pgsql.extraVolumeMounts }}
-        {{- toYaml .Values.pgsql.extraVolumeMounts | nindent 8 }}
+        {{- if .Values.codeIntelDB.extraVolumeMounts }}
+        {{- toYaml .Values.codeIntelDB.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- if .Values.pgsql.extraContainers }}
-        {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
+      {{- if .Values.codeIntelDB.extraContainers }}
+        {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
       {{- end }}
       - env:
-        {{- range $name, $item := .Values.pgsql.postgresExporter.env}}
+        {{- range $name, $item := .Values.codeIntelDB.postgresExporter.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
-          value: /config/queries.yaml
+          value: /config/code_intel_queries.yaml
         image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
         terminationMessagePolicy: FallbackToLogsOnError
         name: pgsql-exporter
@@ -119,34 +115,30 @@ spec:
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
       terminationGracePeriodSeconds: 120
       securityContext:
-        {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
-      {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
+        {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "pgsql") | trim | nindent 6 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "codeIntelDB") | trim | nindent 6 }}
       volumes:
       - name: disk
         persistentVolumeClaim:
-          claimName: pgsql
+          claimName: codeintel-db
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "pgsql-conf" .Values.pgsql.existingConfig }}
-      - name: dshm # Allocate shared memory to match the shared_buffers value
-        emptyDir:
-          medium: Memory
-          sizeLimit: 1G
+          name: {{ default "codeintel-db-conf" .Values.codeIntelDB.existingConfig .Values.codeIntelDB.name }}
       - name: lockdir
         emptyDir: {}
-      {{- if .Values.pgsql.extraVolumes }}
-      {{- toYaml .Values.pgsql.extraVolumes | nindent 6 }}
+      {{- if .Values.codeIntelDB.extraVolumes }}
+      {{- toYaml .Values.codeIntelDB.extraVolumes | nindent 6 }}
       {{- end }}
+  updateStrategy:
+    type: RollingUpdate
 {{- end }}
