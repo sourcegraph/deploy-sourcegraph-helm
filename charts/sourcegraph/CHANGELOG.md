@@ -12,11 +12,11 @@ All notable changes to Sourcegraph are documented in this file.
 
 ### Added
 
-- 
+-
 
 ### Changed
 
-- 
+- **BREAKING**: `pgsql`, `codeintel-db`, and `codeinsights-db` have been converted from [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/) to [StatefulSets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/) [#70](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/70)
 
 ### Fixed
 
