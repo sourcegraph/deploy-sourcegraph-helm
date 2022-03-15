@@ -1,3 +1,7 @@
-# deploy-sourcegraph-helm
+# Sourcegraph on Kubernetes (Helm)
 
-This is an experimental project. NOT INTENDED FOR USE IN PRODUCTION. Instead, use one of Sourcegraph's [supported deployment methods](https://docs.sourcegraph.com/admin/install/kubernetes).
+Deploy Sourcegraph on Kubernetes using [Helm].
+
+Check the [Quickstart](https://docs.sourcegraph.com/admin/install/kubernetes/helm#quickstart) to deploy your Sourcegraph.
+
+[helm]: https://helm.sh
