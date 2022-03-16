@@ -1,0 +1,14 @@
+suite: storageClass
+templates:
+- storageclass.yaml
+tests:
+- it: should have parameters rendered when storageClass.parameters.zones=us-central1-f
+  set:
+    storageClass:
+      create: true
+      parameters:
+        zones: us-central1-f
+  asserts:
+  - equal:
+      path: parameters.zones
+      value: us-central1-f

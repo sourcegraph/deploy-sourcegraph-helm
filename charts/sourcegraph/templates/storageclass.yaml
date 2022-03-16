@@ -14,7 +14,7 @@ provisioner: {{ .Values.storageClass.provisioner }}
 parameters:
   type: {{ .Values.storageClass.type }}
   {{- if .Values.storageClass.parameters}}
-  {{- toYaml .Values.storageClass.parameters| nindent 4 }}
+  {{- toYaml .Values.storageClass.parameters | nindent 2 }}
   {{- end }}
 allowVolumeExpansion: {{ default true .Values.storageClass.allowVolumeExpansion }}
 reclaimPolicy: {{ default "Retain" .Values.storageClass.reclaimPolicy }}
