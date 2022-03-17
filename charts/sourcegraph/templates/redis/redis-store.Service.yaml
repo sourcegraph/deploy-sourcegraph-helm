@@ -15,7 +15,7 @@ metadata:
     {{- if .Values.redisStore.serviceLabels }}
       {{- toYaml .Values.redisStore.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "redis-store" .Values.redisStore.name }}
+  name: redis-store
 spec:
   ports:
   - name: redis

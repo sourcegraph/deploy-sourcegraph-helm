@@ -1,6 +1,6 @@
 {{- if .Values.codeInsightsDB.enabled -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Code Insights TimescaleDB instance.
@@ -13,15 +13,13 @@ metadata:
     deploy: sourcegraph
   name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
 spec:
-  minReadySeconds: 10
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: codeinsights-db
-  strategy:
-    type: Recreate
+  serviceName: codeinsights-db
   template:
     metadata:
       annotations:
@@ -102,10 +100,12 @@ spec:
       - name: timescaledb-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig .Values.codeInsightsDB.name }}
+          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig }}
       - name: lockdir
         emptyDir: {}
       {{- if .Values.codeInsightsDB.extraVolumes }}
       {{- toYaml .Values.codeInsightsDB.extraVolumes | nindent 6 }}
       {{- end }}
+  updateStrategy:
+    type: RollingUpdate
 {{- end }}

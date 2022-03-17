@@ -5,7 +5,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: redis
-  name: {{ default "redis-store" .Values.redisStore.name }}
+  name: redis-store
 spec:
   accessModes:
   - ReadWriteOnce

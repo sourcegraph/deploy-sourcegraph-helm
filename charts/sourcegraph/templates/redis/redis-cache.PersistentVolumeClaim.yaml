@@ -5,7 +5,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: redis
-  name: {{ default "redis-cache" .Values.redisCache.name }}
+  name: redis-cache
 spec:
   accessModes:
   - ReadWriteOnce

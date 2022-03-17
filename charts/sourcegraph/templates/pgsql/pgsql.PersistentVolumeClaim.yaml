@@ -5,7 +5,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql
-  name: {{ default "pgsql" .Values.pgsql.name }}
+  name: pgsql
 spec:
   accessModes:
   - ReadWriteOnce

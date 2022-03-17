@@ -101,7 +101,7 @@ spec:
           claimName: prometheus
       - configMap:
           defaultMode: 0777
-          name: {{ default "prometheus" .Values.prometheus.existingConfig .Values.prometheus.name }}
+          name: {{ default "prometheus" .Values.prometheus.existingConfig }}
         name: config
       {{- if .Values.prometheus.extraVolumes }}
       {{- toYaml .Values.prometheus.extraVolumes | nindent 6 }}

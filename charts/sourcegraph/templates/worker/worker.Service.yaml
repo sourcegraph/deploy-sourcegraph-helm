@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.worker.serviceLabels }}
       {{- toYaml .Values.worker.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "worker" .Values.worker.name }}
+  name: worker
 spec:
   ports:
   - name: http

@@ -12,7 +12,7 @@ metadata:
     {{- if .Values.syntectServer.serviceLabels }}
       {{- toYaml .Values.syntectServer.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "syntect-server" .Values.syntectServer.name }}
+  name: syntect-server
 spec:
   ports:
   - name: http

@@ -114,7 +114,7 @@ spec:
       volumes:
       - name: redis-data
         persistentVolumeClaim:
-          claimName: {{ default "redis-store" .Values.redisStore.name }}
+          claimName: redis-store
       {{- if .Values.redisStore.extraVolumes }}
       {{- toYaml .Values.redisStore.extraVolumes | nindent 6 }}
       {{- end }}

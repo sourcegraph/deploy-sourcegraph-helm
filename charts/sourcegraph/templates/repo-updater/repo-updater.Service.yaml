@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.repoUpdater.serviceLabels }}
       {{- toYaml .Values.repoUpdater.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "repo-updater" .Values.repoUpdater.name }}
+  name: repo-updater
 spec:
   ports:
   - name: http

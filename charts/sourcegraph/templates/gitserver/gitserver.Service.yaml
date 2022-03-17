@@ -17,7 +17,7 @@ metadata:
     {{- if .Values.gitserver.serviceLabels }}
       {{- toYaml .Values.gitserver.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "gitserver" .Values.gitserver.name }}
+  name: gitserver
 spec:
   clusterIP: None
   ports:

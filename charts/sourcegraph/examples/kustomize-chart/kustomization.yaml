@@ -1,0 +1,20 @@
+resources:
+  - all.yaml
+
+patches:
+- target:
+    version: v1
+    kind: Service
+    name: sourcegraph-frontend
+  patch: |-
+    - op: replace
+      path: /spec/ports/0/port
+      value: 80
+- target:
+    version: v1
+    kind: Ingress
+    name: sourcegraph-frontend
+  patch: |-
+    - op: replace
+      path: /spec/rules/0/http/paths/0/backend/service/port/number
+      value: 80

@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.githubProxy.serviceLabels }}
       {{- toYaml .Values.githubProxy.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "github-proxy" .Values.githubProxy.name }}
+  name: github-proxy
 spec:
   ports:
   - name: http

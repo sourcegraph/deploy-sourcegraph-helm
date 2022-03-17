@@ -15,7 +15,7 @@ metadata:
     {{- if .Values.pgsql.serviceLabels }}
       {{- toYaml .Values.pgsql.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "pgsql" .Values.pgsql.name }}
+  name: pgsql
 spec:
   ports:
   - name: pgsql

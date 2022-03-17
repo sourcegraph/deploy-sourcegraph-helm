@@ -80,6 +80,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
+- `<serviceName>.name` - override the default resource name, e.g. you want add custom prefix or suffix to the resource name.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -135,7 +136,6 @@ In addition to the documented values, all services also support the following va
 | githubProxy.image.defaultTag | string | `"3.37.0@sha256:3b173e36f958b68479ae829d784c63346701df417afa14d14ae657a84e630dd5"` | Docker image tag for the `github-proxy` image |
 | githubProxy.image.name | string | `"github-proxy"` | Docker image name for the `github-proxy` image |
 | githubProxy.podSecurityContext | object | `{}` | Security context for the `github-proxy` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| githubProxy.replicaCount | int | `1` | Number of `github-proxy` pod |
 | githubProxy.resources | object | `{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"100m","memory":"250M"}}` | Resource requests & limits for the `github-proxy` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | githubProxy.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `github-proxy` |
 | githubProxy.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -177,14 +177,13 @@ In addition to the documented values, all services also support the following va
 | migrator.env | object | `{}` | Environment variables for the `migrator` container |
 | migrator.image.defaultTag | string | `"3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815"` | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
-| migrator.resources | object | `{}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | minio.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `minio` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | minio.enabled | bool | `true` | Enable `minio` (S3 compatible storage) |
 | minio.env | object | `{"MINIO_ACCESS_KEY":{"value":"AKIAIOSFODNN7EXAMPLE"},"MINIO_SECRET_KEY":{"value":"wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"}}` | Environment variables for the `minio` container You should change below variables in production |
 | minio.image.defaultTag | string | `"3.37.0@sha256:66925bab722ed11584e1135687b5c1e00a13c550e38d954a56048c90f17edc53"` | Docker image tag for the `minio` image |
 | minio.image.name | string | `"minio"` | Docker image tag for the `minio` image |
 | minio.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `minio` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| minio.replicaCount | int | `1` | Number of `minio` pod |
 | minio.resources | object | `{"limits":{"cpu":"1","memory":"500M"},"requests":{"cpu":"1","memory":"500M"}}` | Resource requests & limits for the `minio` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | minio.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `minio` |
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -250,7 +249,6 @@ In addition to the documented values, all services also support the following va
 | repoUpdater.image.defaultTag | string | `"3.37.0@sha256:fd0562d9d3972d2e4f504b0de8803f485603b57fbc4dd77ac085b1f96dfacbe4"` | Docker image tag for the `repo-updater` image |
 | repoUpdater.image.name | string | `"repo-updater"` | Docker image name for the `repo-updater` image |
 | repoUpdater.podSecurityContext | object | `{}` | Security context for the `repo-updater` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| repoUpdater.replicaCount | int | `1` | Number of `repo-updater` pod |
 | repoUpdater.resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"1","memory":"500Mi"}}` | Resource requests & limits for the `repo-updater` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | repoUpdater.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `repo-updater` |
 | repoUpdater.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |

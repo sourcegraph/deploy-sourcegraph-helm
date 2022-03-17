@@ -6,12 +6,12 @@ metadata:
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
+  name: sourcegraph-frontend
 roleRef:
 {{- if .Values.frontend.privileged }}
   apiGroup: "rbac.authorization.k8s.io"
   kind: Role
-  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
+  name: sourcegraph-frontend
 {{- else }}
   apiGroup: ""
   kind: ClusterRole

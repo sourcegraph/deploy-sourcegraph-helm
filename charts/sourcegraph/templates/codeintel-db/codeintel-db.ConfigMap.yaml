@@ -7,7 +7,7 @@ metadata:
   labels:
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
-  name: {{ default "codeintel-db-conf" .Values.codeIntelDB.name }}
+  name: codeintel-db-conf
 data:
   postgresql.conf: |
     # -----------------------------
