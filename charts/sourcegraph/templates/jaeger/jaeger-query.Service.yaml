@@ -8,7 +8,7 @@ metadata:
   {{- end }}
   labels:
     deploy: sourcegraph
-    app.kubernetes.io/component: jaeger
+    app.kubernetes.io/component: all-in-one
     app: jaeger
     app.kubernetes.io/name: jaeger
     {{- if .Values.tracing.query.serviceLabels }}
@@ -22,8 +22,9 @@ spec:
     protocol: TCP
     targetPort: 16686
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app.kubernetes.io/name: jaeger
+    {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: all-in-one
+    app: jaeger
   type: {{ .Values.tracing.query.serviceType | default "ClusterIP" }}
 {{- end }}

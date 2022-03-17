@@ -1,0 +1,9 @@
+frontend:
+  serviceType: ClusterIP
+  ingress:
+    annotations:
+      kubernetes.io/ingress.class: gce
+    enabled: true
+  serviceAnnotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    beta.cloud.google.com/backend-config: '{"default": "sourcegraph-frontend"}'

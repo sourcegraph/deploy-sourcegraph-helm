@@ -13,7 +13,7 @@ metadata:
     {{- if .Values.prometheus.serviceLabels }}
       {{- toYaml .Values.prometheus.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: prometheus
 spec:
   ports:
   - name: http

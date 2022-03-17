@@ -16,7 +16,7 @@ metadata:
     {{- if .Values.indexedSearch.serviceLabels }}
       {{- toYaml .Values.indexedSearch.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "indexed-search" .Values.indexedSearch.name }}
+  name: indexed-search
 spec:
   clusterIP: None
   ports:

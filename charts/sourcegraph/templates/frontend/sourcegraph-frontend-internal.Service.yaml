@@ -12,7 +12,7 @@ metadata:
     {{- if .Values.frontend.serviceLabels }}
       {{- toYaml .Values.frontend.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "sourcegraph-frontend-internal" .Values.frontend.internalServiceName }}
+  name: sourcegraph-frontend-internal
 spec:
   ports:
   - name: http-internal

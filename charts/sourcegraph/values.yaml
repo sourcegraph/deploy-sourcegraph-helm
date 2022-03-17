@@ -347,8 +347,6 @@ githubProxy:
   # -- Security context for the `github-proxy` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
-  # -- Number of `github-proxy` pod
-  replicaCount: 1
   # -- Resource requests & limits for the `github-proxy` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:

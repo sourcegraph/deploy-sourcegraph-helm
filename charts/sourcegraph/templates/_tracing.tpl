@@ -29,7 +29,7 @@ Define the tracing sidecar
   args:
     - --reporter.grpc.host-port={{ default "jaeger-collector" .Values.tracing.collector.name }}:14250
     - --reporter.type=grpc
-{{- end }}
   securityContext:
     {{- toYaml .Values.tracingAgent.containerSecurityContext | nindent 4 }}
+{{- end }}
 {{- end }}

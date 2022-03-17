@@ -16,7 +16,7 @@ metadata:
     {{- if .Values.minio.serviceLabels }}
       {{- toYaml .Values.minio.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "minio" .Values.minio.name }}
+  name: minio
 spec:
   ports:
   - name: minio

@@ -5,7 +5,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: minio
-  name: {{ default "minio" .Values.minio.name }}
+  name: minio
 spec:
   accessModes:
   - ReadWriteOnce

@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.preciseCodeIntel.serviceLabels }}
       {{- toYaml .Values.preciseCodeIntel.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "precise-code-intel-worker" .Values.preciseCodeIntel.name }}
+  name: precise-code-intel-worker
 spec:
   ports:
   - name: http

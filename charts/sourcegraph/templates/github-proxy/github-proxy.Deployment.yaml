@@ -13,7 +13,7 @@ metadata:
   name: {{ default "github-proxy" .Values.githubProxy.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.githubProxy.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
