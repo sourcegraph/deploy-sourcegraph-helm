@@ -1,0 +1,18 @@
+# Demonstrate configuring additional PostgreSQL configuration parameters
+# when internal PostgreSQL deployments are used
+# You should consult your account team prior making any change
+# You can learn more about PostgreSQL configuration from
+# - https://docs.sourcegraph.com/admin/config/postgres-conf
+# - https://www.postgresql.org/docs/12/config-setting.html
+
+pgsql:
+  additionalConfig: |
+    max_connections = 200
+  
+codeIntelDB:
+  additionalConfig: |
+    max_connections = 200
+
+codeInsightsDB:
+  additionalConfig: |
+    max_connections = 200

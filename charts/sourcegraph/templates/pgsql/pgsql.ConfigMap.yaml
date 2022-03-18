@@ -1,3 +1,6 @@
+{{- if and .Values.pgsql.enabled (and .Values.pgsql.existingConfig .Values.pgsql.additionalConfig) -}}
+{{- fail "You can only define one of 'pgsql.existingConfig' and 'pgsql.additionalConfig' at a time" }}
+{{- end }}
 {{- if and .Values.pgsql.enabled (not .Values.pgsql.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
@@ -702,4 +705,5 @@ data:
     #------------------------------------------------------------------------------
 
     # Add settings for extensions here
+    {{ tpl .Values.pgsql.additionalConfig . | nindent 4 | trim }}
 {{- end }}

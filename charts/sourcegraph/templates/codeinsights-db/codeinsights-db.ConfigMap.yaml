@@ -1,3 +1,6 @@
+{{- if and .Values.codeInsightsDB.enabled (and .Values.codeInsightsDB.existingConfig .Values.codeInsightsDB.additionalConfig) -}}
+{{- fail "You can only define one of 'codeInsightsDB.existingConfig' and 'codeInsightsDB.additionalConfig' at a time" }}
+{{- end }}
 {{- if and .Values.codeInsightsDB.enabled (not .Values.codeInsightsDB.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
@@ -771,4 +774,6 @@ data:
     timescaledb.max_background_workers = 8
     timescaledb.last_tuned = '2021-02-16T03:10:41Z'
     timescaledb.last_tuned_version = '0.10.0'
+
+    {{ tpl .Values.codeInsightsDB.additionalConfig . | nindent 4 | trim }}
 {{- end }}

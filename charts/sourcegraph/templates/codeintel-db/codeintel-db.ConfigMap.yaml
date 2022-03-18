@@ -1,3 +1,6 @@
+{{- if and .Values.codeIntelDB.enabled (and .Values.codeIntelDB.existingConfig .Values.codeIntelDB.additionalConfig) -}}
+{{- fail "You can only define one of 'codeIntelDB.existingConfig' and 'codeIntelDB.additionalConfig' at a time" }}
+{{- end }}
 {{- if and .Values.codeIntelDB.enabled (not .Values.codeIntelDB.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
@@ -702,4 +705,5 @@ data:
     #------------------------------------------------------------------------------
 
     # Add settings for extensions here
+    {{ tpl .Values.codeIntelDB.additionalConfig . | nindent 4 | trim }}
 {{- end }}
