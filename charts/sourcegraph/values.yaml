@@ -560,9 +560,9 @@ pgsql:
   existingConfig: "" # Name of an existing configmap
   image:
     # -- Docker image tag for the `pgsql` image
-    defaultTag: 3.37.0@sha256:af00a4465f435742df9980cc9d8a8bda49d6adea173558a371e276b476ea94ae
+    defaultTag: insiders@sha256:3c2de1fbb90a48a64b094eaf402578d17f2d3ba3dd71e572bfd75b36e301f3ac
     # -- Docker image name for the `pgsql` image
-    name: "postgres-12.6-alpine"
+    name: "postgres-12-alpine"
   # -- Security context for the `pgsql` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
