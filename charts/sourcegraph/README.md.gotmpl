@@ -1,6 +1,6 @@
-<!-- 
-  DO NOT EDIT README.md directly. 
-  README.md is automatically generated from README.md.gotmpl 
+<!--
+  DO NOT EDIT README.md directly.
+  README.md is automatically generated from README.md.gotmpl
 -->
 
 # Sourcegraph Helm Chart
@@ -13,7 +13,7 @@
 ## Installation
 
 Add the Sourcegraph charts repo to Helm:
-  
+
 ```sh
 helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/
 ```
@@ -39,8 +39,11 @@ The install command would then be:
 ### Setting a namespace
 
 By default, helm installs the chart into your active namespace. To install to a separate namespace, use the `--namespace` flag. For example:
+
 `helm install --namespace new-namespace <name> sourcegraph/sourcegraph`
+
 Or if using an override file:
+
 `helm install --namespace new-namespace -f <your-override-file.yaml> <name> sourcegraph/sourcegraph`
 
 If the namespace does not already exist, add the `--create-namespace` flag to create it during installation.
@@ -99,7 +102,9 @@ To upgrade to a new version of the helm chart:
 1. (Optional) Review the changes that will be applied (`helm template` or `helm diff`, see [Reviewing changes](#reviewing-changes))
 
 1.  Install the new version:<br>
-    `helm upgrade --install -f <your-override-file.yaml> <name> --version <version> sourcegraph/sourcegraph`
+    `helm upgrade --install --wait -f <your-override-file.yaml> <name> --version <version> sourcegraph/sourcegraph`
+
+    The `--wait` flag is optional and can be removed if you do not want to wait for the upgraded resources to become healthy.
 
 ## Versioning
 
