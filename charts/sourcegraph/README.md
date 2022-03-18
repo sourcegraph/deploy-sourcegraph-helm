@@ -98,7 +98,7 @@ In addition to the documented values, all services also support the following va
 | cadvisor.resources | object | `{"limits":{"cpu":"300m","memory":"2000Mi"},"requests":{"cpu":"150m","memory":"200Mi"}}` | Resource requests & limits for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | cadvisor.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `cadvisor` |
 | cadvisor.serviceAccount.name | string | `"cadvisor"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| codeInsightsDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will overwrite our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| codeInsightsDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | codeInsightsDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.enabled | bool | `true` | Enable `codeinsights-db` PostgreSQL server |
 | codeInsightsDB.env | object | `{"POSTGRES_PASSWORD":{"value":"password"}}` | Environment variables for the `codeinsights-db` container |
@@ -110,7 +110,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeInsightsDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeinsights-db` data volume |
-| codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will overwrite our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | codeIntelDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeIntelDB.enabled | bool | `true` | Enable `codeintel-db` PostgreSQL server |
 | codeIntelDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key |
@@ -193,7 +193,7 @@ In addition to the documented values, all services also support the following va
 | minio.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `minio` |
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
-| pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will overwrite our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | pgsql.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | pgsql.enabled | bool | `true` | Enable `pgsql` PostgreSQL server |
 | pgsql.existingConfig | string | `""` | Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key |

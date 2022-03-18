@@ -144,7 +144,7 @@ codeInsightsDB:
       value: password
   # -- Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key.
   existingConfig: "" # Name of an existing configmap
-  # -- Additional PostgreSQL configuration. This will overwrite our default configuration.
+  # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
   # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
   additionalConfig: ""
@@ -188,7 +188,7 @@ codeIntelDB:
   enabled: true
   # -- Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key
   existingConfig: ""
-  # -- Additional PostgreSQL configuration. This will overwrite our default configuration.
+  # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
   # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
   additionalConfig: ""
@@ -566,7 +566,7 @@ pgsql:
   enabled: true
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
   existingConfig: "" # Name of an existing configmap
-  # -- Additional PostgreSQL configuration. This will overwrite our default configuration.
+  # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
   # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
   additionalConfig: ""
