@@ -144,6 +144,10 @@ codeInsightsDB:
       value: password
   # -- Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key.
   existingConfig: "" # Name of an existing configmap
+  # -- Additional PostgreSQL configuration. This will overwrite our default configuration.
+  # Notes: This is expecting a multiline string.
+  # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
+  additionalConfig: ""
   image:
     # -- Docker image tag for the `codeinsights-db` image
     defaultTag: 3.37.0@sha256:fa608333a6ca1aef148abd33e4ee14886d4f172e0db1e5c9ee6bac36adec0bf1
@@ -184,6 +188,10 @@ codeIntelDB:
   enabled: true
   # -- Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key
   existingConfig: ""
+  # -- Additional PostgreSQL configuration. This will overwrite our default configuration.
+  # Notes: This is expecting a multiline string.
+  # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
+  additionalConfig: ""
   image:
     # -- Docker image tag for the `codeintel-db` image
     defaultTag: 3.37.0@sha256:fc2ab91482f85f77eb73c69a35a2a4cc5055a1b93ef1c1d0f183a7003e632082
@@ -558,6 +566,10 @@ pgsql:
   enabled: true
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
   existingConfig: "" # Name of an existing configmap
+  # -- Additional PostgreSQL configuration. This will overwrite our default configuration.
+  # Notes: This is expecting a multiline string.
+  # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
+  additionalConfig: ""
   image:
     # -- Docker image tag for the `pgsql` image
     defaultTag: insiders@sha256:3c2de1fbb90a48a64b094eaf402578d17f2d3ba3dd71e572bfd75b36e301f3ac
