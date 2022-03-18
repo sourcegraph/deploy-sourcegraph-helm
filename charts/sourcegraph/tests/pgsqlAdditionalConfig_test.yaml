@@ -1,9 +1,7 @@
 ---
-suite: postgresAdditionalConfig_01
+suite: pgsqlAdditionalConfig
 templates:
 - pgsql/pgsql.ConfigMap.yaml
-- codeintel-db/codeintel-db.ConfigMap.yaml
-- codeinsights-db/codeinsights-db.ConfigMap.yaml
 tests:
 - it: should have additional config rendered when *.additionalConfig is defined
   set:
@@ -12,20 +10,15 @@ tests:
         max_connections = 1000000000000000000
     codeIntelDB:
       additionalConfig: |
-        max_connections = 1000000000000000000
+        max_connections = 2000000000000000000
     codeInsightsDB:
       additionalConfig: |
-        max_connections = 1000000000000000000
+        max_connections = 3000000000000000000
   asserts:
   - matchRegex:
       path: data.postgresql\.conf
       pattern: max_connections = 1000000000000000000
----
-suite: postgresAdditionalConfig_02
-templates:
-- pgsql/pgsql.ConfigMap.yaml
-tests:
-- it: should fail to render when both *.additionalConfig and *.existingConfig are defined
+- it: should fail to render when both pgsql.additionalConfig and pgsql.existingConfig are defined
   set:
     pgsql:
       existingConfig: i-will-break-rendering
