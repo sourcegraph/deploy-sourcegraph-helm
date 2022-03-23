@@ -42,7 +42,7 @@ You should consult the list of available [migrator commands]. Below is some exam
 - Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
 
 ```sh
-helm upgrade --install -f <your-override-file.yaml> sg-migrator sourcegraph/sourcegraph-migrator
+helm upgrade --install -f <your-override-file.yaml> --version {{ template "chart.version" . }} sg-migrator sourcegraph/sourcegraph-migrator
 ```
 
 ### Add a migration log entry
@@ -52,7 +52,7 @@ helm upgrade --install -f <your-override-file.yaml> sg-migrator sourcegraph/sour
 Add an entry to the migration log after a site administrator has explicitly applied the contents of a migration file, learn more about troubleshooting a [dirty database].
 
 ```sh
-helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" sg-migrator sourcegraph/sourcegraph-migrator
+helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" --version {{ template "chart.version" . }} sg-migrator sourcegraph/sourcegraph-migrator
 ```
 
 ## Rendering manifests for kubectl deployment
