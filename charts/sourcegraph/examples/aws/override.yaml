@@ -1,0 +1,6 @@
+storageClass:
+  create: true
+  type: gp2 # This configures SSDs (recommended).
+  provisioner: ebs.csi.aws.com
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
