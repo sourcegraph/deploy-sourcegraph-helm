@@ -1,6 +1,6 @@
 storageClass:
   create: true
-  type: pd-ssd # This configures SSDs (recommended).
+  type: null
   provisioner: disk.csi.azure.com
   volumeBindingMode: WaitForFirstConsumer
   reclaimPolicy: Retain
