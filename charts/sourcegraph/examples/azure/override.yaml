@@ -1,0 +1,8 @@
+storageClass:
+  create: true
+  type: pd-ssd # This configures SSDs (recommended).
+  provisioner: disk.csi.azure.com
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
+  parameters:
+    storageaccounttype: Premium_LRS # This configures SSDs (recommended). A Premium VM is required.
