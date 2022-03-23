@@ -20,11 +20,34 @@ All notable changes to Sourcegraph are documented in this file.
 
 ### Fixed
 
-- Fix broken indentation in storageClass parameters [#73](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/73)
+-
 
 ### Removed
 
 -
+
+## 0.7.0
+
+### Added
+
+- Support extending postgres server conf [#77](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/77)
+
+## 0.6.0
+
+Sourcegraph 3.38.0 is now available!
+
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-38-0)
+- [Update](https://docs.sourcegraph.com/admin/updates)
+- [Release post](https://about.sourcegraph.com/blog/release/3.38) (might not be available immediately upon release)
+
+### Changed
+
+- Set `DEPLOY_TYPE` environment variable to track helm chart usage [#66](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/66)
+
+### Fixed
+
+- Fix broken indentation in storageClass parameters [#73](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/73)
+- Fix tracing partial template when tracing is disabled [#75](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/75)
 
 ## 0.5.0
 
