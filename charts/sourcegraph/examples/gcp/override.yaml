@@ -13,6 +13,6 @@ frontend:
 storageClass:
   create: true
   type: pd-ssd # This configures SSDs (recommended).
-  provisioner: kubernetes.io/gce-pd # Consider using 'pd.csi.storage.gke.io' on GKE 1.22+
+  provisioner: pd.csi.storage.gke.io
   volumeBindingMode: WaitForFirstConsumer
   reclaimPolicy: Retain
