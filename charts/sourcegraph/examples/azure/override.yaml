@@ -1,0 +1,18 @@
+frontend:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: azure/application-gateway
+      # additional azure application gateway supported annotations
+      # ...
+    # replace with your actual domain
+    host: sourcegraph.company.com
+
+storageClass:
+  create: true
+  type: null
+  provisioner: disk.csi.azure.com
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
+  parameters:
+    storageaccounttype: Premium_LRS # This configures SSDs (recommended). A Premium VM is required.
