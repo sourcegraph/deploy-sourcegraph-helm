@@ -380,6 +380,10 @@ gitserver:
     defaultTag: 3.38.0@sha256:6474be40cbe0a0a2914bc996835e78bf25ee48527312b8800bc0ccb35341c3ec
     # -- Docker image name for the `gitserver` image
     name: "gitserver"
+  # -- Name of existing Secret that contains SSH credentials to clone repositories.
+  # It usually contains keys, such as `id_rsa` (private key) and `known_hosts`.
+  # Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories)
+  sshSecret: ""
   # -- Security context for the `gitserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
