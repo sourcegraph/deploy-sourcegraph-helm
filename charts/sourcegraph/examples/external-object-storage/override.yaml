@@ -1,6 +1,6 @@
-# Override file demonstrating the use of external object storage
-# Learn more
-# - https://docs.sourcegraph.com/admin/external_services/object_storage
+# Override file demonstrating the use of external Object Storage services
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
 
 # we use YAML anchors and alias to keep override file clean
 objectStorageEnv: &objectStorageEnv
