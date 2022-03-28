@@ -1,17 +1,40 @@
 # Demonstrate using an external database for the main Sourcegraph database
 # Disables deployment of the Postgres docker container
 # Optionally, reference a Kubernetes Secret that contains credentials to the external database
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-postgresql-databases
 
 frontend:
   env:
     PGHOST:
-      value: external-database-dns # external database host
-
+      value: pgsql.database.company.com # external pgsql host
+    PGPORT:
+      value: "5432" # external pgsql port
+    PGDATABASE:
+      value: sg # external pgsql database name
+    PGUSER:
+      value: sg # external pgsql user
     PGPASSWORD:
       valueFrom:
         secretKeyRef: # Pre-existing secret, not created by this chart
-          name: postgres-sourcegraph
-          key: password
+          name: sourcegraph-pgsql-credentials
+          key: PGPASSWORD
+    CODEINTEL_PGHOST:
+      value: codeintel-db.database.company.com # external codeintel-db host
+    CODEINTEL_PGPORT:
+      value: "5432" # external codeintel-db port
+    CODEINTEL_PGDATABASE:
+      value: sg # external codeintel-db database name
+    CODEINTEL_PGUSER:
+      value: sg # external codeintel-db user
+    CODEINTEL_PGPASSWORD:
+      valueFrom:
+        secretKeyRef: # Pre-existing secret, not created by this chart
+          name: sourcegraph-codeintel-db-credentials
+          key: CODEINTEL_PGPASSWORD
 
 pgsql:
-  enabled: false
+  enabled: false # disable internal pgsql database
+
+codeIntelDB:
+  enabled: false # disable internal codeintel-db database
