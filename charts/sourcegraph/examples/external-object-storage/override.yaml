@@ -1,0 +1,30 @@
+# Override file demonstrating the use of external Object Storage services
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
+
+# we use YAML anchors and alias to keep override file clean
+objectStorageEnv: &objectStorageEnv
+  PRECISE_CODE_INTEL_UPLOAD_BACKEND:
+    value: S3 # external object stoage type, one of "S3" or "GCS"
+  PRECISE_CODE_INTEL_UPLOAD_BUCKET:
+    value: lsif-uploads # external object storage bucket name
+  PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT:
+    value: https://s3.us-east-1.amazonaws.com
+  PRECISE_CODE_INTEL_UPLOAD_AWS_REGION:
+    value: us-east-1
+  PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID:
+    secretKeyRef: # Pre-existing secret, not created by this chart
+      name: sourcegraph-s3-credentials
+      key: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
+  PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY:
+    secretKeyRef: # Pre-existing secret, not created by this chart
+      name: sourcegraph-s3-credentials
+      key: PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY
+
+frontend:
+  env:
+    <<: *objectStorageEnv
+
+preciseCodeIntel:
+  env:
+    <<: *objectStorageEnv

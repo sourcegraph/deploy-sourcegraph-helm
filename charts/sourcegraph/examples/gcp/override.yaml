@@ -1,9 +1,19 @@
 frontend:
   serviceType: ClusterIP
   ingress:
-    annotations:
-      kubernetes.io/ingress.class: gce
     enabled: true
+    annotations:
+      kubernetes.io/ingress.class: null
+    ingressClassName: gce
+    host: sourcegraph.company.com # Replace with your actual domain
   serviceAnnotations:
     cloud.google.com/neg: '{"ingress": true}'
+    # reference the `BackendConfig` CR we will be configuring at a later step
     beta.cloud.google.com/backend-config: '{"default": "sourcegraph-frontend"}'
+
+storageClass:
+  create: true
+  type: pd-ssd # This configures SSDs (recommended).
+  provisioner: pd.csi.storage.gke.io
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
