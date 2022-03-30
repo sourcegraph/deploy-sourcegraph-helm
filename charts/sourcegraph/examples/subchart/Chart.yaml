@@ -7,5 +7,5 @@ version: 1.0.0
 dependencies:
 - name: sourcegraph
   alias: sg # Optional, allows a custom name to be used
-  version: 0.1.0
+  version: 0.7.0
   repository: "https://sourcegraph.github.io/deploy-sourcegraph-helm"
