@@ -523,13 +523,18 @@ indexedSearchIndexer:
 minio:
   # -- Enable `minio` (S3 compatible storage)
   enabled: true
-  # -- Environment variables for the `minio` container
-  # You should change below variables in production
-  env:
-    MINIO_ACCESS_KEY:
-      value: AKIAIOSFODNN7EXAMPLE
-    MINIO_SECRET_KEY:
-      value: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+  # -- Configure credentials for the `minio` container,
+  # learn more from the [Minio documentation](https://docs.min.io/minio/baremetal/reference/minio-server/minio-server.html#root-credentials)
+  # @default -- Generate a secret with default credentials
+  auth:
+    # -- Name of existing secret to use for Minio credentials
+    # The secret must contain the keys `user` (root user access key) and `password` (root user secret key)
+    # `auth.user` and `auth.password` are ignored if this is enabled
+    existingSecret: ""
+    # -- Sets root user access key
+    user: "AKIAIOSFODNN7EXAMPLE"
+    # -- Sets root user secret key
+    password: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
   image:
     # -- Docker image tag for the `minio` image
     defaultTag: 3.38.0@sha256:0daf4c0c821634eeefbf90f48d467eece09597aff5d9f582685c8c875f03e6fa

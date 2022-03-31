@@ -1,0 +1,73 @@
+---
+suite: minioAuth
+templates:
+- minio/minio.Secret.yaml
+- minio/minio.Deployment.yaml
+tests:
+- it: should reference existing secret name when existingSecret is passed
+  template: minio/minio.Deployment.yaml
+  set:
+    minio:
+      auth:
+        existingSecret: "my-secret"
+  asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: MINIO_ROOT_USER
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: "my-secret"
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: MINIO_ROOT_PASSWORD
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+          value: "my-secret"
+- it: should not generate a secret when existingSecret is passed
+  template: minio/minio.Secret.yaml
+  set:
+    minio:
+      auth:
+        existingSecret: "my-secret"
+  asserts:
+      - hasDocuments:
+          count: 0
+- it: should generate a secret when existingSecret is blank
+  template: minio/minio.Secret.yaml
+  set:
+    minio:
+      auth:
+        existingSecret: ""
+  asserts:
+      - hasDocuments:
+          count: 1
+- it: should generate a secret by default
+  template: minio/minio.Secret.yaml
+  asserts:
+      - hasDocuments:
+          count: 1
+- it: should use provided value in secret
+  template: minio/minio.Secret.yaml
+  set:
+    minio:
+      auth:
+        password: "hello"
+  asserts:
+      - equal:
+          path: data.password
+          value: "aGVsbG8="
+- it: should reference default secret name when existingSecret is blank
+  template: minio/minio.Deployment.yaml
+  asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: MINIO_ROOT_USER
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: "minio-auth"
+      - equal:
+          path: spec.template.spec.containers[0].env[1].name
+          value: MINIO_ROOT_PASSWORD
+      - equal:
+          path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
+          value: "minio-auth"
