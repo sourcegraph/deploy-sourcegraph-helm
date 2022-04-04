@@ -1079,5 +1079,5 @@ worker:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-# -- Additional manifests to include in the rendered output
-extraManifests: {}
+# -- Additional resources to include in the rendered output
+extraResources: {}
