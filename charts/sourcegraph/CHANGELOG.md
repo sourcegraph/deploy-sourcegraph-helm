@@ -16,7 +16,7 @@ All notable changes to Sourcegraph are documented in this file.
 
 ### Changed
 
--
+- **CAUTION** Migrated Code Insights from Timescale to Postgres. If you have customized the configmap or connection parameters for codeinsights-db, manual updates may be required. [#74](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/74)
 
 ### Fixed
 

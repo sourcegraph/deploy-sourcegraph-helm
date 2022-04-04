@@ -101,7 +101,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | codeInsightsDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.enabled | bool | `true` | Enable `codeinsights-db` PostgreSQL server |
-| codeInsightsDB.env | object | `{"POSTGRES_PASSWORD":{"value":"password"}}` | Environment variables for the `codeinsights-db` container |
+| codeInsightsDB.env | object | `{"POSTGRES_DB":{"value":"postgres"},"POSTGRES_PASSWORD":{"value":"password"},"POSTGRES_USER":{"value":"postgres"}}` | Environment variables for the `codeinsights-db` container |
 | codeInsightsDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key. |
 | codeInsightsDB.image.defaultTag | string | `"3.38.0@sha256:4f971b00939ebbf7d9d622f40fc84a4fde994c67ebd023ed49ccad066aae2044"` | Docker image tag for the `codeinsights-db` image |
 | codeInsightsDB.image.name | string | `"codeinsights-db"` | Docker image name for the `codeinsights-db` image |
