@@ -164,11 +164,6 @@ codeInsightsDB:
     runAsUser: 70
     runAsGroup: 70
     readOnlyRootFilesystem: true
-  postgresExporter:
-    # -- Environment variables for the `pgsql-exporter` sidecar container
-    env:
-      DATA_SOURCE_NAME:
-        value: postgres://postgres:@localhost:5432/?sslmode=disable
   # -- Resource requests & limits for the `codeinsights-db` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:

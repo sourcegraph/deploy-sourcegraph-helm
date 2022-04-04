@@ -106,7 +106,6 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.image.defaultTag | string | `"3.38.0@sha256:4f971b00939ebbf7d9d622f40fc84a4fde994c67ebd023ed49ccad066aae2044"` | Docker image tag for the `codeinsights-db` image |
 | codeInsightsDB.image.name | string | `"codeinsights-db"` | Docker image name for the `codeinsights-db` image |
 | codeInsightsDB.podSecurityContext | object | `{"fsGroup":70,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":70}` | Security context for the `codeinsights-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| codeInsightsDB.postgresExporter.env | object | `{"DATA_SOURCE_NAME":{"value":"postgres://postgres:@localhost:5432/?sslmode=disable"}}` | Environment variables for the `pgsql-exporter` sidecar container |
 | codeInsightsDB.resources | object | `{"limits":{"cpu":"4","memory":"2Gi"},"requests":{"cpu":"4","memory":"2Gi"}}` | Resource requests & limits for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
