@@ -18,9 +18,9 @@ metadata:
   name: codeinsights-db
 spec:
   ports:
-  - name: timescaledb
+  - name: codeinsights-db
     port: 5432
-    targetPort: timescaledb
+    targetPort: codeinsights-db
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeinsights-db

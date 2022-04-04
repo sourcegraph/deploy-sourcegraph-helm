@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    description: Code Insights TimescaleDB instance.
+    description: Code Insights Postgresql instance.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.codeInsightsDB.labels }}
@@ -23,7 +23,7 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: timescaledb
+        kubectl.kubernetes.io/default-container: codeinsights
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -43,7 +43,7 @@ spec:
         group: backend
     spec:
       containers:
-      - name: timescaledb
+      - name: codeinsights
         image: {{ include "sourcegraph.image" (list . "codeInsightsDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.codeInsightsDB.args }}
@@ -62,7 +62,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
-          name: timescaledb
+          name: codeinsights-db
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
@@ -73,11 +73,25 @@ spec:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
-          name: timescaledb-conf
+          name: codeinsights-conf
         - mountPath: /var/run/postgresql
           name: lockdir
         {{- if .Values.codeInsightsDB.extraVolumeMounts }}
         {{- toYaml .Values.codeInsightsDB.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      - env:
+        {{- range $name, $item := .Values.codeInsightsDB.postgresExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
       {{- if .Values.codeInsightsDB.extraContainers }}
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
@@ -97,7 +111,7 @@ spec:
       - name: disk
         persistentVolumeClaim:
           claimName: codeinsights-db
-      - name: timescaledb-conf
+      - name: codeinsights-conf
         configMap:
           defaultMode: 0777
           name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig }}
