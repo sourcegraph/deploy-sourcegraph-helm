@@ -209,9 +209,10 @@ In addition to the documented values, all services also support the following va
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
 | pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | pgsql.auth.database | string | `"sg"` | Sets postgres database name |
-| pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for Postgres credentials The secret must contain the keys `user`, `password`, `database` and `host`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
+| pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for Postgres credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
 | pgsql.auth.host | string | `"pgsql"` | Sets postgres host |
 | pgsql.auth.password | string | `"password"` | Sets postgres password |
+| pgsql.auth.port | string | `"5432"` | Sets postgres port |
 | pgsql.auth.user | string | `"sg"` | Sets postgres username |
 | pgsql.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | pgsql.enabled | bool | `true` | Enable `pgsql` PostgreSQL server |

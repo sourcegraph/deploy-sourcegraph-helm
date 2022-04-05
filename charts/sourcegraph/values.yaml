@@ -589,7 +589,7 @@ pgsql:
   enabled: true
   auth:
     # -- Name of existing secret to use for Postgres credentials
-    # The secret must contain the keys `user`, `password`, `database` and `host`.
+    # The secret must contain the keys `user`, `password`, `database`, `host` and `port`.
     # `auth.user`, `auth.password`, etc. are ignored if this is enabled
     existingSecret: ""
     # -- Sets postgres database name
@@ -600,6 +600,8 @@ pgsql:
     user: "sg"
     # -- Sets postgres password
     password: "password"
+    # -- Sets postgres port
+    port: "5432"
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
   existingConfig: "" # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.

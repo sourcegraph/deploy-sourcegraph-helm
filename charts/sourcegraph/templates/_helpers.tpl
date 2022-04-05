@@ -151,6 +151,11 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: password
       name: {{ $secretName }}
+- name: {{ printf "%sPORT" $prefix }}
+  valueFrom:
+    secretKeyRef:
+      key: port
+      name: {{ $secretName }}
 - name: {{ printf "%sUSER" $prefix }}
   valueFrom:
     secretKeyRef:
@@ -174,11 +179,16 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: password
       name: {{ $secretName }}
+- name: DATA_SOURCE_PORT
+  valueFrom:
+    secretKeyRef:
+      key: port
+      name: {{ $secretName }}
 - name: DATA_SOURCE_USER
   valueFrom:
     secretKeyRef:
       key: user
       name: {{ $secretName }}
 - name: DATA_SOURCE_URI
-  value: "localhost:5432/$(DATA_SOURCE_DB)?sslmode=disable"
+  value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"
 {{- end }}
