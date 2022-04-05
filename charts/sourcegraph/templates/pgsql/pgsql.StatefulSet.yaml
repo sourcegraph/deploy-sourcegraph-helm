@@ -24,7 +24,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: pgsql
-        checksum/pgsqlconfig: {{ include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") . | sha256sum }}
+        checksum/pgsql.secret: {{ include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") . | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
