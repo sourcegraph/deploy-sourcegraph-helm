@@ -1,8 +1,10 @@
 suite: localDevMode
 templates:
+  - minio/minio.Secret.yaml
   - frontend/sourcegraph-frontend.Deployment.yaml
 tests:
   - it: should not have a resource block when localDevMode=true
+    template: frontend/sourcegraph-frontend.Deployment.yaml
     set:
       sourcegraph.localDevMode: true
     asserts:
@@ -10,6 +12,7 @@ tests:
           path: spec.template.spec.containers[0].resources
 
   - it: should have a resource block when localDevMode=false
+    template: frontend/sourcegraph-frontend.Deployment.yaml
     set:
       sourcegraph.localDevMode: false
     asserts:
