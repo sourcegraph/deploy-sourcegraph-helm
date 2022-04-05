@@ -1,11 +1,13 @@
 suite: affinity
 templates:
+- minio/minio.Secret.yaml
 - frontend/sourcegraph-frontend.Deployment.yaml
 release:
   name: sourcegraph
   namespace: sourcegraph
 tests:
 - it: should render affinity values that contain template
+  template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
     frontend:
       affinity:
@@ -35,6 +37,7 @@ tests:
             weight: 100
 
 - it: should render affinity values that do not contain template
+  template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
     frontend:
       affinity:
