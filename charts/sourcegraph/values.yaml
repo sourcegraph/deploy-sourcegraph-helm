@@ -173,6 +173,7 @@ codeInsightsDB:
     requests:
       cpu: "4"
       memory: 2Gi
+  mappingName: "codeinsights-db"
   # -- Security context for the `codeinsights-db` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -222,6 +223,7 @@ codeIntelDB:
     requests:
       cpu: "4"
       memory: 4Gi
+  mappingName: "codeintel-db"
   # -- Security context for the `codeintel-db` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -350,6 +352,7 @@ githubProxy:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  mappingName: "github-proxy"
   # -- Security context for the `github-proxy` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -474,6 +477,7 @@ indexedSearch:
     requests:
       cpu: 500m
       memory: 2G
+  mappingName: "indexed-search"
   # -- Security context for the `indexed-search` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -660,6 +664,7 @@ preciseCodeIntel:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  mappingName: "precise-code-intel"
   # -- Security context for the `precise-code-intel-worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -754,6 +759,7 @@ redisCache:
     requests:
       cpu: "1"
       memory: 7Gi
+  mappingName: "redis-cache"
   # -- Security context for the `redis-cache` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -814,6 +820,7 @@ redisStore:
     requests:
       cpu: "1"
       memory: 7Gi
+  mappingName: "redis-store"
   # -- Security context for the `redis-store` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -840,6 +847,7 @@ repoUpdater:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  mappingName: "repo-updater"
   # -- Security context for the `repo-updater` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -959,6 +967,7 @@ syntectServer:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  mappingName: "syntect-server"
   # -- Security context for the `syntect-server` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
