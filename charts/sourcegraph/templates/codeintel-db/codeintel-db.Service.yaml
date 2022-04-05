@@ -15,7 +15,7 @@ metadata:
     {{- if .Values.codeIntelDB.serviceLabels }}
       {{- toYaml .Values.codeIntelDB.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
+  name: codeintel-db
 spec:
   ports:
   - name: pgsql
