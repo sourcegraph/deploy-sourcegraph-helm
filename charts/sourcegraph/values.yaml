@@ -117,6 +117,7 @@ cadvisor:
     defaultTag: 3.38.0@sha256:246c3d82072511f376049762056a3c82fce5dbc4a00f29f10f64373b5fe0a9a9
     # -- Docker image name for the `cadvisor` image
     name: "cadvisor"
+  name: "cadvisor"
   podSecurityPolicy:
     # -- Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `cadvisor` pods
     enabled: false
@@ -164,6 +165,7 @@ codeInsightsDB:
     runAsUser: 70
     runAsGroup: 70
     readOnlyRootFilesystem: true
+  name: "codeinsights-db"
   # -- Resource requests & limits for the `codeinsights-db` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -213,6 +215,7 @@ codeIntelDB:
     env:
       DATA_SOURCE_NAME:
         value: postgres://sg:@localhost:5432/?sslmode=disable
+  name: "codeintel-db"
   # -- Resource requests & limits for the `codeintel-db` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -298,6 +301,7 @@ frontend:
   privileged: true
   # -- Number of `frontend` pod
   replicaCount: 2
+  name: "sourcegraph-frontend"
   # -- Resource requests & limits for the `frontend` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -356,6 +360,7 @@ githubProxy:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  name: "github-proxy"
   # -- Security context for the `github-proxy` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -398,6 +403,7 @@ gitserver:
     requests:
       cpu: "4"
       memory: 8G
+  name: "gitserver"
   # -- Security context for the `gitserver` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -430,6 +436,7 @@ grafana:
     runAsUser: 472
     runAsGroup: 472
     readOnlyRootFilesystem: true
+  name: "grafana"
   # -- Number of `grafana` pod
   replicaCount: 1
   # -- Resource requests & limits for the `grafana` container,
@@ -469,6 +476,7 @@ indexedSearch:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  name: "indexed-search"
   # -- Number of `indexed-search` pod
   replicaCount: 1
   # -- Resource requests & limits for the `zoekt-webserver` container,
@@ -546,6 +554,7 @@ minio:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
+  name: "minio"
   # -- Resource requests & limits for the `minio` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -596,6 +605,7 @@ pgsql:
     env:
       DATA_SOURCE_NAME:
         value: postgres://sg:@localhost:5432/?sslmode=disable
+  name: "pgsql"
   # -- Resource requests & limits for the `pgsql` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -654,6 +664,7 @@ preciseCodeIntel:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  name: "precise-code-intel-worker"
   # -- Security context for the `precise-code-intel-worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -691,6 +702,7 @@ prometheus:
     runAsUser: 100
     runAsGroup: 100
     readOnlyRootFilesystem: true
+  name: "prometheus"
   # -- Enable RBAC for `prometheus`
   privileged: true
   # -- Number of `prometheus` pod
@@ -748,6 +760,7 @@ redisCache:
     requests:
       cpu: "1"
       memory: 7Gi
+  name: "redis-cache"
   # -- Security context for the `redis-cache` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -808,6 +821,7 @@ redisStore:
     requests:
       cpu: "1"
       memory: 7Gi
+  name: "redis-store"
   # -- Security context for the `redis-store` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
@@ -834,6 +848,7 @@ repoUpdater:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  name: "repo-updater"
   # -- Security context for the `repo-updater` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -868,6 +883,7 @@ searcher:
   # -- Security context for the `searcher` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
+  name: "searcher"
   # -- Number of `searcher` pod
   replicaCount: 2
   # -- Resource requests & limits for the `searcher` container,
@@ -921,6 +937,7 @@ symbols:
   # -- Security context for the `symbols` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
+  name: "symbols"
   # -- Number of `symbols` pod
   replicaCount: 1
   # -- Resource requests & limits for the `symbols` container,
@@ -953,6 +970,7 @@ syntectServer:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  name: "syntect-server"
   # -- Security context for the `syntect-server` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
@@ -992,6 +1010,7 @@ tracing:
     defaultTag: 3.38.0@sha256:7c3505a6702435e2aba88987dbd4795e0f87acc602310df78dcb9581e3ad868f
     # -- Docker image name for the `jaeger` image
     name: "jaeger-all-in-one"
+  name: "jaeger"
   # -- Security context for the `jaeger` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -1068,6 +1087,7 @@ worker:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  name: "worker"
   # -- Security context for the `worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
