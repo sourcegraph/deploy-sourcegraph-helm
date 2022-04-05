@@ -140,8 +140,12 @@ codeInsightsDB:
   enabled: true
   # -- Environment variables for the `codeinsights-db` container
   env:
+    POSTGRES_DB:
+      value: postgres
     POSTGRES_PASSWORD: # Accessible by Sourcegraph applications on the network only, so password auth is not used.
       value: password
+    POSTGRES_USER:
+      value: postgres
   # -- Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key.
   existingConfig: "" # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
