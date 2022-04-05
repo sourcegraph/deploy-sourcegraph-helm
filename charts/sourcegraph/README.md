@@ -208,6 +208,11 @@ In addition to the documented values, all services also support the following va
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
 | pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| pgsql.auth.database | string | `"sg"` | Sets postgres database name |
+| pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for Postgres credentials The secret must contain the keys `user`, `password`, `database` and `host`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
+| pgsql.auth.host | string | `"pgsql"` | Sets postgres host |
+| pgsql.auth.password | string | `"password"` | Sets postgres password |
+| pgsql.auth.user | string | `"sg"` | Sets postgres username |
 | pgsql.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | pgsql.enabled | bool | `true` | Enable `pgsql` PostgreSQL server |
 | pgsql.existingConfig | string | `""` | Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key |
@@ -215,7 +220,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.image.name | string | `"postgres-12-alpine"` | Docker image name for the `pgsql` image |
 | pgsql.name | string | `"pgsql"` | Name used by resources. Does not affect service names or PVCs. |
 | pgsql.podSecurityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| pgsql.postgresExporter.env | object | `{"DATA_SOURCE_NAME":{"value":"postgres://sg:@localhost:5432/?sslmode=disable"}}` | Environment variables for the `pgsql-exporter` sidecar container |
+| pgsql.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
 | pgsql.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pgsql.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `pgsql` |
 | pgsql.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
