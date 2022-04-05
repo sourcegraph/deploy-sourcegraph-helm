@@ -29,7 +29,7 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: frontend
         checksum/minio.secret: {{ include (print $.Template.BasePath "/minio/minio.Secret.yaml") . | sha256sum }}
-        checksum/pgsqlconfig: {{ include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") . | sha256sum }}
+        checksum/pgsql.secret: {{ include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") . | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
