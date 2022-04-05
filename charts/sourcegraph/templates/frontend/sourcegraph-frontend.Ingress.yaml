@@ -15,7 +15,7 @@ metadata:
     {{- end }}
   name: sourcegraph-frontend
 spec:
-  {{- if .Values.frontend.ingress.host }}
+  {{- if and .Values.frontend.ingress.host .Values.frontend.ingress.tlsSecret }}
   tls:
   - hosts:
     - {{ .Values.frontend.ingress.host }}
