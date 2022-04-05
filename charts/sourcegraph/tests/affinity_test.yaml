@@ -1,6 +1,7 @@
 suite: affinity
 templates:
 - minio/minio.Secret.yaml
+- pgsql/pgsql.Secret.yaml
 - frontend/sourcegraph-frontend.Deployment.yaml
 release:
   name: sourcegraph
