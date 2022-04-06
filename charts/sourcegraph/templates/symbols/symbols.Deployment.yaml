@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: symbols
-  name: {{ default "symbols" .Values.symbols.name }}
+  name: {{ .Values.symbols.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.symbols.replicaCount }}

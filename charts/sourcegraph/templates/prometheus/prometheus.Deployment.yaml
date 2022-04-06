@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
-  name: {{ default "prometheus" .Values.prometheus.name }}
+  name: {{ .Values.prometheus.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.prometheus.replicaCount }}
@@ -101,7 +101,7 @@ spec:
           claimName: prometheus
       - configMap:
           defaultMode: 0777
-          name: {{ default "prometheus" .Values.prometheus.existingConfig }}
+          name: {{ default .Values.prometheus.name .Values.prometheus.existingConfig }}
         name: config
       {{- if .Values.prometheus.extraVolumes }}
       {{- toYaml .Values.prometheus.extraVolumes | nindent 6 }}

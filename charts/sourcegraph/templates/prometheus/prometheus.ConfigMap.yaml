@@ -281,5 +281,5 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
-  name: prometheus
+  name: {{ .Values.prometheus.name }}
 {{- end }}

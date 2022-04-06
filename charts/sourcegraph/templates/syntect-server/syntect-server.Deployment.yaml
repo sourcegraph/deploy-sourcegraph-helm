@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: syntect-server
-  name: {{ default "syntect-server" .Values.syntectServer.name }}
+  name: {{ .Values.syntectServer.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.syntectServer.replicaCount }}

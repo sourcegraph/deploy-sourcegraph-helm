@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
+  name: {{ .Values.frontend.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.frontend.replicaCount }}
@@ -90,12 +90,12 @@ spec:
           valueFrom:
             secretKeyRef:
               key: user
-              name: {{ default "minio-auth" .Values.minio.auth.existingSecret }}
+              name: {{ default (print .Values.minio.name "-auth") .Values.minio.auth.existingSecret }}
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
               key: password
-              name: {{ default "minio-auth" .Values.minio.auth.existingSecret }}
+              name: {{ default (print .Values.minio.name "-auth") .Values.minio.auth.existingSecret }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:

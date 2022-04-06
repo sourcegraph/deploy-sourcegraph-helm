@@ -20,5 +20,5 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
-  name: grafana
+  name: {{ .Values.grafana.name }}
 {{- end }}

@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
-  name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
+  name: {{ .Values.codeInsightsDB.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -100,7 +100,7 @@ spec:
       - name: codeinsights-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig }}
+          name: {{ default (print .Values.codeInsightsDB.name "-conf") .Values.codeInsightsDB.existingConfig }}
       - name: lockdir
         emptyDir: {}
       {{- if .Values.codeInsightsDB.extraVolumes }}

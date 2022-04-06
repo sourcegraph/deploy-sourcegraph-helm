@@ -10,7 +10,7 @@ metadata:
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
-  name: codeinsights-db-conf
+  name: {{ .Values.codeInsightsDB.name }}-conf
 data:
   postgresql.conf: |
     # -----------------------------

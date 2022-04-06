@@ -10,7 +10,7 @@ metadata:
     {{- if .Values.indexedSearch.labels }}
       {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
     {{- end }}
-  name: {{ default "indexed-search" .Values.indexedSearch.name }}
+  name: {{ .Values.indexedSearch.name }}
 spec:
   replicas: {{ .Values.indexedSearch.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
