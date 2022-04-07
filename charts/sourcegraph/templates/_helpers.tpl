@@ -133,7 +133,7 @@ app.kubernetes.io/name: jaeger
 {{- $top := index . 0 -}}
 {{- $service := index . 1 -}}
 {{- $prefix := index . 2 -}}
-{{- $secretName := ((snakecase $service) | replace "_" "-") -}}
+{{- $secretName := (index $top.Values $service "name") -}}
 {{- $secretName := printf "%s-auth" $secretName -}}
 {{- if (index $top.Values $service "auth" "existingSecret") }}{{- $secretName = (index $top.Values $service "auth" "existingSecret") }}{{- end -}}
 - name: {{ printf "%sDATABASE" $prefix }}
@@ -166,7 +166,7 @@ app.kubernetes.io/name: jaeger
 {{- define "sourcegraph.dataSource" -}}
 {{- $top := index . 0 -}}
 {{- $service := index . 1 -}}
-{{- $secretName := ((snakecase $service) | replace "_" "-") -}}
+{{- $secretName := (index $top.Values $service "name") -}}
 {{- $secretName := printf "%s-auth" $secretName -}}
 {{- if (index $top.Values $service "auth" "existingSecret") }}{{- $secretName = (index $top.Values $service "auth" "existingSecret") }}{{- end -}}
 - name: DATA_SOURCE_DB
