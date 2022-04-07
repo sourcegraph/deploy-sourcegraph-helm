@@ -262,12 +262,6 @@ frontend:
       value: http://grafana:30070
     JAEGER_SERVER_URL:
       value: http://jaeger-query:16686
-    PGDATABASE:
-      value: sg
-    PGHOST:
-      value: pgsql
-    PGUSER:
-      value: sg
     PROMETHEUS_URL:
       value: http://prometheus:30090
   image:
@@ -593,6 +587,21 @@ minio:
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
   enabled: true
+  auth:
+    # -- Name of existing secret to use for Postgres credentials
+    # The secret must contain the keys `user`, `password`, `database`, `host` and `port`.
+    # `auth.user`, `auth.password`, etc. are ignored if this is enabled
+    existingSecret: ""
+    # -- Sets postgres database name
+    database: "sg"
+    # -- Sets postgres host
+    host: "pgsql"
+    # -- Sets postgres username
+    user: "sg"
+    # -- Sets postgres password
+    password: "password"
+    # -- Sets postgres port
+    port: "5432"
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
   existingConfig: "" # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
@@ -611,11 +620,8 @@ pgsql:
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
-  postgresExporter:
-    # -- Environment variables for the `pgsql-exporter` sidecar container
-    env:
-      DATA_SOURCE_NAME:
-        value: postgres://sg:@localhost:5432/?sslmode=disable
+  # -- Configuration for the `pgsql-exporter` sidecar container
+  postgresExporter: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "pgsql"
   # -- Resource requests & limits for the `pgsql` container,
