@@ -192,3 +192,30 @@ app.kubernetes.io/name: jaeger
 - name: DATA_SOURCE_URI
   value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"
 {{- end }}
+
+{{- define "sourcegraph.redisConnection" -}}
+- name: REDIS_CACHE_ENDPOINT
+  valueFrom:
+    secretKeyRef:
+      key: endpoint
+      name: {{ default .Values.redisCache.name .Values.redisCache.connection.existingSecret }}
+- name: REDIS_STORE_ENDPOINT
+  valueFrom:
+    secretKeyRef:
+      key: endpoint
+      name: {{ default .Values.redisStore.name .Values.redisStore.connection.existingSecret }}
+{{- end }}
+
+{{- define "sourcegraph.authChecksum" -}}
+{{- $checksum := list (include (print $.Template.BasePath "/codeintel-db/codeintel-db.Secret.yaml") .)}}
+{{- $checksum := append $checksum (include (print $.Template.BasePath "/minio/minio.Secret.yaml") .) }}
+{{- $checksum := append $checksum (include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") .) }}
+{{- $checksum := append $checksum (include (print $.Template.BasePath "/codeinsights-db/codeinsights-db.Secret.yaml") .) -}}
+checksum/auth: {{ $checksum | join "" | sha256sum }}
+{{- end -}}
+
+{{- define "sourcegraph.redisChecksum" -}}
+{{- $checksum := list (include (print $.Template.BasePath "/redis/redis-store.Secret.yaml") .)}}
+{{- $checksum := append $checksum (include (print $.Template.BasePath "/redis/redis-cache.Secret.yaml") .) -}}
+checksum/redis-auth: {{ $checksum | join "" | sha256sum }}
+{{- end -}}
