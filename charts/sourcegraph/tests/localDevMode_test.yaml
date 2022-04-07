@@ -2,6 +2,8 @@ suite: localDevMode
 templates:
   - minio/minio.Secret.yaml
   - pgsql/pgsql.Secret.yaml
+  - codeintel-db/codeintel-db.Secret.yaml
+  - codeinsights-db/codeinsights-db.Secret.yaml
   - frontend/sourcegraph-frontend.Deployment.yaml
 tests:
   - it: should not have a resource block when localDevMode=true

@@ -100,9 +100,15 @@ In addition to the documented values, all services also support the following va
 | cadvisor.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `cadvisor` |
 | cadvisor.serviceAccount.name | string | `"cadvisor"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeInsightsDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| codeInsightsDB.auth.database | string | `"postgres"` | Sets codeinsights-db database name |
+| codeInsightsDB.auth.existingSecret | string | `""` | Name of existing secret to use for Code Insights credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
+| codeInsightsDB.auth.host | string | `"codeinsights-db"` | Sets codeinsights-db host |
+| codeInsightsDB.auth.password | string | `"password"` | Sets codeinsights-db password |
+| codeInsightsDB.auth.port | string | `"5432"` | Sets codeinsights-db port |
+| codeInsightsDB.auth.user | string | `"postgres"` | Sets codeinsights-db username |
 | codeInsightsDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.enabled | bool | `true` | Enable `codeinsights-db` PostgreSQL server |
-| codeInsightsDB.env | object | `{"POSTGRES_DB":{"value":"postgres"},"POSTGRES_PASSWORD":{"value":"password"},"POSTGRES_USER":{"value":"postgres"}}` | Environment variables for the `codeinsights-db` container |
+| codeInsightsDB.env | object | `{}` | Environment variables for the `codeinsights-db` container |
 | codeInsightsDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key. |
 | codeInsightsDB.image.defaultTag | string | `"3.38.0@sha256:4f971b00939ebbf7d9d622f40fc84a4fde994c67ebd023ed49ccad066aae2044"` | Docker image tag for the `codeinsights-db` image |
 | codeInsightsDB.image.name | string | `"codeinsights-db"` | Docker image name for the `codeinsights-db` image |
@@ -113,6 +119,12 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeInsightsDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeinsights-db` data volume |
 | codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| codeIntelDB.auth.database | string | `"sg"` | Sets codeintel-db database name |
+| codeIntelDB.auth.existingSecret | string | `""` | Name of existing secret to use for CodeIntel credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
+| codeIntelDB.auth.host | string | `"codeintel-db"` | Sets codeintel-db host |
+| codeIntelDB.auth.password | string | `"password"` | Sets codeintel-db password |
+| codeIntelDB.auth.port | string | `"5432"` | Sets codeintel-db port |
+| codeIntelDB.auth.user | string | `"sg"` | Sets codeintel-db username |
 | codeIntelDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeIntelDB.enabled | bool | `true` | Enable `codeintel-db` PostgreSQL server |
 | codeIntelDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key |
@@ -120,7 +132,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.image.name | string | `"codeintel-db"` | Docker image name for the `codeintel-db` image |
 | codeIntelDB.name | string | `"codeintel-db"` | Name used by resources. Does not affect service names or PVCs. |
 | codeIntelDB.podSecurityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":999}` | Security context for the `codeintel-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| codeIntelDB.postgresExporter.env | object | `{"DATA_SOURCE_NAME":{"value":"postgres://sg:@localhost:5432/?sslmode=disable"}}` | Environment variables for the `pgsql-exporter` sidecar container |
+| codeIntelDB.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
 | codeIntelDB.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
