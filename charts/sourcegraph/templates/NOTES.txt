@@ -11,8 +11,11 @@ To learn more about supported configuration, check out https://docs.sourcegraph.
 {{- if not .Values.prometheus.privileged }}
 🚧 Warning 🚧
 
-You have set 'prometheus.privileged' to 'false'. As a result, our built-in observability stack will not function properly. 
-Please assign proper permission to Service Account '{{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}'.
+You have set 'prometheus.privileged' to 'false' and Prometheus will run with reduced privileges.
+Our observability stack requires some cluster-wide privileges to display provisioning metrics.
+As a result, our built-in observability stack will not function properly. 
+These metrics will provide critial information to help you scale the Sourcegraph deployment.
+Therefore, please assign proper permission to Service Account '{{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}'.
 You can do so by creating the proper ClusterRole and ClusterRoleBinding. 
 You may consult https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/templates/prometheus/prometheus.ClusterRole.yaml
 for a list of expected permissions.
