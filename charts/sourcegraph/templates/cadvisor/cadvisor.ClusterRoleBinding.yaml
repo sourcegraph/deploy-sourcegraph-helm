@@ -7,11 +7,11 @@ metadata:
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: cadvisor
-  name: cadvisor
+  name: {{ .Values.cadvisor.name }}
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: cadvisor
+  name: {{ .Values.cadvisor.name }}
 subjects:
 - kind: ServiceAccount
   name: {{ include "sourcegraph.serviceAccountName" (list . "cadvisor") }}

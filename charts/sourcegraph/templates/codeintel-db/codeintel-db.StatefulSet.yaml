@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
-  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
+  name: {{ .Values.codeIntelDB.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -133,7 +133,7 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeintel-db-conf" .Values.codeIntelDB.existingConfig .Values.codeIntelDB.name }}
+          name: {{ default (print .Values.codeIntelDB.name "-conf") .Values.codeIntelDB.existingConfig }}
       - name: lockdir
         emptyDir: {}
       {{- if .Values.codeIntelDB.extraVolumes }}

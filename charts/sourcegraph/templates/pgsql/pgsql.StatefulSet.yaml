@@ -11,7 +11,7 @@ metadata:
     {{- if .Values.pgsql.labels }}
       {{- toYaml .Values.pgsql.labels | nindent 4 }}
     {{- end }}
-  name: {{ default "pgsql" .Values.pgsql.name }}
+  name: {{ .Values.pgsql.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -137,7 +137,7 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "pgsql-conf" .Values.pgsql.existingConfig }}
+          name: {{ default (print .Values.pgsql.name "-conf") .Values.pgsql.existingConfig }}
       - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory

@@ -10,7 +10,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql
-  name: pgsql-conf
+  name: {{ .Values.pgsql.name }}-conf
 data:
   postgresql.conf: |
     # -----------------------------

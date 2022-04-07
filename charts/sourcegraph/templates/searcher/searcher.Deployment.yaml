@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: searcher
-  name: {{ default "searcher" .Values.searcher.name }}
+  name: {{ .Values.searcher.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.searcher.replicaCount }}

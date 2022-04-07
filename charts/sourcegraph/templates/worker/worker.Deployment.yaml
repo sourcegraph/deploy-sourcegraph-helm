@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: worker
-  name: {{ default "worker" .Values.worker.name }}
+  name: {{ .Values.worker.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.worker.replicaCount }}

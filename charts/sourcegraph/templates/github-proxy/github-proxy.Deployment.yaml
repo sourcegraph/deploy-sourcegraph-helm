@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: github-proxy
-  name: {{ default "github-proxy" .Values.githubProxy.name }}
+  name: {{ .Values.githubProxy.name }}
 spec:
   minReadySeconds: 10
   replicas: 1

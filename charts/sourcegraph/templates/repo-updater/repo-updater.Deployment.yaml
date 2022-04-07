@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: repo-updater
-  name: {{ default "repo-updater" .Values.repoUpdater.name }}
+  name: {{ .Values.repoUpdater.name }}
 spec:
   minReadySeconds: 10
   replicas: 1

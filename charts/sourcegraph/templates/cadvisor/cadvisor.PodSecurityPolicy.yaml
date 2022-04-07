@@ -6,7 +6,7 @@ metadata:
     app: cadvisor
     deploy: sourcegraph
     app.kubernetes.io/component: cadvisor
-  name: cadvisor
+  name: {{ .Values.cadvisor.name }}
 spec:
   seLinux:
     rule: RunAsAny

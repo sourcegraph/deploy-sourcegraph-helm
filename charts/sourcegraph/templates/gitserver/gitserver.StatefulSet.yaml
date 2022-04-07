@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: gitserver
-  name: {{ default "gitserver" .Values.gitserver.name }}
+  name: {{ .Values.gitserver.name }}
 spec:
   replicas: {{ .Values.gitserver.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}

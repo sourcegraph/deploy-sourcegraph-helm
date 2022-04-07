@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: redis
-  name: {{ default "redis-store" .Values.redisStore.name }}
+  name: {{ .Values.redisStore.name }}
 spec:
   minReadySeconds: 10
   replicas: 1

@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: precise-code-intel
-  name: {{ default "precise-code-intel-worker" .Values.preciseCodeIntel.name }}
+  name: {{ .Values.preciseCodeIntel.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.preciseCodeIntel.replicaCount }}

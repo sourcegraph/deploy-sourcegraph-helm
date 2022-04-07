@@ -13,7 +13,7 @@ metadata:
     {{- if .Values.frontend.ingress.labels}}
       {{- toYaml .Values.frontend.ingress.labels | nindent 4 }}
     {{- end }}
-  name: sourcegraph-frontend
+  name: {{ .Values.frontend.name }}
 spec:
   {{- if and .Values.frontend.ingress.host .Values.frontend.ingress.tlsSecret }}
   tls:

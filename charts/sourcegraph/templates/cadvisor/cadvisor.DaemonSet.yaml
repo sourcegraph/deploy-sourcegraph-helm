@@ -12,7 +12,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: cadvisor
-  name: {{ default "cadvisor" .Values.cadvisor.name }}
+  name: {{ .Values.cadvisor.name }}
 spec:
   selector:
     matchLabels:
