@@ -28,9 +28,9 @@ helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/
 
 ## Usage
 
-> If you are not using external databases, the chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
+> The chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
 
-[sourcegraph/sourcegraph-migrator] chart requires the correct `PG*`, `CODEINTEL_PG*`, and `CODEINSIGHTS_PG*` environment variables to be configured at `migrator.env`. Learn more about [using your own PostgreSQL server]. `PG*` and `CODEINTEL_PG*` environment variables are compatible with the `frontend.env` values from the parent [sourcegraph/sourcegraph] chart.
+By default, the [sourcegraph/sourcegraph-migrator] chart references database credentials from a Kubernetes `Secret` created by the parent [sourcegraph/sourcegraph] chart. If you provide your own `Secret` resources, update the `codeInsightsDB.auth.existingSecret`, `codeIntelDB.auth.existingSecret` and `pgsql.auth.existingSecret` settings in values.yaml to match. Learn more about [using your own PostgreSQL server].
 
 You should consult the list of available [migrator commands]. Below is some example usage.
 
@@ -73,12 +73,18 @@ In addition to the documented values, the `migrator` service also supports the f
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| codeInsightsDB.auth.existingSecret | string | `""` | Name of existing secret to use for codeinsights-db credentials This should match the setting in the sourcegraph chart values |
+| codeInsightsDB.name | string | `"codeinsights-db"` |  |
+| codeIntelDB.auth.existingSecret | string | `""` | Name of existing secret to use for codeintel-db credentials This should match the setting in the sourcegraph chart values |
+| codeIntelDB.name | string | `"codeintel-db"` |  |
 | migrator.args | list | `["up","-db=all"]` | Override default `migrator` container args Available commands can be found at https://docs.sourcegraph.com/admin/how-to/manual_database_migrations |
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| migrator.env | object | the chart will add some default environment values | Environment variables for the `migrator` container |
-| migrator.image.defaultTag | string | `"3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815"` | Docker image tag for the `migrator` image |
+| migrator.env | object | `{}` | Environment variables for the `migrator` container |
+| migrator.image.defaultTag | string | `"3.38.0@sha256:16b3cebb1447fce75a8cb3acd6b6640294c70ab96adbfbcbc8da565ffffc5a4e"` | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
 | migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for pgsql credentials This should match the setting in the sourcegraph chart values |
+| pgsql.name | string | `"pgsql"` |  |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |

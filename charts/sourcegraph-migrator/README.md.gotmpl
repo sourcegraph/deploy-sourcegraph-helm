@@ -1,6 +1,6 @@
-<!-- 
-  DO NOT EDIT README.md directly. 
-  README.md is automatically generated from README.md.gotmpl 
+<!--
+  DO NOT EDIT README.md directly.
+  README.md is automatically generated from README.md.gotmpl
 -->
 
 # Sourcegraph Migrator Helm Chart
@@ -28,9 +28,9 @@ helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/
 
 ## Usage
 
-> If you are not using external databases, the chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
+> The chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
 
-[sourcegraph/sourcegraph-migrator] chart requires the correct `PG*`, `CODEINTEL_PG*`, and `CODEINSIGHTS_PG*` environment variables to be configured at `migrator.env`. Learn more about [using your own PostgreSQL server]. `PG*` and `CODEINTEL_PG*` environment variables are compatible with the `frontend.env` values from the parent [sourcegraph/sourcegraph] chart.
+By default, the [sourcegraph/sourcegraph-migrator] chart references database credentials from a Kubernetes `Secret` created by the parent [sourcegraph/sourcegraph] chart. If you provide your own `Secret` resources, update the `codeInsightsDB.auth.existingSecret`, `codeIntelDB.auth.existingSecret` and `pgsql.auth.existingSecret` settings in values.yaml to match. Learn more about [using your own PostgreSQL server].
 
 You should consult the list of available [migrator commands]. Below is some example usage.
 
