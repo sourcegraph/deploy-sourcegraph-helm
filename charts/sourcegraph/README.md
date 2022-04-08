@@ -52,6 +52,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.image.name | string | `"codeinsights-db"` | Docker image name for the `codeinsights-db` image |
 | codeInsightsDB.name | string | `"codeinsights-db"` | Name used by resources. Does not affect service names or PVCs. |
 | codeInsightsDB.podSecurityContext | object | `{"fsGroup":70,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":70}` | Security context for the `codeinsights-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
+| codeInsightsDB.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
 | codeInsightsDB.resources | object | `{"limits":{"cpu":"4","memory":"2Gi"},"requests":{"cpu":"4","memory":"2Gi"}}` | Resource requests & limits for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
