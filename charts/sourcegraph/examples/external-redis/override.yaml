@@ -1,0 +1,12 @@
+# Demonstrate using external redis instance(s)
+# Disables deployment of the internal `redis-cache` and `redis-store` deployment
+
+redisCache:
+  enabled: false
+  connection:
+    endpoint: redis://redis-cache.example.com:6379 # use a dedicated Redis, recommended
+
+redisStore:
+  enabled: false
+  connection:
+    endpoint: redis://redis-shared.example.com:6379/2 # shared Redis, not recommended

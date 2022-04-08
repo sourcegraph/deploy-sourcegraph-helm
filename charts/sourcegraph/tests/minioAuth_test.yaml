@@ -23,6 +23,8 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
           value: "my-secret"
+      - matchSnapshot:
+            path: spec.template.metadata.annotations.[checksum/minio.secret]
 - it: should not generate a secret when existingSecret is passed
   template: minio/minio.Secret.yaml
   set:
@@ -71,3 +73,5 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[1].valueFrom.secretKeyRef.name
           value: "minio-auth"
+      - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/minio.secret]
