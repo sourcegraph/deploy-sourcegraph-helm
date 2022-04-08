@@ -207,15 +207,15 @@ app.kubernetes.io/name: jaeger
 {{- end }}
 
 {{- define "sourcegraph.authChecksum" -}}
-{{- $checksum := list (include (print $.Template.BasePath "/codeintel-db/codeintel-db.Secret.yaml") .)}}
-{{- $checksum := append $checksum (include (print $.Template.BasePath "/minio/minio.Secret.yaml") .) }}
-{{- $checksum := append $checksum (include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") .) }}
-{{- $checksum := append $checksum (include (print $.Template.BasePath "/codeinsights-db/codeinsights-db.Secret.yaml") .) -}}
-checksum/auth: {{ $checksum | join "" | sha256sum }}
+{{- $checksum := list .Values.codeInsightsDB.auth -}}
+{{- $checksum = append $checksum .Values.codeIntelDB.auth -}}
+{{- $checksum = append $checksum .Values.pgsql.auth -}}
+{{- $checksum = append $checksum .Values.minio.auth -}}
+checksum/auth: {{ toJson $checksum | sha256sum }}
 {{- end -}}
 
 {{- define "sourcegraph.redisChecksum" -}}
-{{- $checksum := list (include (print $.Template.BasePath "/redis/redis-store.Secret.yaml") .)}}
-{{- $checksum := append $checksum (include (print $.Template.BasePath "/redis/redis-cache.Secret.yaml") .) -}}
-checksum/redis-auth: {{ $checksum | join "" | sha256sum }}
+{{- $checksum := list .Values.redisStore.connection -}}
+{{- $checksum := append $checksum .Values.redisCache.connection -}}
+checksum/redis-auth: {{ toJson $checksum | sha256sum }}
 {{- end -}}
