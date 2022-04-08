@@ -33,7 +33,7 @@ data:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: redis-cache-endpoint
+  name: redis-cache-connection
 data:
   # notes: secrets data has to be base64-encoded
   endpoint: ""

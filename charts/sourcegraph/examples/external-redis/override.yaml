@@ -4,9 +4,9 @@
 redisCache:
   enabled: false
   connection:
-    endpoint: redis://redis-cache.example.com:6379/2
+    endpoint: redis://redis-cache.example.com:6379 # use a dedicated Redis, recommended
 
 redisStore:
   enabled: false
   connection:
-    endpoint: redis://redis-store.example.com:6379
+    endpoint: redis://redis-shared.example.com:6379/2 # shared Redis, not recommended
