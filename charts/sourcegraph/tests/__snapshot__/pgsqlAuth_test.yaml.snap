@@ -1,0 +1,6 @@
+should reference default secret name when existingSecret is blank:
+  1: |
+    180940fdb956526d197a8efaf15bc2f14a3db83e09610917f8b9040fa5232d39
+should reference existing secret name when existingSecret is passed:
+  1: |
+    e5de6930e808d2ef402f404c12b53ff96e57ac6818a72ed19ab0aa4caf588596

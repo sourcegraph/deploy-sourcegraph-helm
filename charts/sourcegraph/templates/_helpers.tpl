@@ -192,3 +192,30 @@ app.kubernetes.io/name: jaeger
 - name: DATA_SOURCE_URI
   value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"
 {{- end }}
+
+{{- define "sourcegraph.redisConnection" -}}
+- name: REDIS_CACHE_ENDPOINT
+  valueFrom:
+    secretKeyRef:
+      key: endpoint
+      name: {{ default .Values.redisCache.name .Values.redisCache.connection.existingSecret }}
+- name: REDIS_STORE_ENDPOINT
+  valueFrom:
+    secretKeyRef:
+      key: endpoint
+      name: {{ default .Values.redisStore.name .Values.redisStore.connection.existingSecret }}
+{{- end }}
+
+{{- define "sourcegraph.authChecksum" -}}
+{{- $checksum := list .Values.codeInsightsDB.auth -}}
+{{- $checksum = append $checksum .Values.codeIntelDB.auth -}}
+{{- $checksum = append $checksum .Values.pgsql.auth -}}
+{{- $checksum = append $checksum .Values.minio.auth -}}
+checksum/auth: {{ toJson $checksum | sha256sum }}
+{{- end -}}
+
+{{- define "sourcegraph.redisChecksum" -}}
+{{- $checksum := list .Values.redisStore.connection -}}
+{{- $checksum := append $checksum .Values.redisCache.connection -}}
+checksum/redis: {{ toJson $checksum | sha256sum }}
+{{- end -}}

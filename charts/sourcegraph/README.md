@@ -264,6 +264,8 @@ In addition to the documented values, all services also support the following va
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
+| redisCache.connection.endpoint | string | `"redis-cache:6379"` | Endpoint to use for redis-cache. Supports either host:port or IANA specification |
+| redisCache.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisCache.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-cache` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | redisCache.enabled | bool | `true` | Enable `redis-cache` Redis server |
 | redisCache.image.defaultTag | string | `"3.38.0@sha256:f922a4f88c051537767e401c5a601923491e7021cf285aecec1276ebdca83949"` | Docker image tag for the `redis-cache` image |
@@ -278,6 +280,8 @@ In addition to the documented values, all services also support the following va
 | redisExporter.image.defaultTag | string | `"3.38.0@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70"` | Docker image tag for the `redis-exporter` image |
 | redisExporter.image.name | string | `"redis_exporter"` | Docker image name for the `redis-exporter` image |
 | redisExporter.resources | object | `{"limits":{"cpu":"10m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"100Mi"}}` | Resource requests & limits for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| redisStore.connection.endpoint | string | `"redis-store:6379"` | Endpoint to use for redis-store. Supports either host:port or IANA specification |
+| redisStore.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisStore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-store` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | redisStore.enabled | bool | `true` | Enable `redis-store` Redis server |
 | redisStore.image.defaultTag | string | `"3.38.0@sha256:6da998b9b6642ab330bed143b4998a9e8d16d81585035ed1b726311b5708d557"` | Docker image tag for the `redis-store` image |

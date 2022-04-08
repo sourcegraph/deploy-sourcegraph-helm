@@ -28,10 +28,8 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: frontend
-        checksum/minio.secret: {{ include (print $.Template.BasePath "/minio/minio.Secret.yaml") . | sha256sum }}
-        checksum/pgsql.secret: {{ include (print $.Template.BasePath "/pgsql/pgsql.Secret.yaml") . | sha256sum }}
-        checksum/codeintel-db.secret: {{ include (print $.Template.BasePath "/codeintel-db/codeintel-db.Secret.yaml") . | sha256sum }}
-        checksum/codeinsights-db.secret: {{ include (print $.Template.BasePath "/codeinsights-db/codeinsights-db.Secret.yaml") . | sha256sum }}
+        {{- include "sourcegraph.authChecksum" . | nindent 8 }}
+        {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -85,6 +83,7 @@ spec:
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
+        {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         # POD_NAME is used by CACHE_DIR
         - name: POD_NAME
           valueFrom:
