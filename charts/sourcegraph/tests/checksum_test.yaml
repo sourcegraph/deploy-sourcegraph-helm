@@ -1,0 +1,60 @@
+---
+suite: checksumTest
+templates:
+- frontend/sourcegraph-frontend.Deployment.yaml
+tests:
+- it: should update checksum when pgsql secret is modified
+  set:
+    pgsql:
+      auth:
+        existingSecret: "my-secret"
+  asserts:
+      - equal:
+          path: spec.template.metadata.annotations.[checksum/auth]
+          value: "b960ae6db8c72ca9248278a63593de67f1ddfb9805f82eded969ffde767406db"
+- it: should update checksum when minio secret is modified
+  set:
+    minio:
+      auth:
+        password: "newpassword"
+  asserts:
+      - equal:
+          path: spec.template.metadata.annotations.[checksum/auth]
+          value: "bac4d406514d2f8cd604f566607dfc36b963bc324770428d6fd6e8a442037980"
+- it: should update checksum when codeintel-db secret is modified
+  set:
+    codeIntelDB:
+      auth:
+        newkey: "blank"
+  asserts:
+      - equal:
+          path: spec.template.metadata.annotations.[checksum/auth]
+          value: "2518fab3d953a21ea78057f3ad7143f41ec960c0b3b96c49f807ba0fd73ba4b0"
+- it: should update checksum when codeinsights-db secret is modified
+  set:
+    codeInsightsDB:
+      auth:
+        username: "newuser"
+        database: "anotherdb"
+  asserts:
+      - equal:
+          path: spec.template.metadata.annotations.[checksum/auth]
+          value: "0214987aff8c4e6baba1dfe773e8c3218f80f810e499405ae011960ba86dcbfb"
+- it: should update checksum when redis-store secret is modified
+  set:
+    redisStore:
+      connection:
+        endpoint: "external-redis:6379"
+  asserts:
+      - equal:
+          path: spec.template.metadata.annotations.[checksum/redis]
+          value: "5a15b6ae26d7c65cd004a4b0883c028886f3c3689b06464642e31a20e89e29b9"
+- it: should update checksum when redis-cache secret is modified
+  set:
+    redisCache:
+      connection:
+        endpoint: "external-redis:6379"
+  asserts:
+      - equal:
+          path: spec.template.metadata.annotations.[checksum/redis]
+          value: "a7ce533a6e5eee7729be14fc8ca817f4cbbfdb488ac2f0e9ed9552d96a46216d"

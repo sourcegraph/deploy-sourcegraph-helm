@@ -217,5 +217,5 @@ checksum/auth: {{ toJson $checksum | sha256sum }}
 {{- define "sourcegraph.redisChecksum" -}}
 {{- $checksum := list .Values.redisStore.connection -}}
 {{- $checksum := append $checksum .Values.redisCache.connection -}}
-checksum/redis-auth: {{ toJson $checksum | sha256sum }}
+checksum/redis: {{ toJson $checksum | sha256sum }}
 {{- end -}}
