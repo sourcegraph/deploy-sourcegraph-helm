@@ -23,7 +23,7 @@ Each Redis instance requires a separate Secret with the following format. The na
 apiVersion: v1
 kind: Secret
 metadata:
-  name: redis-store-endpoint
+  name: redis-store-connection
 data:
   # notes: secrets data has to be base64-encoded
   endpoint: ""
