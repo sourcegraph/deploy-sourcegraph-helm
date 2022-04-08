@@ -2,6 +2,10 @@
 # Learn more from the tutorial below
 # - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
 
+# Disable deployment of the built-in object storage
+minio:
+  enabled: false
+
 # we use YAML anchors and alias to keep override file clean
 objectStorageEnv: &objectStorageEnv
   PRECISE_CODE_INTEL_UPLOAD_BACKEND:
