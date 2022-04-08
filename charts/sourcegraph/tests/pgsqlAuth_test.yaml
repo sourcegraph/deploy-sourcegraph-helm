@@ -17,9 +17,8 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
           value: "my-secret"
-      - equal:
-          path: spec.template.metadata.annotations.[checksum/pgsql.secret]
-          value: "e5de6930e808d2ef402f404c12b53ff96e57ac6818a72ed19ab0aa4caf588596"
+      - matchSnapshot:
+            path: spec.template.metadata.annotations.[checksum/pgsql.secret]
 - it: should not generate a secret when existingSecret is passed
   template: pgsql/pgsql.Secret.yaml
   set:
@@ -62,6 +61,5 @@ tests:
       - equal:
           path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
           value: "pgsql-auth"
-      - equal:
-          path: spec.template.metadata.annotations.[checksum/pgsql.secret]
-          value: "180940fdb956526d197a8efaf15bc2f14a3db83e09610917f8b9040fa5232d39"
+      - matchSnapshot:
+            path: spec.template.metadata.annotations.[checksum/pgsql.secret]
