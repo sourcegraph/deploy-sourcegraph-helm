@@ -3,8 +3,8 @@
 Sourcegraph deployment by default ships three separate Postgres instances:
 
 - [codeinsights-db.StatefulSet.yaml](../../templates/codeinsights-db/codeinsights-db.StatefulSet.yaml)
-- [codeintel-db.StatefulSet.yaml](../../templates/codeintel-db/codeinsights-db.StatefulSet.yaml)
-- [pgsql.StatefulSet.yaml](../../templates/pgsql/codeinsights-db.StatefulSet.yaml)
+- [codeintel-db.StatefulSet.yaml](../../templates/codeintel-db/codeintel-db.StatefulSet.yaml)
+- [pgsql.StatefulSet.yaml](../../templates/pgsql/pgsql.StatefulSet.yaml)
 
 All three can be disabled individually and replaced with external Postgres instances.
 
