@@ -778,6 +778,7 @@ redisCache:
     # The secret must contain the key `endpoint` and should follow IANA specification
     # learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances)
     existingSecret: ""
+    # -- Endpoint to use for redis-cache. Supports either host:port or IANA specification
     endpoint: "redis-cache:6379"
   # -- Security context for the `redis-cache` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
@@ -841,6 +842,7 @@ redisStore:
     # The secret must contain the key `endpoint` and should follow IANA specification
     # learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances)
     existingSecret: ""
+    # -- Endpoint to use for redis-store. Supports either host:port or IANA specification
     endpoint: "redis-store:6379"
   image:
     # -- Docker image tag for the `redis-store` image
