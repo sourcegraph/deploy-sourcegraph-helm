@@ -773,6 +773,13 @@ redisCache:
     defaultTag: 3.38.0@sha256:f922a4f88c051537767e401c5a601923491e7021cf285aecec1276ebdca83949
     # -- Docker image name for the `redis-cache` image
     name: "redis-cache"
+  connection:
+    # -- Name of existing secret to use for Redis endpoint
+    # The secret must contain the key `endpoint` and should follow IANA specification
+    # learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances)
+    existingSecret: ""
+    # -- Endpoint to use for redis-cache. Supports either host:port or IANA specification
+    endpoint: "redis-cache:6379"
   # -- Security context for the `redis-cache` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -830,6 +837,13 @@ redisExporter:
 redisStore:
   # -- Enable `redis-store` Redis server
   enabled: true
+  connection:
+    # -- Name of existing secret to use for Redis endpoint
+    # The secret must contain the key `endpoint` and should follow IANA specification
+    # learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances)
+    existingSecret: ""
+    # -- Endpoint to use for redis-store. Supports either host:port or IANA specification
+    endpoint: "redis-store:6379"
   image:
     # -- Docker image tag for the `redis-store` image
     defaultTag: 3.38.0@sha256:6da998b9b6642ab330bed143b4998a9e8d16d81585035ed1b726311b5708d557

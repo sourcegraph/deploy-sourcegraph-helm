@@ -1,0 +1,54 @@
+---
+suite: checksumTest
+templates:
+- frontend/sourcegraph-frontend.Deployment.yaml
+tests:
+- it: should update checksum when pgsql secret is modified
+  set:
+    pgsql:
+      auth:
+        existingSecret: "my-secret"
+  asserts:
+    - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/auth]
+- it: should update checksum when minio secret is modified
+  set:
+    minio:
+      auth:
+        password: "newpassword"
+  asserts:
+    - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/auth]
+- it: should update checksum when codeintel-db secret is modified
+  set:
+    codeIntelDB:
+      auth:
+        newkey: "blank"
+  asserts:
+    - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/auth]
+- it: should update checksum when codeinsights-db secret is modified
+  set:
+    codeInsightsDB:
+      auth:
+        username: "newuser"
+        database: "anotherdb"
+  asserts:
+    - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/auth]
+- it: should update checksum when redis-store secret is modified
+  set:
+    redisStore:
+      connection:
+        endpoint: "external-redis:6379"
+  asserts:
+    - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/auth]
+- it: should update checksum when redis-cache secret is modified
+  set:
+    redisCache:
+      connection:
+        endpoint: "external-redis:6379"
+  asserts:
+    - matchSnapshot:
+          path: spec.template.metadata.annotations.[checksum/auth]

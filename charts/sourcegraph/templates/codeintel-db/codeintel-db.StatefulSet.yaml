@@ -24,7 +24,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: pgsql
-        checksum/codeintel-db.secret: {{ include (print $.Template.BasePath "/codeintel-db/codeintel-db.Secret.yaml") . | sha256sum }}
+        checksum/codeintel-db.secret: {{ toJson .Values.codeIntelDB.auth | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

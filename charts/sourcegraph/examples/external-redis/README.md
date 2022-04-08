@@ -5,78 +5,39 @@ Sourcegraph deployment by default ships two separate Redis instances for differe
 - [redis-cache.Deployment.yaml](../../templates/redis/redis-cache.Deployment.yaml)
 - [redis-store.Deployment.yaml](../../templates/redis/redis-store.Deployment.yaml)
 
-When using external Redis instances, you’ll need to specify the corresponding environment variable for each of the following deployments:
+When using external Redis instances, you’ll need to specify the new endpoint for each. You can specify the endpoint directly in the values file, or by referencing an existing secret.
 
-> __IMPORTANT__: This list may not be up-to-date. You should always consult the [offical docs](https://docs.sourcegraph.com/admin/install/kubernetes/configure#configure-custom-redis) for the latest list of dependent services.
+## Option 1 - Customize endpoint in override file (Endpoint does not require authentication)
 
-- [sourcegraph-frontend.Deployment.yaml](../../templates/frontend/sourcegraph-frontend.Deployment.yaml)
-- [repo-updater.Deployment.yaml](../../templates/repo-updater/repo-updater.Deployment.yaml)
-- [gitserver.Deployment.yaml](../../templates/gitserver/gitserver.Deployment.yaml)
-- [searcher.Deployment.yaml](../../templates/searcher/searcher.Deployment.yaml)
-- [symbols.Deployment.yaml](../../templates/symbols/symbols.Deployment.yaml)
-- [worker.Deployment.yaml](../../templates/worker/worker.Deployment.yaml)
-## Option 1 - One shared external Redis instance
+Example values override [override.yaml](./override.yaml)
 
-Example values override [override-shared.yaml](./override-shared.yaml)
+The `endpoint` setting must either have the format `$HOST:PORT` or follow the [IANA specification for Redis URLs](https://www.iana.org/assignments/uri-schemes/prov/redis) (e.g., redis://:mypassword@host:6379/2)
 
-### `REDIS_ENDPOINT`
+## Option 2 - Reference endpoint saved in an existing secret (Authentication required)
 
-The string must either have the format `$HOST:PORT` or follow the [IANA specification for Redis URLs](https://www.iana.org/assignments/uri-schemes/prov/redis) (e.g., redis://:mypassword@host:6379/2)
+If your endpoint requires authentication, we recommend storing the credentials in a [Secret](https://kubernetes.io/docs/concepts/configuration/secret/) created outside of the helm chart and managed in a secure manner.
 
-## Option 2 - Two separate external Redis instances
-
-Example values override [override-separate.yaml](./override-separate.yaml)
-
-### `REDIS_CACHE_ENDPOINT`
-
-The string must either have the format `$HOST:PORT` or follow the [IANA specification for Redis URLs](https://www.iana.org/assignments/uri-schemes/prov/redis) (e.g., redis://:mypassword@host:6379/2)
-
-### `REDIS_STORE_ENDPOINT`
-
-The string must either have the format `$HOST:PORT` or follow the [IANA specification for Redis URLs](https://www.iana.org/assignments/uri-schemes/prov/redis) (e.g., redis://:mypassword@host:6379/2)
-
-## Notes
-
-You may store these sensitive environment variables in a [Secret](https://kubernetes.io/docs/concepts/configuration/secret/).
+Each Redis instance requires a separate Secret with the following format. The names can be customized as desired:
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sourcegraph-external-redis-credentials
+  name: redis-store-connection
 data:
   # notes: secrets data has to be base64-encoded
-  REDIS_ENDPOINT: ""
+  endpoint: ""
 ```
 
 ```yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sourcegraph-external-redis-credentials
+  name: redis-cache-connection
 data:
   # notes: secrets data has to be base64-encoded
-  REDIS_CACHE_ENDPOINT: ""
-  REDIS_STORE_ENDPOINT: ""
+  endpoint: ""
 ```
 
-Optionally, if your external Redis instances do not required authentication, you may use a [ConfigMap](https://kubernetes.io/docs/concepts/configuration/configmap/). Learn more about [how to reference ConfigMap](https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#define-container-environment-variables-using-configmap-data).
+The Secret names should be configured in your override file in the `connection.existingSecret` key for each Redis. Example: [override-secret.yaml](./override-secret.yaml)
 
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: sourcegraph-external-redis-credentials
-data:
-  REDIS_ENDPOINT: "redis://redis.example.com:6379/2"
-```
-
-```yaml
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: sourcegraph-external-redis-credentials
-data:
-  REDIS_CACHE_ENDPOINT: "redis://redis-cache.example.com:6379/2"
-  REDIS_STORE_ENDPOINT: "redis://redis-store.example.com:6379/2"
-```
