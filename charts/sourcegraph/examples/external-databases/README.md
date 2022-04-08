@@ -16,7 +16,7 @@ The example [override.yaml] demonstrates various options for configuring access 
 
 You can provide database credentials in a [Secret](https://kubernetes.io/docs/concepts/configuration/secret/) managed outside the helm chart in a secure manner.
 
-Each database requires its own Secret and should follow the following format. The names can be customized as desired:
+Each database requires its own Secret and should follow the following format. The Secret name can be customized as desired:
 
 ```yaml
 apiVersion: v1
