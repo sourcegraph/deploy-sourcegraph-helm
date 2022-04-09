@@ -1,9 +1,9 @@
-name: Release Charts
+name: Release Charts (Insiders)
 
 on:
   push:
     branches:
-      - release/**
+      - main
 
 jobs:
   release:
@@ -23,8 +23,21 @@ jobs:
         uses: azure/setup-helm@v1
         with:
           version: v3.8.0
+      
+      - name: Get metadata
+        id: metadata
+        uses: contiamo/git-metadata-action@main
+
+      - run: |
+          sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml
+          sed -i '/^version:/ s/$/-insiders.${{ steps.metadata.outputs.shortSHA }}/' charts/*/Chart.yaml
+
+          # hack: otherwise chart-releaser will fail because we nest index.yaml inside the `insiders` directory
+          mkdir -p insiders
 
       - name: Run chart-releaser
         uses: helm/chart-releaser-action@v1.4.0
         env:
           CR_TOKEN: "${{ secrets.CR_PUBLISH_TOKEN }}"
+        with:
+          config: ./insiders-config.yaml

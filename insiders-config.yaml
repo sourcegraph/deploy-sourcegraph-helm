@@ -1,0 +1,4 @@
+owner: sourcegraph
+git-repo: deploy-sourcegraph-helm
+index-path: insiders/index.yaml
+pages-index-path: insiders/index.yaml
