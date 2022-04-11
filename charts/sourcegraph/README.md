@@ -37,7 +37,7 @@ In addition to the documented values, all services also support the following va
 | cadvisor.resources | object | `{"limits":{"cpu":"300m","memory":"2000Mi"},"requests":{"cpu":"150m","memory":"200Mi"}}` | Resource requests & limits for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | cadvisor.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `cadvisor` |
 | cadvisor.serviceAccount.name | string | `"cadvisor"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| codeInsightsDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| codeInsightsDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | codeInsightsDB.auth.database | string | `"postgres"` | Sets codeinsights-db database name |
 | codeInsightsDB.auth.existingSecret | string | `""` | Name of existing secret to use for Code Insights credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
 | codeInsightsDB.auth.host | string | `"codeinsights-db"` | Sets codeinsights-db host |
@@ -56,7 +56,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeInsightsDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeinsights-db` data volume |
-| codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | codeIntelDB.auth.database | string | `"sg"` | Sets codeintel-db database name |
 | codeIntelDB.auth.existingSecret | string | `""` | Name of existing secret to use for CodeIntel credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
 | codeIntelDB.auth.host | string | `"codeintel-db"` | Sets codeintel-db host |
@@ -157,7 +157,7 @@ In addition to the documented values, all services also support the following va
 | minio.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `minio` |
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
-| pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
+| pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | pgsql.auth.database | string | `"sg"` | Sets postgres database name |
 | pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for Postgres credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
 | pgsql.auth.host | string | `"pgsql"` | Sets postgres host |
