@@ -159,7 +159,7 @@ codeInsightsDB:
   existingConfig: "" # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
-  # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
+  # Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeinsights-db` image
@@ -220,7 +220,7 @@ codeIntelDB:
   existingConfig: ""
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
-  # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
+  # Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeintel-db` image
@@ -615,7 +615,7 @@ pgsql:
   existingConfig: "" # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
-  # Learn more from the [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
+  # Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
   additionalConfig: ""
   image:
     # -- Docker image tag for the `pgsql` image
