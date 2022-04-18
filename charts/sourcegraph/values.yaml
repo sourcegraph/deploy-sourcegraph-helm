@@ -734,7 +734,7 @@ prometheus:
     runAsUser: 100
     runAsGroup: 100
     # -- Read-only filesystem not supported for the prometheus container,
-    # see [sourcegraph/issues/33862](https://github.com/sourcegraph/sourcegraph/issues/33862) for more information
+    # see [sourcegraph/issues/34012](https://github.com/sourcegraph/sourcegraph/issues/34012) for more information
     readOnlyRootFilesystem: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "prometheus"

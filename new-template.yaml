@@ -1,0 +1,3821 @@
+---
+# Source: sourcegraph/templates/cadvisor/cadvisor.ServiceAccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: cadvisor
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: cadvisor
+  name: cadvisor
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.ServiceAccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+---
+# Source: sourcegraph/templates/grafana/grafana.ServiceAccount.yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: grafana
+  name: grafana
+---
+# Source: sourcegraph/templates/prometheus/prometheus.ServiceAccount.yaml
+apiVersion: v1
+imagePullSecrets:
+- name: docker-registry
+kind: ServiceAccount
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+---
+# Source: sourcegraph/templates/codeinsights-db/codeinsights-db.Secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: codeinsights-db-auth
+  labels:
+    app: codeinsights-db
+    deploy: sourcegraph
+    app.kubernetes.io/component: codeinsights-db
+type: Opaque
+data:
+  database: "cG9zdGdyZXM="
+  host: "Y29kZWluc2lnaHRzLWRi"
+  password: "cGFzc3dvcmQ="
+  port: "NTQzMg=="
+  user: "cG9zdGdyZXM="
+---
+# Source: sourcegraph/templates/codeintel-db/codeintel-db.Secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: codeintel-db-auth
+  labels:
+    app: codeintel-db
+    deploy: sourcegraph
+    app.kubernetes.io/component: codeintel-db
+type: Opaque
+data:
+  database: "c2c="
+  host: "Y29kZWludGVsLWRi"
+  password: "cGFzc3dvcmQ="
+  port: "NTQzMg=="
+  user: "c2c="
+---
+# Source: sourcegraph/templates/minio/minio.Secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio-auth
+  labels:
+    app: minio
+    deploy: sourcegraph
+    app.kubernetes.io/component: minio
+type: Opaque
+data:
+  user: "QUtJQUlPU0ZPRE5ON0VYQU1QTEU="
+  password: "d0phbHJYVXRuRkVNSS9LN01ERU5HL2JQeFJmaUNZRVhBTVBMRUtFWQ=="
+---
+# Source: sourcegraph/templates/pgsql/pgsql.Secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pgsql-auth
+  labels:
+    app: pgsql
+    deploy: sourcegraph
+    app.kubernetes.io/component: pgsql
+type: Opaque
+data:
+  database: "c2c="
+  host: "cGdzcWw="
+  password: "cGFzc3dvcmQ="
+  port: "NTQzMg=="
+  user: "c2c="
+---
+# Source: sourcegraph/templates/redis/redis-cache.Secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-cache
+  labels:
+    app: redis-cache
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis-cache
+type: Opaque
+data:
+  endpoint: "cmVkaXMtY2FjaGU6NjM3OQ=="
+---
+# Source: sourcegraph/templates/redis/redis-store.Secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redis-store
+  labels:
+    app: redis-store
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis-store
+type: Opaque
+data:
+  endpoint: "cmVkaXMtc3RvcmU6NjM3OQ=="
+---
+# Source: sourcegraph/templates/codeinsights-db/codeinsights-db.ConfigMap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for Code Insights
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+  name: codeinsights-db-conf
+data:
+  postgresql.conf: |
+    #------------------------------------------------------------------------------
+    # POSTGRESQL DEFAULT CONFIGURATION
+    #------------------------------------------------------------------------------
+    
+    # Below is PostgreSQL default configuration.
+    # You should apply your own customization in the CUSTOMIZED OPTIONS section below
+    # to avoid merge conflict in the future.
+    
+    listen_addresses = '*'
+    max_connections = 100
+    shared_buffers = 128MB
+    dynamic_shared_memory_type = posix
+    max_wal_size = 1GB
+    min_wal_size = 80MB
+    log_timezone = 'UTC'
+    datestyle = 'iso, mdy'
+    timezone = 'UTC'
+    lc_messages = 'en_US.utf8'
+    lc_monetary = 'en_US.utf8'
+    lc_numeric = 'en_US.utf8'
+    lc_time = 'en_US.utf8'
+    default_text_search_config = 'pg_catalog.english'
+    
+    
+    #------------------------------------------------------------------------------
+    # SOURCEGRAPH RECOMMENDED OPTIONS
+    #------------------------------------------------------------------------------
+    
+    # Below is Sourcegraph recommended Postgres configuration based on the default resource configuration.
+    # You should apply your own customization in the CUSTOMIZED OPTIONS section below
+    # to avoid merge conflict in the future.
+    
+    shared_buffers = 509546kB
+    work_mem = 3184kB
+    maintenance_work_mem = 254773kB
+    effective_io_concurrency = 200
+    max_worker_processes = 19
+    max_parallel_workers_per_gather = 4
+    max_parallel_workers = 8
+    wal_buffers = 15285kB
+    min_wal_size = 512MB
+    checkpoint_completion_target = 0.9
+    random_page_cost = 1.1
+    effective_cache_size = 1492MB
+    default_statistics_target = 500
+    autovacuum_max_workers = 10
+    autovacuum_naptime = 10
+    shared_preload_libraries = ''
+    max_locks_per_transaction = 64
+    
+    
+    #------------------------------------------------------------------------------
+    # CUSTOMIZED OPTIONS
+    #------------------------------------------------------------------------------
+    
+    # Add your customization by using 'codeInsightsDB.additionalConfig' in your override file.
+    # Learn more: https://docs.sourcegraph.com/admin/config/postgres-conf
+---
+# Source: sourcegraph/templates/codeintel-db/codeintel-db.ConfigMap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for PostgreSQL
+  labels:
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+  name: codeintel-db-conf
+data:
+  postgresql.conf: |
+    #------------------------------------------------------------------------------
+    # POSTGRESQL DEFAULT CONFIGURATION
+    #------------------------------------------------------------------------------
+    
+    # Below is PostgreSQL default configuration.
+    # You should apply your own customization in the CUSTOMIZED OPTIONS section below
+    # to avoid merge conflict in the future.
+    
+    listen_addresses = '*'
+    max_connections = 100
+    shared_buffers = 128MB
+    dynamic_shared_memory_type = posix
+    max_wal_size = 1GB
+    min_wal_size = 80MB
+    log_timezone = 'UTC'
+    datestyle = 'iso, mdy'
+    timezone = 'UTC'
+    lc_messages = 'en_US.utf8'
+    lc_monetary = 'en_US.utf8'
+    lc_numeric = 'en_US.utf8'
+    lc_time = 'en_US.utf8'
+    default_text_search_config = 'pg_catalog.english'
+    
+    
+    #------------------------------------------------------------------------------
+    # SOURCEGRAPH RECOMMENDED OPTIONS
+    #------------------------------------------------------------------------------
+    
+    # Below is Sourcegraph recommended Postgres configuration based on the default resource configuration.
+    # You should apply your own customization in the CUSTOMIZED OPTIONS section below
+    # to avoid merge conflict in the future.
+    
+    shared_buffers = 1GB
+    work_mem = 5MB
+    maintenance_work_mem = 250MB
+    temp_file_limit = 20GB
+    bgwriter_delay = 50ms
+    bgwriter_lru_maxpages = 200
+    effective_io_concurrency = 200
+    max_worker_processes = 4
+    max_parallel_maintenance_workers = 4
+    max_parallel_workers_per_gather = 2
+    max_parallel_workers = 4
+    wal_buffers = 16MB
+    max_wal_size = 8GB
+    min_wal_size = 2GB
+    random_page_cost = 1.1
+    effective_cache_size = 3GB
+    
+    
+    #------------------------------------------------------------------------------
+    # CUSTOMIZED OPTIONS
+    #------------------------------------------------------------------------------
+    
+    # Add your customization by using 'codeIntelDB.additionalConfig' in your override file.
+    # Learn more: https://docs.sourcegraph.com/admin/config/postgres-conf
+---
+# Source: sourcegraph/templates/grafana/grafana.ConfigMap.yaml
+apiVersion: v1
+data:
+  datasources.yml: |
+    apiVersion: 1
+
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:30090
+        isDefault: true
+        editable: false
+      - name: Jaeger
+        type: Jaeger
+        access: proxy
+        url: http://jaeger-query:16686/-/debug/jaeger
+kind: ConfigMap
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: grafana
+  name: grafana
+---
+# Source: sourcegraph/templates/pgsql/pgsql.ConfigMap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for PostgreSQL
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: pgsql
+  name: pgsql-conf
+data:
+  postgresql.conf: |
+    #------------------------------------------------------------------------------
+    # POSTGRESQL DEFAULT CONFIGURATION
+    #------------------------------------------------------------------------------
+    
+    # Below is PostgreSQL default configuration.
+    # You should apply your own customization in the CUSTOMIZED OPTIONS section below
+    # to avoid merge conflict in the future.
+    
+    listen_addresses = '*'
+    max_connections = 100
+    shared_buffers = 128MB
+    dynamic_shared_memory_type = posix
+    max_wal_size = 1GB
+    min_wal_size = 80MB
+    log_timezone = 'UTC'
+    datestyle = 'iso, mdy'
+    timezone = 'UTC'
+    lc_messages = 'en_US.utf8'
+    lc_monetary = 'en_US.utf8'
+    lc_numeric = 'en_US.utf8'
+    lc_time = 'en_US.utf8'
+    default_text_search_config = 'pg_catalog.english'
+    
+    
+    #------------------------------------------------------------------------------
+    # SOURCEGRAPH RECOMMENDED OPTIONS
+    #------------------------------------------------------------------------------
+    
+    # Below is Sourcegraph recommended Postgres configuration based on the default resource configuration.
+    # You should apply your own customization in the CUSTOMIZED OPTIONS section below
+    # to avoid merge conflict in the future.
+    
+    shared_buffers = 1GB
+    work_mem = 5MB
+    maintenance_work_mem = 250MB
+    temp_file_limit = 20GB
+    bgwriter_delay = 50ms
+    bgwriter_lru_maxpages = 200
+    effective_io_concurrency = 200
+    max_worker_processes = 4
+    max_parallel_maintenance_workers = 4
+    max_parallel_workers_per_gather = 2
+    max_parallel_workers = 4
+    wal_buffers = 16MB
+    max_wal_size = 8GB
+    min_wal_size = 2GB
+    random_page_cost = 1.1
+    effective_cache_size = 3GB
+    
+    
+    #------------------------------------------------------------------------------
+    # CUSTOMIZED OPTIONS
+    #------------------------------------------------------------------------------
+    
+    # Add your customization by using 'pgsql.additionalConfig' in your override file.
+    # Learn more: https://docs.sourcegraph.com/admin/config/postgres-conf
+---
+# Source: sourcegraph/templates/prometheus/prometheus.ConfigMap.yaml
+apiVersion: v1
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval:     30s
+      evaluation_interval: 30s
+
+    alerting:
+      alertmanagers:
+        # Bundled Alertmanager, started by prom-wrapper
+        - static_configs:
+            - targets: ['127.0.0.1:9093']
+          path_prefix: /alertmanager
+        # Uncomment the following to have alerts delivered to additional Alertmanagers discovered
+        # in the cluster. This configuration is not required if you use Sourcegraph's built-in alerting:
+        # https://docs.sourcegraph.com/admin/observability/alerting
+        # - kubernetes_sd_configs:
+        #  - role: endpoints
+        #  relabel_configs:
+        #    - source_labels: [__meta_kubernetes_service_name]
+        #      regex: alertmanager
+        #      action: keep
+
+    rule_files:
+      - '*_rules.yml'
+      - "/sg_config_prometheus/*_rules.yml"
+      - "/sg_prometheus_add_ons/*_rules.yml"
+
+    # A scrape configuration for running Prometheus on a Kubernetes cluster.
+    # This uses separate scrape configs for cluster components (i.e. API server, node)
+    # and services to allow each to use different authentication configs.
+    #
+    # Kubernetes labels will be added as Prometheus labels on metrics via the
+    # `labelmap` relabeling action.
+
+    # Scrape config for API servers.
+    #
+    # Kubernetes exposes API servers as endpoints to the default/kubernetes
+    # service so this uses `endpoints` role and uses relabelling to only keep
+    # the endpoints associated with the default/kubernetes service using the
+    # default named port `https`. This works for single API server deployments as
+    # well as HA API server deployments.
+    scrape_configs:
+    - job_name: 'kubernetes-apiservers'
+
+      kubernetes_sd_configs:
+      - role: endpoints
+
+      # Default to scraping over https. If required, just disable this or change to
+      # `http`.
+      scheme: https
+
+      # This TLS & bearer token file config is used to connect to the actual scrape
+      # endpoints for cluster components. This is separate to discovery auth
+      # configuration because discovery & scraping are two separate concerns in
+      # Prometheus. The discovery auth config is automatic if Prometheus runs inside
+      # the cluster. Otherwise, more config options have to be provided within the
+      # <kubernetes_sd_config>.
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        # If your node certificates are self-signed or use a different CA to the
+        # master CA, then disable certificate verification below. Note that
+        # certificate verification is an integral part of a secure infrastructure
+        # so this should only be disabled in a controlled environment. You can
+        # disable certificate verification by uncommenting the line below.
+        #
+        # insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+      # Keep only the default/kubernetes service endpoints for the https port. This
+      # will add targets for each API server which Kubernetes adds an endpoint to
+      # the default/kubernetes service.
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_namespace, __meta_kubernetes_service_name, __meta_kubernetes_endpoint_port_name]
+        action: keep
+        regex: default;kubernetes;https
+
+    - job_name: 'kubernetes-nodes'
+
+      # Default to scraping over https. If required, just disable this or change to
+      # `http`.
+      scheme: https
+
+      # This TLS & bearer token file config is used to connect to the actual scrape
+      # endpoints for cluster components. This is separate to discovery auth
+      # configuration because discovery & scraping are two separate concerns in
+      # Prometheus. The discovery auth config is automatic if Prometheus runs inside
+      # the cluster. Otherwise, more config options have to be provided within the
+      # <kubernetes_sd_config>.
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        # If your node certificates are self-signed or use a different CA to the
+        # master CA, then disable certificate verification below. Note that
+        # certificate verification is an integral part of a secure infrastructure
+        # so this should only be disabled in a controlled environment. You can
+        # disable certificate verification by uncommenting the line below.
+        #
+        insecure_skip_verify: true
+      bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+
+      kubernetes_sd_configs:
+      - role: node
+
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - target_label: __address__
+        replacement: kubernetes.default.svc:443
+      - source_labels: [__meta_kubernetes_node_name]
+        regex: (.+)
+        target_label: __metrics_path__
+        replacement: /api/v1/nodes/${1}/proxy/metrics # End of privileged config
+
+    # Scrape config for service endpoints.
+    #
+    # The relabeling allows the actual service scrape endpoint to be configured
+    # via the following annotations:
+    #
+    # * `prometheus.io/scrape`: Only scrape services that have a value of `true`
+    # * `prometheus.io/scheme`: If the metrics endpoint is secured then you will need
+    # to set this to `https` & most likely set the `tls_config` of the scrape config.
+    # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+    # * `prometheus.io/port`: If the metrics are exposed on a different port to the
+    # service then set this appropriately.
+    - job_name: 'kubernetes-service-endpoints'
+
+      kubernetes_sd_configs:
+      - role: endpoints
+        namespaces:
+          names:
+           - ns-sourcegraph
+
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_container_name]
+        action: drop
+        regex: jaeger-agent
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+        action: replace
+        target_label: __scheme__
+        regex: (https?)
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_service_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: (.+)(?::\d+);(\d+)
+        replacement: $1:$2
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        # Sourcegraph specific customization. We want a more convenient to type label.
+        # target_label: kubernetes_namespace
+        target_label: ns
+      - source_labels: [__meta_kubernetes_service_name]
+        action: replace
+        target_label: kubernetes_name
+      # Sourcegraph specific customization. We want a nicer name for job
+      - source_labels: [app]
+        action: replace
+        target_label: job
+      # Sourcegraph specific customization. We want a nicer name for instance
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: instance
+
+    # Example scrape config for probing services via the Blackbox Exporter.
+    #
+    # The relabeling allows the actual service scrape endpoint to be configured
+    # via the following annotations:
+    #
+    # * `prometheus.io/probe`: Only probe services that have a value of `true`
+    - job_name: 'kubernetes-services'
+
+      metrics_path: /probe
+      params:
+        module: [http_2xx]
+
+      kubernetes_sd_configs:
+      - role: service
+
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
+        action: keep
+        regex: true
+      - source_labels: [__address__]
+        target_label: __param_target
+      - target_label: __address__
+        replacement: blackbox
+      - source_labels: [__param_target]
+        target_label: instance
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels: [__meta_kubernetes_service_namespace]
+        # Sourcegraph specific customization. We want a more convenient to type label.
+        # target_label: kubernetes_namespace
+        target_label: ns
+      - source_labels: [__meta_kubernetes_service_name]
+        target_label: kubernetes_name
+
+    # Example scrape config for pods
+    #
+    # The relabeling allows the actual pod scrape endpoint to be configured via the
+    # following annotations:
+    #
+    # * `prometheus.io/scrape`: Only scrape pods that have a value of `true`
+    # * `prometheus.io/path`: If the metrics path is not `/metrics` override this.
+    # * `prometheus.io/port`: Scrape the pod on the indicated port instead of the default of `9102`.
+    - job_name: 'kubernetes-pods'
+
+      kubernetes_sd_configs:
+      - role: pod
+
+      relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_sourcegraph_prometheus_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        regex: (.+):(?:\d+);(\d+)
+        replacement: ${1}:${2}
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - source_labels: [__meta_kubernetes_pod_name]
+        action: replace
+        target_label: kubernetes_pod_name
+      # Sourcegraph specific customization. We want a more convenient to type label.
+      # target_label: kubernetes_namespace
+      - source_labels: [__meta_kubernetes_namespace]
+        action: replace
+        target_label: ns
+
+      metric_relabel_configs:
+      # cAdvisor-specific customization. Drop container metrics exported by cAdvisor
+      # not in the same namespace as Sourcegraph.
+      # Uncomment this if you have problems with certain dashboards or cAdvisor itself
+      # picking up non-Sourcegraph services. Ensure all Sourcegraph services are running
+      # within the Sourcegraph namespace you have defined.
+      # The regex must keep matches on '^$' (empty string) to ensure other metrics do not
+      # get dropped.
+      - source_labels: [container_label_io_kubernetes_pod_namespace]
+        regex: ^$|ns-sourcegraph
+        action: keep
+      # cAdvisor-specific customization. We want container metrics to be named after their container name label.
+      # Note that 'io.kubernetes.container.name' and 'io.kubernetes.pod.name' must be provided in cAdvisor
+      # '--whitelisted_container_labels' (see cadvisor.DaemonSet.yaml)
+      - source_labels: [container_label_io_kubernetes_container_name, container_label_io_kubernetes_pod_name]
+        regex: (.+)
+        action: replace
+        target_label: name
+        separator: '-'
+
+    # Scrape prometheus itself for metrics.
+    - job_name: 'builtin-prometheus'
+      static_configs:
+        - targets: ['127.0.0.1:9092']
+          labels:
+            app: prometheus
+    - job_name: 'builtin-alertmanager'
+      metrics_path: /alertmanager/metrics
+      static_configs:
+        - targets: ['127.0.0.1:9093']
+          labels:
+            app: alertmanager
+  extra_rules.yml: ""
+kind: ConfigMap
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+---
+# Source: sourcegraph/templates/codeinsights-db/codeinsights-db.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+  name: codeinsights-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/codeintel-db/codeintel-db.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+  name: codeintel-db
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/minio/minio.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: minio
+  name: minio
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/pgsql/pgsql.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: pgsql
+  name: pgsql
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/prometheus/prometheus.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/redis/redis-cache.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: redis-cache
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/redis/redis-store.PersistentVolumeClaim.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: redis-store
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: standard
+---
+# Source: sourcegraph/templates/cadvisor/cadvisor.ClusterRole.yaml
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    app: cadvisor
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: cadvisor
+  name: cadvisor
+rules:
+  - apiGroups: ['policy']
+    resources: ['podsecuritypolicies']
+    verbs:     ['use']
+    resourceNames:
+    - cadvisor
+---
+# Source: sourcegraph/templates/prometheus/prometheus.ClusterRole.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - endpoints
+  - namespaces
+  - nodes
+  - nodes/metrics
+  - nodes/proxy
+  - pods
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - configmaps
+  verbs:
+  - get
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+# Source: sourcegraph/templates/cadvisor/cadvisor.ClusterRoleBinding.yaml
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  labels:
+    app: cadvisor
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: cadvisor
+  name: cadvisor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cadvisor
+subjects:
+- kind: ServiceAccount
+  name: cadvisor
+  namespace: ns-sourcegraph
+---
+# Source: sourcegraph/templates/prometheus/prometheus.ClusterRoleBinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+roleRef:
+  apiGroup: "rbac.authorization.k8s.io"
+  kind: ClusterRole
+  name: prometheus
+subjects:
+- kind: ServiceAccount
+  name: prometheus
+  namespace: ns-sourcegraph
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.Role.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+rules:
+- apiGroups:
+  - ""
+  resources:
+  # necessary for resolving k8s+http://fooservice URLs (see for example searcher URL)
+  - endpoints
+  # necessary to populate Site Admin/Instrumentation page (/-/debug) in the cluster deployment
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - "apps"
+  resources:
+    # necessary for resolving k8s+http://indexed-search?kind=sts URLs
+    - statefulsets
+  verbs:
+    - get
+    - list
+    - watch
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.RoleBinding.yaml
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    category: rbac
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+roleRef:
+  apiGroup: "rbac.authorization.k8s.io"
+  kind: Role
+  name: sourcegraph-frontend
+subjects:
+- kind: ServiceAccount
+  name: sourcegraph-frontend
+  namespace: ns-sourcegraph
+---
+# Source: sourcegraph/templates/codeinsights-db/codeinsights-db.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app.kubernetes.io/component: codeinsights-db
+    app: codeinsights-db
+    deploy: sourcegraph
+  name: codeinsights-db
+spec:
+  ports:
+  - name: codeinsights-db
+    port: 5432
+    targetPort: codeinsights-db
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: codeinsights-db
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/codeintel-db/codeintel-db.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app.kubernetes.io/component: codeintel-db
+    app: codeintel-db
+    deploy: sourcegraph
+  name: codeintel-db
+spec:
+  ports:
+  - name: pgsql
+    port: 5432
+    targetPort: pgsql
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: codeintel-db
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend-internal.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend-internal
+spec:
+  ports:
+  - name: http-internal
+    port: 80
+    targetPort: http-internal
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: sourcegraph-frontend
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+spec:
+  ports:
+  - name: http
+    port: 30080
+    targetPort: http
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: sourcegraph-frontend
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/github-proxy/github-proxy.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: github-proxy
+    deploy: sourcegraph
+    app.kubernetes.io/component: github-proxy
+  name: github-proxy
+spec:
+  ports:
+  - name: http
+    port: 80
+    targetPort: http
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: github-proxy
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/gitserver/gitserver.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      gitserver stateful set.
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: gitserver
+    type: gitserver
+    app: gitserver
+  name: gitserver
+spec:
+  clusterIP: None
+  ports:
+  - name: unused
+    port: 10811
+    targetPort: 10811
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: gitserver
+    type: gitserver
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/grafana/grafana.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: grafana
+    deploy: sourcegraph
+    app.kubernetes.io/component: grafana
+  name: grafana
+spec:
+  ports:
+  - name: http
+    port: 30070
+    targetPort: http
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: grafana
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/indexed-search/indexed-search.IndexerService.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      indexed-search stateful set.
+    sourcegraph.prometheus/scrape: "true"
+    prometheus.io/port: "6072"
+  labels:
+    app: indexed-search-indexer
+    deploy: sourcegraph
+    app.kubernetes.io/component: indexed-search
+  name: indexed-search-indexer
+spec:
+  clusterIP: None
+  ports:
+    - port: 6072
+      targetPort: 6072
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: indexed-search
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/indexed-search/indexed-search.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      indexed-search stateful set.
+    sourcegraph.prometheus/scrape: "true"
+    prometheus.io/port: "6070"
+  labels:
+    app: indexed-search
+    deploy: sourcegraph
+    app.kubernetes.io/component: indexed-search
+  name: indexed-search
+spec:
+  clusterIP: None
+  ports:
+  - port: 6070
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: indexed-search
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/jaeger/jaeger-collector.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: all-in-one
+    app: jaeger
+    app.kubernetes.io/name: jaeger
+  name: jaeger-collector
+spec:
+  ports:
+  - name: jaeger-collector-tchannel
+    port: 14267
+    protocol: TCP
+    targetPort: 14267
+  - name: jaeger-collector-http
+    port: 14268
+    protocol: TCP
+    targetPort: 14268
+  - name: jaeger-collector-grpc
+    port: 14250
+    protocol: TCP
+    targetPort: 14250
+  selector:
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/component: all-in-one
+    app: jaeger
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/jaeger/jaeger-query.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: all-in-one
+    app: jaeger
+    app.kubernetes.io/name: jaeger
+  name: jaeger-query
+spec:
+  ports:
+  - name: query-http
+    port: 16686
+    protocol: TCP
+    targetPort: 16686
+  selector:
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/component: all-in-one
+    app: jaeger
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/minio/minio.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9000"
+    prometheus.io/path: "/minio/prometheus/metrics"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: minio
+    deploy: sourcegraph
+    app.kubernetes.io/component: minio
+  name: minio
+spec:
+  ports:
+  - name: minio
+    port: 9000
+    targetPort: minio
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: minio
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/pgsql/pgsql.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: pgsql
+    deploy: sourcegraph
+    app.kubernetes.io/component: pgsql
+  name: pgsql
+spec:
+  ports:
+  - name: pgsql
+    port: 5432
+    targetPort: pgsql
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: pgsql
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/precise-code-intel/worker.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: precise-code-intel-worker
+    deploy: sourcegraph
+    app.kubernetes.io/component: precise-code-intel
+  name: precise-code-intel-worker
+spec:
+  ports:
+  - name: http
+    port: 3188
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: precise-code-intel-worker
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/prometheus/prometheus.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: prometheus
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+spec:
+  ports:
+  - name: http
+    port: 30090
+    targetPort: http
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: prometheus
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/redis/redis-cache.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9121"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: redis-cache
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: redis-cache
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: redis-cache
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/redis/redis-store.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9121"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: redis-store
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: redis-store
+spec:
+  ports:
+  - name: redis
+    port: 6379
+    targetPort: redis
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: redis-store
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/repo-updater/repo-updater.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: repo-updater
+    deploy: sourcegraph
+    app.kubernetes.io/component: repo-updater
+  name: repo-updater
+spec:
+  ports:
+  - name: http
+    port: 3182
+    targetPort: http
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: repo-updater
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/searcher/searcher.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: searcher
+    deploy: sourcegraph
+    app.kubernetes.io/component: searcher
+  name: searcher
+spec:
+  ports:
+  - name: http
+    port: 3181
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: searcher
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/symbols/symbols.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: symbols
+    deploy: sourcegraph
+    app.kubernetes.io/component: symbols
+  name: symbols
+spec:
+  ports:
+  - name: http
+    port: 3184
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: symbols
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/syntect-server/syntect-server.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+  labels:
+    app: syntect-server
+    deploy: sourcegraph
+    app.kubernetes.io/component: syntect-server
+  name: syntect-server
+spec:
+  ports:
+  - name: http
+    port: 9238
+    targetPort: http
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: syntect-server
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/worker/worker.Service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    app: worker
+    deploy: sourcegraph
+    app.kubernetes.io/component: worker
+  name: worker
+spec:
+  ports:
+  - name: http
+    port: 3189
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app: worker
+  type: ClusterIP
+---
+# Source: sourcegraph/templates/cadvisor/cadvisor.DaemonSet.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  annotations:
+    description: DaemonSet to ensure all nodes run a cAdvisor pod.
+    seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: cadvisor
+  name: cadvisor
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: cadvisor
+  template:
+    metadata:
+      annotations:
+        description: Collects and exports container metrics.
+        prometheus.io/port: "48080"
+        sourcegraph.prometheus/scrape: "true"
+        kubectl.kubernetes.io/default-container: cadvisor
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: cadvisor
+    spec:
+      serviceAccountName: cadvisor
+      containers:
+      - name: cadvisor
+        image: index.docker.io/sourcegraph/cadvisor:3.38.0@sha256:246c3d82072511f376049762056a3c82fce5dbc4a00f29f10f64373b5fe0a9a9
+        imagePullPolicy: IfNotPresent
+        args:
+        # Kubernetes-specific flags below (other flags are baked into the Docker image)
+        #
+        # disable container labels to allow whitelisting to reduce noise
+        - --store_container_labels=false
+        - --whitelisted_container_labels=io.kubernetes.container.name,io.kubernetes.pod.name,io.kubernetes.pod.namespace,io.kubernetes.pod.uid
+        # it is safe to uncomment this option if you use docker as your container runtime to reduce noise
+        # - --docker_only
+        env:
+        securityContext:
+          null
+        volumeMounts:
+        - name: rootfs
+          mountPath: /rootfs
+          readOnly: true
+        - name: var-run
+          mountPath: /var/run
+          readOnly: true
+        - name: sys
+          mountPath: /sys
+          readOnly: true
+        - name: docker
+          mountPath: /var/lib/docker
+          readOnly: true
+        - name: disk
+          mountPath: /dev/disk
+          readOnly: true
+        ports:
+        - name: http
+          containerPort: 48080
+          protocol: TCP
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        null
+      nodeSelector:
+      affinity:
+      tolerations:
+      volumes:
+      - name: rootfs
+        hostPath:
+          path: /
+      - name: var-run
+        hostPath:
+          path: /var/run
+      - name: sys
+        hostPath:
+          path: /sys
+      - name: docker
+        hostPath:
+          path: /var/lib/docker
+      - name: disk
+        hostPath:
+          path: /dev/disk
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Serves the frontend of Sourcegraph via HTTP(S).
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: sourcegraph-frontend
+  strategy:
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: frontend
+        checksum/auth: 3253fcbe6996c20f8e3ce7470a0d5843da49f8f55b4402d309504cb0c63568bb
+        checksum/redis: 63b58e05a2640417d599c4aee6d866cb9063e3a9aa452dc08dbfff836b7781b7
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: sourcegraph-frontend
+        deploy: sourcegraph
+    spec:
+      initContainers:
+      - name: migrator
+        image: index.docker.io/sourcegraph/migrator:3.38.0@sha256:16b3cebb1447fce75a8cb3acd6b6640294c70ab96adbfbcbc8da565ffffc5a4e
+        imagePullPolicy: IfNotPresent
+        args:
+        - up
+        env:
+        - name: PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: pgsql-auth
+        - name: PGHOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: pgsql-auth
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: pgsql-auth
+        - name: PGPORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: pgsql-auth
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: pgsql-auth
+        - name: CODEINTEL_PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGHOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGPORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGUSER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeintel-db-auth
+        - name: CODEINSIGHTS_PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGHOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGPORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGUSER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeinsights-db-auth
+        - name: DEPLOY_TYPE
+          value: helm
+        - name: GRAFANA_SERVER_URL
+          value: http://grafana:30070
+        - name: JAEGER_SERVER_URL
+          value: http://jaeger-query:16686
+        - name: PROMETHEUS_URL
+          value: http://prometheus:30090
+        resources:
+          limits:
+            cpu: 500m
+            memory: 100M
+          requests:
+            cpu: 100m
+            memory: 50M
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      containers:
+      - name: frontend
+        image: index.docker.io/sourcegraph/frontend:3.38.0@sha256:d88aa1afc8a31c6fb6964c7765f79645f9fdd82ce4df2f3a6976d6ca4870573f
+        imagePullPolicy: IfNotPresent
+        args:
+        - serve
+        env:
+        - name: DEPLOY_TYPE
+          value: helm
+        - name: GRAFANA_SERVER_URL
+          value: http://grafana:30070
+        - name: JAEGER_SERVER_URL
+          value: http://jaeger-query:16686
+        - name: PROMETHEUS_URL
+          value: http://prometheus:30090
+        - name: PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: pgsql-auth
+        - name: PGHOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: pgsql-auth
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: pgsql-auth
+        - name: PGPORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: pgsql-auth
+        - name: PGUSER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: pgsql-auth
+        - name: CODEINTEL_PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGHOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGPORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeintel-db-auth
+        - name: CODEINTEL_PGUSER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeintel-db-auth
+        - name: CODEINSIGHTS_PGDATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGHOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGPORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeinsights-db-auth
+        - name: CODEINSIGHTS_PGUSER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeinsights-db-auth
+        - name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+        - name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+        # POD_NAME is used by CACHE_DIR
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        # CACHE_DIR stores larger items we cache. Majority of it is zip
+        # archives of repositories at a commit.
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: minio-auth
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: minio-auth
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 300
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3080
+          name: http
+        - containerPort: 3090
+          name: http-internal
+        - containerPort: 6060
+          name: debug
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+        - mountPath: /home/sourcegraph
+          name: home-dir
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.38.0@sha256:a95d47e5a640e135083479c41457d421479366a8b1394c6cd1d211c265bf45ca
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      serviceAccountName: sourcegraph-frontend
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+      - emptyDir: {}
+        name: home-dir
+---
+# Source: sourcegraph/templates/github-proxy/github-proxy.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Rate-limiting proxy for the GitHub API.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: github-proxy
+  name: github-proxy
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: github-proxy
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: github-proxy
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: github-proxy
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: github-proxy
+        image: index.docker.io/sourcegraph/github-proxy:3.38.0@sha256:c7c2179aec8889ea87fe70002b6e2e519dbf84aa19dd0f563938c4f504174d4e
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        ports:
+        - containerPort: 3180
+          name: http
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.38.0@sha256:a95d47e5a640e135083479c41457d421479366a8b1394c6cd1d211c265bf45ca
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+---
+# Source: sourcegraph/templates/jaeger/jaeger.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jaeger
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: jaeger
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: all-in-one
+    app: jaeger
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: jaeger
+      app: jaeger
+      app.kubernetes.io/component: all-in-one
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "16686"
+        kubectl.kubernetes.io/default-container: jaeger
+      labels:
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/instance: sourcegraph
+        app: jaeger
+        deploy: sourcegraph
+        app.kubernetes.io/component: all-in-one
+    spec:
+      containers:
+      - name: jaeger
+        image: index.docker.io/sourcegraph/jaeger-all-in-one:3.38.0@sha256:7c3505a6702435e2aba88987dbd4795e0f87acc602310df78dcb9581e3ad868f
+        imagePullPolicy: IfNotPresent
+        args:
+        - --memory.max-traces=20000
+        env:
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 16686
+          protocol: TCP
+        - containerPort: 14250
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: "/"
+            port: 14269
+          initialDelaySeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      volumes:
+---
+# Source: sourcegraph/templates/minio/minio.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: MinIO for storing LSIF uploads.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: minio
+  name: minio
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: minio
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: minio
+        checksum/minio.secret: 50eb78907271d137c54240e04157c250d923ba7c9332c7af51a21b86c9bcf486
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: minio-auth
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: minio-auth
+        image: index.docker.io/sourcegraph/minio:3.38.0@sha256:0daf4c0c821634eeefbf90f48d467eece09597aff5d9f582685c8c875f03e6fa
+        imagePullPolicy: IfNotPresent
+        args:
+        - minio
+        - server
+        - /data
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 9000
+          name: minio
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: minio
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: minio
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+        - name: minio-data
+          mountPath: /data
+        - name: minio
+          mountPath: /minio
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 101
+        runAsUser: 100
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: minio-data
+        persistentVolumeClaim:
+          claimName: minio
+      - name: minio
+        emptyDir: {}
+---
+# Source: sourcegraph/templates/precise-code-intel/worker.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles conversion of uploaded precise code intelligence bundles.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: precise-code-intel
+  name: precise-code-intel-worker
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: precise-code-intel-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: precise-code-intel-worker
+        checksum/minio.secret: 0d1f6081dd63d258d47997c3ad288563c4ea193b12f296dc835724566a504d28
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: precise-code-intel-worker
+    spec:
+      containers:
+      - name: precise-code-intel-worker
+        env:
+        - name: NUM_WORKERS
+          value: "4"
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: minio-auth
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: minio-auth
+        image: index.docker.io/sourcegraph/precise-code-intel-worker:3.38.0@sha256:f1e4ce16b5fffbc1270765886aaecebb18a80568a815163f3ea2c36174db119a
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3188
+          name: http
+        - containerPort: 6060
+          name: debug
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+---
+# Source: sourcegraph/templates/prometheus/prometheus.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Collects metrics and aggregates them into graphs.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: prometheus
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: prometheus
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: prometheus
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: index.docker.io/sourcegraph/prometheus:3.38.0@sha256:4fcd8a2469b5d57e3b75e5adbb9b068d2013c6392307790cf69681a6dd7663d5
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9090
+          timeoutSeconds: 3
+          failureThreshold: 120
+          periodSeconds: 5
+        ports:
+        - containerPort: 9090
+          name: http
+        volumeMounts:
+        - mountPath: /prometheus
+          name: data
+        - mountPath: /sg_prometheus_add_ons
+          name: config
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsGroup: 100
+          runAsUser: 100
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        fsGroup: 100
+        fsGroupChangePolicy: OnRootMismatch
+      nodeSelector:
+      affinity:
+      tolerations:
+      serviceAccountName: prometheus
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: prometheus
+      - configMap:
+          defaultMode: 0777
+          name: prometheus
+        name: config
+---
+# Source: sourcegraph/templates/redis/redis-cache.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing short-lived caches.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: redis-cache
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: redis-cache
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: redis-cache
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: redis-cache
+    spec:
+      containers:
+      - name: redis-cache
+        image: index.docker.io/sourcegraph/redis-cache:3.38.0@sha256:f922a4f88c051537767e401c5a601923491e7021cf285aecec1276ebdca83949
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        env:
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsUser: 999
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+      - name: redis-exporter
+        image: index.docker.io/sourcegraph/redis_exporter:3.38.0@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsUser: 999
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-cache
+---
+# Source: sourcegraph/templates/redis/redis-store.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Redis for storing semi-persistent data like user sessions.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: redis-store
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: redis-store
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: redis-store
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: redis-store
+    spec:
+      containers:
+      - name: redis-store
+        image: index.docker.io/sourcegraph/redis-store:3.38.0@sha256:6da998b9b6642ab330bed143b4998a9e8d16d81585035ed1b726311b5708d557
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        livenessProbe:
+          initialDelaySeconds: 30
+          tcpSocket:
+            port: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+        readinessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: redis
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsUser: 999
+        volumeMounts:
+        - mountPath: /redis-data
+          name: redis-data
+      - name: redis-exporter
+        image: index.docker.io/sourcegraph/redis_exporter:3.38.0@sha256:f3f51453e4261734f08579fe9c812c66ee443626690091401674be4fb724da70
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        ports:
+        - containerPort: 9121
+          name: redisexp
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 1000
+          runAsUser: 999
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-store
+---
+# Source: sourcegraph/templates/repo-updater/repo-updater.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles repository metadata (not Git data) lookups and updates from
+      external code hosts and other similar services.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: repo-updater
+  name: repo-updater
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: repo-updater
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: repo-updater
+        checksum/redis: 63b58e05a2640417d599c4aee6d866cb9063e3a9aa452dc08dbfff836b7781b7
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: repo-updater
+    spec:
+      containers:
+      - name: repo-updater
+        image: index.docker.io/sourcegraph/repo-updater:3.38.0@sha256:98c8c45504611d2a2affcb884e639a1217e6786e5441a2daf91e9eea9070cbf5
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+        - name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 3182
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          periodSeconds: 1
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.38.0@sha256:a95d47e5a640e135083479c41457d421479366a8b1394c6cd1d211c265bf45ca
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+---
+# Source: sourcegraph/templates/searcher/searcher.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for text search operations.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: searcher
+  name: searcher
+spec:
+  minReadySeconds: 10
+  replicas: 2
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: searcher
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: searcher
+        checksum/redis: 63b58e05a2640417d599c4aee6d866cb9063e3a9aa452dc08dbfff836b7781b7
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: searcher
+    spec:
+      containers:
+      - name: searcher
+        env:
+        - name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+        - name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+        - name: SEARCHER_CACHE_SIZE_MB
+          valueFrom:
+            resourceFieldRef:
+              containerName: searcher
+              resource: requests.ephemeral-storage
+              divisor: 1M
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: index.docker.io/sourcegraph/searcher:3.38.0@sha256:9fd1c8f3dd4ff7d9f791c9a9b0e1666f7649a9379f2d16457cc9f8c9f7251a8a
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 3181
+          name: http
+        - containerPort: 6060
+          name: debug
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+        - mountPath: /tmp
+          name: tmpdir
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.38.0@sha256:a95d47e5a640e135083479c41457d421479366a8b1394c6cd1d211c265bf45ca
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+      - emptyDir: {}
+        name: tmpdir
+---
+# Source: sourcegraph/templates/symbols/symbols.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for symbols operations.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: symbols
+  name: symbols
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: symbols
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: symbols
+        checksum/redis: 63b58e05a2640417d599c4aee6d866cb9063e3a9aa452dc08dbfff836b7781b7
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: symbols
+    spec:
+      containers:
+      - name: symbols
+        env:
+        - name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+        - name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+        - name: SYMBOLS_CACHE_SIZE_MB
+          valueFrom:
+            resourceFieldRef:
+              containerName: symbols
+              resource: requests.ephemeral-storage
+              divisor: 1M
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: CACHE_DIR
+          value: /mnt/cache/$(POD_NAME)
+        image: index.docker.io/sourcegraph/symbols:3.38.0@sha256:0d42271300254876b5a587fb07441a131368cd34b3f0b373299b96d4be4963ce
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3184
+          name: http
+        - containerPort: 6060
+          name: debug
+        volumeMounts:
+        - mountPath: /mnt/cache
+          name: cache-ssd
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.38.0@sha256:a95d47e5a640e135083479c41457d421479366a8b1394c6cd1d211c265bf45ca
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - emptyDir: {}
+        name: cache-ssd
+---
+# Source: sourcegraph/templates/syntect-server/syntect-server.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Backend for syntax highlighting operations.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: syntect-server
+  name: syntect-server
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: syntect-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: syntect-server
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: syntect-server
+    spec:
+      containers:
+      - name: syntect-server
+        env:
+        image: index.docker.io/sourcegraph/syntax-highlighter:3.38.0@sha256:05a3ccdca334e1f198ee3a8f3c5492c1dffb8f3254f9b43d248f0fc64c95beb6
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: http
+            scheme: HTTP
+          initialDelaySeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 9238
+          name: http
+        readinessProbe:
+          tcpSocket:
+            port: http
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+---
+# Source: sourcegraph/templates/worker/worker.Deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Manages background processes.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: worker
+  name: worker
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: worker
+        checksum/redis: 63b58e05a2640417d599c4aee6d866cb9063e3a9aa452dc08dbfff836b7781b7
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: worker
+    spec:
+      containers:
+      - name: worker
+        env:
+        - name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+        - name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: index.docker.io/sourcegraph/worker:3.38.0@sha256:9180a8740dc3523d39918349a9640a6551f17c0b6ad5a19856efbec4261ae510
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3189
+          name: http
+        - containerPort: 6060
+          name: debug
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+      securityContext:
+        {}
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+---
+# Source: sourcegraph/templates/codeinsights-db/codeinsights-db.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Code Insights Postgresql instance.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: codeinsights-db
+    deploy: sourcegraph
+  name: codeinsights-db
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: codeinsights-db
+  serviceName: codeinsights-db
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: codeinsights
+        checksum/codeinsights-db.secret: 35cdc8301ff913b04e452737cd8989472d5337078306836ec521da1a1bd7384a
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: codeinsights-db
+        group: backend
+    spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine-3.12:3.38.0@sha256:615c19304c7bd68bb7c4930a2ee20018bade07ba493a39d963320d980227e729
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 999
+          runAsUser: 999
+      containers:
+      - name: codeinsights
+        image: index.docker.io/sourcegraph/codeinsights-db:3.38.0@sha256:4f971b00939ebbf7d9d622f40fc84a4fde994c67ebd023ed49ccad066aae2044
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeinsights-db-auth
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: codeinsights-db-auth
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeinsights-db-auth
+        - name: POSTGRES_PORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeinsights-db-auth
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeinsights-db-auth
+        - name: POSTGRES_DB
+          value: $(POSTGRES_DATABASE)
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        - name: POSTGRESQL_CONF_DIR
+          value: "/conf"
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 5432
+          name: codeinsights-db
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 70
+          runAsUser: 70
+        volumeMounts:
+        - mountPath: /var/lib/postgresql/data/
+          name: disk
+        - mountPath: /conf
+          name: codeinsights-conf
+        - mountPath: /var/run/postgresql
+          name: lockdir
+      securityContext:
+        fsGroup: 70
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 70
+      nodeSelector:
+      affinity:
+      tolerations:
+      terminationGracePeriodSeconds: 120
+      
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: codeinsights-db
+      - name: codeinsights-conf
+        configMap:
+          defaultMode: 0777
+          name: codeinsights-db-conf
+      - name: lockdir
+        emptyDir: {}
+  updateStrategy:
+    type: RollingUpdate
+---
+# Source: sourcegraph/templates/codeintel-db/codeintel-db.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Postgres database for various data.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/component: codeintel-db
+    deploy: sourcegraph
+  name: codeintel-db
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: codeintel-db
+  serviceName: codeintel-db
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: pgsql
+        checksum/codeintel-db.secret: c3b334535727d67be427cac1cf5763e2f365faad18866237b3d3e89b6375f72f
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: codeintel-db
+        group: backend
+    spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine-3.12:3.38.0@sha256:615c19304c7bd68bb7c4930a2ee20018bade07ba493a39d963320d980227e729
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 999
+          runAsUser: 999
+      containers:
+      - name: pgsql
+        image: index.docker.io/sourcegraph/codeintel-db:3.38.0@sha256:32682b563f62fd3b883ec8b77b180e4bddff09db51cde17734562f018b5b40a2
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeintel-db-auth
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: codeintel-db-auth
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeintel-db-auth
+        - name: POSTGRES_PORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeintel-db-auth
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeintel-db-auth
+        - name: POSTGRES_DB
+          value: $(POSTGRES_DATABASE)
+        readinessProbe:
+          exec:
+            command:
+              - /ready.sh
+        livenessProbe:
+          initialDelaySeconds: 15
+          exec:
+            command:
+              - /liveness.sh
+        ports:
+        - containerPort: 5432
+          name: pgsql
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 999
+          runAsUser: 999
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        - mountPath: /conf
+          name: pgsql-conf
+        - mountPath: /var/run/postgresql
+          name: lockdir
+      - env:
+        - name: DATA_SOURCE_DB
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: codeintel-db-auth
+        - name: DATA_SOURCE_PASS
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: codeintel-db-auth
+        - name: DATA_SOURCE_PORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: codeintel-db-auth
+        - name: DATA_SOURCE_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: codeintel-db-auth
+        - name: DATA_SOURCE_URI
+          value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_intel_queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:3.38.0@sha256:fd16e2f3c6c3f2b329040009321f9bf63463b4363af6132aaccb77d50122a2d9
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+        runAsUser: 999
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: codeintel-db
+      - name: pgsql-conf
+        configMap:
+          defaultMode: 0777
+          name: codeintel-db-conf
+      - name: lockdir
+        emptyDir: {}
+  updateStrategy:
+    type: RollingUpdate
+---
+# Source: sourcegraph/templates/gitserver/gitserver.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Stores clones of repositories to perform Git operations.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: gitserver
+  name: gitserver
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: gitserver
+  serviceName: gitserver
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: gitserver
+        checksum/redis: 63b58e05a2640417d599c4aee6d866cb9063e3a9aa452dc08dbfff836b7781b7
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: gitserver
+        group: backend
+        type: gitserver
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: gitserver
+        args:
+        - run
+        image: index.docker.io/sourcegraph/gitserver:3.38.0@sha256:6474be40cbe0a0a2914bc996835e78bf25ee48527312b8800bc0ccb35341c3ec
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+        - name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          initialDelaySeconds: 5
+          tcpSocket:
+            port: rpc
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3178
+          name: rpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: false
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /data/repos
+          name: repos
+      - name: jaeger-agent
+        image: index.docker.io/sourcegraph/jaeger-agent:3.38.0@sha256:a95d47e5a640e135083479c41457d421479366a8b1394c6cd1d211c265bf45ca
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
+        ports:
+        - containerPort: 5775
+          protocol: UDP
+        - containerPort: 5778
+          protocol: TCP
+        - containerPort: 6831
+          protocol: UDP
+        - containerPort: 6832
+          protocol: UDP
+        resources:
+          limits:
+            cpu: "1"
+            memory: 500M
+          requests:
+            cpu: 100m
+            memory: 100M
+        args:
+          - --reporter.grpc.host-port=jaeger-collector:14250
+          - --reporter.type=grpc
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 101
+        runAsUser: 100
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: repos
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: repos
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          # The size of disk used to mirror your git repositories.
+          # If you change this, also change indexed-search's disk size.
+          storage: 200Gi
+      storageClassName: standard
+---
+# Source: sourcegraph/templates/grafana/grafana.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Metrics/monitoring dashboards and alerts.
+  labels:
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+    deploy: sourcegraph
+    app.kubernetes.io/component: grafana
+  name: grafana
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: grafana
+  serviceName: grafana
+  updateStrategy:
+     type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: grafana
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: grafana
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: grafana
+        image: index.docker.io/sourcegraph/grafana:3.38.0@sha256:7b1fa3a4848eea68627a1c69695024a6e35e32749f02d326715933878f78ce67
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        ports:
+        - containerPort: 3370
+          name: http
+        volumeMounts:
+        - mountPath: /var/lib/grafana
+          name: grafana-data
+        - mountPath: /sg_config_grafana/provisioning/datasources
+          name: config
+        # Grafana is relied upon to send alerts to site admins when something is wrong with
+        # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough
+        # memory to perform its job reliably and prevent conflicts with other pods on the same
+        # host node.
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 472
+          runAsUser: 472
+      serviceAccountName: grafana
+      securityContext:
+        fsGroup: 472
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 472
+        runAsUser: 472
+      nodeSelector:
+      affinity:
+      tolerations:
+      volumes:
+      - name: config
+        configMap:
+          defaultMode: 0777
+          name: grafana
+  volumeClaimTemplates:
+  - metadata:
+      name: grafana-data
+    spec:
+      accessModes: [ "ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 2Gi
+      storageClassName: standard
+---
+# Source: sourcegraph/templates/indexed-search/indexed-search.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Backend for indexed text search operations.
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: indexed-search
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+  name: indexed-search
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: indexed-search
+  serviceName: indexed-search
+  template:
+    metadata:
+      annotations:
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: indexed-search
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: zoekt-webserver
+        image: index.docker.io/sourcegraph/indexed-searcher:3.38.0@sha256:0c2b31f1b5be6e851676c6df678dee74fd51733a4c230942a52876384f263e6b
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        ports:
+        - containerPort: 6070
+          name: http
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /healthz
+            port: http
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      - name: zoekt-indexserver
+        image: index.docker.io/sourcegraph/search-indexer:3.38.0@sha256:5460a1aa43825d7241d9b203bc98eadf067dd986fc4a3887311425e5723ad4b7
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        ports:
+        - containerPort: 6072
+          name: index-http
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 101
+          runAsUser: 100
+        volumeMounts:
+        - mountPath: /data
+          name: data
+      securityContext:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: data
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 200Gi
+      storageClassName: standard
+---
+# Source: sourcegraph/templates/pgsql/pgsql.StatefulSet.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Postgres database for various data.
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: pgsql
+    helm.sh/chart: sourcegraph-0.7.0
+    app.kubernetes.io/name: sourcegraph
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/version: "3.38.0"
+    app.kubernetes.io/managed-by: Helm
+  name: pgsql
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: sourcegraph
+      app.kubernetes.io/instance: sourcegraph
+      app: pgsql
+  serviceName: pgsql
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: pgsql
+        checksum/pgsql.secret: 180940fdb956526d197a8efaf15bc2f14a3db83e09610917f8b9040fa5232d39
+      labels:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        deploy: sourcegraph
+        app: pgsql
+        group: backend
+    spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: index.docker.io/sourcegraph/alpine-3.12:3.38.0@sha256:615c19304c7bd68bb7c4930a2ee20018bade07ba493a39d963320d980227e729
+        imagePullPolicy: IfNotPresent
+        command: ["sh", "-c", "if [ -d /data/pgdata-12 ]; then chmod 750 /data/pgdata-12; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 999
+          runAsUser: 999
+      containers:
+      - image: index.docker.io/sourcegraph/postgres-12-alpine:3.38.0@sha256:f5329a359f74670eaa2148c72841f7a15323de3eabd9cb8107e4ddda7a457e7f
+        imagePullPolicy: IfNotPresent
+        terminationMessagePolicy: FallbackToLogsOnError
+        readinessProbe:
+          exec:
+            command:
+              - /ready.sh
+        livenessProbe:
+          initialDelaySeconds: 15
+          exec:
+            command:
+              - /liveness.sh
+        name: pgsql
+        env:
+        - name: POSTGRES_DATABASE
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: pgsql-auth
+        - name: POSTGRES_HOST
+          valueFrom:
+            secretKeyRef:
+              key: host
+              name: pgsql-auth
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: pgsql-auth
+        - name: POSTGRES_PORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: pgsql-auth
+        - name: POSTGRES_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: pgsql-auth
+        - name: POSTGRES_DB
+          value: $(POSTGRES_DATABASE)
+        ports:
+        - containerPort: 5432
+          name: pgsql
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsGroup: 999
+          runAsUser: 999
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        - mountPath: /conf
+          name: pgsql-conf
+        - mountPath: /dev/shm
+          name: dshm
+        - mountPath: /var/run/postgresql
+          name: lockdir
+      - env:
+        - name: DATA_SOURCE_DB
+          valueFrom:
+            secretKeyRef:
+              key: database
+              name: pgsql-auth
+        - name: DATA_SOURCE_PASS
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: pgsql-auth
+        - name: DATA_SOURCE_PORT
+          valueFrom:
+            secretKeyRef:
+              key: port
+              name: pgsql-auth
+        - name: DATA_SOURCE_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: pgsql-auth
+        - name: DATA_SOURCE_URI
+          value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/queries.yaml
+        image: index.docker.io/sourcegraph/postgres_exporter:3.38.0@sha256:fd16e2f3c6c3f2b329040009321f9bf63463b4363af6132aaccb77d50122a2d9
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        securityContext:
+          null
+      terminationGracePeriodSeconds: 120
+      securityContext:
+        fsGroup: 999
+        fsGroupChangePolicy: OnRootMismatch
+        runAsGroup: 999
+        runAsUser: 999
+      nodeSelector:
+      affinity:
+      tolerations:
+      
+      volumes:
+      - name: disk
+        persistentVolumeClaim:
+          claimName: pgsql
+      - name: pgsql-conf
+        configMap:
+          defaultMode: 0777
+          name: pgsql-conf
+      - name: dshm # Allocate shared memory to match the shared_buffers value
+        emptyDir:
+          medium: Memory
+          sizeLimit: 1G
+      - name: lockdir
+        emptyDir: {}
+  updateStrategy:
+    type: RollingUpdate
+---
+# Source: sourcegraph/templates/frontend/sourcegraph-frontend.Ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/proxy-body-size: 150m
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+  name: sourcegraph-frontend
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sourcegraph-frontend
+            port:
+              number: 30080
