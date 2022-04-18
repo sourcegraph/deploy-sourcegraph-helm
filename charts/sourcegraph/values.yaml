@@ -403,7 +403,9 @@ gitserver:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
-    readOnlyRootFilesystem: true
+    # -- Read-only filesystem not supported for the gitserver container,
+    # see [sourcegraph/issues/34012](https://github.com/sourcegraph/sourcegraph/issues/34012) for more information
+    readOnlyRootFilesystem: false
   # -- Number of `gitserver` pod
   replicaCount: 1
   # -- Resource requests & limits for the `gitserver` container,
@@ -731,7 +733,9 @@ prometheus:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 100
-    readOnlyRootFilesystem: true
+    # -- Read-only filesystem not supported for the prometheus container,
+    # see [sourcegraph/issues/33862](https://github.com/sourcegraph/sourcegraph/issues/33862) for more information
+    readOnlyRootFilesystem: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "prometheus"
   # -- Enable RBAC for `prometheus`
