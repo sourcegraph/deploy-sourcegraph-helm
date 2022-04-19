@@ -97,6 +97,21 @@ spec:
         {{- if .Values.codeInsightsDB.extraVolumeMounts }}
         {{- toYaml .Values.codeInsightsDB.extraVolumeMounts | nindent 8 }}
         {{- end }}
+      - env:
+        {{- include "sourcegraph.dataSource" (list . "codeInsightsDB" ) | nindent 8 }}
+        {{- range $name, $item := .Values.codeInsightsDB.postgresExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
+        {{- end }}
       {{- if .Values.codeInsightsDB.extraContainers }}
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
       {{- end }}

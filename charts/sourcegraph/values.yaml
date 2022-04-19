@@ -173,6 +173,8 @@ codeInsightsDB:
     runAsUser: 70
     runAsGroup: 70
     readOnlyRootFilesystem: true
+  # -- Configuration for the `pgsql-exporter` sidecar container
+  postgresExporter: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "codeinsights-db"
   # -- Resource requests & limits for the `codeinsights-db` container,
