@@ -70,6 +70,8 @@ spec:
         securityContext:
           {{- toYaml .Values.gitserver.containerSecurityContext | nindent 10 }}
         volumeMounts:
+        - mountPath: /tmp
+          name: tmpdir
         - mountPath: /data/repos
           name: repos
         {{- if .Values.gitserver.sshSecret }}
@@ -94,6 +96,8 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "gitserver") | trim | nindent 6 }}
       volumes:
+      - name: tmpdir
+        emptyDir: {}
       - name: repos
       {{- if .Values.gitserver.sshSecret }}
       - name: ssh
