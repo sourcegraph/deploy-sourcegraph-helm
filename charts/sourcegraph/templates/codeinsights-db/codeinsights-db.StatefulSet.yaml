@@ -43,6 +43,20 @@ spec:
         app: codeinsights-db
         group: backend
     spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: {{ include "sourcegraph.image" (list . "alpine") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.alpine.resources | nindent 10 }}
+        {{- end }}
       containers:
       - name: codeinsights
         image: {{ include "sourcegraph.image" (list . "codeInsightsDB") }}
