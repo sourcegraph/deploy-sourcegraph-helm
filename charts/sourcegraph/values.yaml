@@ -403,9 +403,7 @@ gitserver:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
-    # -- Read-only filesystem not supported for the gitserver container,
-    # see [sourcegraph/issues/34012](https://github.com/sourcegraph/sourcegraph/issues/34012) for more information
-    readOnlyRootFilesystem: false
+    readOnlyRootFilesystem: true
   # -- Number of `gitserver` pod
   replicaCount: 1
   # -- Resource requests & limits for the `gitserver` container,
