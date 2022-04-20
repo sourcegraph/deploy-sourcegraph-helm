@@ -1,0 +1,254 @@
+# Override file pre-populated with all services, to use as a template for adjusting resources and replica count
+# Storage class and ingress configuration not included in this override, but are frequently modified.
+# See https://docs.sourcegraph.com/admin/install/kubernetes/helm#cloud-providers-guides for guidance on configuring these options
+
+cadvisor:
+  resources:
+    limits:
+      cpu: 300m
+      memory: 2000Mi
+    requests:
+      cpu: 150m
+      memory: 200Mi
+
+codeInsightsDB:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 2Gi
+    requests:
+      cpu: "4"
+      memory: 2Gi
+  storageSize: 200Gi
+
+codeIntelDB:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "4"
+      memory: 4Gi
+  storageSize: 200Gi
+
+frontend:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "2"
+      ephemeral-storage: 8Gi
+      memory: 4G
+    requests:
+      cpu: "2"
+      ephemeral-storage: 4Gi
+      memory: 2G
+
+migrator:
+  resources:
+    limits:
+      cpu: 500m
+      memory: 100M
+    requests:
+      cpu: 100m
+      memory: 50M
+
+githubProxy:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 100m
+      memory: 250M
+
+gitserver:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 8G
+    requests:
+      cpu: "4"
+      memory: 8G
+  storageSize: 200Gi
+
+grafana:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 512Mi
+  storageSize: 2Gi
+
+indexedSearch:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
+  storageSize: 200Gi
+
+indexedSearchIndexer:
+  resources:
+    limits:
+      cpu: "8"
+      memory: 8G
+    requests:
+      cpu: "4"
+      memory: 4G
+
+minio:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 500M
+    requests:
+      cpu: "1"
+      memory: 500M
+  storageSize: 100Gi
+
+pgsql:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4Gi
+    requests:
+      cpu: "4"
+      memory: 4Gi
+  storageSize: 200Gi
+
+postgresExporter:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 50Mi
+    requests:
+      cpu: 10m
+      memory: 50Mi
+
+preciseCodeIntel:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
+
+prometheus:
+  resources:
+    limits:
+      cpu: "2"
+      memory: 6G
+    requests:
+      cpu: 500m
+      memory: 6G
+  storageSize: 200Gi
+
+redisCache:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 7Gi
+    requests:
+      cpu: "1"
+      memory: 7Gi
+  storageSize: 100Gi
+
+redisExporter:
+  resources:
+    limits:
+      cpu: 10m
+      memory: 100Mi
+    requests:
+      cpu: 10m
+      memory: 100Mi
+
+redisStore:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 7Gi
+    requests:
+      cpu: "1"
+      memory: 7Gi
+  storageSize: 100Gi
+
+repoUpdater:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: "1"
+      memory: 500Mi
+
+searcher:
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "2"
+      ephemeral-storage: 26G
+      memory: 2G
+    requests:
+      cpu: 500m
+      ephemeral-storage: 25G
+      memory: 500M
+
+
+symbols:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "2"
+      ephemeral-storage: 12G
+      memory: 2G
+    requests:
+      cpu: 500m
+      ephemeral-storage: 10G
+      memory: 500M
+
+syntectServer:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "4"
+      memory: 6G
+    requests:
+      cpu: 250m
+      memory: 2G
+
+tracing:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 1G
+    requests:
+      cpu: 500m
+      memory: 500M
+
+# Jaeger sidecar container
+tracingAgent:
+  resources:
+    limits:
+      cpu: "1"
+      memory: 500M
+    requests:
+      cpu: 100m
+      memory: 100M
+
+worker:
+  replicaCount: 1
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
