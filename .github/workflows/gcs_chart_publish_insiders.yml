@@ -1,0 +1,67 @@
+name: Publish chart (insiders)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/gcs_chart_publish_insiders.yml
+      - 'charts/**'
+
+env:
+  HELM_VERSION: v3.4.0
+  HELM_GCS_VERSION: 0.3.20 # https://github.com/hayorov/helm-gcs
+  BUCKET_NAME: helm.sourcegraph.com
+  BUCKET_PATH: insiders
+
+jobs:
+  release:
+    name: helm
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: ${{ env.HELM_VERSION }}
+
+      - name: Configure gcloud
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
+          service_account: 'github-bot@sourcegraph-helm.iam.gserviceaccount.com'
+
+      - name: Get metadata
+        id: metadata
+        uses: contiamo/git-metadata-action@main
+
+      - name: Install helm-gcs
+        run: helm plugin install https://github.com/hayorov/helm-gcs.git --version ${{ env.HELM_GCS_VERSION }}
+
+      - name: Initialize helm chart
+        run: helm gcs init gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}
+
+      - name: Set up helm repo
+        run: helm repo add sg gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}
+
+      - name: Update chart versions
+        run: |
+          sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml
+          sed -i '/^version:/ s/$/-insiders.${{ steps.metadata.outputs.shortSHA }}/' charts/*/Chart.yaml
+
+      - name: Package helm charts
+        run: for i in charts/*; do helm package -u $i; done
+
+      - name: Publish chart if it doesn't already exist in the repository
+        run: |
+          for i in *.tgz; do
+            if gsutil ls gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}/$i 2>/dev/null; then
+              echo "Chart already published"
+            else
+              helm gcs push $i sg
+            fi;
+          done
