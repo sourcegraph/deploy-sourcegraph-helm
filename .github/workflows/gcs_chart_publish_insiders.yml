@@ -1,4 +1,4 @@
-name: Release Charts
+name: Publish chart (insiders)
 
 on:
   push:
@@ -27,22 +27,26 @@ jobs:
       - name: Install Helm
         uses: azure/setup-helm@v1
         with:
-          version: $HELM_VERSION
+          version: ${{ env.HELM_VERSION }}
 
       - name: Configure gcloud
-        uses: google-github-actions/setup-gcloud@v0
+        uses: google-github-actions/auth@v0
         with:
-          service_account_key: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
+          service_account: 'github-bot@sourcegraph-helm.iam.gserviceaccount.com'
+
+      - name: Get metadata
+        id: metadata
+        uses: contiamo/git-metadata-action@main
 
       - name: Install helm-gcs
-        run: helm plugin install https://github.com/hayorov/helm-gcs.git --version $HELM_GCS_VERSION
+        run: helm plugin install https://github.com/hayorov/helm-gcs.git --version ${{ env.HELM_GCS_VERSION }}
 
       - name: Initialize helm chart
-        run: helm gcs init gs://$BUCKET_NAME/$BUCKET_PATH
+        run: helm gcs init gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}
 
       - name: Set up helm repo
-        run: helm repo add sg gs://$BUCKET_NAME
+        run: helm repo add sg gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}
 
       - name: Update chart versions
         run: |
@@ -55,9 +59,9 @@ jobs:
       - name: Publish chart if it doesn't already exist in the repository
         run: |
           for i in *.tgz; do
-            if gsutil ls gs://$BUCKET_NAME $BUCKET_PATH/$i 2>/dev/null; then
+            if gsutil ls gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}/$i 2>/dev/null; then
               echo "Chart already published"
             else
-              helm gcs push $i sg --bucketPath=$BUCKET_PATH
+              helm gcs push $i sg
             fi;
           done
