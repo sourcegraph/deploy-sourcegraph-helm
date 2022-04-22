@@ -51,7 +51,7 @@ jobs:
       - name: Update chart versions
         run: |
           sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml
-          sed -i '/^version:/ s/$/-insiders.${{ steps.metadata.outputs.shortSHA }}/' charts/*/Chart.yaml
+          sed -i '/^version:/ s/"$/-insiders.${{ steps.metadata.outputs.shortSHA }}"/' charts/*/Chart.yaml
 
       - name: Package helm charts
         run: for i in charts/*; do helm package -u $i; done
