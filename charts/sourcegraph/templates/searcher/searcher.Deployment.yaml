@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: searcher
-  name: {{ default "searcher" .Values.searcher.name }}
+  name: {{ .Values.searcher.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.searcher.replicaCount }}
@@ -28,6 +28,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: searcher
+      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -52,6 +53,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         env:
+        {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- range $name, $item := .Values.searcher.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}

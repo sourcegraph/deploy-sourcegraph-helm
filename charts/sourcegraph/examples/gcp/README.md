@@ -1,18 +1,16 @@
 # GCP
 
-Deploy Sourcegraph on GKE and use [Container-native load balancing through Ingress] to make Sourcegraph publically accessible.
+Deploy Sourcegraph on GKE and use [Container-native load balancing through Ingress] to make Sourcegraph publicly accessible.
 
 ## Get started
 
-Deploy or upgrade Sourcegraph Helm chart with the provided [override.yaml](./override.yaml)
+Deploy or upgrade Sourcegraph Helm chart with the provided [override.yaml](./override.yaml). This will create a public-facing load balancer that supports HTTP traffic. You can then access your deployment via the IP of the load balancer.
 
-> Looking to enable TLS with Google-managed certificates? [Learn more](https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs)
+**To enable HTTPS**, provide [your own SSL cert] or use [Google-managed certificates].
 
-Deploy the [BackendConfig] CRD. This is necessary to instruct GCP load balancer how to perform healthcheck on our deployment.
-
-```sh
-kubectl apply -f sourcegraph-frontend.BackendConfig.yaml
-```
+The override file includes a [BackendConfig] CRD. This is necessary to instruct GCP load balancer how to perform healthcheck on our deployment.
 
 [Container-native load balancing through Ingress]: https://cloud.google.com/kubernetes-engine/docs/how-to/container-native-load-balancing
 [BackendConfig]: https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-features#create_backendconfig
+[your own SSL cert]: https://cloud.google.com/kubernetes-engine/docs/concepts/ingress-xlb#setting_up_https_tls_between_client_and_load_balancer
+[Google-managed certificates]: https://cloud.google.com/kubernetes-engine/docs/how-to/managed-certs

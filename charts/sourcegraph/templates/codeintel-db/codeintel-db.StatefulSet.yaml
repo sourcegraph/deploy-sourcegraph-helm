@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
-  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
+  name: {{ .Values.codeIntelDB.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -24,6 +24,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: pgsql
+        checksum/codeintel-db.secret: {{ toJson .Values.codeIntelDB.auth | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -66,6 +67,9 @@ spec:
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
+        {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "POSTGRES_") | nindent 8 }}
+        - name: POSTGRES_DB
+          value: $(POSTGRES_DATABASE)
         {{- range $name, $item := .Values.codeIntelDB.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -102,6 +106,7 @@ spec:
         {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
       {{- end }}
       - env:
+        {{- include "sourcegraph.dataSource" (list . "codeIntelDB" ) | nindent 8 }}
         {{- range $name, $item := .Values.codeIntelDB.postgresExporter.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -133,7 +138,7 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeintel-db-conf" .Values.codeIntelDB.existingConfig .Values.codeIntelDB.name }}
+          name: {{ default (print .Values.codeIntelDB.name "-conf") .Values.codeIntelDB.existingConfig }}
       - name: lockdir
         emptyDir: {}
       {{- if .Values.codeIntelDB.extraVolumes }}

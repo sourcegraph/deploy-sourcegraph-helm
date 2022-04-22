@@ -1,17 +1,27 @@
-# Demonstrate using an external database for the main Sourcegraph database
-# Disables deployment of the Postgres docker container
+# Demonstrate using an external database for each Sourcegraph database
 # Optionally, reference a Kubernetes Secret that contains credentials to the external database
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-postgresql-databases
 
-frontend:
-  env:
-    PGHOST:
-      value: external-database-dns # external database host
-
-    PGPASSWORD:
-      valueFrom:
-        secretKeyRef: # Pre-existing secret, not created by this chart
-          name: postgres-sourcegraph
-          key: password
-
+# Connect to an external postgres instance configured with default Sourcegraph settings (database, username, etc.)
 pgsql:
-  enabled: false
+  enabled: false # disable internal pgsql database
+  auth:
+    host: pgsql.database.company.com # external pgsql host
+
+
+# Connect to an external postgres instance with custom settings
+codeInsightsDB:
+  enabled: false # disable internal codeinsights-db database
+  auth:
+    database: "customdb"
+    host: pgsql.database.company.com # external pgsql host
+    user: "newuser"
+    password: "newpassword"
+    port: "4432"
+
+# Use an existing secret for credentials to an external postgres instance
+codeIntelDB:
+  enabled: false # disable internal codeintel-db database
+  auth:
+    existingSecret: "codeintel-credentials" # created outside the helm chart

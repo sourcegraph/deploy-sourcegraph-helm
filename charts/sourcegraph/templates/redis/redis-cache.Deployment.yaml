@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: redis
-  name: {{ default "redis-cache" .Values.redisCache.name }}
+  name: {{ .Values.redisCache.name }}
 spec:
   minReadySeconds: 10
   replicas: 1

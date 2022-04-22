@@ -1,0 +1,16 @@
+frontend:
+  ingress:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: alb # aws load balancer controller ingressClass name
+      # additional aws alb ingress controller supported annotations
+      # ...
+    # replace with your actual domain
+    host: sourcegraph.company.com
+
+storageClass:
+  create: true
+  type: gp2 # This configures SSDs (recommended).
+  provisioner: ebs.csi.aws.com
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain

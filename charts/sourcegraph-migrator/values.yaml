@@ -78,33 +78,35 @@ sourcegraph:
 #   # Toggle deployment of applications on/off. Applies to databases and third-party applications
 #   enabled: true
 
+codeInsightsDB:
+  name: "codeinsights-db"
+  auth:
+    # -- Name of existing secret to use for codeinsights-db credentials
+    # This should match the setting in the sourcegraph chart values
+    existingSecret: ""
+
+codeIntelDB:
+  name: "codeintel-db"
+  auth:
+    # -- Name of existing secret to use for codeintel-db credentials
+    # This should match the setting in the sourcegraph chart values
+    existingSecret: ""
+
+pgsql:
+  name: "pgsql"
+  auth:
+    # -- Name of existing secret to use for pgsql credentials
+    # This should match the setting in the sourcegraph chart values
+    existingSecret: ""
+
 migrator:
   image:
     # -- Docker image tag for the `migrator` image
-    defaultTag: 3.37.0@sha256:404df69cfee90eaa9a3ab8b540a2d9affd22605caa5326a8ac4ba016e1d6d815
+    defaultTag: 3.38.0@sha256:16b3cebb1447fce75a8cb3acd6b6640294c70ab96adbfbcbc8da565ffffc5a4e
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
-  # @default -- the chart will add some default environment values
-  env:
-    CODEINSIGHTS_PGDATASOURCE:
-      value: postgres://postgres:password@codeinsights-db:5432/postgres
-    CODEINTEL_PGDATABASE:
-      value: sg
-    CODEINTEL_PGHOST:
-      value: codeintel-db
-    CODEINTEL_PGPORT:
-      value: "5432"
-    CODEINTEL_PGSSLMODE:
-      value: disable
-    CODEINTEL_PGUSER:
-      value: sg
-    PGDATABASE:
-      value: sg
-    PGHOST:
-      value: pgsql
-    PGUSER:
-      value: sg
+  env: {}
   # -- Resource requests & limits for the `migrator` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:

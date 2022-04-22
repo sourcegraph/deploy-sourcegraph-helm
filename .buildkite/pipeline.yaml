@@ -3,13 +3,13 @@ steps:
     commands: 
       - "scripts/ci/install-helm-env.sh"
       - "scripts/ci/helm-unittest.sh"
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":database: Schema Validation"
     commands: 
       - "scripts/ci/install-helm-env.sh"
       - "scripts/ci/validate-schema.sh"
-    agents: { queue: job }
+    agents: { queue: standard }
 
   - label: ":mag: Lint"
     commands: 
@@ -17,11 +17,11 @@ steps:
       - "scripts/ci/lint.sh"
     soft_fail:
       - exit_status: 255
-    agents: { queue: job }
+    agents: { queue: standard }
   
   - label: ":book: Verify helm-docs is up-to-date"
     commands:
       - "./scripts/helm-docs.sh"
       - "echo \"checking for uncommitted changes\""
       - "[[ -z $(git status -s) ]]"
-    agents: { queue: job }
+    agents: { queue: standard }

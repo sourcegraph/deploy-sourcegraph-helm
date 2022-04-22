@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
-  name: {{ default "grafana" .Values.grafana.name }}
+  name: {{ .Values.grafana.name }}
 spec:
   replicas: {{ .Values.grafana.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -94,7 +94,7 @@ spec:
       - name: config
         configMap:
           defaultMode: 0777
-          name: {{ default "grafana" .Values.grafana.existingConfig }}
+          name: {{ default .Values.grafana.name .Values.grafana.existingConfig }}
       {{- if .Values.grafana.extraVolumes }}
       {{- toYaml .Values.grafana.extraVolumes | nindent 6 }}
       {{- end }}

@@ -1,0 +1,16 @@
+suite: prometheusPrivileged
+templates:
+  - NOTES.txt
+tests:
+  - it: should not have the warning text when prometheus.privileged=true
+    set:
+      prometheus.privileged: true
+    asserts:
+      - notMatchRegexRaw:
+          pattern: You have set 'prometheus.privileged' to 'false'
+  - it: should have the warning text when prometheus.privileged=false
+    set:
+      prometheus.privileged: false
+    asserts:
+      - matchRegexRaw:
+          pattern: You have set 'prometheus.privileged' to 'false'

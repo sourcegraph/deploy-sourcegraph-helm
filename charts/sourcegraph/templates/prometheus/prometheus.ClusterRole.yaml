@@ -6,7 +6,7 @@ metadata:
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
-  name: prometheus
+  name: {{ .Values.prometheus.name }}
 rules:
 - apiGroups:
   - ""

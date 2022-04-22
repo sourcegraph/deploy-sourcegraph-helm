@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: minio
-  name: {{ default "minio" .Values.minio.name }}
+  name: {{ .Values.minio.name }}
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -26,6 +26,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: minio
+        checksum/minio.secret: {{ toJson .Values.minio.auth | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -46,6 +47,16 @@ spec:
       containers:
       - name: minio
         env:
+        - name: MINIO_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: {{ default (print .Values.minio.name "-auth") .Values.minio.auth.existingSecret }}
+        - name: MINIO_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: {{ default (print .Values.minio.name "-auth") .Values.minio.auth.existingSecret }}
         {{- range $name, $item := .Values.minio.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}

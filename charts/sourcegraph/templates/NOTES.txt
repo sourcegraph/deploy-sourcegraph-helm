@@ -1,0 +1,20 @@
+{{- "\n" }}
+
+Thank you for installing {{ .Chart.Name }}.
+
+Your release is named {{ .Release.Name }}.
+
+To learn more about supported configuration, check out https://docs.sourcegraph.com/admin/install/kubernetes/helm.
+
+{{- "\n" }}
+
+{{- if not .Values.prometheus.privileged }}
+🚧 Warning 🚧
+
+You have set 'prometheus.privileged' to 'false' and Prometheus will run with reduced privileges.
+Our observability stack requires some cluster-wide privileges to display provisioning metrics.
+These metrics provide critical information to help you scale the Sourcegraph deployment.
+Provisioning metrics can be restored by assigning elevated permissions to Service Account '{{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}'.
+Consult https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/templates/prometheus/prometheus.ClusterRole.yaml for the necessary permissions.
+
+{{- end }}

@@ -1,0 +1,28 @@
+suite: postgresAdditionalConfig
+templates:
+- codeinsights-db/codeinsights-db.ConfigMap.yaml
+tests:
+- it: should have additional config rendered when *.additionalConfig is defined
+  set:
+    pgsql:
+      additionalConfig: |
+        max_connections = 1000000000000000000
+    codeIntelDB:
+      additionalConfig: |
+        max_connections = 2000000000000000000
+    codeInsightsDB:
+      additionalConfig: |
+        max_connections = 3000000000000000000
+  asserts:
+  - matchRegex:
+      path: data.postgresql\.conf
+      pattern: max_connections = 3000000000000000000
+- it: should fail to render when both codeInsightsDB.additionalConfig and codeInsightsDB.existingConfig are defined
+  set:
+    codeInsightsDB:
+      existingConfig: i-will-break-rendering
+      additionalConfig: |
+        max_connections = 3000000000000000000
+  asserts:
+  - failedTemplate:
+      errorMessage: You can only define one of 'codeInsightsDB.existingConfig' and 'codeInsightsDB.additionalConfig' at a time

@@ -7,11 +7,11 @@ metadata:
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: cadvisor
-  name: cadvisor
+  name: {{ .Values.cadvisor.name }}
 rules:
   - apiGroups: ['policy']
     resources: ['podsecuritypolicies']
     verbs:     ['use']
     resourceNames:
-    - {{ default "cadvisor" .Values.cadvisor.name }}
+    - {{ .Values.cadvisor.name }}
 {{- end }}

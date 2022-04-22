@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    description: Code Insights TimescaleDB instance.
+    description: Code Insights Postgresql instance.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.codeInsightsDB.labels }}
@@ -11,7 +11,7 @@ metadata:
     {{- end }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
-  name: {{ default "codeinsights-db" .Values.codeInsightsDB.name }}
+  name: {{ .Values.codeInsightsDB.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -23,7 +23,8 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: timescaledb
+        kubectl.kubernetes.io/default-container: codeinsights
+        checksum/codeinsights-db.secret: {{ toJson .Values.codeInsightsDB.auth | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -42,8 +43,22 @@ spec:
         app: codeinsights-db
         group: backend
     spec:
+      initContainers:
+      - name: correct-data-dir-permissions
+        image: {{ include "sourcegraph.image" (list . "alpine") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
+        volumeMounts:
+        - mountPath: /data
+          name: disk
+        securityContext:
+        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.alpine.resources | nindent 10 }}
+        {{- end }}
       containers:
-      - name: timescaledb
+      - name: codeinsights
         image: {{ include "sourcegraph.image" (list . "codeInsightsDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.codeInsightsDB.args }}
@@ -51,6 +66,9 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         env:
+        {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "POSTGRES_") | nindent 8 }}
+        - name: POSTGRES_DB
+          value: $(POSTGRES_DATABASE)
         {{- range $name, $item := .Values.codeInsightsDB.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -62,7 +80,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
-          name: timescaledb
+          name: codeinsights-db
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
@@ -73,11 +91,26 @@ spec:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         - mountPath: /conf
-          name: timescaledb-conf
+          name: codeinsights-conf
         - mountPath: /var/run/postgresql
           name: lockdir
         {{- if .Values.codeInsightsDB.extraVolumeMounts }}
         {{- toYaml .Values.codeInsightsDB.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      - env:
+        {{- include "sourcegraph.dataSource" (list . "codeInsightsDB" ) | nindent 8 }}
+        {{- range $name, $item := .Values.codeInsightsDB.postgresExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/code_insights_queries.yaml
+        image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        name: pgsql-exporter
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
       {{- if .Values.codeInsightsDB.extraContainers }}
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
@@ -97,10 +130,10 @@ spec:
       - name: disk
         persistentVolumeClaim:
           claimName: codeinsights-db
-      - name: timescaledb-conf
+      - name: codeinsights-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "codeinsights-db-conf" .Values.codeInsightsDB.existingConfig }}
+          name: {{ default (print .Values.codeInsightsDB.name "-conf") .Values.codeInsightsDB.existingConfig }}
       - name: lockdir
         emptyDir: {}
       {{- if .Values.codeInsightsDB.extraVolumes }}

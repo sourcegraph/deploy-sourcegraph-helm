@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-  name: {{ default "sourcegraph-frontend" .Values.frontend.name }}
+  name: {{ .Values.frontend.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.frontend.replicaCount }}
@@ -28,6 +28,8 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: frontend
+        {{- include "sourcegraph.authChecksum" . | nindent 8 }}
+        {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -52,6 +54,9 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
         env:
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
+        {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
+        {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
         {{- range $name, $item := .Values.frontend.env }}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -75,6 +80,10 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
+        {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
+        {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
+        {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         # POD_NAME is used by CACHE_DIR
         - name: POD_NAME
           valueFrom:
@@ -84,6 +93,18 @@ spec:
         # archives of repositories at a commit.
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
+        {{- if .Values.minio.enabled }}
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              key: user
+              name: {{ default (print .Values.minio.name "-auth") .Values.minio.auth.existingSecret }}
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: {{ default (print .Values.minio.name "-auth") .Values.minio.auth.existingSecret }}
+        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

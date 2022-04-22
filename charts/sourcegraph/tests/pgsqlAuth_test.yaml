@@ -1,0 +1,65 @@
+---
+suite: pgsqlAuth
+templates:
+- pgsql/pgsql.Secret.yaml
+- pgsql/pgsql.StatefulSet.yaml
+tests:
+- it: should reference existing secret name when existingSecret is passed
+  template: pgsql/pgsql.StatefulSet.yaml
+  set:
+    pgsql:
+      auth:
+        existingSecret: "my-secret"
+  asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: POSTGRES_DATABASE
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: "my-secret"
+      - matchSnapshot:
+            path: spec.template.metadata.annotations.[checksum/pgsql.secret]
+- it: should not generate a secret when existingSecret is passed
+  template: pgsql/pgsql.Secret.yaml
+  set:
+    pgsql:
+      auth:
+        existingSecret: "my-secret"
+  asserts:
+      - hasDocuments:
+          count: 0
+- it: should generate a secret when existingSecret is blank
+  template: pgsql/pgsql.Secret.yaml
+  set:
+    pgsql:
+      auth:
+        existingSecret: ""
+  asserts:
+      - hasDocuments:
+          count: 1
+- it: should generate a secret by default
+  template: pgsql/pgsql.Secret.yaml
+  asserts:
+      - hasDocuments:
+          count: 1
+- it: should use provided value in secret
+  template: pgsql/pgsql.Secret.yaml
+  set:
+    pgsql:
+      auth:
+        password: "hello"
+  asserts:
+      - equal:
+          path: data.password
+          value: "aGVsbG8="
+- it: should reference default secret name when existingSecret is blank
+  template: pgsql/pgsql.StatefulSet.yaml
+  asserts:
+      - equal:
+          path: spec.template.spec.containers[0].env[0].name
+          value: POSTGRES_DATABASE
+      - equal:
+          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+          value: "pgsql-auth"
+      - matchSnapshot:
+            path: spec.template.metadata.annotations.[checksum/pgsql.secret]

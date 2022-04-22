@@ -10,7 +10,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: symbols
-  name: {{ default "symbols" .Values.symbols.name }}
+  name: {{ .Values.symbols.name }}
 spec:
   minReadySeconds: 10
   replicas: {{ .Values.symbols.replicaCount }}
@@ -28,6 +28,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: symbols
+      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -48,6 +49,7 @@ spec:
       containers:
       - name: symbols
         env:
+        {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- range $name, $item := .Values.symbols.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}

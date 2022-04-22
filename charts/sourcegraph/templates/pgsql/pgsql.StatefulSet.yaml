@@ -11,7 +11,7 @@ metadata:
     {{- if .Values.pgsql.labels }}
       {{- toYaml .Values.pgsql.labels | nindent 4 }}
     {{- end }}
-  name: {{ default "pgsql" .Values.pgsql.name }}
+  name: {{ .Values.pgsql.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -24,6 +24,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: pgsql
+        checksum/pgsql.secret: {{ toJson .Values.pgsql.auth | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -75,6 +76,9 @@ spec:
               - /liveness.sh
         name: pgsql
         env:
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "POSTGRES_") | nindent 8 }}
+        - name: POSTGRES_DB
+          value: $(POSTGRES_DATABASE)
         {{- range $name, $item := .Values.pgsql.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -104,6 +108,7 @@ spec:
         {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
       {{- end }}
       - env:
+        {{- include "sourcegraph.dataSource" (list . "pgsql" ) | nindent 8 }}
         {{- range $name, $item := .Values.pgsql.postgresExporter.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -137,7 +142,7 @@ spec:
       - name: pgsql-conf
         configMap:
           defaultMode: 0777
-          name: {{ default "pgsql-conf" .Values.pgsql.existingConfig }}
+          name: {{ default (print .Values.pgsql.name "-conf") .Values.pgsql.existingConfig }}
       - name: dshm # Allocate shared memory to match the shared_buffers value
         emptyDir:
           medium: Memory
