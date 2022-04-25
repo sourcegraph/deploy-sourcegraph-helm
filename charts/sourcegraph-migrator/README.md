@@ -23,7 +23,7 @@ Use cases:
 Add the Sourcegraph charts repo to Helm:
 
 ```sh
-helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/
+helm repo add sourcegraph https://helm.sourcegraph.com/release
 ```
 
 ## Usage
