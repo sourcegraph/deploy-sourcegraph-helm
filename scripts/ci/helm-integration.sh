@@ -26,7 +26,7 @@ curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KI
 chmod +x ./kind
 
 # Rootless Docker
-export DOCKER_HOST=unix://${XDG_RUNTIME_DIR}/docker.sock
+#export DOCKER_HOST=unix://${XDG_RUNTIME_DIR}/docker.sock
 
 # Create integration cluster
 ./kind create cluster
