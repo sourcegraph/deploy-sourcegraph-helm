@@ -35,6 +35,6 @@ steps:
 
   - label: ":jigsaw: Helm Integration"
     commands:
-      - "./scripts/ci/install-helm-env.sh"
+      #      - "./scripts/ci/install-helm-env.sh"
       - "./scripts/ci/helm-integration.sh" 
     agents: { queue: standard }
