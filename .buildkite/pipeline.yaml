@@ -25,3 +25,15 @@ steps:
       - "echo \"checking for uncommitted changes\""
       - "[[ -z $(git status -s) ]]"
     agents: { queue: standard }
+
+  - label: ":book: Verify helm-docs is up-to-date"
+    commands:
+      - "./scripts/helm-docs.sh"
+      - "echo \"checking for uncommitted changes\""
+      - "[[ -z $(git status -s) ]]"
+    agents: { queue: standard }
+
+  - label: ":merge: Helm Integration"
+    commands:
+      - "which kind"
+    agents: { queue: standard }
