@@ -9,7 +9,20 @@ set -euf -o pipefail
 # Install kind via asdf
 # TBD
 
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.12.0/kind-darwin-amd64
+KIND_VERSION=0.12.0
+
+if [[ `uname -a | grep -i "Linux"` && `uname -a | grep -i "x86"` ]]
+then
+	DOWNLOADABLE=kind-linux-amd64
+elif [[ `uname -a | grep -i "Darwin"` && `uname -a | grep -i "x86"` ]]
+then
+	DOWNLOADABLE=kind-darwin-amd64
+elif [[ `uname -a | grep -i "Darwin"` && `uname -a | grep -i "arm64"` ]]
+then
+	DOWNLOADABLE=kind-darwin-amd64
+fi
+
+curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v${KIND_VERSION}/${DOWNLOADABLE}"
 chmod +x ./kind
 
-./kind cluster create
+./kind create cluster
