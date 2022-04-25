@@ -33,7 +33,8 @@ steps:
       - "[[ -z $(git status -s) ]]"
     agents: { queue: standard }
 
-  - label: ":merge: Helm Integration"
+  - label: ":jigsaw: Helm Integration"
     commands:
-      - "which kind"
+      - "./scripts/ci/install-helm-env.sh"
+      - "./scripts/ci/helm-integration.sh" 
     agents: { queue: standard }
