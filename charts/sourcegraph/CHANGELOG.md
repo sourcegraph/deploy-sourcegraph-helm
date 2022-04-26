@@ -8,7 +8,17 @@ All notable changes to Sourcegraph are documented in this file.
 
 <!-- START CHANGELOG -->
 
-## Unreleased
+## 3.39.0
+
+The Sourcegraph Helm chart is now GA and can be used for production deployments.
+
+**Note**: The location of the helm chart repository has been moved to https://helm.sourcegraph.com/release and any existing `helm repo` references should be updated. Future chart versions will only be published to the new URL.
+
+Sourcegraph 3.39.0 is now available!
+
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-39-0)
+- [Update](https://docs.sourcegraph.com/admin/updates)
+- [Release post](https://about.sourcegraph.com/blog/release/3.39)
 
 ### Added
 
@@ -50,7 +60,7 @@ Sourcegraph 3.38.0 is now available!
 
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-38-0)
 - [Update](https://docs.sourcegraph.com/admin/updates)
-- [Release post](https://about.sourcegraph.com/blog/release/3.38) (might not be available immediately upon release)
+- [Release post](https://about.sourcegraph.com/blog/release/3.38)
 
 ### Changed
 
