@@ -1,5 +1,5 @@
 provider "google" {
-  project = "${var.project}"
+  project = var.project
 }
 
 resource "random_id" "suffix" {
@@ -7,7 +7,7 @@ resource "random_id" "suffix" {
 }
 
 data "google_container_engine_versions" "main" {
-  location = "${var.zone}"
+  location       = var.zone
   version_prefix = "1.20."
 }
 
@@ -17,7 +17,7 @@ data "google_service_account" "gcpapi" {
 
 resource "google_container_cluster" "cluster" {
   name               = "vault-helm-dev-${random_id.suffix.dec}"
-  project            = "${var.project}"
+  project            = var.project
   enable_legacy_abac = true
   initial_node_count = 1
   location           = "${var.zone}"
@@ -42,12 +42,12 @@ resource "google_container_cluster" "cluster" {
 }
 
 resource "null_resource" "kubectl" {
-  count = "${var.init_cli ? 1 : 0 }"
+  count = "${var.init_cli ? 1 : 0}"
 
   triggers = {
-    cluster_id = "${google_container_cluster.cluster.id}"
-    cluster_name= "${google_container_cluster.cluster.name}"
-    
+    cluster_id   = "${google_container_cluster.cluster.id}"
+    cluster_name = "${google_container_cluster.cluster.name}"
+
   }
 
   # On creation, we want to setup the kubectl credentials. The easiest way
@@ -61,14 +61,14 @@ resource "null_resource" "kubectl" {
   # want this to continue on failure. Generally, this works just fine since
   # it only operates on local data.
   provisioner "local-exec" {
-    when       = "destroy"
-    on_failure = "continue"
+    when       = destroy
+    on_failure = continue
     command    = "kubectl config get-clusters | grep ${self.triggers.cluster_name} | xargs -n1 kubectl config delete-cluster"
   }
 
   provisioner "local-exec" {
-    when       = "destroy"
-    on_failure = "continue"
+    when       = destroy
+    on_failure = continue
     command    = "kubectl config get-contexts | grep ${self.triggers.cluster_name} | xargs -n1 kubectl config delete-context"
   }
 }
