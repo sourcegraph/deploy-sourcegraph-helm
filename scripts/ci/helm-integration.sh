@@ -20,7 +20,7 @@ terraform apply -auto-approve || true
 popd
 
 # checkout main branch
-git checkout main
+git checkout main charts/sourcegraph
 
 # integration test: install chart at main branch ref
 helm upgrade \
@@ -36,7 +36,7 @@ kubectl config set-context --current --namespace sourcegraph
 kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
 
 # checkout current branch
-git checkout HEAD 
+git checkout .
 
 # verify git-fu 
 git status
