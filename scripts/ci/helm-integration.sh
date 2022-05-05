@@ -10,5 +10,5 @@ set -euf -o pipefail
 asdf install
 
 
-asdf terraform init
-asdf terraform plan
+asdf exec terraform init
+asdf exec terraform plan
