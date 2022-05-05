@@ -11,11 +11,21 @@ set -euf -o pipefail
 asdf install
 asdf reshim
 
+pushd $(pwd)
 cd scripts/ci/terraform
 
 terraform init
-terraform apply -auto-approve
+terraform apply -auto-approve || true
 
-echo "TESTS would happen here"
+popd
 
-terraform destroy -auto-approve
+# Smoke test, replaces manual testing
+helm upgrade \
+  --install \
+  --create-namespace -n sourcegraph-${BUILDKITE_BUILD_NUMBER} \
+  --set sourcegraph.localDevMode \
+  sourcegraph charts/sourcegraph/. || true
+
+# Cleanup
+cd scripts/ci/terraform
+terraform destroy -auto-approve || true
