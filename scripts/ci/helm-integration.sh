@@ -9,6 +9,7 @@ set -euf -o pipefail
 # Install terraform via asdf
 asdf install
 
+cd scripts/ci/terraform
 
 asdf exec terraform init
 asdf exec terraform plan
