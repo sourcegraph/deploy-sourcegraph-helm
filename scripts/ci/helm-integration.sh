@@ -22,15 +22,21 @@ popd
 # Smoke test, replaces manual testing
 helm upgrade \
   --install \
-  --create-namespace -n sourcegraph-${BUILDKITE_BUILD_NUMBER} \
+  --create-namespace -n sourcegraph \
   --set sourcegraph.localDevMode=true \
   sourcegraph charts/sourcegraph/. || true
 
+# Set the default namespace
+kubectl config set-context --current --namespace sourcegraph
+
+# Add a delay for registration to occur
+sleep 5
 
 # Wait for frontend pods to stabilize
 kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
 
-kubectl get pods -n sourcegraph-${BUILDKITE_BUILD_NUMBER}
+# We would want to do actual tests here ... 
+kubectl get pods -n sourcegraph
 
 # Cleanup
 cd scripts/ci/terraform
