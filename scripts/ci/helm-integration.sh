@@ -26,11 +26,9 @@ helm upgrade \
   --set sourcegraph.localDevMode=true \
   sourcegraph charts/sourcegraph/. || true
 
-sleep 10
 
-kubectl get pods -n sourcegraph-${BUILDKITE_BUILD_NUMBER}
-
-sleep 10
+# Wait for frontend pods to stabilize
+kubectl wait --for=condition=Ready --timeout=5m pod -l app=app=sourcegraph-frontend
 
 kubectl get pods -n sourcegraph-${BUILDKITE_BUILD_NUMBER}
 
