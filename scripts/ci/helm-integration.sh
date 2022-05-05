@@ -26,6 +26,14 @@ helm upgrade \
   --set sourcegraph.localDevMode=true \
   sourcegraph charts/sourcegraph/. || true
 
+sleep 10
+
+kubectl get pods -n sourcegraph-${BUILDKITE_BUILD_NUMBER}
+
+sleep 10
+
+kubectl get pods -n sourcegraph-${BUILDKITE_BUILD_NUMBER}
+
 # Cleanup
 cd scripts/ci/terraform
 terraform destroy -auto-approve || true
