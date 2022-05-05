@@ -12,4 +12,4 @@ asdf install
 cd scripts/ci/terraform
 
 asdf exec terraform init
-asdf exec terraform plan
+asdf exec terraform apply -auto-approve
