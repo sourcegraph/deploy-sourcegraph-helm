@@ -26,6 +26,7 @@ git checkout main charts/sourcegraph
 helm upgrade \
   --install \
   --create-namespace -n sourcegraph \
+  --wait \
   --set sourcegraph.localDevMode=true \
   sourcegraph charts/sourcegraph/. || true
 
@@ -36,7 +37,7 @@ kubectl config set-context --current --namespace sourcegraph
 kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
 
 # checkout current branch
-git checkout .
+git reset HEAD --hard
 
 # verify git-fu 
 git status
@@ -45,6 +46,7 @@ git status
 helm upgrade \
   --install \
   --create-namespace -n sourcegraph \
+  --wait \
   --set sourcegraph.localDevMode=true \
   sourcegraph charts/sourcegraph/. || true
 
