@@ -37,7 +37,7 @@ kubectl config set-context --current --namespace sourcegraph
 kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
 
 # checkout current branch
-git reset HEAD --hard
+git checkout HEAD charts/sourcegraph
 
 # verify git-fu 
 git status
