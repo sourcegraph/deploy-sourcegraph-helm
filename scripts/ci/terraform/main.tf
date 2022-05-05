@@ -45,13 +45,15 @@ resource "null_resource" "kubectl" {
   count = "${var.init_cli ? 1 : 0 }"
 
   triggers = {
-    cluster = "${google_container_cluster.cluster.id}"
+    cluster_id = "${google_container_cluster.cluster.id}"
+    cluster_name= "${google_container_cluster.cluster.name}"
+    
   }
 
   # On creation, we want to setup the kubectl credentials. The easiest way
   # to do this is to shell out to gcloud.
   provisioner "local-exec" {
-    command = "gcloud container clusters get-credentials --zone=${var.zone} ${google_container_cluster.cluster.name}"
+    command = "gcloud container clusters get-credentials --zone=${var.zone} ${self.triggers.cluster_name}"
   }
 
   # On destroy we want to try to clean up the kubectl credentials. This
@@ -61,12 +63,12 @@ resource "null_resource" "kubectl" {
   provisioner "local-exec" {
     when       = "destroy"
     on_failure = "continue"
-    command    = "kubectl config get-clusters | grep ${google_container_cluster.cluster.name} | xargs -n1 kubectl config delete-cluster"
+    command    = "kubectl config get-clusters | grep ${self.triggers.cluster_name} | xargs -n1 kubectl config delete-cluster"
   }
 
   provisioner "local-exec" {
     when       = "destroy"
     on_failure = "continue"
-    command    = "kubectl config get-contexts | grep ${google_container_cluster.cluster.name} | xargs -n1 kubectl config delete-context"
+    command    = "kubectl config get-contexts | grep ${self.triggers.cluster_name} | xargs -n1 kubectl config delete-context"
   }
 }
