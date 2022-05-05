@@ -29,14 +29,11 @@ helm upgrade \
 # Set the default namespace
 kubectl config set-context --current --namespace sourcegraph
 
-# Add a delay for registration to occur
-sleep 5
-
 # Wait for frontend pods to stabilize
-kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
+kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend || true
 
 # We would want to do actual tests here ... 
-kubectl get pods -n sourcegraph
+kubectl get pods -n sourcegraph || true
 
 # Cleanup
 cd scripts/ci/terraform

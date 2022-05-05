@@ -19,7 +19,7 @@ resource "google_container_cluster" "cluster" {
   name               = "vault-helm-dev-${random_id.suffix.dec}"
   project            = var.project
   enable_legacy_abac = true
-  initial_node_count = 1
+  initial_node_count = 3
   location           = "${var.zone}"
   min_master_version = "${data.google_container_engine_versions.main.latest_master_version}"
   node_version       = "${data.google_container_engine_versions.main.latest_node_version}"
