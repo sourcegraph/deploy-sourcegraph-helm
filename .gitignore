@@ -1,2 +1,5 @@
 target/*
 kind
+*.terraform/**
+*.tfstat
+*.terraform.lock.hcl
