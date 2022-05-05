@@ -30,10 +30,10 @@ helm upgrade \
 kubectl config set-context --current --namespace sourcegraph
 
 # Wait for frontend pods to stabilize
-kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend || true
+kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
 
 # We would want to do actual tests here ... 
-kubectl get pods -n sourcegraph || true
+kubectl get pods -n sourcegraph
 
 # Cleanup
 cd scripts/ci/terraform
