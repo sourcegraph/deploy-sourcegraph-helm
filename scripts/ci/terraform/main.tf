@@ -47,13 +47,13 @@ resource "null_resource" "kubectl" {
   triggers = {
     cluster_id   = "${google_container_cluster.cluster.id}"
     cluster_name = "${google_container_cluster.cluster.name}"
-    project = var.project
+    project      = var.project
   }
 
   # On creation, we want to setup the kubectl credentials. The easiest way
   # to do this is to shell out to gcloud.
   provisioner "local-exec" {
-    command = "gcloud container clusters get-credentials --zone=${var.zone} ${self.triggers.cluster_name} --project ${self.project}"
+    command = "gcloud container clusters get-credentials --zone=${var.zone} ${self.triggers.cluster_name} --project=${self.triggers.project}"
   }
 
   # On destroy we want to try to clean up the kubectl credentials. This
