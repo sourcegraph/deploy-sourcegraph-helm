@@ -8,3 +8,7 @@ set -euf -o pipefail
 
 # Install terraform via asdf
 asdf install
+
+
+asdf terraform init
+asdf terraform plan
