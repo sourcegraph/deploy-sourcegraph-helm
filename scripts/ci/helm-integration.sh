@@ -28,7 +28,7 @@ helm upgrade \
 
 
 # Wait for frontend pods to stabilize
-kubectl wait --for=condition=Ready --timeout=5m pod -l app=app=sourcegraph-frontend
+kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
 
 kubectl get pods -n sourcegraph-${BUILDKITE_BUILD_NUMBER}
 
