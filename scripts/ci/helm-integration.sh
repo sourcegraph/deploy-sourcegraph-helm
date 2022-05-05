@@ -19,7 +19,10 @@ terraform apply -auto-approve || true
 
 popd
 
-# Smoke test, replaces manual testing
+# checkout main branch
+git checkout main
+
+# integration test: install chart at main branch ref
 helm upgrade \
   --install \
   --create-namespace -n sourcegraph \
@@ -28,6 +31,22 @@ helm upgrade \
 
 # Set the default namespace
 kubectl config set-context --current --namespace sourcegraph
+
+# Wait for frontend pods to stabilize
+kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
+
+# checkout current branch
+git checkout HEAD 
+
+# verify git-fu 
+git status
+
+# integration test: install chart with changes in this branch
+helm upgrade \
+  --install \
+  --create-namespace -n sourcegraph \
+  --set sourcegraph.localDevMode=true \
+  sourcegraph charts/sourcegraph/. || true
 
 # Wait for frontend pods to stabilize
 kubectl wait --for=condition=Ready --timeout=5m pod -l app=sourcegraph-frontend
