@@ -23,7 +23,7 @@ popd
 helm upgrade \
   --install \
   --create-namespace -n sourcegraph-${BUILDKITE_BUILD_NUMBER} \
-  --set sourcegraph.localDevMode \
+  --set sourcegraph.localDevMode=true \
   sourcegraph charts/sourcegraph/. || true
 
 # Cleanup
