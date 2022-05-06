@@ -18,3 +18,14 @@ Provisioning metrics can be restored by assigning elevated permissions to Servic
 Consult https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/templates/prometheus/prometheus.ClusterRole.yaml for the necessary permissions.
 
 {{- end }}
+
+{{- if not .Values.cadvisor.containerSecurityContext.privileged }}
+🚧 Warning 🚧
+
+You have set 'cadvisor.containerSecurityContext.privileged' to 'false' and cadvisor will run with reduced privileges.
+Our observability stack requires to be run in privileged mode to display a provisioning metric, out of memory events.
+Such metric provides critical information to help you scale the Sourcegraph deployment.
+If you would like to bring your own infrastructure monitoring & alerting solution,
+you may want to disable the `cadvisor` DaemonSet completely by setting `cadvisor.enabled=false` in your override file.
+
+{{- end }}

@@ -29,6 +29,7 @@ In addition to the documented values, all services also support the following va
 | alpine.image.defaultTag | string | `"3.39.1@sha256:66b1e40aede9860c7e7e570aca6a41e551db33f44b944ce102bc5b658b1be5a6"` | Docker image tag for the `alpine` image |
 | alpine.image.name | string | `"alpine-3.12"` | Docker image name for the `alpine` image |
 | alpine.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| cadvisor.containerSecurityContext | object | `{"privileged":true}` | Security context for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | cadvisor.enabled | bool | `true` | Enable `cadvisor` |
 | cadvisor.image.defaultTag | string | `"3.39.1@sha256:e3d69d30b16629f7e3fa3b6d6a3a8270e3beec389b02b1cc36c8d4c43b06876b"` | Docker image tag for the `cadvisor` image |
 | cadvisor.image.name | string | `"cadvisor"` | Docker image name for the `cadvisor` image |

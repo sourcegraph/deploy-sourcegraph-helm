@@ -134,6 +134,18 @@ cadvisor:
     create: true
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: cadvisor
+  # -- Security context for the `cadvisor` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    # You may set `privileged` to `false and `cadvisor` will run with reduced privileges.
+    # `cadvisor` requires root privileges in order to display provisioning metrics.
+    # These metrics provide critical information to help you scale the Sourcegraph deployment.
+    # If you would like to bring your own infrastructure monitoring & alerting solution,
+    # you may want to disable the `cadvisor` DaemonSet completely
+    # by setting `cadvisor.enabled=false` in your override file
+    # You may also run `cadvisor` with reduced privileges by setting
+    # `cadvisor.containerSecurityContext.privileged=false` in your override file
+    privileged: true
 
 codeInsightsDB:
   # -- Enable `codeinsights-db` PostgreSQL server
