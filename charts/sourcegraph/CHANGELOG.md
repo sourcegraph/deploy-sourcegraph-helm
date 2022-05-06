@@ -8,7 +8,7 @@ All notable changes to Sourcegraph are documented in this file.
 
 ### Changed
 
-- **IMPORTANT** `cadvisor` can collect out of memory events happening to containers and it can be used to discover underprovisoned resources. As a result, `cadvisor` now has to run in `privileged` mode. If you have your own monitoring infrastructure, you may choose to disable `cadvisor` or set `cadvisor.containerSecurityContext.privileged=false` in your override file. [#121](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/121)
+- **IMPORTANT** `cadvisor` now defaults to run in `privileged` mode. This allows `cadvisor` to collect out of memory events happening to containers which can be used to discover underprovisoned resources. If you have your own monitoring infrastructure, you may choose to disable `cadvisor` or set `cadvisor.containerSecurityContext.privileged=false` in your override file. [#121](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/121)
 
 <!-- START CHANGELOG -->
 
