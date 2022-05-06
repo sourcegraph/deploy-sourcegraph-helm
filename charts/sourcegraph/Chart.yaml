@@ -5,7 +5,7 @@ description: Chart for installing Sourcegraph
 type: application
 
 # Chart version, separate from Sourcegraph
-version: 0.7.0
+version: "3.39.1"
 
 # Version of Sourcegraph release
-appVersion: "3.38.0"
+appVersion: "3.39.1"

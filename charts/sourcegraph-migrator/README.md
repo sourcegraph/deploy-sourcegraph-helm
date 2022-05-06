@@ -23,7 +23,7 @@ Use cases:
 Add the Sourcegraph charts repo to Helm:
 
 ```sh
-helm repo add sourcegraph https://sourcegraph.github.io/deploy-sourcegraph-helm/
+helm repo add sourcegraph https://helm.sourcegraph.com/release
 ```
 
 ## Usage
@@ -42,7 +42,7 @@ You should consult the list of available [migrator commands]. Below is some exam
 - Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
 
 ```sh
-helm upgrade --install -f <your-override-file.yaml> --version 0.1.0 sg-migrator sourcegraph/sourcegraph-migrator
+helm upgrade --install -f <your-override-file.yaml> --version 3.39.1 sg-migrator sourcegraph/sourcegraph-migrator
 ```
 
 ### Add a migration log entry
@@ -52,7 +52,7 @@ helm upgrade --install -f <your-override-file.yaml> --version 0.1.0 sg-migrator 
 Add an entry to the migration log after a site administrator has explicitly applied the contents of a migration file, learn more about troubleshooting a [dirty database].
 
 ```sh
-helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" --version 0.1.0 sg-migrator sourcegraph/sourcegraph-migrator
+helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" --version 3.39.1 sg-migrator sourcegraph/sourcegraph-migrator
 ```
 
 ## Rendering manifests for kubectl deployment
@@ -80,7 +80,7 @@ In addition to the documented values, the `migrator` service also supports the f
 | migrator.args | list | `["up","-db=all"]` | Override default `migrator` container args Available commands can be found at https://docs.sourcegraph.com/admin/how-to/manual_database_migrations |
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | migrator.env | object | `{}` | Environment variables for the `migrator` container |
-| migrator.image.defaultTag | string | `"3.38.0@sha256:16b3cebb1447fce75a8cb3acd6b6640294c70ab96adbfbcbc8da565ffffc5a4e"` | Docker image tag for the `migrator` image |
+| migrator.image.defaultTag | string | `"3.39.1@sha256:d2658c0fa4ff4fe0487cef7983f00566f4533d5ad143f9ddb910310c6d011dfc"` | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
 | migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for pgsql credentials This should match the setting in the sourcegraph chart values |

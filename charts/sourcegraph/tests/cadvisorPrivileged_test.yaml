@@ -1,0 +1,63 @@
+suite: cadvisorPrivileged
+templates:
+  - NOTES.txt
+  - cadvisor/cadvisor.DaemonSet.yaml
+tests:
+  - it: should not have the warning text when cadvisor.containerSecurityContext.privileged=true
+    set:
+      cadvisor:
+        containerSecurityContext:
+          privileged: true
+    asserts:
+      - notMatchRegexRaw:
+          pattern: You have set 'cadvisor.containerSecurityContext.privileged' to 'false'
+        template: NOTES.txt
+  - it: should have the warning text when prometheus.privileged=false
+    set:
+      cadvisor:
+        containerSecurityContext:
+          privileged: false
+    asserts:
+      - matchRegexRaw:
+          pattern: You have set 'cadvisor.containerSecurityContext.privileged' to 'false'
+        template: NOTES.txt
+  - it: should render /dev/kmsg in volumes and volumeMounts when cadvisor.containerSecurityContext.privileged=true
+    set:
+      cadvisor:
+        containerSecurityContext:
+          privileged: true
+    asserts:
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: kmsg
+            hostPath:
+              path: /dev/kmsg
+        template: cadvisor/cadvisor.DaemonSet.yaml
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: kmsg
+            mountPath: /dev/kmsg
+            readOnly: true
+        template: cadvisor/cadvisor.DaemonSet.yaml
+  - it: should not render /dev/kmsg in volumes and volumeMounts when cadvisor.containerSecurityContext.privileged=false
+    set:
+      cadvisor:
+        containerSecurityContext:
+          privileged: false
+    asserts:
+      - notContains:
+          path: spec.template.spec.volumes
+          content:
+            name: kmsg
+            hostPath:
+              path: /dev/kmsg
+        template: cadvisor/cadvisor.DaemonSet.yaml
+      - notContains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: kmsg
+            mountPath: /dev/kmsg
+            readOnly: true
+        template: cadvisor/cadvisor.DaemonSet.yaml

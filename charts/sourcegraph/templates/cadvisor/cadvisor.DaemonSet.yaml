@@ -82,6 +82,11 @@ spec:
         - name: disk
           mountPath: /dev/disk
           readOnly: true
+        {{- if .Values.cadvisor.containerSecurityContext.privileged }}
+        - name: kmsg
+          mountPath: /dev/kmsg
+          readOnly: true
+        {{- end }}
         {{- if .Values.cadvisor.extraVolumeMounts }}
         {{- toYaml .Values.cadvisor.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -119,6 +124,11 @@ spec:
       - name: disk
         hostPath:
           path: /dev/disk
+      {{- if .Values.cadvisor.containerSecurityContext.privileged }}
+      - name: kmsg
+        hostPath:
+          path: /dev/kmsg
+      {{- end }}
       {{- if .Values.cadvisor.extraVolumes }}
       {{- toYaml .Values.cadvisor.extraVolumes | nindent 6 }}
       {{- end }}
