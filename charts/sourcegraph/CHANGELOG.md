@@ -9,6 +9,7 @@ All notable changes to Sourcegraph are documented in this file.
 ### Changed
 
 - **IMPORTANT** `cadvisor` now defaults to run in `privileged` mode. This allows `cadvisor` to collect out of memory events happening to containers which can be used to discover underprovisoned resources. If you have your own monitoring infrastructure, you may choose to disable `cadvisor` or set `cadvisor.containerSecurityContext.privileged=false` in your override file. [#121](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/121)
+- The alpine-3.12 docker image has been updated to use alpine-3.14 [#124](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/124/)
 
 <!-- START CHANGELOG -->
 
