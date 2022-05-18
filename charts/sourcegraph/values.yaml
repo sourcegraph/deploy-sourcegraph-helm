@@ -87,9 +87,9 @@ sourcegraph:
 alpine: # Used in init containers
   image:
     # -- Docker image tag for the `alpine` image
-    defaultTag: 3.39.1@sha256:66b1e40aede9860c7e7e570aca6a41e551db33f44b944ce102bc5b658b1be5a6
+    defaultTag: insiders@sha256:06c6bcf2df49cad29ab9b8d2e0db3f5c9bf0d4365c2fc6d579c3e0fd4627dbe1
     # -- Docker image name for the `alpine` image
-    name: "alpine-3.12"
+    name: "alpine-3.14"
   # -- Security context for the `alpine` initContainer,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
