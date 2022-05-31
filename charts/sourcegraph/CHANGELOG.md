@@ -6,6 +6,12 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 
+## 3.40.1
+
+Sourcegraph 3.40.1 is now available!
+
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-40-1)
+
 ## 3.40.0
 
 Sourcegraph 3.40.0 is now available!
