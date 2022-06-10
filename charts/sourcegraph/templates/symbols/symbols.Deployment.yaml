@@ -66,7 +66,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
-        - name: TMP_DIR
+        - name: TMPDIR
           value: /mnt/cache/$(POD_NAME)-tmp
         image: {{ include "sourcegraph.image" (list . "symbols" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
