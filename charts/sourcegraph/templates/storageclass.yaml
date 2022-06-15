@@ -12,7 +12,9 @@ metadata:
     {{- end }}
 provisioner: {{ .Values.storageClass.provisioner }}
 parameters:
-  type: {{ .Values.storageClass.type }}
+  {{- with .Values.storageClass.type }}
+  type: {{ . }}
+  {{- end }}
   {{- if .Values.storageClass.parameters}}
   {{- toYaml .Values.storageClass.parameters | nindent 2 }}
   {{- end }}
