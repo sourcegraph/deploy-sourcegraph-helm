@@ -12,3 +12,11 @@ tests:
   - equal:
       path: parameters.zones
       value: us-central1-f
+- it: should not have 'type' when storageClass.type=null
+  set:
+    storageClass:
+      create: true
+      type: null
+  asserts:
+  - isNull:
+      path: parameters
