@@ -49,7 +49,7 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command: ["sh", "-c", "if [ -d /var/lib/postgresql/data/pgdata ]; then chmod 750 /var/lib/postgresql/data/pgdata; fi"]
         volumeMounts:
-        - mountPath: /data
+        - mountPath: /var/lib/postgresql/data/
           name: disk
         securityContext:
         {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
