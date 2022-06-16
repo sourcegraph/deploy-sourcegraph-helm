@@ -52,7 +52,7 @@ spec:
         - mountPath: /var/lib/postgresql/data/
           name: disk
         securityContext:
-        {{- toYaml .Values.codeInsightsDB.containerSecurityContext | nindent 10 }}
+        {{- toYaml .Values.codeInsightsDB.init.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
