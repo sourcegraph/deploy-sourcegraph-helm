@@ -6,6 +6,12 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 
+## 3.40.2-rev.1
+
+### Fixed
+
+- Fix broken template in storageClass parameters when `type=null` [#134](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/134)
+
 ## 3.40.1
 
 Sourcegraph 3.40.1 is now available!
