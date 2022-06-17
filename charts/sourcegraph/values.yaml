@@ -185,6 +185,14 @@ codeInsightsDB:
     runAsUser: 70
     runAsGroup: 70
     readOnlyRootFilesystem: true
+  init:
+    # -- Security context for the `alpine` initContainer,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsUser: 70
+      runAsGroup: 70
+      readOnlyRootFilesystem: true
   # -- Configuration for the `pgsql-exporter` sidecar container
   postgresExporter: {}
   # -- Name used by resources. Does not affect service names or PVCs.
