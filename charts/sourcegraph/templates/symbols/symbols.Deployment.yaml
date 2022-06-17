@@ -66,6 +66,8 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
+        - name: TMPDIR
+          value: /mnt/tmp
         image: {{ include "sourcegraph.image" (list . "symbols" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.symbols.args }}
@@ -95,6 +97,8 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache-ssd
+        - mountPath: /mnt/tmp
+          name: tmp
         {{- if .Values.symbols.extraVolumeMounts }}
         {{- toYaml .Values.symbols.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -121,6 +125,8 @@ spec:
       volumes:
       - emptyDir: {}
         name: cache-ssd
+      - emptyDir: {}
+        name: tmp
       {{- if .Values.symbols.extraVolumes }}
       {{- toYaml .Values.symbols.extraVolumes | nindent 6 }}
       {{- end }}
