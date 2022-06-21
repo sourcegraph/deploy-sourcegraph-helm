@@ -4,9 +4,14 @@ Use `**BREAKING**:` to denote a breaking change
 
 # Changelog
 
-## Unreleased
+## 3.41.0
+- Sourcegraph 3.41.0 is now available
 
 <!-- START CHANGELOG -->
+
+## Unreleased
+
+
 
 ## 3.41.0
 
