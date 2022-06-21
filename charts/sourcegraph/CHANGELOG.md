@@ -4,6 +4,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 # Changelog
 
+## Unreleased
+
 <!-- START CHANGELOG -->
 
 ## 3.41.0
