@@ -4,8 +4,21 @@ Use `**BREAKING**:` to denote a breaking change
 
 # Changelog
 
+## Unreleased
+
 <!-- START CHANGELOG -->
+
+## 3.41.0
+
+Sourcegraph 3.41.0 is now available!
+
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-41-0)
+- [Update](https://docs.sourcegraph.com/admin/updates)
+- [Release post](https://about.sourcegraph.com/blog/release/3.41)
+
 - Fixed mountPath and permissions used by codeinsights-db initContainer [#138](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/138)
+- Add mount path for a tmp dir to symbols deployment [#132](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/132)
+- Add startup probes to codeintel-db and pgsql deployments [#133](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/133)
 
 ## 3.40.2-rev.1
 
