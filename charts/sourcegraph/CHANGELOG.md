@@ -5,6 +5,10 @@ Use `**BREAKING**:` to denote a breaking change
 # Changelog
 
 <!-- START CHANGELOG -->
+
+## Unreleased
+
+
 - Fixed mountPath and permissions used by codeinsights-db initContainer [#138](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/138)
 
 ## 3.40.2-rev.1
