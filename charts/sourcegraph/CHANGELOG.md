@@ -3,10 +3,9 @@ Use `**BREAKING**:` to denote a breaking change
 -->
 
 # Changelog
+<!-- START CHANGELOG -->
 
 ## Unreleased
-
-<!-- START CHANGELOG -->
 
 ## 3.41.0
 
