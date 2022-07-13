@@ -3,15 +3,14 @@ Use `**BREAKING**:` to denote a breaking change
 -->
 
 # Changelog
+
 <!-- START CHANGELOG -->
 
 ## Unreleased
 
-## 3.41.1
+### Added
 
-Sourcegraph 3.41.1 is now available!
-
-- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-41-1)
+- Add new example `envoy` to enable HTTP trailers using Envoy Filter [#148](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/148)
 
 ## 3.41.0
 
