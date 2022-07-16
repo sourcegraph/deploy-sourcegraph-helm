@@ -53,6 +53,15 @@ serviceAccountName: {{ include "sourcegraph.serviceAccountName" (list $top $serv
 {{- end }}
 {{- end }}
 
+{{- define "sourcegraph.serviceAccountAnnotations" -}}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- with (index $top.Values $service "serviceAccount" "annotations") }}
+annotations:
+{{- . | toYaml | trim | nindent 4 }}
+{{- end }}
+{{- end }}
+
 {{/*
 Create the docker image reference and allow it to be overridden on a per-service basis
 Default tags are toggled between a global and service-specific setting by the

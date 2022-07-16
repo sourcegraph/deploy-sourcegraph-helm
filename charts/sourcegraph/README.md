@@ -22,6 +22,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
+- `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
