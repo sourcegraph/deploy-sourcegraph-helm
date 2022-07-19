@@ -1,7 +1,7 @@
 apiVersion: v2
 name: sourcegraph
 description: Chart for installing Sourcegraph
-
+icon: https://sourcegraph.com/favicon.ico
 type: application
 
 # Chart version, separate from Sourcegraph
