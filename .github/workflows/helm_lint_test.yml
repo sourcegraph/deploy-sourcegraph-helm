@@ -45,7 +45,7 @@ jobs:
       - name: Install Helm charts
         run: helm install -f ./ci/override.yaml test-sg ./charts/sourcegraph/
       - name: Sleep for 30 seconds
-        run: sleep 30s
+        run: sleep 60s
         shell: bash
       - name: Run Helm Testing
         run: helm test test-sg
