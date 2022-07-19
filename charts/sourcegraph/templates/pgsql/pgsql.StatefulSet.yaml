@@ -74,6 +74,12 @@ spec:
           exec:
             command:
               - /liveness.sh
+        startupProbe:
+          exec:
+            command:
+              - /liveness.sh
+          failureThreshold: 360
+          periodSeconds: 10
         name: pgsql
         env:
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "POSTGRES_") | nindent 8 }}

@@ -4,14 +4,49 @@ Use `**BREAKING**:` to denote a breaking change
 
 # Changelog
 
+<!-- START CHANGELOG -->
+
+## Unreleased
+
+### Added
+
+- Add new example `envoy` to enable HTTP trailers using Envoy Filter [#148](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/148)
+- Add support to configure service account annotations [#151](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/151)
+
+## 3.41.0
+
+Sourcegraph 3.41.0 is now available!
+
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-41-0)
+- [Update](https://docs.sourcegraph.com/admin/updates)
+- [Release post](https://about.sourcegraph.com/blog/release/3.41)
+
+- Fixed mountPath and permissions used by codeinsights-db initContainer [#138](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/138)
+- Add mount path for a tmp dir to symbols deployment [#132](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/132)
+- Add startup probes to codeintel-db and pgsql deployments [#133](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/133)
+
+## 3.40.2-rev.1
+
+### Fixed
+
+- Fix broken template in storageClass parameters when `type=null` [#134](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/134)
+
+## 3.40.1
+
+Sourcegraph 3.40.1 is now available!
+
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-40-1)
+
+## 3.40.0
+
+Sourcegraph 3.40.0 is now available!
+
 All notable changes to Sourcegraph are documented in this file.
 
 ### Changed
 
 - **IMPORTANT** `cadvisor` now defaults to run in `privileged` mode. This allows `cadvisor` to collect out of memory events happening to containers which can be used to discover underprovisoned resources. If you have your own monitoring infrastructure, you may choose to disable `cadvisor` or set `cadvisor.containerSecurityContext.privileged=false` in your override file. [#121](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/121)
 - Uses of alpine-3.12 docker image have been updated to use alpine-3.14 [#124](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/124/)
-
-<!-- START CHANGELOG -->
 
 ## 3.39.1
 
