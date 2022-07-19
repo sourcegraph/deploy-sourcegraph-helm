@@ -11,6 +11,7 @@ Use `**BREAKING**:` to denote a breaking change
 ### Added
 
 - Add new example `envoy` to enable HTTP trailers using Envoy Filter [#148](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/148)
+- Add support to configure service account annotations [#151](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/151)
 
 ## 3.41.0
 
