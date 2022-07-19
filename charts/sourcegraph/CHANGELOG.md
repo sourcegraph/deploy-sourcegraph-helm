@@ -8,6 +8,11 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+
+## 3.42.0
+
+- Sourcegraph 3.42.0 is now available
+
 ### Added
 
 - Add new example `envoy` to enable HTTP trailers using Envoy Filter [#148](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/148)
