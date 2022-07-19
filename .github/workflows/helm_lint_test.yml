@@ -44,7 +44,7 @@ jobs:
       - name: Install Helm charts
         run: helm install --debug -f ./ci/override.yaml test-sg ./charts/sourcegraph/
       - name: Wait for frontend to come up
-        run: kubectl wait --for=condition=Ready -l app=sourcegraph-frontend pod 
+        run: kubectl wait --for=condition=Ready -l app=sourcegraph-frontend pod --timeout=300s
         shell: bash
       - name: Run Helm Testing
         run: helm test test-sg
