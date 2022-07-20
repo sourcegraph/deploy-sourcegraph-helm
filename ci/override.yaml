@@ -1,0 +1,6 @@
+storageClass:
+  create: false
+  name: standard
+
+sourcegraph: 
+  localDevMode: true

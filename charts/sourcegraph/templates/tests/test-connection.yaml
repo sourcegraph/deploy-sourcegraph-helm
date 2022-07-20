@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "sg-test-connection"
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['sourcegraph-frontend:30080/']
+  restartPolicy: Never
