@@ -1,0 +1,51 @@
+name: Lint and Test charts
+on: 
+  push:
+    branches:
+      - release/**
+  pull_request:
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.9.1
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.7
+      - uses: azure/setup-kubectl@v2.0
+        id: install
+      - name: Set up chart-testing
+        uses: helm/chart-testing-action@v2.2.1
+
+      - name: Run chart-testing (list-changed)
+        id: list-changed
+        run: |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          if [[ -n "$changed" ]]; then
+            echo "::set-output name=changed::true"
+          fi
+      - name: Helm lint
+        run:  |
+          changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
+          echo $changed | xargs helm lint
+        if: steps.list-changed.outputs.changed == 'true'
+      - name: Create kind cluster
+        uses: helm/kind-action@v1.3.0
+        if: steps.list-changed.outputs.changed == 'true'
+
+      - name: Install Helm charts
+        run: helm install --debug -f ./ci/override.yaml test-sg ./charts/sourcegraph/
+      - name: Wait for frontend to come up
+        run: sleep 60s && kubectl wait --for=condition=Ready -l app=sourcegraph-frontend pod --timeout=300s
+        shell: bash
+      - name: Run Helm Testing
+        run: helm test test-sg
