@@ -12,10 +12,11 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## 3.42.0
 
-- Sourcegraph 3.42.0 is now available
+Sourcegraph 3.42.0 is now available!
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-0)
 - [Update](https://docs.sourcegraph.com/admin/updates)
 - [Release post](https://about.sourcegraph.com/blog/release/3.42)
+
 
 - Add new example `envoy` to enable HTTP trailers using Envoy Filter [#148](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/148)
 - Add support to configure service account annotations [#151](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/151)
