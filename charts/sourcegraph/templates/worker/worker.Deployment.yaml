@@ -84,6 +84,8 @@ spec:
           name: http
         - containerPort: 6060
           name: debug
+        - containerPort: 6996
+          name: prom
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.worker.resources | nindent 10 }}
