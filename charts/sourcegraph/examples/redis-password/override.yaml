@@ -19,7 +19,7 @@ extraResources:
         ###################
         ## Customization ##
         ###################
-        requirepass demopasswordchangeme123
+        requirepass EXAMPLEPASSWORD
 
     kind: ConfigMap
     metadata:
@@ -46,7 +46,8 @@ extraResources:
       ###################
       ## Customization ##
       ###################
-      requirepass demopasswordchangeme123
+      requirepass EXAMPLEPASSWORD
+
     kind: ConfigMap
     metadata:
     labels:
@@ -66,7 +67,6 @@ redisCache:
     - mountPath: /etc/redis/
       name: redis-cache-conf
 
-
 redisStore:
   extraVolumes:
   - configMap:
@@ -78,3 +78,38 @@ redisStore:
     subPathExpr: $(POD_NAME)
   - mountPath: /etc/redis/
     name: redis-store-conf
+
+frontend:
+  env:
+  - name: REDIS_CACHE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-cache:6379
+  - name: REDIS_STORE_ENDPOINT
+    value: redis://:PASSWORD@redis-store:6379
+
+repoUpdater:
+  env:
+  - name: REDIS_CACHE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-cache:6379
+  - name: REDIS_STORE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-store:6379
+
+searcher:
+  env:
+  - name: REDIS_CACHE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-cache:6379
+  - name: REDIS_STORE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-store:6379
+
+symbols:
+  env:
+  - name: REDIS_CACHE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-cache:6379
+  - name: REDIS_STORE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-store:6379
+
+worker:
+  env:
+  - name: REDIS_CACHE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-cache:6379
+  - name: REDIS_STORE_ENDPOINT
+    value: redis://:EXAMPLEPASSWORD@redis-store:6379
