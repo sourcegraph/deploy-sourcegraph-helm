@@ -1,0 +1,80 @@
+# -- Additional resources to include in the rendered manifest. Templates are supported.
+extraResources: 
+  - apiVersion: v1
+    data:
+      redis.conf: |
+        #############################
+        ## Default redis.conf file           ##
+        #############################
+        # allow access from all instances
+        protected-mode no
+        # limit memory usage, discard unused keys when hitting limit
+        maxmemory 6gb
+        maxmemory-policy allkeys-lru
+        # snapshots on disk every minute
+        dir /redis-data/
+        appendonly no
+        save 60 1
+
+        ###################
+        ## Customization ##
+        ###################
+        requirepass demopasswordchangeme123
+
+    kind: ConfigMap
+    metadata:
+      labels:
+        app.kubernetes.io/component: redis-cache
+        deploy: sourcegraph
+      name: redis-cache-conf
+  - apiVersion: v1
+    data:
+    redis.conf: |
+      #############################
+      ## Default redis.conf file           ##
+      #############################
+      # allow access from all instances
+      protected-mode no
+      # limit memory usage, return error when hitting limit
+      maxmemory 6gb
+      maxmemory-policy noeviction
+      # live commit log to disk, additionally snapshot every 5 minutes
+      dir /redis-data/
+      appendonly yes
+      aof-use-rdb-preamble yes
+      save 300 1
+      ###################
+      ## Customization ##
+      ###################
+      requirepass demopasswordchangeme123
+    kind: ConfigMap
+    metadata:
+    labels:
+    app.kubernetes.io/component: redis-store
+    deploy: sourcegraph
+    name: redis-store-conf
+
+redisCache:
+  extraVolumes:
+  - configMap:
+      name: redis-cache-conf
+    name: redis-cache-conf
+  extraVolumeMounts:
+    - mountPath: /redis-data
+      name: redis-data
+      subPathExpr: $(POD_NAME)
+    - mountPath: /etc/redis/
+      name: redis-cache-conf
+
+
+redisStore:
+  extraVolumes:
+  - configMap:
+      name: redis-store-conf
+    name: redis-store-conf
+  extraVolumeMounts:
+  - mountPath: /redis-data
+    name: redis-data
+    subPathExpr: $(POD_NAME)
+  - mountPath: /etc/redis/
+    name: redis-store-conf

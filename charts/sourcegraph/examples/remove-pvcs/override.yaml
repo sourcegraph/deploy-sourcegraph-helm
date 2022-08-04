@@ -1,0 +1,2 @@
+sourcegraph:
+  usePVCs: false
