@@ -7,7 +7,24 @@ Use `**BREAKING**:` to denote a breaking change
 <!-- START CHANGELOG -->
 
 ## Unreleased
-### Added
+
+## 3.42.2
+
+Sourcegraph 3.42.2 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-2)
+
+## 3.42.1
+
+Sourcegraph 3.42.1 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-1)
+
+## 3.42.0
+
+Sourcegraph 3.42.0 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-0)
+- [Update](https://docs.sourcegraph.com/admin/updates)
+- [Release post](https://about.sourcegraph.com/blog/release/3.42)
+
 
 ## 3.42.1
 
