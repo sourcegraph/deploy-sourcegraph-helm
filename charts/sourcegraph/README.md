@@ -86,9 +86,10 @@ In addition to the documented values, all services also support the following va
 | frontend.image.defaultTag | string | `"3.42.2@sha256:abe3ed2071e9e8020209bf0f4cf5cb4432fb25e60f776fedb9be0423747e259e"` | Docker image tag for the `frontend` image |
 | frontend.image.name | string | `"frontend"` | Docker image name for the `frontend` image |
 | frontend.ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
+| frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
 | frontend.ingress.enabled | bool | `true` | Enable ingress for the Sourcegraph server |
 | frontend.ingress.host | string | `""` | External hostname for the Sourcegraph server ingress (SSL) |
-| frontend.ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) |
+| frontend.ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) If you set this field, set the annotation `kubernetes.io/ingress.class` to `null` |
 | frontend.ingress.tlsSecret | string | `""` | Secret containing SSL cert |
 | frontend.name | string | `"sourcegraph-frontend"` | Name used by resources. Does not affect service names or PVCs. |
 | frontend.podSecurityContext | object | `{}` | Security context for the `frontend` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
