@@ -2,6 +2,10 @@ apiVersion: v1
 kind: Service
 metadata:
   name: otel-collector
+  annotations:
+    {{- if .Values.otelCollector.serviceAnnotations }}
+    {{- toYaml .Values.otelCollector.serviceAnnotations | nindent 4 }}
+    {{- end }}
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.otelCollector.serviceLabels }}
