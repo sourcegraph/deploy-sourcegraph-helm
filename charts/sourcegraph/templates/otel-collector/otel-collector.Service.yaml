@@ -4,8 +4,8 @@ metadata:
   name: otel-collector
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.otelCollector.labels }}
-      {{- toYaml .Values.otelCollector.labels | nindent 4 }}
+    {{- if .Values.otelCollector.serviceLabels }}
+      {{- toYaml .Values.otelCollector.serviceLabels | nindent 4 }}
     {{- end }}
     app: opentelemetry
     deploy: sourcegraph
