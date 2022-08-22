@@ -2,10 +2,10 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  {{- if .Values.frontend.ingress.annotations}}
   annotations:
-    {{- if .Values.frontend.ingress.annotations}}
     {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
-    {{- end }}
+  {{- end }}
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
