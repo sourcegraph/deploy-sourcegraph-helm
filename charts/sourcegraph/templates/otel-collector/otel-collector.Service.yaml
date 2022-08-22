@@ -15,14 +15,14 @@ metadata:
     app.kubernetes.io/component: otel-collector
 spec:
   ports:
-    - name: otlp-grpc # Default endpoint for OpenTelemetry gRPC receiver.
-      port: 4317 # TODO: parametrize if also done in config
+    - name: otlp-grpc
+      port: 4317
       protocol: TCP
-      targetPort: 4317 # TODO: parametrize if also done in config
-    - name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
-      port: 4318 # TODO: parametrize if also done in config
+      targetPort: 4317
+    - name: otlp-http
+      port: 4318
       protocol: TCP
-      targetPort: 4318 # TODO: parametrize if also done in config
+      targetPort: 4318
     # TODO: do we need this opened?
     #- name: metrics # Default endpoint for querying metrics.
     #  port: 8888

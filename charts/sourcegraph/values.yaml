@@ -632,7 +632,10 @@ otelCollector:
     requests:
       cpu: "0.5"
       memory: 512Mi
-
+  config:
+    # -- A multiline string to connect to an otlp-compatible backend
+    otlp: ""
+    
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
   enabled: true

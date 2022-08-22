@@ -86,7 +86,7 @@ spec:
             #- containerPort: 8888
             #  name: metrics
           volumeMounts:
-            - name: otel-collector-config
+            - name: config
               mountPath: /etc/otel-collector
             # TODO: do we support TLS?            
             #- name: otel-collector-secrets
@@ -100,11 +100,11 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        - name: otel-collector-config
+        - name: config
           configMap:
-            name: otel-collector-config
+            name: otel-collector
             items:
-              - key: config
+              - key: config.yaml
                 path: config.yaml
                 
 # TODO: do we support TLS?          
