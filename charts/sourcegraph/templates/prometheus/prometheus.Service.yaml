@@ -2,10 +2,10 @@
 apiVersion: v1
 kind: Service
 metadata:
+  {{- if .Values.prometheus.serviceAnnotations }}
   annotations:
-    {{- if .Values.prometheus.serviceAnnotations }}
     {{- toYaml .Values.prometheus.serviceAnnotations | nindent 4 }}
-    {{- end }}
+  {{- end }}
   labels:
     app: prometheus
     deploy: sourcegraph

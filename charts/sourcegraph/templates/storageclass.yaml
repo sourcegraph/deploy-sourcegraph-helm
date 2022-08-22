@@ -6,10 +6,10 @@ metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     deploy: sourcegraph-storage
+  {{- if .Values.storageClass.annotations}}
   annotations:
-    {{- if .Values.storageClass.annotations}}
     {{- toYaml .Values.storageClass.annotations | nindent 4 }}
-    {{- end }}
+  {{- end }}
 provisioner: {{ .Values.storageClass.provisioner }}
 parameters:
   {{- with .Values.storageClass.type }}

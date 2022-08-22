@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- (lint) Don't emit `annotations` key on k8s objects if the value is empty [#163](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/163)
 
 ## 3.43.0
 
