@@ -312,7 +312,7 @@ frontend:
     # -- External hostname for the Sourcegraph server ingress (SSL)
     host: ""
     # -- IngressClassName for the Ingress (Available in Kubernetes 1.18+)
-    # If you set this field, set the annotation `kubernetes.io/ingress.class` to `null`
+    # If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null`
     ingressClassName: null
     # -- Secret containing SSL cert
     tlsSecret: ""

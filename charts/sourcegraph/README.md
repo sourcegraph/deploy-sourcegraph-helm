@@ -89,7 +89,7 @@ In addition to the documented values, all services also support the following va
 | frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
 | frontend.ingress.enabled | bool | `true` | Enable ingress for the Sourcegraph server |
 | frontend.ingress.host | string | `""` | External hostname for the Sourcegraph server ingress (SSL) |
-| frontend.ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) If you set this field, set the annotation `kubernetes.io/ingress.class` to `null` |
+| frontend.ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null` |
 | frontend.ingress.tlsSecret | string | `""` | Secret containing SSL cert |
 | frontend.name | string | `"sourcegraph-frontend"` | Name used by resources. Does not affect service names or PVCs. |
 | frontend.podSecurityContext | object | `{}` | Security context for the `frontend` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
