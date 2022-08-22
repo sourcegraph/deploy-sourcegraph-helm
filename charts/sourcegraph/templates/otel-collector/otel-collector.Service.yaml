@@ -11,23 +11,22 @@ metadata:
     {{- if .Values.otelCollector.serviceLabels }}
       {{- toYaml .Values.otelCollector.serviceLabels | nindent 4 }}
     {{- end }}
-    app: opentelemetry
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
 spec:
   ports:
     - name: otlp-grpc # Default endpoint for OpenTelemetry gRPC receiver.
-      port: 4317
+      port: 4317 # TODO: parametrize if also done in config
       protocol: TCP
-      targetPort: 4317
-    # TODO: do we need these opened?
-    #- name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
-    #  port: 4318
-    #  protocol: TCP
-    #  targetPort: 4318
+      targetPort: 4317 # TODO: parametrize if also done in config
+    - name: otlp-http # Default endpoint for OpenTelemetry HTTP receiver.
+      port: 4318 # TODO: parametrize if also done in config
+      protocol: TCP
+      targetPort: 4318 # TODO: parametrize if also done in config
+    # TODO: do we need this opened?
     #- name: metrics # Default endpoint for querying metrics.
     #  port: 8888
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: opentelemetry
+    app: otel-collector
   type: {{ .Values.otelCollector.serviceType | default "ClusterIP" }}
