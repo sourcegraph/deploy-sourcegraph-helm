@@ -615,6 +615,24 @@ minio:
   # -- PVC Storage Request for `minio` data volume
   storageSize: 100Gi
 
+otelCollector:
+  # -- Name used by resources. Does not affect service names or PVCs.
+  name: "otel-collector"
+  image:
+    # -- Docker image tag for the `otel-collector` image
+    defaultTag: 3.42.2@sha256:xxxxxxx # TODO: there is no 3.42.2 image, so needs to be corrected with release of 3.43.0
+    # -- Docker image name for the `otel-collector` image
+    name: "opentelemetry-collector"
+  # -- Resource requests & limits for the `otel-collector` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+    requests:
+      cpu: "0.5"
+      memory: 512Mi
+
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
   enabled: true
