@@ -33,20 +33,21 @@ jobs:
           if [[ -n "$changed" ]]; then
             echo "::set-output name=changed::true"
           fi
-      - run: |
-          echo "no change is detected. exiting..."
-          exit 0
-        if: steps.list-changed.outputs.changed == 'true'
       - name: Helm lint
         run:  |
           changed=$(ct list-changed --target-branch ${{ github.event.repository.default_branch }})
           echo $changed | xargs helm lint
+        if: steps.list-changed.outputs.changed == 'true'
       - name: Create kind cluster
         uses: helm/kind-action@v1.3.0
+        if: steps.list-changed.outputs.changed == 'true'
       - name: Install Helm charts
         run: helm install --debug -f ./ci/override.yaml test-sg ./charts/sourcegraph/
+        if: steps.list-changed.outputs.changed == 'true'
       - name: Wait for frontend to come up
         run: sleep 60s && kubectl wait --for=condition=Ready -l app=sourcegraph-frontend pod --timeout=300s
         shell: bash
+        if: steps.list-changed.outputs.changed == 'true'
       - name: Run Helm Testing
         run: helm test test-sg
+        if: steps.list-changed.outputs.changed == 'true'
