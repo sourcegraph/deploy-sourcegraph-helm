@@ -27,7 +27,7 @@ data:
       health_check:
         port: 13133
       zpages:
-        endpoint: "localhost:55679"    
+        endpoint: "localhost:55679"
 
     service:
       extensions:

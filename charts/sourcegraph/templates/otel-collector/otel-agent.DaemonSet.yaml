@@ -1,65 +1,63 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   annotations:
-    description: Receives, processes, and exports telemetry data.
+    description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.otelCollector.labels }}
-      {{- toYaml .Values.otelCollector.labels | nindent 4 }}
+    {{- if .Values.otelCollector.agent.labels }}
+      {{- toYaml .Values.otelCollector.agent.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
-  name: {{ .Values.otelCollector.name }}
+  name: {{ .Values.otelCollector.agent.name }}
 spec:
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: otel-collector
+      app: otel-agent
   minReadySeconds: 5
-  progressDeadlineSeconds: 120
-  replicas: 1
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: otel-collector
+        kubectl.kubernetes.io/default-container: otel-agent
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.otelCollector.podAnnotations }}
-      {{- toYaml .Values.otelCollector.podAnnotations | nindent 8 }}
+      {{- if .Values.otelCollector.agent.podAnnotations }}
+      {{- toYaml .Values.otelCollector.agent.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.otelCollector.podLabels }}
-      {{- toYaml .Values.otelCollector.podLabels | nindent 8 }}
+      {{- if .Values.otelCollector.agent.podLabels }}
+      {{- toYaml .Values.otelCollector.agent.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
-        app: otel-collector
+        app: otel-agent
     spec:
       containers:
-        - name: otel-collector
+        - name: otel-agent
           image: {{ include "sourcegraph.image" (list . "otelCollector") }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           command:
             - "/bin/otelcol-sourcegraph"
-            - "--config=/etc/otel-collector/config.yaml"
-          {{- with .Values.otelCollector.args }}
+            - "--config=/etc/otel-agent/config.yaml"
+          {{- with .Values.otelCollector.agent.args }}
           args:
             {{- toYaml . | nindent 8 }}
           {{- end }}
           terminationMessagePolicy: FallbackToLogsOnError
           # TODO: set format and backend vars 
           env:
-          {{- range $name, $item := .Values.otelCollector.env}}
-          - name: {{ $name }}
+          {{- range $name, $item := .Values.otelCollector.agent.env}}
+            - name: {{ $name }}
             {{- $item | toYaml | nindent 10 }}
           {{- end }}
           resources:
-            {{- toYaml .Values.otelCollector.gateway.resources | nindent 10 }}
+            {{- toYaml .Values.otelCollector.agent.resources | nindent 10 }}
           readinessProbe:
             httpGet:
               path: /
@@ -75,21 +73,9 @@ spec:
               name: otlp-grpc
             - containerPort: 4318 # TODO: parametrize if also done in config
               name: otlp-http
-            # TODO: do we need these?
-            #- containerPort: 14250
-            #  name: jaeger-grpc
-            #- containerPort: 14268
-            #  name: jaeger-http
-            #- containerPort: 9411
-            #  name: zipkin
-            #- containerPort: 8888
-            #  name: metrics
           volumeMounts:
             - name: config
-              mountPath: /etc/otel-collector
-            # TODO: do we support TLS?            
-            #- name: otel-collector-secrets
-            #  mountPath: /secrets
+              mountPath: /etc/otel-agent
       terminationGracePeriodSeconds: 120
       {{- include "sourcegraph.nodeSelector" (list . "otelCollector" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "otelCollector" ) | trim | nindent 6 }}
@@ -101,16 +87,7 @@ spec:
       volumes:
         - name: config
           configMap:
-            name: otel-collector
+            name: otel-agent
             items:
               - key: config.yaml
                 path: config.yaml
-                
-# TODO: do we support TLS?          
-#        - secret:
-#            name: otel-collector-secrets
-#            items:
-#              - key: cert.pem
-#                path: cert.pem
-#              - key: key.pem
-  #                path: key.pem
