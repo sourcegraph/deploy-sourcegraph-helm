@@ -5,12 +5,12 @@ metadata:
     description: Receives, processes, and exports telemetry data.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.otelCollector.labels }}
-      {{- toYaml .Values.otelCollector.labels | nindent 4 }}
+    {{- if .Values.otelCollector.gateway.labels }}
+      {{- toYaml .Values.otelCollector.gateway.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
-  name: {{ .Values.otelCollector.name }}
+  name: {{ .Values.otelCollector.gateway.name }}
 spec:
   selector:
     matchLabels:
@@ -26,16 +26,16 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.otelCollector.podAnnotations }}
-      {{- toYaml .Values.otelCollector.podAnnotations | nindent 8 }}
+      {{- if .Values.otelCollector.gateway.podAnnotations }}
+      {{- toYaml .Values.otelCollector.gateway.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.otelCollector.podLabels }}
-      {{- toYaml .Values.otelCollector.podLabels | nindent 8 }}
+      {{- if .Values.otelCollector.gateway.podLabels }}
+      {{- toYaml .Values.otelCollector.gateway.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: otel-collector
@@ -47,14 +47,14 @@ spec:
           command:
             - "/bin/otelcol-sourcegraph"
             - "--config=/etc/otel-collector/config.yaml"
-          {{- with .Values.otelCollector.args }}
+          {{- with .Values.otelCollector.gateway.args }}
           args:
             {{- toYaml . | nindent 8 }}
           {{- end }}
           terminationMessagePolicy: FallbackToLogsOnError
           # TODO: set format and backend vars 
           env:
-          {{- range $name, $item := .Values.otelCollector.env}}
+          {{- range $name, $item := .Values.otelCollector.gateway.env}}
           - name: {{ $name }}
             {{- $item | toYaml | nindent 10 }}
           {{- end }}

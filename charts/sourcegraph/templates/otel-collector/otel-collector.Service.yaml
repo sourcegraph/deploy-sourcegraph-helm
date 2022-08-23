@@ -3,13 +3,13 @@ kind: Service
 metadata:
   name: otel-collector
   annotations:
-    {{- if .Values.otelCollector.serviceAnnotations }}
-    {{- toYaml .Values.otelCollector.serviceAnnotations | nindent 4 }}
+    {{- if .Values.otelCollector.gateway.serviceAnnotations }}
+    {{- toYaml .Values.otelCollector.gateway.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.otelCollector.serviceLabels }}
-      {{- toYaml .Values.otelCollector.serviceLabels | nindent 4 }}
+    {{- if .Values.otelCollector.gateway.serviceLabels }}
+      {{- toYaml .Values.otelCollector.gateway.serviceLabels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
@@ -29,4 +29,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: otel-collector
-  type: {{ .Values.otelCollector.serviceType | default "ClusterIP" }}
+  type: {{ .Values.otelCollector.gateway.serviceType | default "ClusterIP" }}
