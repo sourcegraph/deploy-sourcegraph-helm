@@ -634,8 +634,10 @@ otelCollector:
         cpu: "0.5"
         memory: 512Mi
     config:
-      # -- A multiline string to connect to an otlp-compatible backend
-      otlp: ""
+      # -- Define where traces should be exported to. 
+      # Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters)
+      exporters: {}
+      
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-agent"
