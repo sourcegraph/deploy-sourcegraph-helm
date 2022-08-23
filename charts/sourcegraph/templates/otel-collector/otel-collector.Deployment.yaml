@@ -91,9 +91,9 @@ spec:
             #- name: otel-collector-secrets
             #  mountPath: /secrets
       terminationGracePeriodSeconds: 120
-      {{- include "sourcegraph.nodeSelector" (list . "otelCollector.gateway" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "otelCollector.gateway" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "otelCollector.gateway" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.nodeSelector" (list . "otelCollector" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "otelCollector" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "otelCollector" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
