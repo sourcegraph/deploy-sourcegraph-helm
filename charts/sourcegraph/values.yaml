@@ -648,11 +648,11 @@ otelCollector:
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources:
       limits:
-        cpu: "1"
-        memory: 2Gi
+        cpu: "500m"
+        memory: 500Mi
       requests:
-        cpu: "0.5"
-        memory: 512Mi
+        cpu: "100m"
+        memory: 100Mi
     
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
