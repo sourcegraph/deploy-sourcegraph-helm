@@ -69,11 +69,11 @@ spec:
               path: /
               port: 13133
           ports:
-            - containerPort: 55679 # TODO: parametrize if also done in config
+            - containerPort: 55679
               name: zpages
-            - containerPort: 4317 # TODO: parametrize if also done in config
+            - containerPort: 4317
               name: otlp-grpc
-            - containerPort: 4318 # TODO: parametrize if also done in config
+            - containerPort: 4318
               name: otlp-http
             # TODO: do we need these?
             #- containerPort: 14250
@@ -91,9 +91,9 @@ spec:
             #- name: otel-collector-secrets
             #  mountPath: /secrets
       terminationGracePeriodSeconds: 120
-      {{- include "sourcegraph.nodeSelector" (list . "otelCollector" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "otelCollector" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "otelCollector" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.nodeSelector" (list . "otelCollector.gateway" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "otelCollector.gateway" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "otelCollector.gateway" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

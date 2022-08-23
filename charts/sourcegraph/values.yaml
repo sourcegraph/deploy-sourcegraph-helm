@@ -616,14 +616,14 @@ minio:
   storageSize: 100Gi
 
 otelCollector:
+  image:
+    # -- Docker image tag for the `otel-collector` image
+    defaultTag: 3.42.2@sha256:xxxxxxx # TODO: there is no 3.42.2 image, so needs to be corrected with release of 3.43.0
+    # -- Docker image name for the `otel-collector` image
+    name: "opentelemetry-collector"
   gateway:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-collector"
-    image:
-      # -- Docker image tag for the `otel-collector` image
-      defaultTag: 3.42.2@sha256:xxxxxxx # TODO: there is no 3.42.2 image, so needs to be corrected with release of 3.43.0
-      # -- Docker image name for the `otel-collector` image
-      name: "opentelemetry-collector"
     # -- Resource requests & limits for the `otel-collector` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources:
@@ -641,11 +641,6 @@ otelCollector:
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-agent"
-    image:
-      # -- Docker image tag for the `otel-agent` image
-      defaultTag: 3.42.2@sha256:xxxxxxx # TODO: there is no 3.42.2 image, so needs to be corrected with release of 3.43.0
-      # -- Docker image name for the `otel-agent` image
-      name: "opentelemetry-collector"
     # -- Resource requests & limits for the `otel-agent` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources:
