@@ -39,43 +39,43 @@ spec:
         app: otel-agent
     spec:
       containers:
-        - name: otel-agent
-          image: {{ include "sourcegraph.image" (list . "otelCollector") }}
-          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-          command:
-            - "/bin/otelcol-sourcegraph"
-            - "--config=/etc/otel-agent/config.yaml"
-          {{- with .Values.otelCollector.agent.args }}
-          args:
-            {{- toYaml . | nindent 8 }}
-          {{- end }}
-          terminationMessagePolicy: FallbackToLogsOnError
-          # TODO: set format and backend vars 
-          env:
-          {{- range $name, $item := .Values.otelCollector.agent.env}}
-            - name: {{ $name }}
-            {{- $item | toYaml | nindent 10 }}
-          {{- end }}
-          resources:
-            {{- toYaml .Values.otelCollector.agent.resources | nindent 10 }}
-          readinessProbe:
-            httpGet:
-              path: /
-              port: 13133
-          livenessProbe:
-            httpGet:
-              path: /
-              port: 13133
-          ports:
-            - containerPort: 55679 # TODO: parametrize if also done in config
-              name: zpages
-            - containerPort: 4317 # TODO: parametrize if also done in config
-              name: otlp-grpc
-            - containerPort: 4318 # TODO: parametrize if also done in config
-              name: otlp-http
-          volumeMounts:
-            - name: config
-              mountPath: /etc/otel-agent
+      - name: otel-agent
+        image: {{ include "sourcegraph.image" (list . "otelCollector") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        command:
+          - "/bin/otelcol-sourcegraph"
+          - "--config=/etc/otel-agent/config.yaml"
+        {{- with .Values.otelCollector.agent.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        # TODO: set format and backend vars 
+        env:
+        {{- range $name, $item := .Values.otelCollector.agent.env}}
+          - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.otelCollector.agent.resources | nindent 10 }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        ports:
+          - containerPort: 55679 # TODO: parametrize if also done in config
+            name: zpages
+          - containerPort: 4317 # TODO: parametrize if also done in config
+            name: otlp-grpc
+          - containerPort: 4318 # TODO: parametrize if also done in config
+            name: otlp-http
+        volumeMounts:
+          - name: config
+            mountPath: /etc/otel-agent
       terminationGracePeriodSeconds: 120
       {{- include "sourcegraph.nodeSelector" (list . "otelCollector" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "otelCollector" ) | trim | nindent 6 }}
