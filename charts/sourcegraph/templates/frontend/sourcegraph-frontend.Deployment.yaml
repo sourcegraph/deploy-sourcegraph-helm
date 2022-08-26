@@ -84,15 +84,6 @@ spec:
         {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
-        # POD_NAME is used by CACHE_DIR
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        # CACHE_DIR stores larger items we cache. Majority of it is zip
-        # archives of repositories at a commit.
-        - name: CACHE_DIR
-          value: /mnt/cache/$(POD_NAME)
         {{- if .Values.minio.enabled }}
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
           valueFrom:
@@ -134,8 +125,6 @@ spec:
         securityContext:
           {{- toYaml .Values.frontend.containerSecurityContext | nindent 10 }}
         volumeMounts:
-        - mountPath: /mnt/cache
-          name: cache-ssd
         - mountPath: /home/sourcegraph
           name: home-dir
         {{- if .Values.frontend.extraVolumeMounts }}
@@ -156,8 +145,6 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "frontend") | trim | nindent 6 }}
       volumes:
-      - emptyDir: {}
-        name: cache-ssd
       - emptyDir: {}
         name: home-dir
       {{- if .Values.frontend.extraVolumes }}
