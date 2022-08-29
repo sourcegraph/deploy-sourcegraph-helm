@@ -10,9 +10,15 @@ Use `**BREAKING**:` to denote a breaking change
 
 - (lint) Don't emit `annotations` key on k8s objects if the value is empty [#163](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/163)
 
+## 3.43.1
+
+Sourcegraph 3.43.1 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-43-1)
+
 ## 3.43.0
 
-- Sourcegraph 3.43.0 is now available
+Sourcegraph 3.43.0 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-43-0)
 
 ## 3.42.2
 
