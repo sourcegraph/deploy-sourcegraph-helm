@@ -61,7 +61,7 @@ spec:
         env:
         {{- if .Values.jaeger.enabled }}
         - name: JAEGER_HOST
-          value: jaeger-collector-grpc
+          value: jaeger-collector-grpc # TODO maybe requires http:// prefix
         {{- end }}
         {{- range $name, $item := .Values.otelCollector.gateway.env}}
         - name: {{ $name }}

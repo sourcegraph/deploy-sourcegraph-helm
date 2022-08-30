@@ -50,7 +50,6 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-        # TODO: set format and backend vars 
         env:
         {{- range $name, $item := .Values.otelCollector.agent.env}}
           - name: {{ $name }}
@@ -67,11 +66,14 @@ spec:
             path: /
             port: 13133
         ports:
-          - containerPort: 55679 # TODO: parametrize if also done in config
+          - containerPort: 55679
+            hostPort: 55679
             name: zpages
-          - containerPort: 4317 # TODO: parametrize if also done in config
+          - containerPort: 4317
+            hostPort: 4317
             name: otlp-grpc
-          - containerPort: 4318 # TODO: parametrize if also done in config
+          - containerPort: 4318
+            hostPort: 4318
             name: otlp-http
         volumeMounts:
           - name: config
