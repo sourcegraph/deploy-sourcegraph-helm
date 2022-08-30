@@ -87,9 +87,10 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/otel-collector
-          # TODO: do we support TLS?            
-          #- name: otel-collector-secrets
-          #  mountPath: /secrets
+          {{- if .Values.otelCollector.gateway.config.exportersTlsSecretName -}}
+          - name: otel-collector-tls
+            mountPath: /tls
+          {{- end }}
       terminationGracePeriodSeconds: 120
       {{- include "sourcegraph.nodeSelector" (list . "otelCollector" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "otelCollector" ) | trim | nindent 6 }}
@@ -107,12 +108,8 @@ spec:
               - key: config.yaml
                 path: config.yaml
         {{- end }}
-                
-# TODO: do we support TLS?          
-#        - secret:
-#            name: otel-collector-secrets
-#            items:
-#              - key: cert.pem
-#                path: cert.pem
-#              - key: key.pem
-  #                path: key.pem
+        {{- if .Values.otelCollector.gateway.config.exportersTlsSecretName -}}
+        - name: otel-collector-tls
+          secret:
+            secretName: {{ .Values.otelCollector.gateway.config.exportersTlsSecretName }}
+        {{- end }}
