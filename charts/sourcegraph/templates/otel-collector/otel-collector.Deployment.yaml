@@ -85,8 +85,10 @@ spec:
           - containerPort: 4318
             name: otlp-http
         volumeMounts:
+          {{- if .Values.otelCollector.gateway.config.traces.exporters -}}
           - name: config
             mountPath: /etc/otel-collector
+          {{- end }}
           {{- if .Values.otelCollector.gateway.config.traces.exportersTlsSecretName -}}
           - name: otel-collector-tls
             mountPath: /tls
