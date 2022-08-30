@@ -1,3 +1,6 @@
+{{- if and .Values.otelCollector.gateway.config.exporters .Values.jaeger.enabled -}}
+{{- fail "Set 'jaeger.enabled' to false or remove 'otelCollector.gateway.config.exporters'. The bundled jaeger instance is preconfigured." }}
+{{- end }}
 {{- if and .Values.otelCollector.gateway.config.exporters (not .Values.jaeger.enabled) -}}
 apiVersion: v1
 kind: ConfigMap
