@@ -618,7 +618,7 @@ minio:
 otelCollector:
   image:
     # -- Docker image tag for the `otel-collector` image
-    defaultTag: 3.42.2@sha256:xxxxxxx # TODO: there is no 3.42.2 image, so needs to be corrected with release of 3.43.0
+    defaultTag: 3.43.1@sha256:16b210628bbe448d0e14c333adbff01ad8c772aba7ee5b6db72d1d39257dd4e9
     # -- Docker image name for the `otel-collector` image
     name: "opentelemetry-collector"
   gateway:
