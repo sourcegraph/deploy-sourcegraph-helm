@@ -6,6 +6,8 @@ metadata:
     {{- if .Values.otelCollector.gateway.serviceAnnotations }}
     {{- toYaml .Values.otelCollector.gateway.serviceAnnotations | nindent 4 }}
     {{- end }}
+    sourcegraph.prometheus/scrape: "true"
+    prometheus.io/port: "8888"
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.otelCollector.gateway.serviceLabels }}
@@ -23,9 +25,8 @@ spec:
       port: 4318
       protocol: TCP
       targetPort: 4318
-    # TODO: do we need this opened?
-    #- name: metrics # Default endpoint for querying metrics.
-    #  port: 8888
+    - name: metrics # Default endpoint for querying metrics.
+      port: 8888
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: otel-collector
