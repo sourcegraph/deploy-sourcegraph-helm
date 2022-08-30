@@ -1,0 +1,96 @@
+---
+suite: otelCollectorJaeger
+tests:
+  - it: should use the logging exporter when Jaeger is disabled and no exporter has been set
+    template: otel-collector/otel-collector.Deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/logging.yaml"]
+      - isEmpty:
+          path: spec.template.spec.containers[0].volumeMounts
+      - isEmpty:
+          path: spec.template.spec.volumes
+      - hasDocuments:
+          templates: 
+            - otel-collector/otel-collector.ConfigMap.yaml
+            - otel-collector/otel-collector.Deployment.yaml
+          count: 1 # ConfigMap is not rendered
+  - it: should use the bundled Jaeger config when Jaeger is enabled
+    template: otel-collector/otel-collector.Deployment.yaml
+    set:
+      jaeger:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: ["/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/jaeger.yaml"]
+      - isEmpty:
+          path: spec.template.spec.containers[0].volumeMounts
+      - isEmpty:
+          path: spec.template.spec.volumes
+      - hasDocuments:
+          templates:
+            - otel-collector/otel-collector.ConfigMap.yaml
+            - otel-collector/otel-collector.Deployment.yaml
+          count: 1 # ConfigMap is not rendered
+#  - it: should use the exporter from the 
+#    template: otel-collector/otel-collector.Deployment.yaml
+#    set:
+#      jaeger:
+#        enabled: true
+#    asserts:
+#      - equal:
+#          path: spec.template.spec.containers[0].command
+#          value: ["/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/jaeger.yaml"]
+#      - isEmpty:
+#          path: spec.template.spec.containers[0].volumeMounts
+#      - isEmpty:
+#          path: spec.template.spec.volumes
+
+
+
+#  - it: should not generate a secret when existingSecret is passed
+#    template: pgsql/pgsql.Secret.yaml
+#    set:
+#      pgsql:
+#        auth:
+#          existingSecret: "my-secret"
+#    asserts:
+#      - hasDocuments:
+#          count: 0
+#  - it: should generate a secret when existingSecret is blank
+#    template: pgsql/pgsql.Secret.yaml
+#    set:
+#      pgsql:
+#        auth:
+#          existingSecret: ""
+#    asserts:
+#      - hasDocuments:
+#          count: 1
+#  - it: should generate a secret by default
+#    template: pgsql/pgsql.Secret.yaml
+#    asserts:
+#      - hasDocuments:
+#          count: 1
+#  - it: should use provided value in secret
+#    template: pgsql/pgsql.Secret.yaml
+#    set:
+#      pgsql:
+#        auth:
+#          password: "hello"
+#    asserts:
+#      - equal:
+#          path: data.password
+#          value: "aGVsbG8="
+#  - it: should reference default secret name when existingSecret is blank
+#    template: pgsql/pgsql.StatefulSet.yaml
+#    asserts:
+#      - equal:
+#          path: spec.template.spec.containers[0].env[0].name
+#          value: POSTGRES_DATABASE
+#      - equal:
+#          path: spec.template.spec.containers[0].env[0].valueFrom.secretKeyRef.name
+#          value: "pgsql-auth"
+#      - matchSnapshot:
+#          path: spec.template.metadata.annotations.[checksum/pgsql.secret]
