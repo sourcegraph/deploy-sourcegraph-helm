@@ -100,7 +100,6 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.searcher.containerSecurityContext | nindent 10 }}
-      {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.searcher.extraContainers }}
         {{- toYaml .Values.searcher.extraContainers | nindent 6 }}
       {{- end }}

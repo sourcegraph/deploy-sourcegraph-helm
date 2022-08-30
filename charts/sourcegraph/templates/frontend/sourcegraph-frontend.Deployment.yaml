@@ -141,7 +141,6 @@ spec:
         {{- if .Values.frontend.extraVolumeMounts }}
         {{- toYaml .Values.frontend.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.frontend.extraContainers }}
         {{- toYaml .Values.frontend.extraContainers | nindent 6 }}
       {{- end }}

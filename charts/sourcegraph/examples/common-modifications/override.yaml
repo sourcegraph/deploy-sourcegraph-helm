@@ -233,16 +233,6 @@ tracing:
       cpu: 500m
       memory: 500M
 
-# Jaeger sidecar container
-tracingAgent:
-  resources:
-    limits:
-      cpu: "1"
-      memory: 500M
-    requests:
-      cpu: 100m
-      memory: 100M
-
 worker:
   replicaCount: 1
   resources:

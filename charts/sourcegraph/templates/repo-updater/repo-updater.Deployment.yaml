@@ -93,7 +93,6 @@ spec:
         {{- if .Values.repoUpdater.extraVolumeMounts }}
         {{- toYaml .Values.repoUpdater.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.repoUpdater.extraContainers }}
         {{- toYaml .Values.repoUpdater.extraContainers | nindent 6 }}
       {{- end }}

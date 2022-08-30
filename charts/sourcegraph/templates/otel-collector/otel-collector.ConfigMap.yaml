@@ -1,3 +1,4 @@
+{{- if and .Values.tracing.enabled (not .Values.tracing.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -43,5 +44,4 @@ data:
             {{- if .Values.tracing.enabled }}
             - jaeger
             {{ end }}
-    
-    
+{{- end }}
