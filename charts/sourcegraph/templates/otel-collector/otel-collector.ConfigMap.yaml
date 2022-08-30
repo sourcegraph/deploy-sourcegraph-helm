@@ -1,4 +1,4 @@
-{{- if and .Values.jaeger.enabled (not .Values.jaeger.existingConfig) -}}
+{{- if and .Values.otelCollector.gateway.config.exporters (not .Values.jaeger.enabled) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -16,13 +16,7 @@ data:
     
     exporters:
       {{ .Values.otelCollector.gateway.config.exporters }}
-          
-      {{- if .Values.tracingAgent.enabled }}
-      jaeger:
-        endpoint: "$JAEGER_HOST:14250"
-        tls:
-          insecure: true
-      {{ end }} 
+           
     extensions:
       health_check:
         port: 13133
@@ -41,7 +35,4 @@ data:
             {{- range $key, $val := .Values.otelCollector.gateway.config.exporters }}
             - {{ $key }}
             {{- end }}
-            {{- if .Values.jaeger.enabled }}
-            - jaeger
-            {{ end }}
 {{- end }}
