@@ -46,7 +46,7 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command:
           - "/bin/otelcol-sourcegraph"
-          {{- if and (not .Values.otelCollector.gateway.config.exporters) (not .Values.jaeger.enabled) -}}  # default config: enable logging exporter
+          {{- if and (not .Values.otelCollector.gateway.config.traces.exporters) (not .Values.jaeger.enabled) -}}  # default config: enable logging exporter
           - "--config=/etc/otel-collector/configs/logging.yaml"
           {{- else if .Values.jaeger.enabled -}} # use bundled config to connect to bundled jaeger
           - "--config=/etc/otel-collector/configs/jaeger.yaml"
@@ -87,7 +87,7 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/otel-collector
-          {{- if .Values.otelCollector.gateway.config.exportersTlsSecretName -}}
+          {{- if .Values.otelCollector.gateway.config.traces.exportersTlsSecretName -}}
           - name: otel-collector-tls
             mountPath: /tls
           {{- end }}
@@ -100,7 +100,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        {{- if .Values.otelCollector.gateway.config.exporters -}}
+        {{- if .Values.otelCollector.gateway.config.traces.exporters -}}
         - name: config
           configMap:
             name: otel-collector
@@ -108,8 +108,8 @@ spec:
               - key: config.yaml
                 path: config.yaml
         {{- end }}
-        {{- if .Values.otelCollector.gateway.config.exportersTlsSecretName -}}
+        {{- if .Values.otelCollector.gateway.config.traces.exportersTlsSecretName -}}
         - name: otel-collector-tls
           secret:
-            secretName: {{ .Values.otelCollector.gateway.config.exportersTlsSecretName }}
+            secretName: {{ .Values.otelCollector.gateway.config.traces.exportersTlsSecretName }}
         {{- end }}

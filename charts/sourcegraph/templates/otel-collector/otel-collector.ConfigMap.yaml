@@ -1,7 +1,7 @@
-{{- if and .Values.otelCollector.gateway.config.exporters .Values.jaeger.enabled -}}
+{{- if and .Values.otelCollector.gateway.config.traces.exporters .Values.jaeger.enabled -}}
 {{- fail "Set 'jaeger.enabled' to false or remove 'otelCollector.gateway.config.exporters'. The bundled jaeger instance is preconfigured." }}
 {{- end }}
-{{- if and .Values.otelCollector.gateway.config.exporters (not .Values.jaeger.enabled) -}}
+{{- if and .Values.otelCollector.gateway.config.traces.exporters (not .Values.jaeger.enabled) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -18,7 +18,7 @@ data:
           http: # port 4318
     
     exporters:
-      {{ .Values.otelCollector.gateway.config.exporters }}
+      {{ .Values.otelCollector.gateway.config.traces.exporters }}
            
     extensions:
       health_check:
@@ -35,7 +35,7 @@ data:
           receivers:
             - otlp
           exporters:
-            {{- range $key, $val := .Values.otelCollector.gateway.config.exporters }}
+            {{- range $key, $val := .Values.otelCollector.gateway.config.traces.exporters }}
             - {{ $key }}
             {{- end }}
 {{- end }}
