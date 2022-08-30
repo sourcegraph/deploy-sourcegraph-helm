@@ -1113,7 +1113,7 @@ jaeger:
     # @default -- "ClusterIP"
     serviceType: ""
   # -- Enable `jaeger`
-  enabled: true
+  enabled: false
   image:
     # -- Docker image tag for the `jaeger` image
     defaultTag: 3.42.2@sha256:45cffb3c264395c5fe58c7aa52c54d3b8f0440f00b9e83cb76df81d0a169cc73
