@@ -5,7 +5,7 @@
 frontend:
   ingress:
     annotations:
-      kubernetes.io/ingress.class: custom-value # Changes value of annotation
+      kubernetes.io/ingress.class: null # Disables annotation since we are setting ingressClassName
       nginx.ingress.kubernetes.io/proxy-body-size: null # Disables annotation
       custom-annotation: custom # Adds a new annotation
     ingressClassName: nginx # Sets the ingressClassname
