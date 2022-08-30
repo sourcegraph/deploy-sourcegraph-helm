@@ -1,4 +1,4 @@
-{{- if and .Values.tracing.enabled (not .Values.tracing.existingConfig) -}}
+{{- if and .Values.jaeger.enabled (not .Values.jaeger.existingConfig) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -41,7 +41,7 @@ data:
             {{- range $key, $val := .Values.otelCollector.gateway.config.exporters }}
             - {{ $key }}
             {{- end }}
-            {{- if .Values.tracing.enabled }}
+            {{- if .Values.jaeger.enabled }}
             - jaeger
             {{ end }}
 {{- end }}

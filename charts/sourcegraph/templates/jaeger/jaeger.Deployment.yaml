@@ -1,18 +1,18 @@
-{{- if .Values.tracing.enabled -}}
+{{- if .Values.jaeger.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.tracing.name }}
+  name: {{ .Values.jaeger.name }}
   labels:
     {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
-    {{- if .Values.tracing.labels }}
-      {{- toYaml .Values.tracing.labels | nindent 4 }}
+    {{- if .Values.jaeger.labels }}
+      {{- toYaml .Values.jaeger.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger
 spec:
-  replicas: {{ .Values.tracing.replicaCount }}
+  replicas: {{ .Values.jaeger.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -30,16 +30,16 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.tracing.podAnnotations }}
-      {{- toYaml .Values.tracing.podAnnotations | nindent 8 }}
+      {{- if .Values.jaeger.podAnnotations }}
+      {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.tracing.podLabels }}
-      {{- toYaml .Values.tracing.podLabels | nindent 8 }}
+      {{- if .Values.jaeger.podLabels }}
+      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
       {{- end }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app: jaeger
@@ -50,9 +50,9 @@ spec:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "tracing") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args: {{- default (list "--memory.max-traces=20000") .Values.tracing.args | toYaml | nindent 8 }}
+        args: {{- default (list "--memory.max-traces=20000") .Values.jaeger.args | toYaml | nindent 8 }}
         env:
-        {{- range $name, $item := .Values.tracing.env}}
+        {{- range $name, $item := .Values.jaeger.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
@@ -76,19 +76,19 @@ spec:
           initialDelaySeconds: 5
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
-          {{- toYaml .Values.tracing.resources | nindent 10 }}
+          {{- toYaml .Values.jaeger.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.tracing.containerSecurityContext | nindent 10 }}
+          {{- toYaml .Values.jaeger.containerSecurityContext | nindent 10 }}
         volumeMounts:
-        {{- if .Values.tracing.extraVolumeMounts }}
-        {{- toYaml .Values.tracing.extraVolumeMounts | nindent 8 }}
+        {{- if .Values.jaeger.extraVolumeMounts }}
+        {{- toYaml .Values.jaeger.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- if .Values.tracing.extraContainers }}
-        {{- toYaml .Values.tracing.extraContainers | nindent 6 }}
+      {{- if .Values.jaeger.extraContainers }}
+        {{- toYaml .Values.jaeger.extraContainers | nindent 6 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.tracing.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.jaeger.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "tracing" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "tracing" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "tracing" ) | trim | nindent 6 }}
@@ -98,7 +98,7 @@ spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "tracing") | trim | nindent 6 }}
       {{- end }}
       volumes:
-      {{- if .Values.tracing.extraVolumes }}
-      {{- toYaml .Values.tracing.extraVolumes | nindent 6 }}
+      {{- if .Values.jaeger.extraVolumes }}
+      {{- toYaml .Values.jaeger.extraVolumes | nindent 6 }}
       {{- end }}
 {{- end }}

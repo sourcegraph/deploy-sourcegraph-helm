@@ -1100,7 +1100,7 @@ syntectServer:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-tracing:
+jaeger:
   collector:
     # -- Name of jaeger `collector` service 
     name: ""
