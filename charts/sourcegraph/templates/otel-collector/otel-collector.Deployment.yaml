@@ -61,7 +61,7 @@ spec:
         env:
         {{- if .Values.jaeger.enabled }}
         - name: JAEGER_HOST
-          value: jaeger-collector-grpc
+          value: jaeger-collector
         {{- end }}
         {{- range $name, $item := .Values.otelCollector.gateway.env}}
         - name: {{ $name }}
