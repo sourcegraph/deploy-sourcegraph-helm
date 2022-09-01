@@ -1,3 +1,4 @@
+{{- if .Values.otelCollector.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -31,3 +32,4 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: otel-collector
   type: {{ .Values.otelCollector.gateway.serviceType | default "ClusterIP" }}
+{{- end }}
