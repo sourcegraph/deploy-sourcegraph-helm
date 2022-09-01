@@ -619,6 +619,7 @@ minio:
   storageSize: 100Gi
 
 otelCollector:
+  enabled: true
   image:
     # -- Docker image tag for the `otel-collector` image
     defaultTag: insiders@sha256:6f507b593741060dfce7e4895d8327731411967a342bf2be896fcc56295dd9f1 # TODO: change once we have a versioned image with bundled configs + logging exporter
