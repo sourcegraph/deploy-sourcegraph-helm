@@ -1,3 +1,6 @@
+{{- if and .Values.jaeger.enabled (not .Values.otelCollector.enabled) -}}
+{{- fail "'otelCollector.enabled' must be set to true when 'jaeger.enabled' is set to true." }}
+{{- end }}
 {{- if .Values.jaeger.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
