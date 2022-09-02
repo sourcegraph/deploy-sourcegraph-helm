@@ -138,6 +138,18 @@ Jaeger selector labels
 app.kubernetes.io/name: jaeger
 {{- end }}
 
+{{- define "sourcegraph.otelCollectorEnv" -}}
+{{- if .Values.otelCollector.enabled -}}
+# OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
+- name: OTEL_AGENT_HOST
+  valueFrom:
+    fieldRef:
+      fieldPath: status.hostIP
+- name: OTEL_EXPORTER_OTLP_ENDPOINT
+  value: http://$(OTEL_AGENT_HOST):4317
+{{- end }}
+{{- end }}
+
 {{- define "sourcegraph.databaseAuth" -}}
 {{- $top := index . 0 -}}
 {{- $service := index . 1 -}}
