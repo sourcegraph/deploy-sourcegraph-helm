@@ -183,6 +183,7 @@ In addition to the documented values, all services also support the following va
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
 | otelCollector.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
 | otelCollector.agent.resources | object | `{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| otelCollector.enabled | bool | `true` |  |
 | otelCollector.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to.  Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | otelCollector.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
 | otelCollector.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |

@@ -6,7 +6,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/logging.yaml"]
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/logging.yaml" ]
       - isEmpty:
           path: spec.template.spec.containers[0].volumeMounts
       - isEmpty:
@@ -22,7 +22,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/jaeger.yaml"]
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/jaeger.yaml" ]
       - isEmpty:
           path: spec.template.spec.containers[0].volumeMounts
       - isEmpty:
@@ -37,7 +37,7 @@ tests:
         gateway:
           config:
             traces:
-              exporters:                
+              exporters:
                 otlp:
                   endpoint: "otlp.service.com:443"
                   headers:
@@ -46,7 +46,7 @@ tests:
     asserts:
       - equal:
           path: spec.template.spec.containers[0].command
-          value: ["/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/config.yaml"]
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/config.yaml" ]
       - contains:
           path: spec.template.spec.containers[0].volumeMounts
           content:
@@ -86,3 +86,13 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "Set 'jaeger.enabled' to false or remove 'otelCollector.gateway.config.exporters'. The bundled jaeger instance is preconfigured."
+  - it: should not allow jaeger to be enabled without otelCollector enabled
+    template: jaeger/jaeger.Deployment.yaml
+    set:
+      otelCollector:
+        enabled: false
+      jaeger:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "When 'jaeger.enabled' is set to true, 'otelCollector.enabled' must be set to true as well."
