@@ -1,4 +1,4 @@
-{{- if .Values.otelCollector.enabled -}}
+{{- if .Values.openTelemetry.enabled -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
@@ -6,12 +6,12 @@ metadata:
     description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.otelCollector.agent.labels }}
-      {{- toYaml .Values.otelCollector.agent.labels | nindent 4 }}
+    {{- if .Values.openTelemetry.agent.labels }}
+      {{- toYaml .Values.openTelemetry.agent.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
-  name: {{ .Values.otelCollector.agent.name }}
+  name: {{ .Values.openTelemetry.agent.name }}
 spec:
   selector:
     matchLabels:
@@ -25,39 +25,39 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.otelCollector.agent.podAnnotations }}
-      {{- toYaml .Values.otelCollector.agent.podAnnotations | nindent 8 }}
+      {{- if .Values.openTelemetry.agent.podAnnotations }}
+      {{- toYaml .Values.openTelemetry.agent.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.otelCollector.agent.podLabels }}
-      {{- toYaml .Values.otelCollector.agent.podLabels | nindent 8 }}
+      {{- if .Values.openTelemetry.agent.podLabels }}
+      {{- toYaml .Values.openTelemetry.agent.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: otel-agent
     spec:
       containers:
       - name: otel-agent
-        image: {{ include "sourcegraph.image" (list . "otelCollector") }}
+        image: {{ include "sourcegraph.image" (list . "openTelemetry") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command:
           - "/bin/otelcol-sourcegraph"
           - "--config=/etc/otel-agent/config.yaml"
-        {{- with .Values.otelCollector.agent.args }}
+        {{- with .Values.openTelemetry.agent.args }}
         args:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
-        {{- range $name, $item := .Values.otelCollector.agent.env}}
+        {{- range $name, $item := .Values.openTelemetry.agent.env}}
           - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         resources:
-          {{- toYaml .Values.otelCollector.agent.resources | nindent 10 }}
+          {{- toYaml .Values.openTelemetry.agent.resources | nindent 10 }}
         readinessProbe:
           httpGet:
             path: /
@@ -80,9 +80,9 @@ spec:
           - name: config
             mountPath: /etc/otel-agent
       terminationGracePeriodSeconds: 120
-      {{- include "sourcegraph.nodeSelector" (list . "otelCollector" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "otelCollector" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "otelCollector" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

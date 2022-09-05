@@ -1,9 +1,9 @@
 # Config for the agent pods running as a DaemonSet, which forward data to the gateway pod
-{{ if .Values.otelCollector.enabled -}}  
+{{ if .Values.openTelemetry.enabled -}}  
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.otelCollector.agent.name }}
+  name: {{ .Values.openTelemetry.agent.name }}
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector

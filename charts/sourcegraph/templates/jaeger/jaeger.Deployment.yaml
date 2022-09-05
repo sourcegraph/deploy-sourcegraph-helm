@@ -1,5 +1,5 @@
-{{- if and .Values.jaeger.enabled (not .Values.otelCollector.enabled) -}}
-{{- fail "When 'jaeger.enabled' is set to true, 'otelCollector.enabled' must be set to true as well." }}
+{{- if and .Values.jaeger.enabled (not .Values.openTelemetry.enabled) -}}
+{{- fail "When 'jaeger.enabled' is set to true, 'openTelemetry.enabled' must be set to true as well." }}
 {{- end }}
 {{- if .Values.jaeger.enabled -}}
 apiVersion: apps/v1

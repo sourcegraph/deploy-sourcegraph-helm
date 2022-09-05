@@ -69,7 +69,7 @@ spec:
               key: password
               name: {{ default "minio-auth" .Values.minio.auth.existingSecret }}
         {{- end }}
-        {{- if .Values.otelCollector.enabled }}
+        {{- if .Values.openTelemetry.enabled }}
         # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
         - name: OTEL_AGENT_HOST
           valueFrom:

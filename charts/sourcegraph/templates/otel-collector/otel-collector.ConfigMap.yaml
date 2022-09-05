@@ -1,11 +1,11 @@
-{{- if and .Values.otelCollector.gateway.config.traces.exporters .Values.jaeger.enabled -}}
-{{- fail "Set 'jaeger.enabled' to false or remove 'otelCollector.gateway.config.exporters'. The bundled jaeger instance is preconfigured." }}
+{{- if and .Values.openTelemetry.gateway.config.traces.exporters .Values.jaeger.enabled -}}
+{{- fail "Set 'jaeger.enabled' to false or remove 'openTelemetry.gateway.config.exporters'. The bundled jaeger instance is preconfigured." }}
 {{- end }}
-{{- if and .Values.otelCollector.enabled .Values.otelCollector.gateway.config.traces.exporters (not .Values.jaeger.enabled) -}}
+{{- if and .Values.openTelemetry.enabled .Values.openTelemetry.gateway.config.traces.exporters (not .Values.jaeger.enabled) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Values.otelCollector.gateway.name }}
+  name: {{ .Values.openTelemetry.gateway.name }}
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
@@ -18,7 +18,7 @@ data:
           http: # port 4318
     
     exporters:
-      {{- toYaml .Values.otelCollector.gateway.config.traces.exporters | nindent 6 }}
+      {{- toYaml .Values.openTelemetry.gateway.config.traces.exporters | nindent 6 }}
            
     extensions:
       health_check:
@@ -35,7 +35,7 @@ data:
           receivers:
             - otlp
           exporters:
-            {{- range $key, $val := .Values.otelCollector.gateway.config.traces.exporters }}
+            {{- range $key, $val := .Values.openTelemetry.gateway.config.traces.exporters }}
             - {{ $key }}
             {{- end }}
 {{- end }}
