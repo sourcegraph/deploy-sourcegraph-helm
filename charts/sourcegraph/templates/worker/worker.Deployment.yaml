@@ -58,6 +58,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "worker" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.worker.args }}

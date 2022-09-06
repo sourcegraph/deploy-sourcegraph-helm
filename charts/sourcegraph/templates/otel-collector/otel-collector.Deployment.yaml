@@ -1,0 +1,121 @@
+{{- if .Values.openTelemetry.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Receives, processes, and exports telemetry data.
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.openTelemetry.gateway.labels }}
+      {{- toYaml .Values.openTelemetry.gateway.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+  name: {{ .Values.openTelemetry.gateway.name }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: otel-collector
+  minReadySeconds: 5
+  progressDeadlineSeconds: 120
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: otel-collector
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.openTelemetry.gateway.podAnnotations }}
+      {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.openTelemetry.gateway.podLabels }}
+      {{- toYaml .Values.openTelemetry.gateway.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: otel-collector
+    spec:
+      containers:
+      - name: otel-collector
+        image: {{ include "sourcegraph.image" (list . "openTelemetry") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        command:
+          - "/bin/otelcol-sourcegraph"
+          {{- if and (not .Values.openTelemetry.gateway.config.traces.exporters) (not .Values.jaeger.enabled) }}  # default config: enable logging exporter
+          - "--config=/etc/otel-collector/configs/logging.yaml"
+          {{- else if .Values.jaeger.enabled }} # use bundled config to connect to bundled jaeger
+          - "--config=/etc/otel-collector/configs/jaeger.yaml"
+          {{- else }} # use config defined by customer in values.yaml
+          - "--config=/etc/otel-collector/config.yaml"
+          {{- end -}}
+        {{- with .Values.openTelemetry.gateway.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- if .Values.jaeger.enabled }}
+        - name: JAEGER_HOST
+          value: jaeger-collector
+        {{- end }}
+        {{- range $name, $item := .Values.openTelemetry.gateway.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        resources:
+          {{- toYaml .Values.openTelemetry.gateway.resources | nindent 10 }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+        ports:
+          - containerPort: 55679
+            name: zpages
+          - containerPort: 4317
+            name: otlp-grpc
+          - containerPort: 4318
+            name: otlp-http
+          - containerPort: 8888
+            name: metrics
+        volumeMounts:
+          {{- if .Values.openTelemetry.gateway.config.traces.exporters }}
+          - name: config
+            mountPath: /etc/otel-collector
+          {{- end }}
+          {{- if .Values.openTelemetry.gateway.config.traces.exportersTlsSecretName }}
+          - name: otel-collector-tls
+            mountPath: /tls
+          {{- end }}
+      terminationGracePeriodSeconds: 120
+      {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "openTelemetry" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.openTelemetry.gateway.config.traces.exporters }}
+        - name: config
+          configMap:
+            name: otel-collector
+            items:
+              - key: config.yaml
+                path: config.yaml
+        {{- end }}
+        {{- if .Values.openTelemetry.gateway.config.traces.exportersTlsSecretName }}
+        - name: otel-collector-tls
+          secret:
+            secretName: {{ .Values.openTelemetry.gateway.config.traces.exportersTlsSecretName }}
+        {{- end }}
+{{- end }}

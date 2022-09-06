@@ -55,6 +55,11 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
+        {{- if .Values.openTelemetry.enabled }}
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        {{- end }}
         ports:
         - containerPort: 6070
           name: http
@@ -86,6 +91,11 @@ spec:
         {{- range $name, $item := .Values.indexedSearchIndexer.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
+        {{- if .Values.openTelemetry.enabled }}
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
         {{- end }}
         ports:
         - containerPort: 6072

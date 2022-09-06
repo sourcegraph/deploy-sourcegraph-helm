@@ -59,6 +59,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         ports:
         - containerPort: 3180
           name: http
@@ -72,7 +73,6 @@ spec:
         {{- if .Values.githubProxy.extraVolumeMounts }}
         {{- toYaml .Values.githubProxy.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.githubProxy.extraContainers }}
         {{- toYaml .Values.githubProxy.extraContainers | nindent 6 }}
       {{- end }}

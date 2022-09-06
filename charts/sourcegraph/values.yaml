@@ -618,6 +618,50 @@ minio:
   # -- PVC Storage Request for `minio` data volume
   storageSize: 100Gi
 
+openTelemetry:
+  enabled: true
+  image:
+    # -- Docker image tag for the `otel-collector` image
+    defaultTag: insiders@sha256:6f507b593741060dfce7e4895d8327731411967a342bf2be896fcc56295dd9f1 # TODO: change once we have a versioned image with bundled configs + logging exporter
+    # -- Docker image name for the `otel-collector` image
+    name: "opentelemetry-collector"
+  gateway:
+    # -- Name used by resources. Does not affect service names or PVCs.
+    name: "otel-collector"
+    # -- Resource requests & limits for the `otel-collector` container,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    resources:
+      limits:
+        cpu: "3"
+        memory: 3Gi
+      requests:
+        cpu: "1"
+        memory: 1Gi
+    config:
+      traces:
+        # -- Define trace processors.
+        # Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces)
+        processors: {}
+        # -- Define where traces should be exported to. 
+        # Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters)
+        exporters: {}
+        # -- Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls".
+        # Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md)
+        exportersTlsSecretName: ""
+      
+  agent:
+    # -- Name used by resources. Does not affect service names or PVCs.
+    name: "otel-agent"
+    # -- Resource requests & limits for the `otel-agent` container,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    resources:
+      limits:
+        cpu: "500m"
+        memory: 500Mi
+      requests:
+        cpu: "100m"
+        memory: 100Mi
+    
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
   enabled: true
@@ -1067,7 +1111,7 @@ syntectServer:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-tracing:
+jaeger:
   collector:
     # -- Name of jaeger `collector` service 
     name: ""
@@ -1080,7 +1124,7 @@ tracing:
     # @default -- "ClusterIP"
     serviceType: ""
   # -- Enable `jaeger`
-  enabled: true
+  enabled: false
   image:
     # -- Docker image tag for the `jaeger` image
     defaultTag: 3.43.1@sha256:29d8a4c30cb93c1ed755bf86bf3af52195f28b8fca5fc88979bc63abb39eb1b1
@@ -1125,31 +1169,6 @@ tracing:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
-
-# Jaeger sidecar container
-tracingAgent:
-  enabled: true
-  image:
-    # -- Docker image tag for the `jaeger-agent` image
-    defaultTag: 3.43.1@sha256:fd71f756fb2e422f6675699047f8c4f3dc37f5838efd3c2e867a61ee475d45dd
-    # -- Docker image name for the `jaeger-agent` image
-    name: "jaeger-agent"
-  # -- Security context for the `jaeger-agent` sidecar container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  # -- Resource requests & limits for the `jaeger-agent` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  resources:
-    limits:
-      cpu: "1"
-      memory: 500M
-    requests:
-      cpu: 100m
-      memory: 100M
 
 worker:
   image:

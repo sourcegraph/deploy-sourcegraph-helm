@@ -1,0 +1,98 @@
+---
+suite: otelCollectorJaeger
+tests:
+  - it: should use the logging exporter when Jaeger is disabled and no exporter has been set
+    template: otel-collector/otel-collector.Deployment.yaml
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/logging.yaml" ]
+      - isEmpty:
+          path: spec.template.spec.containers[0].volumeMounts
+      - isEmpty:
+          path: spec.template.spec.volumes
+      - hasDocuments:
+          count: 0 # ConfigMap is not rendered
+        template: otel-collector/otel-collector.ConfigMap.yaml
+  - it: should use the bundled Jaeger config when Jaeger is enabled
+    template: otel-collector/otel-collector.Deployment.yaml
+    set:
+      jaeger:
+        enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/jaeger.yaml" ]
+      - isEmpty:
+          path: spec.template.spec.containers[0].volumeMounts
+      - isEmpty:
+          path: spec.template.spec.volumes
+      - hasDocuments:
+          count: 0 # ConfigMap is not rendered
+        template: otel-collector/otel-collector.ConfigMap.yaml
+  - it: should use the exporter defined in the config
+    template: otel-collector/otel-collector.Deployment.yaml
+    set:
+      openTelemetry:
+        gateway:
+          config:
+            traces:
+              exporters:
+                otlp:
+                  endpoint: "otlp.service.com:443"
+                  headers:
+                    "x-header-1": "$HEADER1"
+                    "x-header-2": "$HEADER2"
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].command
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/config.yaml" ]
+      - contains:
+          path: spec.template.spec.containers[0].volumeMounts
+          content:
+            name: config
+            mountPath: /etc/otel-collector
+      - contains:
+          path: spec.template.spec.volumes
+          content:
+            name: config
+            configMap:
+              name: otel-collector
+              items:
+                - key: config.yaml
+                  path: config.yaml
+      - hasDocuments:
+          count: 1 # ConfigMap is rendered
+        template: otel-collector/otel-collector.ConfigMap.yaml
+      - matchRegex:
+          path: data.[config.yaml]
+          pattern: "endpoint: otlp.service.com:443" # check if element of config is substituted correctly
+        template: otel-collector/otel-collector.ConfigMap.yaml
+  - it: should fail if a configuration is provided and jaeger is enabled
+    template: otel-collector/otel-collector.ConfigMap.yaml
+    set:
+      openTelemetry:
+        gateway:
+          config:
+            traces:
+              exporters:
+                otlp:
+                  endpoint: "otlp.service.com:443"
+                  headers:
+                    "x-header-1": "$HEADER1"
+                    "x-header-2": "$HEADER2"
+      jaeger:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "Set 'jaeger.enabled' to false or remove 'openTelemetry.gateway.config.exporters'. The bundled jaeger instance is preconfigured."
+  - it: should not allow jaeger to be enabled without otelCollector enabled
+    template: jaeger/jaeger.Deployment.yaml
+    set:
+      openTelemetry:
+        enabled: false
+      jaeger:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "When 'jaeger.enabled' is set to true, 'openTelemetry.enabled' must be set to true as well."

@@ -1,0 +1,50 @@
+{{- if and .Values.openTelemetry.gateway.config.traces.exporters .Values.jaeger.enabled -}}
+{{- fail "Set 'jaeger.enabled' to false or remove 'openTelemetry.gateway.config.exporters'. The bundled jaeger instance is preconfigured." }}
+{{- end }}
+{{- if and .Values.openTelemetry.enabled .Values.openTelemetry.gateway.config.traces.exporters (not .Values.jaeger.enabled) -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.openTelemetry.gateway.name }}
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: otel-collector
+data:
+  config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc: # port 4317
+          http: # port 4318
+    {{ if .Values.openTelemetry.gateway.config.traces.processors }}
+    processors:
+      {{- toYaml .Values.openTelemetry.gateway.config.traces.processors | nindent 6 }}
+    {{ end }}
+    exporters:
+      {{- toYaml .Values.openTelemetry.gateway.config.traces.exporters | nindent 6 }}
+
+    extensions:
+      health_check:
+        port: 13133
+      zpages:
+        endpoint: "localhost:55679"
+    
+    service:
+      extensions:
+        - health_check
+        - zpages
+      pipelines:
+        traces:
+          receivers:
+            - otlp
+          {{- if .Values.openTelemetry.gateway.config.traces.processors }}
+          processors:
+            {{- range $key, $val := .Values.openTelemetry.gateway.config.traces.processors }}
+            - {{ $key }}
+            {{- end }}
+          {{- end }}
+          exporters:
+            {{- range $key, $val := .Values.openTelemetry.gateway.config.traces.exporters }}
+            - {{ $key }}
+            {{- end }}
+{{- end }}

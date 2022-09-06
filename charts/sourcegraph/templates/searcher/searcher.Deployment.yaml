@@ -70,6 +70,7 @@ spec:
               fieldPath: metadata.name
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "searcher" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
@@ -100,7 +101,6 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.searcher.containerSecurityContext | nindent 10 }}
-      {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.searcher.extraContainers }}
         {{- toYaml .Values.searcher.extraContainers | nindent 6 }}
       {{- end }}

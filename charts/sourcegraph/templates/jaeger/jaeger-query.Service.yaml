@@ -1,20 +1,20 @@
-{{- if .Values.tracing.enabled -}}
+{{- if .Values.jaeger.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- if .Values.tracing.query.serviceAnnotations }}
   annotations:
-  {{- toYaml .Values.tracing.query.serviceAnnotations | nindent 4 }}
+  {{- if .Values.jaeger.query.serviceAnnotations }}
+  {{- toYaml .Values.jaeger.query.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger
     app.kubernetes.io/name: jaeger
-    {{- if .Values.tracing.query.serviceLabels }}
-      {{- toYaml .Values.tracing.query.serviceLabels | nindent 4 }}
+    {{- if .Values.jaeger.query.serviceLabels }}
+      {{- toYaml .Values.jaeger.query.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ default "jaeger-query" .Values.tracing.query.name }}
+  name: {{ default "jaeger-query" .Values.jaeger.query.name }}
 spec:
   ports:
   - name: query-http
@@ -26,5 +26,5 @@ spec:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/component: all-in-one
     app: jaeger
-  type: {{ .Values.tracing.query.serviceType | default "ClusterIP" }}
+  type: {{ .Values.jaeger.query.serviceType | default "ClusterIP" }}
 {{- end }}

@@ -54,6 +54,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
@@ -81,7 +82,6 @@ spec:
         {{- if .Values.gitserver.extraVolumeMounts }}
         {{- toYaml .Values.gitserver.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- include "sourcegraph.tracing" . | nindent 6 }}
       {{- if .Values.gitserver.extraContainers }}
         {{- toYaml .Values.gitserver.extraContainers | nindent 6 }}
       {{- end }}

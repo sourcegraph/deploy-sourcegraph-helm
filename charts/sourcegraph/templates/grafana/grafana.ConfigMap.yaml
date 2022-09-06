@@ -14,7 +14,7 @@ data:
       - name: Jaeger
         type: Jaeger
         access: proxy
-        url: http://{{ default "jaeger-query" .Values.tracing.query.name }}:16686/-/debug/jaeger
+        url: http://{{ default "jaeger-query" .Values.jaeger.query.name }}:16686/-/debug/jaeger
 kind: ConfigMap
 metadata:
   labels:
