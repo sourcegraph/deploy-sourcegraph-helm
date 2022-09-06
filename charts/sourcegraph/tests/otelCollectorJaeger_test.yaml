@@ -33,7 +33,7 @@ tests:
   - it: should use the exporter defined in the config
     template: otel-collector/otel-collector.Deployment.yaml
     set:
-      otelCollector:
+      openTelemetry:
         gateway:
           config:
             traces:
@@ -71,7 +71,7 @@ tests:
   - it: should fail if a configuration is provided and jaeger is enabled
     template: otel-collector/otel-collector.ConfigMap.yaml
     set:
-      otelCollector:
+      openTelemetry:
         gateway:
           config:
             traces:
@@ -85,14 +85,14 @@ tests:
         enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "Set 'jaeger.enabled' to false or remove 'otelCollector.gateway.config.exporters'. The bundled jaeger instance is preconfigured."
+          errorMessage: "Set 'jaeger.enabled' to false or remove 'openTelemetry.gateway.config.exporters'. The bundled jaeger instance is preconfigured."
   - it: should not allow jaeger to be enabled without otelCollector enabled
     template: jaeger/jaeger.Deployment.yaml
     set:
-      otelCollector:
+      openTelemetry:
         enabled: false
       jaeger:
         enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "When 'jaeger.enabled' is set to true, 'otelCollector.enabled' must be set to true as well."
+          errorMessage: "When 'jaeger.enabled' is set to true, 'openTelemetry.enabled' must be set to true as well."

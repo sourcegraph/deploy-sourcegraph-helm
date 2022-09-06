@@ -68,7 +68,7 @@ spec:
           value: /mnt/cache/$(POD_NAME)
         - name: TMPDIR
           value: /mnt/tmp
-        {{- include "sourcegraph.otelCollectorEnv" . | nindent 8 }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "symbols" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.symbols.args }}

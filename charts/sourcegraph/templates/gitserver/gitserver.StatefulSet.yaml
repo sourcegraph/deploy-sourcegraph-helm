@@ -54,7 +54,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        {{- include "sourcegraph.otelCollectorEnv" . | nindent 8 }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           initialDelaySeconds: 5
