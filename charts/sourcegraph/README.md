@@ -181,15 +181,16 @@ In addition to the documented values, all services also support the following va
 | minio.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `minio` |
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
-| otelCollector.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
-| otelCollector.agent.resources | object | `{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| otelCollector.enabled | bool | `true` |  |
-| otelCollector.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to.  Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
-| otelCollector.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
-| otelCollector.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
-| otelCollector.gateway.resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"0.5","memory":"512Mi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| otelCollector.image.defaultTag | string | `"insiders@sha256:6f507b593741060dfce7e4895d8327731411967a342bf2be896fcc56295dd9f1"` | Docker image tag for the `otel-collector` image |
-| otelCollector.image.name | string | `"opentelemetry-collector"` | Docker image name for the `otel-collector` image |
+| openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
+| openTelemetry.agent.resources | object | `{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| openTelemetry.enabled | bool | `true` |  |
+| openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to.  Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
+| openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
+| openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
+| openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
+| openTelemetry.gateway.resources | object | `{"limits":{"cpu":"1","memory":"2Gi"},"requests":{"cpu":"0.5","memory":"512Mi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| openTelemetry.image.defaultTag | string | `"insiders@sha256:6f507b593741060dfce7e4895d8327731411967a342bf2be896fcc56295dd9f1"` | Docker image tag for the `otel-collector` image |
+| openTelemetry.image.name | string | `"opentelemetry-collector"` | Docker image name for the `otel-collector` image |
 | pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | pgsql.auth.database | string | `"sg"` | Sets postgres database name |
 | pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for Postgres credentials The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
