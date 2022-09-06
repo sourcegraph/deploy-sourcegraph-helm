@@ -639,6 +639,9 @@ openTelemetry:
         memory: 512Mi
     config:
       traces:
+        # -- Define trace processors.
+        # Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces)
+        processors: {}
         # -- Define where traces should be exported to. 
         # Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters)
         exporters: {}

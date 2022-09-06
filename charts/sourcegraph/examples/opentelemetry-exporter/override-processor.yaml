@@ -1,0 +1,16 @@
+openTelemetry:
+  gateway:
+    env:
+      JAEGER_HOST:
+        value: "http://your.jaeger.endpoint"
+    config:
+      traces:
+        processors:
+          probabilistic_sampler:
+            hash_seed: 22 # An integer used to compute the hash algorithm. Note that all collectors for a given tier (e.g. behind the same load balancer) should have the same hash_seed.
+            sampling_percentage: 10.0 # (default = 0): Percentage at which traces are sampled; >= 100 samples all traces
+        exporters:
+          jaeger:
+            endpoint: "$JAEGER_HOST:14250"
+            tls:
+              insecure: true
