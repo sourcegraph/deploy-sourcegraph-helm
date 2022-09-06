@@ -9,12 +9,12 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - (lint) Don't emit `annotations` key on k8s objects if the value is empty [#163](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/163)
-  - **BREAKING**: Switched to OpenTelemetry for trace data collection [#167](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/167)  
-    Relevant changes:
-    - `tracing` and `tracingAgent` value blocks have been removed
-    - `openTelemetry` value block has been added
-    - The `otel-collector` service can be configured to export trace data to arbitrary external observability backends (see `openTelemetry.gateway.config.traces` value)  
-    - The bundled Jaeger instance is now disabled by default. You can re-enable it by setting `jaeger.enabled` to true. This will automatically configure `otel-collector` to export trace data to this instance.
+- **BREAKING**: Switched to OpenTelemetry for trace data collection [#167](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/167)  
+  Relevant changes:
+  - `tracing` and `tracingAgent` value blocks have been removed
+  - `openTelemetry` value block has been added
+  - The `otel-collector` service can be configured to export trace data to arbitrary external observability backends (see `openTelemetry.gateway.config.traces` value)  
+  - The bundled Jaeger instance is now disabled by default. You can re-enable it by setting `jaeger.enabled` to true. This will automatically configure `otel-collector` to export trace data to this instance.
 
 ## 3.43.1
 
