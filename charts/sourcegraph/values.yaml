@@ -632,11 +632,11 @@ openTelemetry:
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources:
       limits:
-        cpu: "1"
-        memory: 2Gi
+        cpu: "3"
+        memory: 3Gi
       requests:
-        cpu: "0.5"
-        memory: 512Mi
+        cpu: "1"
+        memory: 1Gi
     config:
       traces:
         # -- Define where traces should be exported to. 
