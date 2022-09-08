@@ -16,6 +16,11 @@ Use `**BREAKING**:` to denote a breaking change
   - The `otel-collector` service can be configured to export trace data to arbitrary external observability backends (see `openTelemetry.gateway.config.traces` value)  
   - The bundled Jaeger instance is now disabled by default. You can re-enable it by setting `jaeger.enabled` to true. This will automatically configure `otel-collector` to export trace data to this instance.
 
+## 3.43.2
+
+Sourcegraph 3.43.2 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-43-2)
+
 ## 3.43.1
 
 Sourcegraph 3.43.1 is now available!
