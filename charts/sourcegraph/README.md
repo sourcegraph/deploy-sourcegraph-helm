@@ -149,7 +149,7 @@ In addition to the documented values, all services also support the following va
 | jaeger.collector.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `collector` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
 | jaeger.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | jaeger.enabled | bool | `false` | Enable `jaeger` |
-| jaeger.image.defaultTag | string | `"3.43.1@sha256:29d8a4c30cb93c1ed755bf86bf3af52195f28b8fca5fc88979bc63abb39eb1b1"` | Docker image tag for the `jaeger` image |
+| jaeger.image.defaultTag | string | `"3.43.2@sha256:251808f84ba3891f291ae1db0d5f037a5a90fcbc3227a7a4867c81020896cf74"` | Docker image tag for the `jaeger` image |
 | jaeger.image.name | string | `"jaeger-all-in-one"` | Docker image name for the `jaeger` image |
 | jaeger.name | string | `"jaeger"` | Name used by resources. Does not affect service names or PVCs. |
 | jaeger.podSecurityContext | object | `{}` | Security context for the `jaeger` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -319,24 +319,6 @@ In addition to the documented values, all services also support the following va
 | syntectServer.resources | object | `{"limits":{"cpu":"4","memory":"6G"},"requests":{"cpu":"250m","memory":"2G"}}` | Resource requests & limits for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntectServer.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntect-server` |
 | syntectServer.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| tracing.collector.name | string | `""` | Name of jaeger `collector` service  |
-| tracing.collector.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `collector` service |
-| tracing.collector.serviceLabels | object | `{}` | Add extra labels to jaeger `collector` service |
-| tracing.collector.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `collector` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
-| tracing.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| tracing.enabled | bool | `true` | Enable `jaeger` |
-| tracing.image.defaultTag | string | `"3.43.2@sha256:251808f84ba3891f291ae1db0d5f037a5a90fcbc3227a7a4867c81020896cf74"` | Docker image tag for the `jaeger` image |
-| tracing.image.name | string | `"jaeger-all-in-one"` | Docker image name for the `jaeger` image |
-| tracing.name | string | `"jaeger"` | Name used by resources. Does not affect service names or PVCs. |
-| tracing.podSecurityContext | object | `{}` | Security context for the `jaeger` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| tracing.query.name | string | `""` | Name of jaeger `query` service  |
-| tracing.query.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `query` service |
-| tracing.query.serviceLabels | object | `{}` | Add extra labels to jaeger `query` service |
-| tracing.query.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `query` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
-| tracing.replicaCount | int | `1` | Number of `jaeger` pod |
-| tracing.resources | object | `{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| tracing.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `jaeger` |
-| tracing.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | tracingAgent.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `jaeger-agent` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | tracingAgent.enabled | bool | `true` |  |
 | tracingAgent.image.defaultTag | string | `"3.43.2@sha256:4909fb20bf1ded208e8d89a0290718b666935cde987f47401728f391d539f20a"` | Docker image tag for the `jaeger-agent` image |
