@@ -73,3 +73,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       restartPolicy: Never
+      {{- if .Values.migrator.extraVolumes }}
+      volumes:
+      {{- toYaml .Values.migrator.extraVolumes | nindent 6 }}
+      {{- end }}
