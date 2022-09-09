@@ -4,6 +4,3 @@ storageClass:
 
 sourcegraph: 
   localDevMode: true
-  
-migrator:
-  databaseAuthOverrideEnvVars: false
