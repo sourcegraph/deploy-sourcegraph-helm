@@ -1170,31 +1170,6 @@ jaeger:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-# Jaeger sidecar container
-tracingAgent:
-  enabled: true
-  image:
-    # -- Docker image tag for the `jaeger-agent` image
-    defaultTag: 3.43.2@sha256:4909fb20bf1ded208e8d89a0290718b666935cde987f47401728f391d539f20a
-    # -- Docker image name for the `jaeger-agent` image
-    name: "jaeger-agent"
-  # -- Security context for the `jaeger-agent` sidecar container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  # -- Resource requests & limits for the `jaeger-agent` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  resources:
-    limits:
-      cpu: "1"
-      memory: 500M
-    requests:
-      cpu: 100m
-      memory: 100M
-
 worker:
   image:
     # -- Docker image tag for the `worker` image
