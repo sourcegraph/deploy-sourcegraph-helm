@@ -8,6 +8,11 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+
+## 4.0.0
+
+- Sourcegraph 4.0.0 is now available
+
 - (lint) Don't emit `annotations` key on k8s objects if the value is empty [#163](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/163)
 - **BREAKING**: Switched to OpenTelemetry for trace data collection [#167](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/167)  
   Relevant changes:
