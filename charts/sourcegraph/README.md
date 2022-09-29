@@ -80,7 +80,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
-| extraResources | object | `{}` | Additional resources to include in the rendered manifest. Templates are supported. |
+| extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
 | frontend.image.defaultTag | string | `"4.0.1@sha256:a56e2df91184c92c181b4d10dbb9cde782e3cc038e6bd957ddc6a85dfab87afd"` | Docker image tag for the `frontend` image |

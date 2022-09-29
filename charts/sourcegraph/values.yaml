@@ -1206,4 +1206,4 @@ worker:
     name: ""
 
 # -- Additional resources to include in the rendered manifest. Templates are supported.
-extraResources: {}
+extraResources: []
