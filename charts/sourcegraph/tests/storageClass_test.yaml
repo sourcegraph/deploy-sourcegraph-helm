@@ -20,3 +20,24 @@ tests:
   asserts:
   - isNull:
       path: parameters
+- it: should have 'allowedTopologies` when storageClass.allowedTopologies is set
+  set:
+    storageClass:
+      create: true
+      allowedTopologies:
+        - matchLabelExpressions:
+            - key: topology.gke.io/zone
+              values:
+                - us-central1-a
+                - us-central1-b
+                - us-central1-f
+  asserts:
+  - equal:
+      path: allowedTopologies[0]
+      value:
+        matchLabelExpressions:
+        - key: topology.gke.io/zone
+          values:
+          - us-central1-a
+          - us-central1-b
+          - us-central1-f

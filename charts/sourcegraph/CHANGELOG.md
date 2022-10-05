@@ -8,6 +8,10 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+### Added
+
+- Added `allowedTopologies` support to storageclass [#188](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/188)
+
 ## 4.0.1
 
 Sourcegraph 4.0.1 is now available!

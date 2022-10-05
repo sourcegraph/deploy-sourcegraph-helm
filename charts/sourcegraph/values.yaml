@@ -1038,6 +1038,9 @@ storageClass:
   # -- Extra parameters of storageClass,
   # consult your cloud provider persistent storage documentation
   parameters: {}
+  # -- Persistent volumes topology configuration,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
+  allowedTopologies: {}
 
 symbols:
   image:
