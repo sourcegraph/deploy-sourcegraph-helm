@@ -21,4 +21,8 @@ parameters:
 allowVolumeExpansion: {{ default true .Values.storageClass.allowVolumeExpansion }}
 reclaimPolicy: {{ default "Retain" .Values.storageClass.reclaimPolicy }}
 volumeBindingMode: {{ default "Immediate" .Values.storageClass.volumeBindingMode }}
+{{- if .Values.storageClass.allowedTopologies }}
+allowedTopologies:
+  {{- toYaml .Values.storageClass.allowedTopologies | nindent 2 }}
+{{- end }}
 {{- end -}}
