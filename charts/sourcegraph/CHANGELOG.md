@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 4.1.0
+
 ### Added
 
 - Added `allowedTopologies` support to storageclass [#188](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/188). This is useful to restrict provisioning of PV in specific zones or regions. In some cloud providers (e.g. GCP), this can be used to provision regional disks with only one worker node present.
