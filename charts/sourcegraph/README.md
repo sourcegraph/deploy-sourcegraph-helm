@@ -181,6 +181,19 @@ In addition to the documented values, all services also support the following va
 | minio.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `minio` |
 | minio.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | minio.storageSize | string | `"100Gi"` | PVC Storage Request for `minio` data volume |
+| nodeExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":65534,"runAsUser":65534}` | Security context for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| nodeExporter.enabled | bool | `true` | Enable `node-exporter` |
+| nodeExporter.extraArgs | list | `[]` |  |
+| nodeExporter.hostNetwork | bool | `true` |  |
+| nodeExporter.hostPID | bool | `true` |  |
+| nodeExporter.image.defaultTag | string | `"4.0.1@sha256:03e4cd2183e454261c2bba0ff89192f661591ebfbc856e7c81ca6bbd4aaf1df8"` | Docker image tag for the `node-exporter` image |
+| nodeExporter.image.name | string | `"node-exporter"` | Docker image name for the `node-exporter` image |
+| nodeExporter.name | string | `"node-exporter"` | Name used by resources. Does not affect service names or PVCs. |
+| nodeExporter.podSecurityContext | object | `{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534}` | Security context for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| nodeExporter.podSecurityPolicy.enabled | bool | `false` | Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `node-exporter` pods |
+| nodeExporter.resources | object | `{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":".2","memory":"100Mi"}}` | Resource requests & limits for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| nodeExporter.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `node-exporter` |
+| nodeExporter.serviceAccount.name | string | `"node-exporter"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
 | openTelemetry.agent.resources | object | `{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.enabled | bool | `true` |  |
