@@ -11,6 +11,7 @@ metadata:
       {{- toYaml .Values.nodeExporter.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
+    app: node-exporter
     app.kubernetes.io/component: node-exporter
   name: {{ .Values.nodeExporter.name }}
 spec:
@@ -40,10 +41,10 @@ spec:
         deploy: sourcegraph
         app: node-exporter
     spec:
-      {{- include "sourcegraph.renderServiceAccountName" (list . "node-exporter") | trim | nindent 6 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "nodeExporter") | trim | nindent 6 }}
       containers:
       - name: node-exporter
-        image: {{ include "sourcegraph.image" (list . "node-exporter" ) }}
+        image: {{ include "sourcegraph.image" (list . "nodeExporter" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args:
           - --web.listen-address=:9100
@@ -55,6 +56,9 @@ spec:
           - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
           - --collector.netclass.ignored-devices=^(veth.*)$
           - --collector.netdev.device-exclude=^(veth.*)$
+{{- if .Values.nodeExporter.extraArgs }}
+{{ toYaml .Values.nodeExporter.extraArgs | indent 12 }}
+{{- end }}
         env:
         {{- range $name, $item := .Values.nodeExporter.env}}
         - name: {{ $name }}
@@ -79,8 +83,6 @@ spec:
           mountPath: /host/proc
           mountPropagation: HostToContainer
           readOnly: true
-        {{- if .Values.nodeExporter.containerSecurityContext.privileged }}
-        {{- end }}
         {{- if .Values.nodeExporter.extraVolumeMounts }}
         {{- toYaml .Values.nodeExporter.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -88,6 +90,23 @@ spec:
         - name: metrics
           containerPort: 9100
           protocol: TCP
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders: []
+            scheme: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            scheme: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
       terminationMessagePolicy: FallbackToLogsOnError
@@ -96,13 +115,15 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.nodeExporter.podSecurityContext | nindent 8 }}
-      {{- include "sourcegraph.nodeSelector" (list . "node-exporter" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "node-exporter" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "node-exporter" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.nodeSelector" (list . "nodeExporter" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "nodeExporter" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "nodeExporter" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      hostNetwork: {{ .Values.nodeExporter.hostNetwork }}
+      hostPID: {{ .Values.nodeExporter.hostPID }}
       volumes:
       - name: rootfs
         hostPath:
@@ -113,8 +134,6 @@ spec:
       - name: proc
         hostPath:
           path: /proc
-      {{- if .Values.nodeExporter.containerSecurityContext.privileged }}
-      {{- end }}
       {{- if .Values.nodeExporter.extraVolumes }}
       {{- toYaml .Values.nodeExporter.extraVolumes | nindent 6 }}
       {{- end }}

@@ -9,6 +9,7 @@ metadata:
   name: {{ .Values.nodeExporter.name }}
 spec:
   privileged: false
+  hostIPC: false
   hostNetwork: true
   hostPid: true
   seLinux:
@@ -25,4 +26,5 @@ spec:
   - pathPrefix: "/"
   - pathPrefix: "/sys"
   - pathPrefix: "/proc"
+  readOnlyRootFilesystem: true
 {{- end }}

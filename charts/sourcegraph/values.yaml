@@ -689,9 +689,21 @@ nodeExporter:
     create: true
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: node-exporter
-
   # Share the host process ID namespace. 
   hostPID: true
+  # Expose the service to the host network
+  hostNetwork: true
+  ## Additional container arguments for the node-exporter container
+  extraArgs: []
+  #   - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v)d[a-z]|nvme\\d+n\\d+p)\\d+$
+  #   - --collector.textfile.directory=/run/prometheus
+  # -- Security context for the `pgsql` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 65534
+    runAsGroup: 65534
+    readOnlyRootFilesystem: true
   # -- Security context for the `node-exporter` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   podSecurityContext:
