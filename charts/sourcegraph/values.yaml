@@ -679,11 +679,11 @@ nodeExporter:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
-      cpu: 200m
-      memory: 100Mi
-    requests:
       cpu: '1'
       memory: 1Gi
+    requests:
+      cpu: '.2'
+      memory: 100Mi
   serviceAccount:
     # -- Enable creation of ServiceAccount for `node-exporter`
     create: true

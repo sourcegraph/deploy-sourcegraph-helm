@@ -23,7 +23,7 @@ spec:
   ports:
   - name: metrics
     port: 9100
-    targetPort: meterics
+    targetPort: metrics
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: node-exporter

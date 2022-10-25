@@ -107,9 +107,9 @@ spec:
           periodSeconds: 10
           successThreshold: 1
           timeoutSeconds: 1
+        terminationMessagePolicy: FallbackToLogsOnError
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
-      terminationMessagePolicy: FallbackToLogsOnError
       {{- if .Values.nodeExporter.extraContainers }}
         {{- toYaml .Values.nodeExporter.extraContainers | nindent 6 }}
       {{- end }}
