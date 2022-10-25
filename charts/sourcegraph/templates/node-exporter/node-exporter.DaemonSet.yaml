@@ -93,7 +93,7 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            scheme: http
+            scheme: HTTP
             port: metrics
           initialDelaySeconds: 0
           periodSeconds: 10
@@ -102,7 +102,7 @@ spec:
         livenessProbe:
           failureThreshold: 3
           httpGet:
-            scheme: http
+            scheme: HTTP
             port: metrics
           initialDelaySeconds: 0
           periodSeconds: 10
