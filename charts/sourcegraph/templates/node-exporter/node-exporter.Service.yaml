@@ -1,0 +1,31 @@
+{{- if .Values.nodeExporter.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Prometheus exporter for hardware and OS metrics.
+    url: https://github.com/prometheus/node_exporter
+    prometheus.io/port: "9100"
+    sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.nodeExporter.serviceAnnotations }}
+    {{- toYaml .Values.nodeExporter.serviceAnnotations | nindent 4 }}
+    {{- end }}
+  labels:
+    app.kubernetes.io/component: node-exporter
+    app: node-exporter
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    {{- if .Values.nodeExporter.serviceLabels }}
+      {{- toYaml .Values.nodeExporter.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: node-exporter
+spec:
+  ports:
+  - name: metrics
+    port: 9100
+    targetPort: meterics
+  selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    app: node-exporter
+  type: {{ .Values.nodeExporter.serviceType | default "ClusterIP" }}
+{{- end }}
