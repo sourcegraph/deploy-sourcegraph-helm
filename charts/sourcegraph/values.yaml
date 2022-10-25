@@ -697,7 +697,7 @@ nodeExporter:
   extraArgs: []
   #   - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v)d[a-z]|nvme\\d+n\\d+p)\\d+$
   #   - --collector.textfile.directory=/run/prometheus
-  # -- Security context for the `pgsql` container,
+  # -- Security context for the `node-exporter` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
