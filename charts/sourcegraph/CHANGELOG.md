@@ -11,6 +11,14 @@ Use `**BREAKING**:` to denote a breaking change
 ### Added
 
 - Added `allowedTopologies` support to storageclass [#188](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/188). This is useful to restrict provisioning of PV in specific zones or regions. In some cloud providers (e.g. GCP), this can be used to provision regional disks with only one worker node present.
+- Added a node-exporter daemonset, which collects crucial machine-level metrics that help Sourcegraph scale your deployment. See [#194](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/194) for more information
+
+🚨 **WARNING**: Similarly to cadvisor,  `node-exporter`:
+  - runs as a daemonset 
+  - needs to mount various read-only directories from the host machine (`/`, `/proc`, and `/sys`)
+  - ideally shares the machine's PID and Network namespaces
+
+If necessary, node-exporter can be disabled by setting `nodeExporter.enabled: false` in your `override.yaml` configuration file.
 
 ## 4.0.1
 
