@@ -1,0 +1,19 @@
+{{- if eq .Values.symbols.persistentVolume.create true }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: symbols
+  name: symbols
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.symbols.persistentVolume.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.symbols.persistentVolume.volumeName }}
+  volumeName: {{ .Values.symbols.persistentVolume.volumeName }}
+  {{- end }}
+{{- end }}
