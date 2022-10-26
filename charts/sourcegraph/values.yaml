@@ -704,8 +704,8 @@ nodeExporter:
     runAsUser: 65534
     runAsGroup: 65534
     readOnlyRootFilesystem: true
-  # -- Security context for the `node-exporter` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  # -- Security context for the `node-exporter` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
     fsGroup: 65534
     runAsGroup: 65534

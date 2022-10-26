@@ -10,8 +10,8 @@ metadata:
 spec:
   privileged: false
   hostIPC: false
-  hostNetwork: true
-  hostPid: true
+  hostNetwork: {{ .Values.nodeExporter.hostNetwork }}
+  hostPID: {{ .Values.nodeExporter.hostPID }}
   seLinux:
     rule: RunAsAny
   supplementalGroups:

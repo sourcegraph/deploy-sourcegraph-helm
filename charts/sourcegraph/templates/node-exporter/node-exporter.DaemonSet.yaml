@@ -57,7 +57,7 @@ spec:
           - --collector.netclass.ignored-devices=^(veth.*)$
           - --collector.netdev.device-exclude=^(veth.*)$
 {{- if .Values.nodeExporter.extraArgs }}
-{{ toYaml .Values.nodeExporter.extraArgs | indent 12 }}
+{{ toYaml .Values.nodeExporter.extraArgs | indent 10 }}
 {{- end }}
         env:
         {{- range $name, $item := .Values.nodeExporter.env}}
