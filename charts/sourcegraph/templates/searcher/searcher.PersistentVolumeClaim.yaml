@@ -1,0 +1,19 @@
+{{- if eq .Values.searcher.persistentVolume.create true }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: searcher
+  name: searcher
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.searcher.persistentVolume.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.searcher.persistentVolume.volumeName }}
+  volumeName: {{ .Values.searcher.persistentVolume.volumeName }}
+  {{- end }}
+{{- end }}

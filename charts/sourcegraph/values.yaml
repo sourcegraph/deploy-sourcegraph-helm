@@ -1020,6 +1020,13 @@ searcher:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  persistentVolume:
+    # -- Enable create of PersistentVolumeClaim for 'searcher'
+    create: true
+    # -- Name of the PersistentVolume for 'searcher'
+    volumeName:
+    # -- Size of PersistentVolume for 'searcher', unused if persistentVolume.enabled is false
+    storageSize: 25G
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -1078,6 +1085,13 @@ symbols:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  persistentVolume:
+    # -- Enable create of PersistentVolumeClaim for 'symbols'
+    create: false
+    # -- Name of the PersistentVolume for 'symbols'
+    volumeName:
+    # -- Size of PersistentVolume for 'symbols', unused if persistentVolume.enabled is false
+    storageSize: 10G
 
 syntectServer:
   image:

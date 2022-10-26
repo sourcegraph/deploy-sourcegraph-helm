@@ -115,8 +115,15 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "searcher") | trim | nindent 6 }}
       volumes:
+      {{- if eq .Values.searcher.persistentVolume.create true }}
+      - name: cache-ssd
+        persistentVolumeClaim:
+          claimName: searcher
+      {{- end }}
+      {{- if eq .Values.searcher.persistentVolume.create false }}
       - emptyDir: {}
         name: cache-ssd
+      {{- end }}
       - emptyDir: {}
         name: tmpdir
       {{- if .Values.searcher.extraVolumes }}
