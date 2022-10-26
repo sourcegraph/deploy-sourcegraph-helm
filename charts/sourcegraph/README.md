@@ -186,7 +186,7 @@ In addition to the documented values, all services also support the following va
 | nodeExporter.extraArgs | list | `[]` |  |
 | nodeExporter.hostNetwork | bool | `true` |  |
 | nodeExporter.hostPID | bool | `true` |  |
-| nodeExporter.image.defaultTag | string | `"4.0.1@sha256:03e4cd2183e454261c2bba0ff89192f661591ebfbc856e7c81ca6bbd4aaf1df8"` | Docker image tag for the `node-exporter` image |
+| nodeExporter.image.defaultTag | string | `"179720_2022-10-25_4d925e87cfb8@sha256:2d9dcdf0b2226f0c3d550a64d2667710265462350a3ba9ebe37d0302bc64af0f"` | Docker image tag for the `node-exporter` image |
 | nodeExporter.image.name | string | `"node-exporter"` | Docker image name for the `node-exporter` image |
 | nodeExporter.name | string | `"node-exporter"` | Name used by resources. Does not affect service names or PVCs. |
 | nodeExporter.podSecurityContext | object | `{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534}` | Security context for the `node-exporter` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
