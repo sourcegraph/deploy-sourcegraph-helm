@@ -29,3 +29,37 @@ If you would like to bring your own infrastructure monitoring & alerting solutio
 you may want to disable the `cadvisor` DaemonSet completely by setting `cadvisor.enabled=false` in your override file.
 
 {{- end }}
+
+{{- if not .Values.nodeExporter.enabled }}
+
+🚧 Warning 🚧
+
+You have set 'nodeExporter.enabled' to 'false', which completely disables node exporter. Node exporter provides 
+critical machine-level metrics that help you scale your Sourcegraph deployments. Without node-exporter, you might have 
+to rely on the (possibility limited) tooling that your cloud provider provides to have insight into your machines.
+
+{{- end }}
+
+{{- if not .Values.nodeExporter.hostPID }}
+
+🚧 Warning 🚧
+
+You have set 'nodeExporter.hostPID' to 'false' which greatly limits the metrics that node-exporter is able to provide. Many of the 
+metrics that Sourcegraph uses to help you scale your deployment might be broken as a result.
+
+If you would like to bring your own infrastructure monitoring & alerting solution,
+you may want to disable the `node-exporter` DaemonSet completely by setting `nodeExporter.enabled=false` in your override file.
+
+{{- end }}
+
+{{- if not .Values.nodeExporter.hostNetwork }}
+
+🚧 Warning 🚧
+
+You have set 'nodeExporter.hostNetwork' to 'false' which greatly limits the metrics that node-exporter is able to provide. Many of the 
+metrics that Sourcegraph uses to help you scale your deployment might be broken as a result.
+
+If you would like to bring your own infrastructure monitoring & alerting solution,
+you may want to disable the `node-exporter` DaemonSet completely by setting `nodeExporter.enabled=false` in your override file.
+
+{{- end }}

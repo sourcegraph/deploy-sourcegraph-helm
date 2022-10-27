@@ -661,6 +661,56 @@ openTelemetry:
       requests:
         cpu: "100m"
         memory: 100Mi
+
+nodeExporter:
+  # -- Enable `node-exporter`
+  enabled: true
+  image:
+    # -- Docker image tag for the `node-exporter` image
+    defaultTag: 179720_2022-10-25_4d925e87cfb8@sha256:2d9dcdf0b2226f0c3d550a64d2667710265462350a3ba9ebe37d0302bc64af0f
+    # -- Docker image name for the `node-exporter` image
+    name: "node-exporter"
+  # -- Name used by resources. Does not affect service names or PVCs.
+  name: "node-exporter"
+  podSecurityPolicy:
+    # -- Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `node-exporter` pods
+    enabled: false
+  # -- Resource requests & limits for the `node-exporter` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: '1'
+      memory: 1Gi
+    requests:
+      cpu: '.2'
+      memory: 100Mi
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `node-exporter`
+    create: true
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: node-exporter
+  # Share the host process ID namespace. 
+  hostPID: true
+  # Expose the service to the host network
+  hostNetwork: true
+  ## Additional container arguments for the node-exporter container
+  extraArgs: []
+  #   - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v)d[a-z]|nvme\\d+n\\d+p)\\d+$
+  #   - --collector.textfile.directory=/run/prometheus
+  # -- Security context for the `node-exporter` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 65534
+    runAsGroup: 65534
+    readOnlyRootFilesystem: true
+  # -- Security context for the `node-exporter` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext:
+    fsGroup: 65534
+    runAsGroup: 65534
+    runAsNonRoot: true
+    runAsUser: 65534
     
 pgsql:
   # -- Enable `pgsql` PostgreSQL server

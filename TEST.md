@@ -12,7 +12,19 @@ helm lint charts/sourcegraph/.
 
 ## Unit testing
 
-We utilize [helm-unittest], a BDD styled unit test framework, to validate our helm chart.
+We utilize [helm-unittest](https://github.com/quintush/helm-unittest/), a BDD styled unit test framework, to validate our helm chart.
+
+helm-unittest can be installed with:
+
+```bash
+helm plugin install https://github.com/quintush/helm-unittest
+```
+
+Once the plugin is installed, you can run the unit tests using the following:
+
+```bash
+helm unittest --helm3 ./charts/sourcegraph/.
+```
 
 We currently do not have testing best practices or require unit tests for new changes, so add test cases at your best judgement if possible.
 

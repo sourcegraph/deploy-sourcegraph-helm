@@ -1,0 +1,30 @@
+{{- if and .Values.nodeExporter.enabled .Values.nodeExporter.podSecurityPolicy.enabled  -}}
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app: node-exporter
+    deploy: sourcegraph
+    app.kubernetes.io/component: node-exporter
+  name: {{ .Values.nodeExporter.name }}
+spec:
+  privileged: false
+  hostIPC: false
+  hostNetwork: {{ .Values.nodeExporter.hostNetwork }}
+  hostPID: {{ .Values.nodeExporter.hostPID }}
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  runAsUser:
+    rule: RunAsAny
+  fsGroup:
+    rule: RunAsAny
+  volumes:
+  - '*'
+  allowedHostPaths:
+  - pathPrefix: "/"
+  - pathPrefix: "/sys"
+  - pathPrefix: "/proc"
+  readOnlyRootFilesystem: true
+{{- end }}

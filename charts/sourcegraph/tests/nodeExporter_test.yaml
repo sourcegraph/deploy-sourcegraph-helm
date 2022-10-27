@@ -1,0 +1,173 @@
+suite: nodeExporter
+templates:
+  - NOTES.txt
+  - node-exporter/node-exporter.ClusterRole.yaml
+  - node-exporter/node-exporter.ClusterRoleBinding.yaml
+  - node-exporter/node-exporter.DaemonSet.yaml
+  - node-exporter/node-exporter.PodSecurityPolicy.yaml
+  - node-exporter/node-exporter.Service.yaml
+  - node-exporter/node-exporter.ServiceAccount.yaml
+tests:
+  - it: should render the DaemonSet, Service, and ClusterRoles if node-exporter is enabled
+    set: 
+      nodeExporter:
+        enabled: true
+    asserts:
+      - containsDocument:
+          kind: DaemonSet
+          apiVersion: apps/v1
+          name: node-exporter
+        template: node-exporter/node-exporter.DaemonSet.yaml
+      - containsDocument:
+          kind: Service
+          apiVersion: v1
+          name: node-exporter
+        template: node-exporter/node-exporter.Service.yaml
+      - containsDocument:
+          kind: ClusterRole
+          apiVersion: rbac.authorization.k8s.io/v1
+          name: node-exporter
+        template: node-exporter/node-exporter.ClusterRole.yaml
+      - containsDocument:
+          kind: ClusterRoleBinding
+          apiVersion: rbac.authorization.k8s.io/v1
+          name: node-exporter
+        template: node-exporter/node-exporter.ClusterRoleBinding.yaml
+
+  - it: should not render any resources if node-exporter is disabled
+    set: 
+      nodeExporter:
+        enabled: false
+    asserts:
+      - hasDocuments: 
+          count: 0
+    templates:
+      - node-exporter/node-exporter.ClusterRole.yaml
+      - node-exporter/node-exporter.ClusterRoleBinding.yaml
+      - node-exporter/node-exporter.DaemonSet.yaml
+      - node-exporter/node-exporter.PodSecurityPolicy.yaml
+      - node-exporter/node-exporter.Service.yaml
+      - node-exporter/node-exporter.ServiceAccount.yaml
+
+  - it: should render the podSecurityPolicy if enabled
+    set: 
+      nodeExporter:
+        podSecurityPolicy: 
+          enabled: true
+    asserts:
+      - containsDocument:
+          kind: PodSecurityPolicy
+          apiVersion: policy/v1beta1
+          name: node-exporter
+        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
+
+  - it: should not render the podSecurityPolicy if disabled 
+    set: 
+      nodeExporter:
+        podSecurityPolicy: 
+          enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
+  
+  - it: should ensure that the namespace is properly propagated to the cluster role binding 
+    release:
+      namespace: "my-test-namespace"
+    asserts:
+      - equal:
+          path: subjects[0].namespace
+          value: "my-test-namespace"
+    template: node-exporter/node-exporter.ClusterRoleBinding.yaml
+
+  - it: should have host Network and PID enabled by default
+    set:
+      nodeExporter:
+        podSecurityPolicy: # (unrelated to host network/pid defaults, just for ensuring that PodSecurityPolicy gets rendered so that we can check them in same test)
+          enabled: true
+    asserts:  
+      - equal: 
+          path: spec.template.spec.hostNetwork
+          value: true
+        template: node-exporter/node-exporter.DaemonSet.yaml
+      - equal: 
+          path: spec.template.spec.hostPID
+          value: true
+        template: node-exporter/node-exporter.DaemonSet.yaml
+      - equal: 
+          path: spec.hostNetwork
+          value: true
+        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
+      - equal: 
+          path: spec.hostPID
+          value: true
+        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
+  
+  - it: should propagate host PID/network settings to both the daemonset and podSecurityPolicy
+    set:
+      nodeExporter:
+        hostNetwork: false 
+        hostPID: false
+        podSecurityPolicy: # (unrelated to host network/pid settings, just for ensuring that PodSecurityPolicy gets rendered so that we can check them in same test)
+          enabled: true
+    asserts:  
+      - equal: 
+          path: spec.template.spec.hostNetwork
+          value: false
+        template: node-exporter/node-exporter.DaemonSet.yaml
+      - equal: 
+          path: spec.template.spec.hostPID
+          value: false
+        template: node-exporter/node-exporter.DaemonSet.yaml
+      - equal: 
+          path: spec.hostNetwork
+          value: false
+        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
+      - equal: 
+          path: spec.hostPID
+          value: false
+        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
+
+  - it: should not generate warnings if node-exporter is enabled
+    set:
+      nodeExporter:
+        enabled: true
+    asserts:  
+      - notMatchRegexRaw:
+          pattern: You have set 'nodeExporter.enabled' to 'false'
+        template: NOTES.txt
+  
+  - it: should generate warnings if node-exporter is disabled
+    set:
+      nodeExporter:
+        enabled: false
+    asserts:  
+      - matchRegexRaw:
+          pattern: You have set 'nodeExporter.enabled' to 'false'
+        template: NOTES.txt
+
+  - it: should not generate warnings if hostPID or hostNetwork are true
+    set:
+      nodeExporter:
+        hostNetwork: true 
+        hostPID: true
+    asserts:  
+      - notMatchRegexRaw:
+          pattern: You have set 'nodeExporter.hostPID' to 'false'
+        template: NOTES.txt
+      - notMatchRegexRaw:
+          pattern: You have set 'nodeExporter.hostNetwork' to 'false'
+        template: NOTES.txt
+
+  - it: should generate warnings if hostPID or hostNetwork are false 
+    set:
+      nodeExporter:
+        hostNetwork: false 
+        hostPID: false
+    asserts:  
+      - matchRegexRaw:
+          pattern: You have set 'nodeExporter.hostPID' to 'false'
+        template: NOTES.txt
+      - matchRegexRaw:
+          pattern: You have set 'nodeExporter.hostNetwork' to 'false'
+        template: NOTES.txt
