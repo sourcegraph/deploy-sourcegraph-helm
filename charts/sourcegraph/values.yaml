@@ -87,7 +87,7 @@ sourcegraph:
 alpine: # Used in init containers
   image:
     # -- Docker image tag for the `alpine` image
-    defaultTag: 4.1.0@sha256:87fede17e58a4983283b31668f08b00b6f2d48b884392bf5a1eb19f4b41b86b0
+    defaultTag: 4.1.1@sha256:a1f1a13b0b04006f0c068bfb2e481df205821b6e79c45b0bd5e863874d73fc2f
     # -- Docker image name for the `alpine` image
     name: "alpine-3.14"
   # -- Security context for the `alpine` initContainer,
@@ -112,7 +112,7 @@ cadvisor:
   enabled: true
   image:
     # -- Docker image tag for the `cadvisor` image
-    defaultTag: 4.1.0@sha256:9a4a6bc61827f334263a60bfdc098573f94797862f7df044f66aeac312627a56
+    defaultTag: 4.1.1@sha256:a6cb03c0d53b910bb91ab4645c04c49bfadb30ae5c86fce712e7a59a975286bb
     # -- Docker image name for the `cadvisor` image
     name: "cadvisor"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -175,7 +175,7 @@ codeInsightsDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeinsights-db` image
-    defaultTag: 4.1.0@sha256:5b3202f1da318fbf6cc2322a4ffe39b0cd532a11f8be1a95f83b21342d2a6392
+    defaultTag: 4.1.1@sha256:44673b39b8b8d4b285e73318c68a470eae732df0411f5d5d67456000aba2c981
     # -- Docker image name for the `codeinsights-db` image
     name: "codeinsights-db"
   # -- Security context for the `codeinsights-db` container,
@@ -246,7 +246,7 @@ codeIntelDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeintel-db` image
-    defaultTag: 4.1.0@sha256:cc3e51e97048a32f781b50671c5b9b76d7dcf7ecc2d1aabbf4611d7e372f4db9
+    defaultTag: 4.1.1@sha256:efaeb640bd1ba2d224752ac1268d96585d3c29d48a25fae024cca3455dfa1a88
     # -- Docker image name for the `codeintel-db` image
     name: "codeintel-db"
   # -- Security context for the `codeintel-db` container,
@@ -297,7 +297,7 @@ frontend:
       value: http://prometheus:30090
   image:
     # -- Docker image tag for the `frontend` image
-    defaultTag: 4.1.0@sha256:aa57f07e5d1547b49e6f37e86e9e23eae79b9abb32e06b199930f069f735512e
+    defaultTag: 4.1.1@sha256:9eb691aef09446d3a248fe530219e569f1843e7e924f40c08bb44d814a4cc5fe
     # -- Docker image name for the `frontend` image
     name: "frontend"
   ingress:
@@ -355,7 +355,7 @@ migrator:
   enabled: true
   image:
     # -- Docker image tag for the `migrator` image
-    defaultTag: 4.1.0@sha256:a3a7507f8fdb6e7d8cea0ca3f65747b849cba3655c60bb1a8c56c155e729408e
+    defaultTag: 4.1.1@sha256:54b89ef64c73baf9b8444f9344cfc1281c3f1b6055e85d7a484ff5aa34e8aa44
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
@@ -380,7 +380,7 @@ migrator:
 githubProxy:
   image:
     # -- Docker image tag for the `github-proxy` image
-    defaultTag: 4.1.0@sha256:354b05ce452a94d6283209293ccca13c03205972b5d9b705fd30c04c56e0688b
+    defaultTag: 4.1.1@sha256:233275e08b5462b6f7d1f451d815b2be0c1cee1340030c55acb7d07560696442
     # -- Docker image name for the `github-proxy` image
     name: "github-proxy"
   # -- Security context for the `github-proxy` container,
@@ -413,7 +413,7 @@ githubProxy:
 gitserver:
   image:
     # -- Docker image tag for the `gitserver` image
-    defaultTag: 4.1.0@sha256:f1d29928999e25f67ea9f97af4e8dec2b24f489fbf54a6cc41f93ea88eb0931f
+    defaultTag: 4.1.1@sha256:387e90b5009a3c98e3084d9f4d962055bde006cf37d63bca55a73d1948a18073
     # -- Docker image name for the `gitserver` image
     name: "gitserver"
   # -- Name of existing Secret that contains SSH credentials to clone repositories.
@@ -462,7 +462,7 @@ grafana:
   existingConfig: "" # Name of an existing configmap
   image:
     # -- Docker image tag for the `grafana` image
-    defaultTag: 4.1.0@sha256:6067c5d9ff057c62c8b0622feb2562e2981616525868ab860ab2b19d4a67fe0f
+    defaultTag: 4.1.1@sha256:5a6adbb2721175d08050a4be0fcd5226b9da160efbad7e71d57b1c42341b5fed
     # -- Docker image name for the `grafana` image
     name: "grafana"
   # -- Security context for the `grafana` container,
@@ -503,7 +503,7 @@ grafana:
 indexedSearch:
   image:
     # -- Docker image tag for the `zoekt-webserver` image
-    defaultTag: 4.1.0@sha256:b82f01effbe0ef407557bbe0f1c83f3bb47f7fab64584532590fae6e125c5e7f
+    defaultTag: 4.1.1@sha256:b82f01effbe0ef407557bbe0f1c83f3bb47f7fab64584532590fae6e125c5e7f
     # -- Docker image name for the `zoekt-webserver` image
     name: "indexed-searcher"
   # -- Security context for the `zoekt-webserver` container,
@@ -544,7 +544,7 @@ indexedSearch:
 indexedSearchIndexer:
   image:
     # -- Docker image tag for the `zoekt-indexserver` image
-    defaultTag: 4.1.0@sha256:a3ff6f983b1d8db52f2767420d72af1330eaec2a7938bb1a4949bfe00739a9c2
+    defaultTag: 4.1.1@sha256:a3ff6f983b1d8db52f2767420d72af1330eaec2a7938bb1a4949bfe00739a9c2
     # -- Docker image name for the `zoekt-indexserver` image
     name: "search-indexer"
   # -- Security context for the `zoekt-indexserver` container,
@@ -583,7 +583,7 @@ minio:
     password: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
   image:
     # -- Docker image tag for the `minio` image
-    defaultTag: 4.1.0@sha256:a8cc7269c2ffecc7c03791d3999ccc30635e5af36cc73e412bec2ac944be7006
+    defaultTag: 4.1.1@sha256:a8cc7269c2ffecc7c03791d3999ccc30635e5af36cc73e412bec2ac944be7006
     # -- Docker image tag for the `minio` image
     name: "minio"
   # -- Security context for the `minio` container,
@@ -622,7 +622,7 @@ openTelemetry:
   enabled: true
   image:
     # -- Docker image tag for the `otel-collector` image
-    defaultTag: 4.1.0@sha256:a26d16ca8e7e8dc07c1ce4e24c7ae1eb374c7510d696355d08a60e63335170ef # TODO: change once we have a versioned image with bundled configs + logging exporter
+    defaultTag: 4.1.1@sha256:593aeaf7eb30bbc53348b4ad33aafc7cfabc0d5118b9fc766bf727e6ceb771a6 # TODO: change once we have a versioned image with bundled configs + logging exporter
     # -- Docker image name for the `otel-collector` image
     name: "opentelemetry-collector"
   gateway:
@@ -738,7 +738,7 @@ pgsql:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `pgsql` image
-    defaultTag: 4.1.0@sha256:a6544b8313d5acad0243dacbe6947de52b4239c03bf5e5c67538376fc52bf3eb
+    defaultTag: 4.1.1@sha256:fe06def794d2427d15c739bf4c86aeaa31ecd0e7eb7ca76107b41a13ba6c7710
     # -- Docker image name for the `pgsql` image
     name: "postgres-12-alpine"
   # -- Security context for the `pgsql` container,
@@ -780,7 +780,7 @@ pgsql:
 postgresExporter:
   image:
     # -- Docker image tag for the `pgsql-exporter` image
-    defaultTag: 4.1.0@sha256:8e38fc0311b472a24aa0e9e05c4401d30cbd1d3f9490c043c3d031772428ab2a
+    defaultTag: 4.1.1@sha256:c04e306b7aabb2b76f5201cf5e9982399e93edfc0d19587d2279f1d01286962b
     # -- Docker image name for the `pgsql-exporter` image
     name: "postgres_exporter"
   # -- Resource requests & limits for the `pgsql-exporter` sidecar container,
@@ -800,7 +800,7 @@ preciseCodeIntel:
       value: "4"
   image:
     # -- Docker image tag for the `precise-code-intel-worker` image
-    defaultTag: 4.1.0@sha256:6224fd16cf640bf0c5d74dde07a64558b80eeb6ecf062f7187937de8fb22f591
+    defaultTag: 4.1.1@sha256:a5d5120ab5097a8469bd0d483429dbe9507d1b9970ad928aa6d9e98e51c7b2f9
     # -- Docker image name for the `precise-code-intel-worker` image
     name: "precise-code-intel-worker"
   # -- Security context for the `precise-code-intel-worker` container,
@@ -839,7 +839,7 @@ prometheus:
   existingConfig: "" # Name of an existing configmap
   image:
     # -- Docker image tag for the `prometheus` image
-    defaultTag: 4.1.0@sha256:30c587a3fcf1beb80f18ebdd56e7f644d6df8455a6050ae61d7b3916bec306b2
+    defaultTag: 4.1.1@sha256:7f4396c89234587c1f485d7ba1986ad2f65884bcc1e05016f478fd40256cfd9c
     # -- Docker image name for the `prometheus` image
     name: "prometheus"
   # -- Security context for the `prometheus` container,
@@ -891,7 +891,7 @@ redisCache:
   enabled: true
   image:
     # -- Docker image tag for the `redis-cache` image
-    defaultTag: 4.1.0@sha256:7f3a3ab227fc5cb640eb72f117ebc8a065b5d09ccd2a1c7383790161cd4dbd94
+    defaultTag: 4.1.1@sha256:e7af9b8533f94db57b60eeeb868335223b5c69293f3d210cf6ebb2cf16cc04e3
     # -- Docker image name for the `redis-cache` image
     name: "redis-cache"
   connection:
@@ -935,7 +935,7 @@ redisCache:
 redisExporter:
   image:
     # -- Docker image tag for the `redis-exporter` image
-    defaultTag: 4.1.0@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
+    defaultTag: 4.1.1@sha256:edb0c9b19cacd90acc78f13f0908a7e6efd1df704e401805c24bffd241285f70
     # -- Docker image name for the `redis-exporter` image
     name: "redis_exporter"
   # -- Security context for the `redis-exporter` sidecar container,
@@ -967,7 +967,7 @@ redisStore:
     endpoint: "redis-store:6379"
   image:
     # -- Docker image tag for the `redis-store` image
-    defaultTag: 4.1.0@sha256:e46c4b0f740b4e58a75d0b44339c3ae252f57ee02cb91b9f74355005d6497dd3
+    defaultTag: 4.1.1@sha256:d88e813d534947464c656934cdf594b7318296142fbc4a4c22ae170d353705a8
     # -- Docker image name for the `redis-store` image
     name: "redis-store"
   # -- Security context for the `redis-store` container,
@@ -1004,7 +1004,7 @@ redisStore:
 repoUpdater:
   image:
     # -- Docker image tag for the `repo-updater` image
-    defaultTag: 4.1.0@sha256:7d15b9e1094f4b166363ad6e15b9c33e58e9a47f2a8ca1e72653d0c8fda5b255
+    defaultTag: 4.1.1@sha256:5d4a97147f74d96997b04d66b3b61e57e63e819354415e176a8697e2586bfffc
     # -- Docker image name for the `repo-updater` image
     name: "repo-updater"
   # -- Security context for the `repo-updater` container,
@@ -1037,7 +1037,7 @@ repoUpdater:
 searcher:
   image:
     # -- Docker image tag for the `searcher` image
-    defaultTag: 4.1.0@sha256:4fedf8c4ee163984e6eb3be34e6b4545f63613efb4c7acfaab6d1ab7be248e7b
+    defaultTag: 4.1.1@sha256:46eae12ecfbdd04801aa1fba9d1dafc5ca59b0f60fc77758ded20b78c9f4d174
     # -- Docker image name for the `searcher` image
     name: "searcher"
   # -- Security context for the `searcher` container,
@@ -1095,7 +1095,7 @@ storageClass:
 symbols:
   image:
     # -- Docker image tag for the `symbols` image
-    defaultTag: 4.1.0@sha256:8eef84ce05e28628c03fbd87a63f4356944332846ef063326a6b498884d8adcc
+    defaultTag: 4.1.1@sha256:eac4ad1ad684c0fc6dbbe70a4bc6de62467178ed03e46af60e051e36e8ef871b
     # -- Docker image name for the `symbols` image
     name: "symbols"
   # -- Security context for the `symbols` container,
@@ -1132,7 +1132,7 @@ symbols:
 syntectServer:
   image:
     # -- Docker image tag for the `syntect-server` image
-    defaultTag: 4.1.0@sha256:9df78574fd71cdcfe01912ed6ecd9a9b923fe02d2947995d4de19997ab6e4f13
+    defaultTag: 4.1.1@sha256:30404879a9b49ac3f4ff305135f2ee4debe0d060e30034f97c044abf003347c2
     # -- Docker image name for the `syntect-server` image
     name: "syntax-highlighter"
   # -- Security context for the `syntect-server` container,
@@ -1180,7 +1180,7 @@ jaeger:
   enabled: false
   image:
     # -- Docker image tag for the `jaeger` image
-    defaultTag: 4.1.0@sha256:9c8e01e6d667197cbf994ea1a3050c9e2fc97a8442ebe3c9756d5bbd92e7823c
+    defaultTag: 4.1.1@sha256:d859ae1018aa3f256ff5ad5b27482f13ac4e5388599fbfff36b4f5feaf4923a2
     # -- Docker image name for the `jaeger` image
     name: "jaeger-all-in-one"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -1226,7 +1226,7 @@ jaeger:
 worker:
   image:
     # -- Docker image tag for the `worker` image
-    defaultTag: 4.1.0@sha256:7171ed01692eb01cb058d0084c73aad547a8ae2b4b92bf1c78b01ea73b62b943
+    defaultTag: 4.1.1@sha256:81941138a55a1ec0a054e06eed20cd7b9f0e25266c3135810d70780e3dbc17a3
     # -- Docker image name for the `worker` image
     name: "worker"
   # -- Security context for the `worker` container,
