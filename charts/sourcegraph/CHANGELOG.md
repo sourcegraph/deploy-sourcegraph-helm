@@ -9,6 +9,7 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Added PVC support for `searcher` and `symbols` [#195](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/195). Allows more flexibility for environments with limited ephemeral storage available.
+
 ## 4.1.0
 
 Sourcegraph 4.1.0 is now available!
