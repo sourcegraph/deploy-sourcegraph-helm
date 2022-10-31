@@ -691,8 +691,6 @@ nodeExporter:
     name: node-exporter
   # Share the host process ID namespace. 
   hostPID: true
-  # Expose the service to the host network
-  hostNetwork: true
   ## Additional container arguments for the node-exporter container
   extraArgs: []
   #   - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v)d[a-z]|nvme\\d+n\\d+p)\\d+$

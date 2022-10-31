@@ -143,55 +143,38 @@ tests:
           value: "my-test-namespace"
     template: node-exporter/node-exporter.ClusterRoleBinding.yaml
 
-  - it: should have host Network and PID enabled by default
+  - it: should have hostPID enabled by default
     set:
       nodeExporter:
-        # (these settings are unrelated to host network/pid defaults, they're just for ensuring that PodSecurityPolicy gets rendered so that we can check them in same test)
+        # (these settings are unrelated to host pid defaults, they're just for ensuring that PodSecurityPolicy gets rendered so that we can check them in same test)
         serviceAccount:
           create: true
         podSecurityPolicy:
           enabled: true
     asserts:  
       - equal: 
-          path: spec.template.spec.hostNetwork
-          value: true
-        template: node-exporter/node-exporter.DaemonSet.yaml
-      - equal: 
           path: spec.template.spec.hostPID
           value: true
         template: node-exporter/node-exporter.DaemonSet.yaml
-      - equal: 
-          path: spec.hostNetwork
-          value: true
-        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
       - equal: 
           path: spec.hostPID
           value: true
         template: node-exporter/node-exporter.PodSecurityPolicy.yaml
   
-  - it: should propagate host PID/network settings to both the daemonset and podSecurityPolicy
+  - it: should propagate host PID settings to both the daemonset and podSecurityPolicy
     set:
       nodeExporter:
-        hostNetwork: false 
         hostPID: false
-        # (these settings are unrelated to host network/pid defaults, they're just for ensuring that PodSecurityPolicy gets rendered so that we can check them in same test)
+        # (these settings are unrelated to host pid defaults, they're just for ensuring that PodSecurityPolicy gets rendered so that we can check them in same test)
         serviceAccount:
           create: true
         podSecurityPolicy:
           enabled: true
     asserts:  
       - equal: 
-          path: spec.template.spec.hostNetwork
-          value: false
-        template: node-exporter/node-exporter.DaemonSet.yaml
-      - equal: 
           path: spec.template.spec.hostPID
           value: false
         template: node-exporter/node-exporter.DaemonSet.yaml
-      - equal: 
-          path: spec.hostNetwork
-          value: false
-        template: node-exporter/node-exporter.PodSecurityPolicy.yaml
       - equal: 
           path: spec.hostPID
           value: false
@@ -215,28 +198,20 @@ tests:
           pattern: You have set 'nodeExporter.enabled' to 'false'
         template: NOTES.txt
 
-  - it: should not generate warnings if hostPID or hostNetwork are true
+  - it: should not generate warnings if hostPID is true
     set:
       nodeExporter:
-        hostNetwork: true 
         hostPID: true
     asserts:  
       - notMatchRegexRaw:
           pattern: You have set 'nodeExporter.hostPID' to 'false'
         template: NOTES.txt
-      - notMatchRegexRaw:
-          pattern: You have set 'nodeExporter.hostNetwork' to 'false'
-        template: NOTES.txt
 
-  - it: should generate warnings if hostPID or hostNetwork are false 
+  - it: should generate warnings if hostPID is false 
     set:
       nodeExporter:
-        hostNetwork: false 
         hostPID: false
     asserts:  
       - matchRegexRaw:
           pattern: You have set 'nodeExporter.hostPID' to 'false'
-        template: NOTES.txt
-      - matchRegexRaw:
-          pattern: You have set 'nodeExporter.hostNetwork' to 'false'
         template: NOTES.txt
