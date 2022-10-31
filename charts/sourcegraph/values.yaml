@@ -686,7 +686,7 @@ nodeExporter:
       memory: 100Mi
   serviceAccount:
     # -- Enable creation of ServiceAccount for `node-exporter`
-    create: true
+    create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: node-exporter
   # Share the host process ID namespace. 

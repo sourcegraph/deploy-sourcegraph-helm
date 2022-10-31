@@ -41,7 +41,9 @@ spec:
         deploy: sourcegraph
         app: node-exporter
     spec:
+      {{- if .Values.nodeExporter.serviceAccount.create }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "nodeExporter") | trim | nindent 6 }}
+      {{- end }}
       containers:
       - name: node-exporter
         image: {{ include "sourcegraph.image" (list . "nodeExporter" ) }}
