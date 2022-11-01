@@ -125,7 +125,6 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      hostNetwork: {{ .Values.nodeExporter.hostNetwork }}
       hostPID: {{ .Values.nodeExporter.hostPID }}
       volumes:
       - name: rootfs

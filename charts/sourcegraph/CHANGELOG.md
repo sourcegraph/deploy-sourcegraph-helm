@@ -28,7 +28,7 @@ Sourcegraph 4.1.0 is now available!
 🚨 **WARNING**: Similarly to cadvisor,  `node-exporter`:
   - runs as a daemonset 
   - needs to mount various read-only directories from the host machine (`/`, `/proc`, and `/sys`)
-  - ideally shares the machine's PID and Network namespaces
+  - ideally shares the machine's PID namespaces
 
 If necessary, node-exporter can be disabled by setting `nodeExporter.enabled: false` in your `override.yaml` configuration file.
 
