@@ -1,4 +1,4 @@
-{{- if .Values.nodeExporter.enabled -}}
+{{- if and .Values.nodeExporter.enabled .Values.nodeExporter.podSecurityPolicy.enabled  -}}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
