@@ -1255,6 +1255,17 @@ worker:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+      
+testConnection:
+  # -- Enable `test-connection`
+  enabled: true
+  image:
+    # -- Docker image tag for the `test-connection` image
+    defaultTag: "latest"
+    # -- Docker image name for the `test-connection` image
+    name: "busybox"
+  # -- Name used by resources. Does not affect service names or PVCs.
+  name: "sg-test-connection"
 
 # -- Additional resources to include in the rendered manifest. Templates are supported.
 extraResources: []
