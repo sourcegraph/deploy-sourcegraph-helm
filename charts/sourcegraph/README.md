@@ -332,10 +332,6 @@ In addition to the documented values, all services also support the following va
 | syntectServer.resources | object | `{"limits":{"cpu":"4","memory":"6G"},"requests":{"cpu":"250m","memory":"2G"}}` | Resource requests & limits for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntectServer.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntect-server` |
 | syntectServer.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| testConnection.enabled | bool | `true` | Enable `test-connection` test |
-| testConnection.image.defaultTag | string | `"latest"` | Docker image tag for the `test-connection` image |
-| testConnection.image.name | string | `"busybox"` | Docker image name for the `test-connection` image |
-| testConnection.name | string| `"sg-test-connection"` | Name used by resources. Does not effect service names of PVCs. |
 | worker.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | worker.image.defaultTag | string | `"4.1.2@sha256:79c85866469e96379a6f0b36c2deee08ba3d81520f6fffc8de16a6e7667a67ab"` | Docker image tag for the `worker` image |
 | worker.image.name | string | `"worker"` | Docker image name for the `worker` image |
