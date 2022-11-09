@@ -17,6 +17,11 @@ Use `**BREAKING**:` to denote a breaking change
 
   - If necessary, node-exporter can be disabled by setting `nodeExporter.enabled: false` in your `override.yaml` configuration file.
 
+## 4.1.3
+
+Sourcegraph 4.1.3 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-1-3)
+
 ## 4.1.2
 
 Sourcegraph 4.1.2 is now available!
