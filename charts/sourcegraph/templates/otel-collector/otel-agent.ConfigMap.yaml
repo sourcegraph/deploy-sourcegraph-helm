@@ -1,5 +1,5 @@
 # Config for the agent pods running as a DaemonSet, which forward data to the gateway pod
-{{ if .Values.openTelemetry.enabled -}}  
+{{ if .Values.openTelemetry.enabled -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,7 +14,7 @@ data:
         protocols:
           grpc: # port 4317
           http: # port 4318
-          
+
     exporters:
       otlp:
         endpoint: "otel-collector:4317"
@@ -25,8 +25,8 @@ data:
           queue_size: 100
         retry_on_failure:
           enabled: true
-    
-    # TODO: allow configuring processors through values      
+
+    # TODO: allow configuring processors through values
     #processors:
     #  batch:
     #  memory_limiter:
@@ -35,22 +35,22 @@ data:
     #    # 25% of limit up to 2G
     #    spike_limit_mib: 100
     #    check_interval: 5s
-        
+
     extensions:
       health_check:
-        port: 13133
+        endpoint: ":13133"
       zpages:
         endpoint: "localhost:55679"
-        
+
     service:
-      extensions: 
+      extensions:
         - zpages
         - health_check
       pipelines:
         traces:
-          receivers: 
+          receivers:
             - otlp
-          exporters: 
+          exporters:
             - otlp
-          
+
 {{- end }}
