@@ -8,6 +8,11 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+
+## 4.2.0
+
+- Sourcegraph 4.2.0 is now available
+
 - Added a node-exporter daemonset, which collects crucial machine-level metrics that help Sourcegraph scale your deployment. See [#194](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/194) for more information
 
   - 🚨 **WARNING**: Similarly to cadvisor,  `node-exporter`:
