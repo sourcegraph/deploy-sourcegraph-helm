@@ -1,29 +1,26 @@
-{{- if .Values.minio.enabled -}}
+{{- if .Values.blobstore.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/port: "9000"
-    prometheus.io/path: "/minio/prometheus/metrics"
-    sourcegraph.prometheus/scrape: "true"
-    {{- if .Values.minio.serviceAnnotations }}
-    {{- toYaml .Values.minio.serviceAnnotations | nindent 4 }}
+    {{- if .Values.blobstore.serviceAnnotations }}
+    {{- toYaml .Values.blobstore.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: minio
+    app: blobstore
     deploy: sourcegraph
-    app.kubernetes.io/component: minio
-    {{- if .Values.minio.serviceLabels }}
-      {{- toYaml .Values.minio.serviceLabels | nindent 4 }}
+    app.kubernetes.io/component: blobstore
+    {{- if .Values.blobstore.serviceLabels }}
+      {{- toYaml .Values.blobstore.serviceLabels | nindent 4 }}
     {{- end }}
-  name: minio
+  name: blobstore
 spec:
   ports:
-  - name: minio
+  - name: blobstore
     port: 9000
-    targetPort: minio
+    targetPort: blobstore
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: minio
-  type: {{ .Values.minio.serviceType | default "ClusterIP" }}
+    app: blobstore
+  type: {{ .Values.blobstore.serviceType | default "ClusterIP" }}
 {{- end }}

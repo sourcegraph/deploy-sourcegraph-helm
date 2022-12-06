@@ -52,7 +52,7 @@ spec:
         {{- end }}
         image: {{ include "sourcegraph.image" (list . "blobstore") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args: {{- default () .Values.blobstore.args | toYaml | nindent 8 }}
+        args: {{- default (list "") .Values.blobstore.args | toYaml | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 9000
