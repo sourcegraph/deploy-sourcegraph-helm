@@ -11,14 +11,6 @@ tests:
   asserts:
     - matchSnapshot:
           path: spec.template.metadata.annotations.[checksum/auth]
-- it: should update checksum when minio secret is modified
-  set:
-    minio:
-      auth:
-        password: "newpassword"
-  asserts:
-    - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
 - it: should update checksum when codeintel-db secret is modified
   set:
     codeIntelDB:
