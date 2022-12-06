@@ -231,7 +231,6 @@ app.kubernetes.io/name: jaeger
 {{- $checksum := list .Values.codeInsightsDB.auth -}}
 {{- $checksum = append $checksum .Values.codeIntelDB.auth -}}
 {{- $checksum = append $checksum .Values.pgsql.auth -}}
-{{- $checksum = append $checksum .Values.minio.auth -}}
 checksum/auth: {{ toJson $checksum | sha256sum }}
 {{- end -}}
 

@@ -1,0 +1,19 @@
+{{- if .Values.blobstore.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: blobstore
+  name: blobstore
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.blobstore.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.blobstore.volumeName }}
+  volumeName: {{ .Values.blobstore.volumeName }}
+  {{- end }}
+{{- end }}
