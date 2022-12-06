@@ -87,7 +87,8 @@ spec:
         {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
-        {{- if .Values.minio.enabled }}
+        {{- if .Values.blobstore.enabled }}
+        # TODO(blobstore): update env vars
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:

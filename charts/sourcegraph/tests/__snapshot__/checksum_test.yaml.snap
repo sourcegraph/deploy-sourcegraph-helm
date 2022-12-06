@@ -4,9 +4,6 @@ should update checksum when codeinsights-db secret is modified:
 should update checksum when codeintel-db secret is modified:
   1: |
     2518fab3d953a21ea78057f3ad7143f41ec960c0b3b96c49f807ba0fd73ba4b0
-should update checksum when minio secret is modified:
-  1: |
-    bac4d406514d2f8cd604f566607dfc36b963bc324770428d6fd6e8a442037980
 should update checksum when pgsql secret is modified:
   1: |
     b960ae6db8c72ca9248278a63593de67f1ddfb9805f82eded969ffde767406db

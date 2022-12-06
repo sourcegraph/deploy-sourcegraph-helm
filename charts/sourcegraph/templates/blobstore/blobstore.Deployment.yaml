@@ -1,0 +1,110 @@
+{{- if .Values.blobstore.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: blobstore for storing LSIF uploads.
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.blobstore.labels }}
+      {{- toYaml .Values.blobstore.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: blobstore
+  name: {{ .Values.blobstore.name }}
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: blobstore
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: blobstore
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.blobstore.podAnnotations }}
+      {{- toYaml .Values.blobstore.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.blobstore.podLabels }}
+      {{- toYaml .Values.blobstore.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: blobstore
+    spec:
+      containers:
+      - name: blobstore
+        env:
+        {{- range $name, $item := .Values.blobstore.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        image: {{ include "sourcegraph.image" (list . "blobstore") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        args: {{- default () .Values.blobstore.args | toYaml | nindent 8 }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        ports:
+        - containerPort: 9000
+          name: blobstore
+        livenessProbe:
+          httpGet:
+            path: /
+            port: blobstore
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /
+            port: blobstore
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.blobstore.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.blobstore.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        - name: blobstore-data
+          mountPath: /data
+        - name: blobstore
+          mountPath: /blobstore
+        {{- if .Values.blobstore.extraVolumeMounts }}
+        {{- toYaml .Values.blobstore.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.blobstore.extraContainers }}
+        {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.blobstore.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "blobstore" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "blobstore" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "blobstore" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "blobstore") | trim | nindent 6 }}
+      volumes:
+      - name: blobstore-data
+        persistentVolumeClaim:
+          claimName: blobstore
+      - name: blobstore
+        emptyDir: {}
+      {{- if .Values.blobstore.extraVolumes }}
+      {{- toYaml .Values.blobstore.extraVolumes | nindent 6 }}
+      {{- end }}
+{{- end }}

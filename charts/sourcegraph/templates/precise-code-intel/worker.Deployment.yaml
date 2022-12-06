@@ -28,7 +28,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: precise-code-intel-worker
-        checksum/minio.secret: {{ include (print $.Template.BasePath "/minio/minio.Secret.yaml") . | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -58,6 +57,7 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         {{- if .Values.minio.enabled }}
+        # TODO(blobstore): update env vars
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
