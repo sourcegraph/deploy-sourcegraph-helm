@@ -54,6 +54,12 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- if .Values.blobstore.enabled }}
+        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:

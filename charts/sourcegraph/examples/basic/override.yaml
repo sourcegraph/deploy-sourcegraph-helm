@@ -40,7 +40,7 @@ indexedSearch:
         cpu: "4"
         memory: 8G
 
-minio:
+blobstore:
   resources:
     limits:
       cpu: "1"

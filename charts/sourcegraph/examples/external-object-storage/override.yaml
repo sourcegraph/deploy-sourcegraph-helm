@@ -3,7 +3,7 @@
 # - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
 
 # Disable deployment of the built-in object storage
-minio:
+blobstore:
   enabled: false
 
 # we use YAML anchors and alias to keep override file clean
