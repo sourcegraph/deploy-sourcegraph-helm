@@ -8,6 +8,16 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 4.3.1
+
+Sourcegraph 4.3.1 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-3-1)
+
+## 4.3.0
+
+Sourcegraph 4.3.0 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-3-0)
+
 ## 4.2.1
 
 * `minio` has been replaced with `blobstore`. If you use Sourcegraph's built-in object storage (instead of an external S3/GCP bucket), then please see the update notes here: https://docs.sourcegraph.com/admin/how-to/blobstore_update_notes
