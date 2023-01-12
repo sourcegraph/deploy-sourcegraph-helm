@@ -19,6 +19,7 @@ spec:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: searcher
+  serviceName: searcher
   updateStrategy:
     type: RollingUpdate
   template:

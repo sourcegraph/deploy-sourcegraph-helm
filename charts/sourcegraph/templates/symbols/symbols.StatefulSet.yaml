@@ -21,6 +21,7 @@ spec:
       app: symbols
   updateStrategy:
     type: RollingUpdate
+  serviceName: symbols
   template:
     metadata:
       annotations:
