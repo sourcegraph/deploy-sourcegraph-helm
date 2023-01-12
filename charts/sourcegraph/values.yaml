@@ -1045,17 +1045,16 @@ searcher:
   resources:
     limits:
       cpu: "2"
-      ephemeral-storage: 26G
       memory: 2G
     requests:
       cpu: 500m
-      ephemeral-storage: 25G
       memory: 500M
   serviceAccount:
     # -- Enable creation of ServiceAccount for `searcher`
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  storageSize: 26Gi
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -1103,17 +1102,16 @@ symbols:
   resources:
     limits:
       cpu: "2"
-      ephemeral-storage: 12G
       memory: 2G
     requests:
       cpu: 500m
-      ephemeral-storage: 10G
       memory: 500M
   serviceAccount:
     # -- Enable creation of ServiceAccount for `symbols`
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  storageSize: 12Gi
 
 syntectServer:
   image:
