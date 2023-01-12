@@ -1035,7 +1035,10 @@ searcher:
     readOnlyRootFilesystem: true
   # -- Security context for the `searcher` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 100
+    fsGroup: 101
+    fsGroupChangePolicy: "OnRootMismatch"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "searcher"
   # -- Number of `searcher` pod
@@ -1092,7 +1095,10 @@ symbols:
     readOnlyRootFilesystem: true
   # -- Security context for the `symbols` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 100
+    fsGroup: 101
+    fsGroupChangePolicy: "OnRootMismatch"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "symbols"
   # -- Number of `symbols` pod
