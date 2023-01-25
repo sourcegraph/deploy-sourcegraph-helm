@@ -8,6 +8,10 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 4.4.1
+
+Sourcegraph 4.4.1 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-4-1)
 
 ## 4.4.0
 
