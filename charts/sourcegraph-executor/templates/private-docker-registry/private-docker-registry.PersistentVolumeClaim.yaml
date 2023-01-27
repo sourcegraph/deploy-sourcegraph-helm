@@ -1,4 +1,4 @@
-{[- if .Values.privateDockerRegistry.enabled -]}
+{{- if .Values.privateDockerRegistry.enabled -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -13,5 +13,7 @@ spec:
     requests:
       storage: {{ .Values.privateDockerRegistry.storageSize }}
   storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.privateDockerRegistry.volumeName }}
   volumeName: {{ .Values.privateDockerRegistry.volumeName }}
+  {{- end }}
 {{- end }}
