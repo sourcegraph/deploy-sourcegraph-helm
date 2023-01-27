@@ -82,4 +82,3 @@ spec:
         - name: cache
           persistentVolumeClaim:
             claimName: private-docker-registry
-{{- end }}
