@@ -1,4 +1,4 @@
-{{- if .Values.private-docker-registry.enabled -}}
+{{ if .Values.private-docker-registry.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
