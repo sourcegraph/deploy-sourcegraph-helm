@@ -31,6 +31,27 @@ sourcegraph:
   # -- Add extra labels to attach to all pods
   podLabels: {}
 
+storageClass:
+  # -- Enable creation of storageClass.
+  # Disable if you have your own existing storage class
+  create: true
+  # -- Name of the storageClass.
+  # Use to customize to the existing storage class name
+  name: sourcegraph
+  # -- Name of the storageClass provisioner,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
+  # and consult your cloud provider persistent storage documentation
+  provisioner: kubernetes.io/gce-pd
+  # -- Value of `type` key in storageClass `parameters`,
+  # consult your cloud provider persistent storage documentation
+  type: pd-ssd
+  # -- Extra parameters of storageClass,
+  # consult your cloud provider persistent storage documentation
+  parameters: {}
+  # -- Persistent volumes topology configuration,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
+  allowedTopologies: {}
+
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name

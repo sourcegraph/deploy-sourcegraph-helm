@@ -71,15 +71,14 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/registry
               name: cache
-      {{- include "sourcegraph.nodeSelector" (list . "private-docker-registry" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "private-docker-registry" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.nodeSelector" (list . "privateDockerRegistry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "privateDockerRegistry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "privateDockerRegistry" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
+        volumes:
         - name: cache
           persistentVolumeClaim:
             claimName: private-docker-registry
-{{- end }}
