@@ -1,0 +1,141 @@
+{{- if .Values.executor.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Runs sourcegraph executors
+    kubectl.kubernetes.io/default-container: executor
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.executor.labels }}
+      {{- toYaml .Values.executor.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: executor
+spec:
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: executor
+  minReadySeconds: 10
+  replicas: {{ .Values.executor.replicaCount }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: executor
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.executor.podAnnotations }}
+      {{- toYaml .Values.executor.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.executor.podLabels }}
+      {{- toYaml .Values.executor.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: executor
+    spec:
+      containers:
+        - name: executor
+          image: {{ include "sourcegraph.image" (list . "executor") }}
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: debug
+              scheme: HTTP
+            initialDelaySeconds: 60
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: debug
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          ports:
+            - containerPort: 6060
+              name: debug
+          terminationMessagePolicy: FallbackToLogsOnError
+          env:
+          {{- range $name, $item := .Values.executor.env}}
+          - name: {{ $name }}
+            {{- $item | toYaml | nindent 10 }}
+          {{- end }}
+            - name: EXECUTOR_USE_FIRECRACKER
+              value: "false"
+            - name: EXECUTOR_JOB_NUM_CPUS
+              value: "0"
+            - name: EXECUTOR_JOB_MEMORY
+              value: "0"
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+            - name: TMPDIR
+              value: /scratch
+          volumeMounts:
+            - mountPath: /scratch
+              name: executor-scratch
+        - name: dind
+          image: {{ include "sourcegraph.image" (list . "dind") }}
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          securityContext:
+            privileged: true
+          command:
+            - 'dockerd'
+            - '--tls=false'
+            - '--mtu=1200'
+            - '--registry-mirror=http://executor:5000'
+            - '--host=tcp://0.0.0.0:2375'
+          livenessProbe:
+            tcpSocket:
+                  port: 2375
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 5
+          readinessProbe:
+            tcpSocket:
+              port: 2375
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 5
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: metadata.name
+          ports:
+            - containerPort: 2375
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /scratch
+              name: executor-scratch
+            - mountPath: /etc/docker/daemon.json
+              subPath: daemon.json
+              name: docker-config
+      {{- include "sourcegraph.nodeSelector" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: executor-scratch
+          emptyDir: {}
+        - name: docker-config
+          configMap:
+            defaultMode: 420
+            name: docker-config
+{{- end }}

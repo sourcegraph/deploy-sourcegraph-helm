@@ -1,0 +1,85 @@
+{{- if .Values.private-docker-registry.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Runs a private docker registry for private-docker-registrys.
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.private-docker-registry.labels }}
+      {{- toYaml .Values.private-docker-registry.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: private-docker-registry
+  name: {{ .Values.private-docker-registry.name }}
+spec:
+  replicas: {{ .Values.private-docker-registry.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: private-docker-registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: private-docker-registry
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.private-docker-registry.podAnnotations }}
+      {{- toYaml .Values.private-docker-registry.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.private-docker-registry.podLabels }}
+      {{- toYaml .Values.private-docker-registry.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: private-docker-registry
+    spec:
+      containers:
+        - name: private-docker-registry
+        image: {{ include "sourcegraph.image" (list . "private-docker-registry") }}
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          env:
+            - name: REGISTRY_PROXY_REMOTEURL
+              value: http://registry-1.docker.io
+          ports:
+            - containerPort: 5000
+              name: registry
+          resources:
+            {{- toYaml .Values.private-docker-registry.resources | nindent 10 }}
+          {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: registry
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /
+              port: registry
+              scheme: HTTP
+            periodSeconds: 5
+            timeoutSeconds: 5
+          volumeMounts:
+            - mountPath: /var/lib/registry
+              name: cache
+      {{- include "sourcegraph.nodeSelector" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: cache
+          persistentVolumeClaim:
+            claimName: private-docker-registry
+{{- end }}
