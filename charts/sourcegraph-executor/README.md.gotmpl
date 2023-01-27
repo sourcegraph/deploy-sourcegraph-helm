@@ -5,13 +5,11 @@
 
 # Sourcegraph Exexutor Helm Chart
 
-This chart contains a single [Job] to run [migrator] operations. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy executors
+This chart contains two deployments, Sourcegraph Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy executors
 
 Use cases:
 
-- Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
-- Perform database migrations prior to upgrading the Sourcegraph deployment
-- Troubleshoot a [dirty database]
+- Deploy Sourcegraph Executors on Kubernetes
 
 ## Requirements
 
@@ -30,68 +28,42 @@ helm repo add sourcegraph https://helm.sourcegraph.com/release
 
 > The chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
 
-By default, the [sourcegraph/sourcegraph-migrator] chart references database credentials from a Kubernetes `Secret` created by the parent [sourcegraph/sourcegraph] chart. If you provide your own `Secret` resources, update the `codeInsightsDB.auth.existingSecret`, `codeIntelDB.auth.existingSecret` and `pgsql.auth.existingSecret` settings in values.yaml to match. Learn more about [using your own PostgreSQL server].
-
-You should consult the list of available [migrator commands]. Below is some example usage.
-
-### Run database migration
-
-[`migrator up`](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#up)
-
-- Perform database migrations prior to upgrading the Sourcegraph deployment
-- Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
-
-```sh
-helm upgrade --install -f <your-override-file.yaml> --version {{ template "chart.version" . }} sg-migrator sourcegraph/sourcegraph-migrator
-```
-
-### Add a migration log entry
-
-[`migrator add-log -db=frontend -version=1528395834`](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log)
-
-Add an entry to the migration log after a site administrator has explicitly applied the contents of a migration file, learn more about troubleshooting a [dirty database].
-
-```sh
-helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" --version {{ template "chart.version" . }} sg-migrator sourcegraph/sourcegraph-migrator
-```
-
 ## Rendering manifests for kubectl deployment
 
 Manifests rendered using the `helm template` command can be used for direct deployment using `kubectl`.
 
 ## Configuration Options
 
-Reference the table below for available configuration parameters and consult [migrator] documentation.
+Reference the table below for available configuration parameters and consult [executor] documentation.
 
-In addition to the documented values, the `migrator` service also supports the following values
+In addition to the documented values, the `executor` and `private-docker-registry` services also supports the following values
 
-- `migrator.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `migrator.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `migrator.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `migrator.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `migrator.env` - consult `values.yaml` file
+- `executor.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+- `executor.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+- `executor.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+- `executor.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `executor.env` - consult `values.yaml` fiprivate-docker-registry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
 
+- `private-docker-registry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+- `private-docker-registry.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+- `private-docker-registry.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `private-docker-registry.env` - consult `values.yaml` file
 {{ template "chart.valuesTable" . }}
 
 ## Troubleshooting
 
-See a list of running migrator jobs
+See a list of running executor pods
 
 ```sh
-kubectl get jobs -l app.kubernetes.io/component=migrator
+kubectl get pods -l app=executor
 ```
 
-Check logs of the migrator job
+Check logs of the executor container
 
-```sb
-kubectl logs -l job=migrator -c migrator
+```sh
+kubectl logs -l app=executor -c executor
 ```
 
 [sourcegraph/sourcegraph]: ../sourcegraph/
-[sourcegraph/sourcegraph-migrator]: ./
-[dirty database]: https://docs.sourcegraph.com/admin/how-to/dirty_database
-[migrator]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
-[migrator commands]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#commands
-[job]: https://kubernetes.io/docs/concepts/workloads/controllers/job/
-[add-log]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log
-[using your own postgresql server]: https://docs.sourcegraph.com/admin/external_services/postgres#instructions
+[sourcegraph/sourcegraph-executor]: ./
+[executor]: https://docs.sourcegraph.com/admin/executors
