@@ -89,22 +89,12 @@ executor:
           value:
         EXECUTOR_FRONTEND_PASSWORD:
           value:
-        EXECUTOR_USE_FIRECRACKER:
-          value: "false"
         EXECUTOR_QUEUE_NAME:
           value:
-        EXECUTOR_JOB_NUM_CPUS:
-          value: "0"
-        EXECUTOR_JOB_MEMORY:
-          value: "0"
-        DOCKER_HOST:
-          value: tcp://localhost:2375
         SRC_ACCESS_TOKEN:
           value:
         SRC_ENDPOINT:
           value:
-        TMPDIR:
-          value: /scratch
   dind:
     image:
       repository: index.docker.io/docker:20.10.22-dind@sha256
