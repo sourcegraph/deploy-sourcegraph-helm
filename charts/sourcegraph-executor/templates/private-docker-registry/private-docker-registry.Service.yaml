@@ -1,10 +1,10 @@
-{{ if .Values.private-docker-registry.enabled }}
+{{- if .Values.privateDockerRegistry.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- if .Values.private-docker-registry.serviceAnnotations }}
+  {{- if .Values.privateDockerRegistry.serviceAnnotations }}
     annotations:
-    {{- toYaml .Values.private-docker-registry.serviceAnnotations | nindent 4 }}
+    {{- toYaml .Values.privateDockerRegistry.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
     app: private-docker-registry

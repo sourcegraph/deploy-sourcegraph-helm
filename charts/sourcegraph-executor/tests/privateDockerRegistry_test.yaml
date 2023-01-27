@@ -1,4 +1,4 @@
-suite: private-docker-registry
+suite: privateDockerRegistry
 templates:
   - private-docker-registry.Deployment.yaml
   - private-docker-registry.PersistentVolumeClaim.yaml
@@ -6,7 +6,7 @@ templates:
 tests:
   - it: should render the Deployment, Service and PVC if registry is enabled
     set:
-      executor:
+      privateDockerRegistry:
         enabled: true
     asserts:
       - containsDocument:
@@ -27,7 +27,7 @@ tests:
 
   - it: should not render any resources if registry is disabled
     set:
-      executor:
+      privateDockerRegistry:
         enabled: false
     asserts:
       - hasDocuments:

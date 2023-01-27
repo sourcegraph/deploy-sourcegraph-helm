@@ -124,9 +124,9 @@ spec:
             - mountPath: /etc/docker/daemon.json
               subPath: daemon.json
               name: docker-config
-      {{- include "sourcegraph.nodeSelector" (list . "private-docker-registry" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "private-docker-registry" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "private-docker-registry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.nodeSelector" (list . "executor" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "executor" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "executor" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

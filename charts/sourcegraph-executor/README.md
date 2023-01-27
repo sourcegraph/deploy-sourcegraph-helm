@@ -44,11 +44,11 @@ In addition to the documented values, the `executor` and `private-docker-registr
 - `executor.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
 - `executor.env` - consult `values.yaml`
 
-- `private-docker-registry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `private-docker-registry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `private-docker-registry.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `private-docker-registry.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `private-docker-registry.env` - consult `values.yaml` file
+- `privateDockerRegistry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+- `privateDockerRegistry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+- `privateDockerRegistry.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+- `privateDockerRegistry.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `privateDockerRegistry.env` - consult `values.yaml` file
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
@@ -62,9 +62,9 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.executor.image.env.SRC_ACCESS_TOKEN.value | string | `nil` |  |
 | executor.executor.image.env.SRC_ENDPOINT.value | string | `nil` |  |
 | executor.executor.image.name | string | `"executor"` |  |
-| private-docker-registry.enabled | bool | `true` |  |
-| private-docker-registry.image.repository | string | `"index.docker.io/registry:2@sha256"` |  |
-| private-docker-registry.image.tag | string | `"03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37"` |  |
+| privateDockerRegistry.enabled | bool | `true` |  |
+| privateDockerRegistry.image.repository | string | `"index.docker.io/registry:2@sha256"` |  |
+| privateDockerRegistry.image.tag | string | `"03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37"` |  |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |

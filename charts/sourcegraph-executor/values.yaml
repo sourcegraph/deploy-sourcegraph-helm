@@ -100,7 +100,7 @@ executor:
       repository: index.docker.io/docker:20.10.22-dind@sha256
       tag: 03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
 
-private-docker-registry:
+privateDockerRegistry:
   enabled: true
   image:
     repository: index.docker.io/registry:2@sha256

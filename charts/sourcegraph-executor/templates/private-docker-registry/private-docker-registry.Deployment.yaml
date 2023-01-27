@@ -1,4 +1,4 @@
-{{- if .Values.private-docker-registry.enabled -}}
+{{- if .Values.privateDockerRegistry.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -6,14 +6,14 @@ metadata:
     description: Runs a private docker registry for private-docker-registrys.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.private-docker-registry.labels }}
-      {{- toYaml .Values.private-docker-registry.labels | nindent 4 }}
+    {{- if .Values.privateDockerRegistry.labels }}
+      {{- toYaml .Values.privateDockerRegistry.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: private-docker-registry
-  name: {{ .Values.private-docker-registry.name }}
+  name: {{ .Values.privateDockerRegistry.name }}
 spec:
-  replicas: {{ .Values.private-docker-registry.replicaCount }}
+  replicas: {{ .Values.privateDockerRegistry.replicaCount }}
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
@@ -27,16 +27,16 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.private-docker-registry.podAnnotations }}
-      {{- toYaml .Values.private-docker-registry.podAnnotations | nindent 8 }}
+      {{- if .Values.privateDockerRegistry.podAnnotations }}
+      {{- toYaml .Values.privateDockerRegistry.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-      {{- if .Values.private-docker-registry.podLabels }}
-      {{- toYaml .Values.private-docker-registry.podLabels | nindent 8 }}
+      {{- if .Values.privateDockerRegistry.podLabels }}
+      {{- toYaml .Values.privateDockerRegistry.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: private-docker-registry
@@ -52,7 +52,7 @@ spec:
             - containerPort: 5000
               name: registry
           resources:
-            {{- toYaml .Values.private-docker-registry.resources | nindent 10 }}
+            {{- toYaml .Values.privateDockerRegistry.resources | nindent 10 }}
           {{- end }}
           livenessProbe:
             httpGet:
