@@ -69,10 +69,10 @@ spec:
               name: debug
           terminationMessagePolicy: FallbackToLogsOnError
           env:
-          {{- range $name, $item := .Values.executor.env}}
-          - name: {{ $name }}
-            {{- $item | toYaml | nindent 10 }}
-          {{- end }}
+            {{- range $name, $item := .Values.executor.env }}
+            - name: {{ $name }}
+              {{- $item | toYaml | nindent 10 }}
+            {{- end }}
             - name: EXECUTOR_USE_FIRECRACKER
               value: "false"
             - name: EXECUTOR_JOB_NUM_CPUS

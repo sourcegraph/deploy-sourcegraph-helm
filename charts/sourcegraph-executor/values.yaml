@@ -104,17 +104,17 @@ executor:
   image:
     defaultTag: 4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53
     name: "executor"
-    env:
-      EXECUTOR_FRONTEND_URL:
-        value:
-      EXECUTOR_FRONTEND_PASSWORD:
-        value:
-      EXECUTOR_QUEUE_NAME:
-        value:
-      SRC_ACCESS_TOKEN:
-        value:
-      SRC_ENDPOINT:
-        value:
+  env:
+    EXECUTOR_FRONTEND_URL:
+      value: test
+    EXECUTOR_FRONTEND_PASSWORD:
+      value: test
+    EXECUTOR_QUEUE_NAME:
+      value: test
+    SRC_ACCESS_TOKEN:
+      value: test
+    SRC_ENDPOINT:
+      value: test
 dind:
   image:
     registry: index.docker.io
