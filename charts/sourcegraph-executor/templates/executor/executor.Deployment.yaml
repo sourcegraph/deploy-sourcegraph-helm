@@ -99,7 +99,7 @@ spec:
             - '--host=tcp://0.0.0.0:2375'
           livenessProbe:
             tcpSocket:
-                  port: 2375
+              port: 2375
             initialDelaySeconds: 5
             periodSeconds: 5
             failureThreshold: 5
