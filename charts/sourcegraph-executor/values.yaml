@@ -34,7 +34,7 @@ sourcegraph:
 
 storageClass:
   # -- Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class
-  create: true
+  create: false
   # -- Name of the storageClass.
   # Use to customize to the existing storage class name
   name: sourcegraph
