@@ -71,7 +71,7 @@ spec:
           env:
             {{- range $name, $item := .Values.executor.env }}
             - name: {{ $name }}
-              {{- $item | toYaml | nindent 10 }}
+              {{- $item | toYaml | nindent 14 }}
             {{- end }}
             - name: EXECUTOR_USE_FIRECRACKER
               value: "false"
