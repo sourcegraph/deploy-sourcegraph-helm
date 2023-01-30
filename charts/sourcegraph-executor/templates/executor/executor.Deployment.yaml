@@ -87,7 +87,7 @@ spec:
             - mountPath: /scratch
               name: executor-scratch
         - name: dind
-          image: {{ .Values.dind.image }}
+          image: {{ .Values.dind.image.registry}}/{{ .Values.dind.image.repository}}:{{ .Values.dind.image.tag}}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           securityContext:
             privileged: true
@@ -124,9 +124,18 @@ spec:
             - mountPath: /etc/docker/daemon.json
               subPath: daemon.json
               name: docker-config
-      {{- include "sourcegraph.nodeSelector" (list . "executor" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "executor" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "executor" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}

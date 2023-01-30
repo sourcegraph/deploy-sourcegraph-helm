@@ -117,11 +117,13 @@ executor:
         value:
 dind:
   image:
-    repository: index.docker.io/docker:20.10.22-dind@sha256
-    tag: 03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
+    registry: index.docker.io
+    repository: docker
+    tag: 20.10.22-dind
 
 privateDockerRegistry:
-  enabled: true
-  image: dave
-    # repository: index.docker?.io/registry
+  image:
+    registry: index.docker.io
+    repository: docker/regisry
+    tag: 2
 

@@ -41,7 +41,7 @@ spec:
     spec:
       containers:
         - name: private-docker-registry
-          image: {{- .Values.privateDockerRegistry.iamge }}
+          image: {{ .Values.privateDockerRegistry.image.registry}}/{{ .Values.privateDockerRegistry.image.repository}}:{{ .Values.privateDockerRegistry.image.tag}}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
             - name: REGISTRY_PROXY_REMOTEURL
