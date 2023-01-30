@@ -106,15 +106,15 @@ executor:
     name: "executor"
   env:
     EXECUTOR_FRONTEND_URL:
-      value: test
+      value:
     EXECUTOR_FRONTEND_PASSWORD:
-      value: test
+      value:
     EXECUTOR_QUEUE_NAME:
-      value: test
+      value:
     SRC_ACCESS_TOKEN:
-      value: test
+      value:
     SRC_ENDPOINT:
-      value: test
+      value:
 dind:
   image:
     registry: index.docker.io
