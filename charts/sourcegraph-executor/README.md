@@ -56,11 +56,9 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"20.10.22-dind"` |  |
 | executor.enabled | bool | `true` |  |
-| executor.env.EXECUTOR_FRONTEND_PASSWORD.value | string | `nil` |  |
-| executor.env.EXECUTOR_FRONTEND_URL.value | string | `nil` |  |
-| executor.env.EXECUTOR_QUEUE_NAME.value | string | `nil` |  |
-| executor.env.SRC_ACCESS_TOKEN.value | string | `nil` |  |
-| executor.env.SRC_ENDPOINT.value | string | `nil` |  |
+| executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":null}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
+| executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":null}` | The external URL of the Sourcegraph instance. Required. |
+| executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":null}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required. |
 | executor.image.defaultTag | string | `"4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53"` |  |
 | executor.image.name | string | `"executor"` |  |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |

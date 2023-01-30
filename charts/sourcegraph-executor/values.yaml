@@ -105,16 +105,16 @@ executor:
     defaultTag: 4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53
     name: "executor"
   env:
+    # -- The external URL of the Sourcegraph instance. Required.
     EXECUTOR_FRONTEND_URL:
       value:
+    # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
     EXECUTOR_FRONTEND_PASSWORD:
       value:
+    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required.
     EXECUTOR_QUEUE_NAME:
       value:
-    SRC_ACCESS_TOKEN:
-      value:
-    SRC_ENDPOINT:
-      value:
+
 dind:
   image:
     registry: index.docker.io
