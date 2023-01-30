@@ -52,19 +52,20 @@ In addition to the documented values, the `executor` and `private-docker-registr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| executor.dind.image.repository | string | `"index.docker.io/docker:20.10.22-dind@sha256"` |  |
-| executor.dind.image.tag | string | `"03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37"` |  |
+| dind.image.registry | string | `"index.docker.io"` |  |
+| dind.image.repository | string | `"docker"` |  |
+| dind.image.tag | string | `"20.10.22-dind"` |  |
 | executor.enabled | bool | `true` |  |
-| executor.executor.image.defaultTag | string | `"4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53"` |  |
-| executor.executor.image.env.EXECUTOR_FRONTEND_PASSWORD.value | string | `nil` |  |
-| executor.executor.image.env.EXECUTOR_FRONTEND_URL.value | string | `nil` |  |
-| executor.executor.image.env.EXECUTOR_QUEUE_NAME.value | string | `nil` |  |
-| executor.executor.image.env.SRC_ACCESS_TOKEN.value | string | `nil` |  |
-| executor.executor.image.env.SRC_ENDPOINT.value | string | `nil` |  |
-| executor.executor.image.name | string | `"executor"` |  |
-| privateDockerRegistry.enabled | bool | `true` |  |
-| privateDockerRegistry.image.repository | string | `"index.docker.io/registry:2@sha256"` |  |
-| privateDockerRegistry.image.tag | string | `"03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37"` |  |
+| executor.image.defaultTag | string | `"4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53"` |  |
+| executor.image.env.EXECUTOR_FRONTEND_PASSWORD.value | string | `nil` |  |
+| executor.image.env.EXECUTOR_FRONTEND_URL.value | string | `nil` |  |
+| executor.image.env.EXECUTOR_QUEUE_NAME.value | string | `nil` |  |
+| executor.image.env.SRC_ACCESS_TOKEN.value | string | `nil` |  |
+| executor.image.env.SRC_ENDPOINT.value | string | `nil` |  |
+| executor.image.name | string | `"executor"` |  |
+| privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
+| privateDockerRegistry.image.repository | string | `"docker/regisry"` |  |
+| privateDockerRegistry.image.tag | int | `2` |  |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
@@ -77,6 +78,12 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| storageClass.allowedTopologies | object | `{}` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
+| storageClass.create | bool | `true` | Enable creation of storageClass. Disable if you have your own existing storage class |
+| storageClass.name | string | `"sourcegraph"` | Name of the storageClass. Use to customize to the existing storage class name |
+| storageClass.parameters | object | `{}` | Extra parameters of storageClass, consult your cloud provider persistent storage documentation |
+| storageClass.provisioner | string | `"kubernetes.io/gce-pd"` | Name of the storageClass provisioner, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner) and consult your cloud provider persistent storage documentation |
+| storageClass.type | string | `"pd-ssd"` | Value of `type` key in storageClass `parameters`, consult your cloud provider persistent storage documentation |
 
 ## Troubleshooting
 
