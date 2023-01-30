@@ -101,29 +101,27 @@ storageClass:
 
 executor:
   enabled: true
-  executor:
-    image:
-      defaultTag: 4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53
-      name: "executor"
-      env:
-        EXECUTOR_FRONTEND_URL:
-          value:
-        EXECUTOR_FRONTEND_PASSWORD:
-          value:
-        EXECUTOR_QUEUE_NAME:
-          value:
-        SRC_ACCESS_TOKEN:
-          value:
-        SRC_ENDPOINT:
-          value:
-  dind:
-    image:
-      repository: index.docker.io/docker:20.10.22-dind@sha256
-      tag: 03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
+  image:
+    defaultTag: 4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53
+    name: "executor"
+    env:
+      EXECUTOR_FRONTEND_URL:
+        value:
+      EXECUTOR_FRONTEND_PASSWORD:
+        value:
+      EXECUTOR_QUEUE_NAME:
+        value:
+      SRC_ACCESS_TOKEN:
+        value:
+      SRC_ENDPOINT:
+        value:
+dind:
+  image:
+    repository: index.docker.io/docker:20.10.22-dind@sha256
+    tag: 03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
 
 privateDockerRegistry:
   enabled: true
-  image:
-    repository: index.docker.io/registry:2@sha256
-    tag: 03f2d563100b9776283de1e18f10a1f0b66d2fdc7918831bf8db1cda767d6b37
+  image: dave
+    # repository: index.docker?.io/registry
 

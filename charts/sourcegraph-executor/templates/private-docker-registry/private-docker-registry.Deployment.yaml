@@ -1,9 +1,8 @@
-{{- if .Values.privateDockerRegistry.enabled -}}
+{{- if .Values.executor.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    description: Runs a private docker registry for private-docker-registrys.
+  name: private-docker-registry
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.privateDockerRegistry.labels }}
@@ -11,7 +10,6 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: private-docker-registry
-  name: {{ .Values.privateDockerRegistry.name }}
 spec:
   replicas: {{ .Values.privateDockerRegistry.replicaCount }}
   selector:
@@ -43,7 +41,7 @@ spec:
     spec:
       containers:
         - name: private-docker-registry
-        image: {{ include "sourcegraph.image" (list . "private-docker-registry") }}
+          image: {{- .Values.privateDockerRegistry.iamge }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
             - name: REGISTRY_PROXY_REMOTEURL
@@ -51,9 +49,6 @@ spec:
           ports:
             - containerPort: 5000
               name: registry
-          resources:
-            {{- toYaml .Values.privateDockerRegistry.resources | nindent 10 }}
-          {{- end }}
           livenessProbe:
             httpGet:
               path: /
@@ -71,14 +66,24 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/registry
               name: cache
-      {{- include "sourcegraph.nodeSelector" (list . "privateDockerRegistry" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "privateDockerRegistry" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "privateDockerRegistry" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-        volumes:
+      volumes:
         - name: cache
           persistentVolumeClaim:
             claimName: private-docker-registry
+{{- end }}

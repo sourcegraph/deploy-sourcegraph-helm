@@ -87,7 +87,7 @@ spec:
             - mountPath: /scratch
               name: executor-scratch
         - name: dind
-          image: {{ include "sourcegraph.image" (list . "dind") }}
+          image: {{ .Values.dind.image }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           securityContext:
             privileged: true
