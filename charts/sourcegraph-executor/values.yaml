@@ -31,9 +31,9 @@ sourcegraph:
   # -- Add extra labels to attach to all pods
   podLabels: {}
 
+
 storageClass:
-  # -- Enable creation of storageClass.
-  # Disable if you have your own existing storage class
+  # -- Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class
   create: true
   # -- Name of the storageClass.
   # Use to customize to the existing storage class name

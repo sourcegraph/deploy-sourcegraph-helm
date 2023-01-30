@@ -56,9 +56,9 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"20.10.22-dind"` |  |
 | executor.enabled | bool | `true` |  |
-| executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":null}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
-| executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":null}` | The external URL of the Sourcegraph instance. Required. |
-| executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":null}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required. |
+| executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":""}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
+| executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":""}` | The external URL of the Sourcegraph instance. Required. |
+| executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":""}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required. |
 | executor.image.defaultTag | string | `"4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53"` |  |
 | executor.image.name | string | `"executor"` |  |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
@@ -77,7 +77,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | object | `{}` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
-| storageClass.create | bool | `true` | Enable creation of storageClass. Disable if you have your own existing storage class |
+| storageClass.create | bool | `true` | Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class |
 | storageClass.name | string | `"sourcegraph"` | Name of the storageClass. Use to customize to the existing storage class name |
 | storageClass.parameters | object | `{}` | Extra parameters of storageClass, consult your cloud provider persistent storage documentation |
 | storageClass.provisioner | string | `"kubernetes.io/gce-pd"` | Name of the storageClass provisioner, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner) and consult your cloud provider persistent storage documentation |
