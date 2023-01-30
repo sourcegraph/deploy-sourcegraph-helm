@@ -126,4 +126,3 @@ privateDockerRegistry:
     registry: index.docker.io
     repository: docker/regisry
     tag: 2
-
