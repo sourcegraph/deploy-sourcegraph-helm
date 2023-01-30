@@ -20,3 +20,4 @@ function lint_chart() {
 
 lint_chart "sourcegraph"
 lint_chart "sourcegraph-migrator"
+lint_chart "sourcegraph-executor"
