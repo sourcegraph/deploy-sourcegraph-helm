@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Deploy Sourcegraph Executors now deployable via helm [#236](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/236).
+
 ## 4.4.1
 
 Sourcegraph 4.4.1 is now available!
@@ -38,7 +40,7 @@ Sourcegraph 4.3.0 is now available!
 - Added a node-exporter daemonset, which collects crucial machine-level metrics that help Sourcegraph scale your deployment. See [#194](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/194) for more information
 
   - 🚨 **WARNING**: Similarly to cadvisor,  `node-exporter`:
-    - runs as a daemonset 
+    - runs as a daemonset
     - needs to mount various read-only directories from the host machine (`/`, `/proc`, and `/sys`)
     - ideally shares the machine's PID namespaces
 
@@ -75,11 +77,11 @@ Sourcegraph 4.0.1 is now available!
 Sourcegraph 4.0.0 is now available!
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-0-0)
 - (lint) Don't emit `annotations` key on k8s objects if the value is empty [#163](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/163)
-- **BREAKING**: Switched to OpenTelemetry for trace data collection [#167](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/167)  
+- **BREAKING**: Switched to OpenTelemetry for trace data collection [#167](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/167)
   Relevant changes:
   - `tracing` and `tracingAgent` value blocks have been removed
   - `openTelemetry` value block has been added
-  - The `otel-collector` service can be configured to export trace data to arbitrary external observability backends (see `openTelemetry.gateway.config.traces` value)  
+  - The `otel-collector` service can be configured to export trace data to arbitrary external observability backends (see `openTelemetry.gateway.config.traces` value)
   - The bundled Jaeger instance is now disabled by default. You can re-enable it by setting `jaeger.enabled` to true. This will automatically configure `otel-collector` to export trace data to this instance.
 
 ## 3.43.2
