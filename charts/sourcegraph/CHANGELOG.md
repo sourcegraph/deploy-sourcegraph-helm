@@ -10,6 +10,11 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Deploy Sourcegraph Executors now deployable via helm [#236](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/236).
 
+## 4.4.2
+
+Sourcegraph 4.4.2 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-4-2)
+
 ## 4.4.1
 
 Sourcegraph 4.4.1 is now available!
