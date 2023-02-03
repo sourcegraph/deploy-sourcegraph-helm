@@ -52,7 +52,7 @@ sourcegraph:
 # More values to be added in order to test your change
 ```
 
-Make sure you test both enabled and disabled toggles. For example, if you added a new values to conditional render some templates, turn it on and off in the `overrid.yaml` to make sure they both work. You can also include your `override.yaml` in the `Test plan` during PR review to help others understand your testing strategy.
+Make sure you test both enabled and disabled toggles. For example, if you added a new values to conditional render some templates, turn it on and off in the `override.yaml` to make sure they both work. You can also include your `override.yaml` in the `Test plan` during PR review to help others understand your testing strategy.
 
 ### Inspect the entire rendered template
 
