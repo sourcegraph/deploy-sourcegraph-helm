@@ -98,8 +98,8 @@ spec:
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "jaeger") | trim | nindent 6 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "jaeger") | trim | nindent 6 }}
       volumes:
       {{- if .Values.jaeger.extraVolumes }}
       {{- toYaml .Values.jaeger.extraVolumes | nindent 6 }}
