@@ -32,6 +32,27 @@ sourcegraph:
   podLabels: {}
 
 
+storageClass:
+  # -- Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class
+  create: false
+  # -- Name of the storageClass.
+  # Use to customize to the existing storage class name
+  name: sourcegraph
+  # -- Name of the storageClass provisioner,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
+  # and consult your cloud provider persistent storage documentation
+  provisioner: kubernetes.io/gce-pd
+  # -- Value of `type` key in storageClass `parameters`,
+  # consult your cloud provider persistent storage documentation
+  type: pd-ssd
+  # -- Extra parameters of storageClass,
+  # consult your cloud provider persistent storage documentation
+  parameters: {}
+  # -- Persistent volumes topology configuration,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
+  allowedTopologies: {}
+
+
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
 #   replicaCount: 1
@@ -78,54 +99,30 @@ sourcegraph:
 #   # Toggle deployment of applications on/off. Applies to databases and third-party applications
 #   enabled: true
 
-codeInsightsDB:
-  name: "codeinsights-db"
-  auth:
-    # -- Name of existing secret to use for codeinsights-db credentials
-    # This should match the setting in the sourcegraph chart values
-    existingSecret: ""
-
-codeIntelDB:
-  name: "codeintel-db"
-  auth:
-    # -- Name of existing secret to use for codeintel-db credentials
-    # This should match the setting in the sourcegraph chart values
-    existingSecret: ""
-
-pgsql:
-  name: "pgsql"
-  auth:
-    # -- Name of existing secret to use for pgsql credentials
-    # This should match the setting in the sourcegraph chart values
-    existingSecret: ""
-
-migrator:
+executor:
+  enabled: true
   image:
-    # -- Docker image tag for the `migrator` image
-    defaultTag: 4.4.2@sha256:603b17216b6390e486fed6ff3ce4d6bced1446f8ef820b5b4e1278e4d885123f
-    # -- Docker image name for the `migrator` image
-    name: "migrator"
-  # -- Environment variables for the `migrator` container
-  env: {}
-  # -- Resource requests & limits for the `migrator` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  resources:
-    limits:
-      cpu: 500m
-      memory: 100M
-    requests:
-      cpu: 100m
-      memory: 50M
-  # -- Security context for the `migrator` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  # -- Override default `migrator` container args
-  # Available commands can be found at
-  # https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
-  args:
-  - up
-  - -db=all
+    defaultTag: 4.4.1@sha256:ec8bd27e8599694cfb24341c564b0e4e8947f863d98c4f5b1cb6e67dd8697f53
+    name: "executor"
+  env:
+    # -- The external URL of the Sourcegraph instance. Required.
+    EXECUTOR_FRONTEND_URL:
+      value: ""
+    # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
+    EXECUTOR_FRONTEND_PASSWORD:
+      value: ""
+    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required.
+    EXECUTOR_QUEUE_NAME:
+      value: ""
+
+dind:
+  image:
+    registry: index.docker.io
+    repository: docker
+    tag: 20.10.22-dind
+
+privateDockerRegistry:
+  image:
+    registry: index.docker.io
+    repository: docker/regisry
+    tag: 2

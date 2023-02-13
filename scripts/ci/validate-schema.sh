@@ -17,3 +17,4 @@ function validate_schema() {
 
 validate_schema "sourcegraph"
 validate_schema "sourcegraph-migrator"
+validate_schema "sourcegraph-executor"

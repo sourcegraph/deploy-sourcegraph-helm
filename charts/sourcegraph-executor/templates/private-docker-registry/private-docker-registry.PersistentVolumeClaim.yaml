@@ -1,0 +1,19 @@
+{{- if .Values.privateDockerRegistry.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: private-docker-registry
+  name: private-docker-registry
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.privateDockerRegistry.storageSize }}
+  storageClassName: {{ .Values.storageClass.name }}
+  {{- if .Values.privateDockerRegistry.volumeName }}
+  volumeName: {{ .Values.privateDockerRegistry.volumeName }}
+  {{- end }}
+{{- end }}
