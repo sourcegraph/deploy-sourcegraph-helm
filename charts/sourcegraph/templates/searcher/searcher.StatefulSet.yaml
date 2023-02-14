@@ -122,6 +122,5 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          # If you change this, also change indexed-search's disk size.
           storage: {{ .Values.searcher.storageSize }}
       storageClassName: {{ .Values.storageClass.name }}
