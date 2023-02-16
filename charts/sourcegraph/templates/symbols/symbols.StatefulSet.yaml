@@ -53,7 +53,7 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SYMBOLS_CACHE_SIZE_MB
-          value: {{ trimSuffix "G" .Values.symbols.storageSize | mul 500 | quote }}
+          value: {{ trimSuffix "Gi" .Values.symbols.storageSize | mul 900 | quote }}
         - name: POD_NAME
           valueFrom:
             fieldRef:

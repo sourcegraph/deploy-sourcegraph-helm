@@ -1057,7 +1057,7 @@ searcher:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
-  storageSize: 26G
+  storageSize: 26Gi
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -1117,7 +1117,7 @@ symbols:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
-  storageSize: 12G
+  storageSize: 12Gi
 
 syntectServer:
   image:

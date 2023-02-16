@@ -57,7 +57,7 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SEARCHER_CACHE_SIZE_MB
-          value: {{ trimSuffix "G" .Values.searcher.storageSize | mul 500 | quote }}
+          value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 900 | quote }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
