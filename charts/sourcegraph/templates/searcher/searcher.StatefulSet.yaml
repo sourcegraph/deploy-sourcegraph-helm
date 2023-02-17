@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Backend for text search operations.
@@ -19,10 +19,8 @@ spec:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: searcher
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+  serviceName: searcher
+  updateStrategy:
     type: RollingUpdate
   template:
     metadata:
@@ -59,11 +57,11 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SEARCHER_CACHE_SIZE_MB
-          valueFrom:
-            resourceFieldRef:
-              containerName: searcher
-              resource: requests.ephemeral-storage
-              divisor: 1M
+          {{- if .Values.searcher.storageSize }}
+          value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 900 | quote }}
+          {{- else }}
+          value: "23400"  
+          {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -89,7 +87,7 @@ spec:
           timeoutSeconds: 5
         volumeMounts:
         - mountPath: /mnt/cache
-          name: cache-ssd
+          name: cache
         - mountPath: /tmp
           name: tmpdir
         {{- if .Values.searcher.extraVolumeMounts }}
@@ -116,9 +114,19 @@ spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "searcher") | trim | nindent 6 }}
       volumes:
       - emptyDir: {}
-        name: cache-ssd
+        name: cache
       - emptyDir: {}
         name: tmpdir
       {{- if .Values.searcher.extraVolumes }}
       {{- toYaml .Values.searcher.extraVolumes | nindent 6 }}
       {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: cache
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.searcher.storageSize | default "26Gi" }}
+      storageClassName: {{ .Values.storageClass.name }}

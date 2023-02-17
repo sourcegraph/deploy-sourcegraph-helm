@@ -1,5 +1,5 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   annotations:
     description: Backend for symbols operations.
@@ -19,11 +19,9 @@ spec:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: symbols
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
+  updateStrategy:
     type: RollingUpdate
+  serviceName: symbols
   template:
     metadata:
       annotations:
@@ -55,11 +53,11 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SYMBOLS_CACHE_SIZE_MB
-          valueFrom:
-            resourceFieldRef:
-              containerName: symbols
-              resource: requests.ephemeral-storage
-              divisor: 1M
+          {{- if .Values.symbols.storageSize }}
+          value: {{ trimSuffix "Gi" .Values.symbols.storageSize | mul 900 | quote }}
+          {{- else }}
+          value: "10800"
+          {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -97,7 +95,7 @@ spec:
           name: debug
         volumeMounts:
         - mountPath: /mnt/cache
-          name: cache-ssd
+          name: cache
         - mountPath: /mnt/tmp
           name: tmp
         {{- if .Values.symbols.extraVolumeMounts }}
@@ -124,9 +122,19 @@ spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "symbols") | trim | nindent 6 }}
       volumes:
       - emptyDir: {}
-        name: cache-ssd
+        name: cache
       - emptyDir: {}
         name: tmp
       {{- if .Values.symbols.extraVolumes }}
       {{- toYaml .Values.symbols.extraVolumes | nindent 6 }}
       {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: cache
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.symbols.storageSize | default "12Gi" }}
+      storageClassName: {{ .Values.storageClass.name }}
