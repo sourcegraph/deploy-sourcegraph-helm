@@ -57,7 +57,11 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SEARCHER_CACHE_SIZE_MB
+          {{- if .Values.searcher.storageSize }}
           value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 900 | quote }}
+          {{- else }}
+          value: "23400"  
+          {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -124,5 +128,5 @@ spec:
       - ReadWriteOnce
       resources:
         requests:
-          storage: {{ .Values.searcher.storageSize }}
+          storage: {{ .Values.searcher.storageSize | default "26Gi" }}
       storageClassName: {{ .Values.storageClass.name }}

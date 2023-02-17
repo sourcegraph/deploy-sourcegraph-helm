@@ -9,6 +9,7 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Deploy Sourcegraph Executors now deployable via helm [#236](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/236).
+- Searcher and Symbols now use StatefulSets and PVCs to avoid large `ephermeralStorage` requests [#242](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/242)
 
 ## 4.4.2
 
