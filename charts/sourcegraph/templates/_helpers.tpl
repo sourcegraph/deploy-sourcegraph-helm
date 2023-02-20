@@ -146,7 +146,7 @@ app.kubernetes.io/name: jaeger
     fieldRef:
       fieldPath: status.hostIP
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
-  value: http://$(OTEL_AGENT_HOST):4317
+  value: http://$(OTEL_AGENT_HOST):{{ toYaml .Values.openTelemetry.agent.hostPorts.otlpGrpc }}
 {{- end }}
 {{- end }}
 

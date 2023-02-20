@@ -642,6 +642,10 @@ openTelemetry:
     name: "otel-agent"
     # -- Resource requests & limits for the `otel-agent` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+    hostPorts:
+      otlpGrpc: 4317
+      otlpHttp: 4318
+      zpages: 55679
     resources:
       limits:
         cpu: "500m"
