@@ -239,3 +239,13 @@ checksum/auth: {{ toJson $checksum | sha256sum }}
 {{- $checksum := append $checksum .Values.redisCache.connection -}}
 checksum/redis: {{ toJson $checksum | sha256sum }}
 {{- end -}}
+
+{{- define "sourcegraph.initContainers" -}}
+{{- $top := index . 0 }}
+{{- $service := index . 1 }}
+{{- $serviceInitContainers := (index $top.Values $service "initContainers") }}
+{{- if $serviceInitContainers -}}
+initContainers:
+{{- $serviceInitContainers | toYaml | trim | nindent 2 -}}
+{{- end -}}
+{{- end -}}

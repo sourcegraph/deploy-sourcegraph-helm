@@ -43,6 +43,7 @@ spec:
         deploy: sourcegraph
         app: blobstore
     spec:
+      {{- include "sourcegraph.initContainers" (list . "blobstore") | nindent 6 }}
       containers:
       - name: blobstore
         env:
