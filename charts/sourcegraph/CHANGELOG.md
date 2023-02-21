@@ -7,7 +7,7 @@ Use `**BREAKING**:` to denote a breaking change
 <!-- START CHANGELOG -->
 
 ## Unreleased
-
+* The default `hostPort`s for OpenTelemetry agent pods deployed by the DaemonSet can now be overridden by setting `openTelemetry.agent.hostPorts` for one or more of `otlpGrpc`, `otlpHttp`, and `zpages`. This allows multiple instances of Sourcegraph to be deployed on a single cluster [#245](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/245).
 
 ## 4.5.0
 
