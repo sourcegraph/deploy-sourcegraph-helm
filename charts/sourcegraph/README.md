@@ -189,8 +189,12 @@ In addition to the documented values, all services also support the following va
 | nodeExporter.resources | object | `{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":".2","memory":"100Mi"}}` | Resource requests & limits for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nodeExporter.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `node-exporter` |
 | nodeExporter.serviceAccount.name | string | `"node-exporter"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| openTelemetry.agent.hostPorts | object | `{"otlpGrpc":4317,"otlpHttp":4318,"zpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
-| openTelemetry.agent.resources | object | `{"limits":{"cpu":"500m","memory":"500Mi"},"requests":{"cpu":"100m","memory":"100Mi"}}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| openTelemetry.agent.resources.limits.cpu | string | `"500m"` |  |
+| openTelemetry.agent.resources.limits.memory | string | `"500Mi"` |  |
+| openTelemetry.agent.resources.requests.cpu | string | `"100m"` |  |
+| openTelemetry.agent.resources.requests.memory | string | `"100Mi"` |  |
 | openTelemetry.enabled | bool | `true` |  |
 | openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to.  Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
