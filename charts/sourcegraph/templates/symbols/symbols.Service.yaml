@@ -16,6 +16,7 @@ metadata:
     {{- end }}
   name: symbols
 spec:
+  clusterIP: None
   ports:
   - name: http
     port: 3184

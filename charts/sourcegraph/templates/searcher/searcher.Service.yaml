@@ -16,6 +16,7 @@ metadata:
     {{- end }}
   name: searcher
 spec:
+  clusterIP: None
   ports:
   - name: http
     port: 3181
