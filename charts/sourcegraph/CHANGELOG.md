@@ -10,6 +10,7 @@ Use `**BREAKING**:` to denote a breaking change
 * The default `hostPort`s for OpenTelemetry agent pods deployed by the DaemonSet can now be overridden by setting `openTelemetry.agent.hostPorts` for one or more of `otlpGrpc`, `otlpHttp`, and `zpages`. This allows multiple instances of Sourcegraph to be deployed on a single cluster [#245](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/245).
 * Update default `searcher` replicas from 2 --> 1
 * Update `searcher` and `symbols` services to be headless.
+  * Before upgrading, delete your `searcher` and `symbols` services (ex: `kubectl delete svc/searcher svc/symbols`)
 
 ## 4.5.0
 
