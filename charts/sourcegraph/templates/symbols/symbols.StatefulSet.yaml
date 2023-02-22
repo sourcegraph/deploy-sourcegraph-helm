@@ -53,9 +53,12 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SYMBOLS_CACHE_SIZE_MB
+          # Set the cache size to ~90% of the PVC size
           {{- if .Values.symbols.storageSize }}
           value: {{ trimSuffix "Gi" .Values.symbols.storageSize | mul 900 | quote }}
           {{- else }}
+          # This value is ~90% of the default value for
+          # storageSize in the VolumeClaimTemplate below
           value: "10800"
           {{- end }}
         - name: POD_NAME
