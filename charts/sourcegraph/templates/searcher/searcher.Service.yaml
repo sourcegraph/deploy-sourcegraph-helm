@@ -16,6 +16,7 @@ metadata:
     {{- end }}
   name: searcher
 spec:
+  clusterIP: None
   ports:
   - name: http
     port: 3181
@@ -26,4 +27,3 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: searcher
-  type: {{ .Values.searcher.serviceType | default "ClusterIP" }}

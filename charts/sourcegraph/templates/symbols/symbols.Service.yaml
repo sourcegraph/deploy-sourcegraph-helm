@@ -16,6 +16,7 @@ metadata:
     {{- end }}
   name: symbols
 spec:
+  clusterIP: None
   ports:
   - name: http
     port: 3184
@@ -26,4 +27,3 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: symbols
-  type: {{ .Values.symbols.serviceType | default "ClusterIP" }}
