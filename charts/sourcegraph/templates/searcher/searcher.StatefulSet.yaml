@@ -57,9 +57,12 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         - name: SEARCHER_CACHE_SIZE_MB
+          # Set the cache size to ~90% of the PVC size
           {{- if .Values.searcher.storageSize }}
           value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 900 | quote }}
           {{- else }}
+          # This value is ~90% of the default value for
+          # storageSize in the VolumeClaimTemplate below
           value: "23400"  
           {{- end }}
         - name: POD_NAME

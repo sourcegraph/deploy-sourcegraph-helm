@@ -1056,7 +1056,7 @@ searcher:
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "searcher"
   # -- Number of `searcher` pod
-  replicaCount: 2
+  replicaCount: 1
   # -- Resource requests & limits for the `searcher` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1071,6 +1071,7 @@ searcher:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Size of the PVC for searcher pods to store cache data
   storageSize: 26Gi
 
 storageClass:
@@ -1131,6 +1132,7 @@ symbols:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Size of the PVC for symbols pods to store cache data
   storageSize: 12Gi
 
 syntectServer:
