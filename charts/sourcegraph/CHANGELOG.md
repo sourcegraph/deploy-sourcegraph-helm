@@ -14,12 +14,12 @@ Use `**BREAKING**:` to denote a breaking change
 - Sourcegraph 4.5.0 is now available
 
 
-- The default `hostPort`s for OpenTelemetry agent pods deployed by the DaemonSet can now be overridden by setting `openTelemetry.agent.hostPorts` for one or more of `otlpGrpc`, `otlpHttp`, and `zpages`. This allows multiple instances of Sourcegraph to be deployed on a single cluster [#245](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/245).
-- Update default `searcher` replicas from 2 --> 1
-- Update `searcher` and `symbols` services to be headless.
-  - Before upgrading, delete your `searcher` and `symbols` services (ex: `kubectl delete svc/searcher svc/symbols`) [#250](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/250)
 - Deploy Sourcegraph Executors now deployable via helm [#236](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/236).
 - Searcher and Symbols now use StatefulSets and PVCs to avoid large `ephermeralStorage` requests [#242](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/242)
+- The default `hostPort`s for OpenTelemetry agent pods deployed by the DaemonSet can now be overridden by setting `openTelemetry.agent.hostPorts` for one or more of `otlpGrpc`, `otlpHttp`, and `zpages`. This allows multiple instances of Sourcegraph to be deployed on a single cluster [#245](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/245).
+- Update default `searcher` replicas from 2 --> 1 [#247](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/247)
+- Update `searcher` and `symbols` services to be headless.
+  - Before upgrading, delete your `searcher` and `symbols` services (ex: `kubectl delete svc/searcher svc/symbols`) [#250](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/250)
 
 ## 4.4.2
 
