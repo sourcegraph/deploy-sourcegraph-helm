@@ -27,4 +27,3 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: searcher
-  # type: {{ .Values.searcher.serviceType | default "ClusterIP" }}
