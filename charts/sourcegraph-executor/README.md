@@ -59,7 +59,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":""}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
 | executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":""}` | The external URL of the Sourcegraph instance. Required. |
 | executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":""}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required. |
-| executor.image.defaultTag | string | `"4.5.0@sha256:3701a647ab3833b4aa0205ce0c46f38911dd1311f9161edbf0b63d9c76ac8242"` |  |
+| executor.image.defaultTag | string | `"4.5.1@sha256:420f5c3a96337e085edd29d01f7992133dedd9b8667bda520c53ab0294cfa929"` |  |
 | executor.image.name | string | `"executor"` |  |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
 | privateDockerRegistry.image.repository | string | `"docker/regisry"` |  |
