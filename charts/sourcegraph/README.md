@@ -134,7 +134,6 @@ In addition to the documented values, all services also support the following va
 | grafana.image.name | string | `"grafana"` | Docker image name for the `grafana` image |
 | grafana.name | string | `"grafana"` | Name used by resources. Does not affect service names or PVCs. |
 | grafana.podSecurityContext | object | `{"fsGroup":472,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| grafana.replicaCount | int | `1` | Number of `grafana` pod |
 | grafana.resources | object | `{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests & limits for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | grafana.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `grafana` |
 | grafana.serviceAccount.name | string | `"grafana"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -247,7 +246,6 @@ In addition to the documented values, all services also support the following va
 | prometheus.name | string | `"prometheus"` | Name used by resources. Does not affect service names or PVCs. |
 | prometheus.podSecurityContext | object | `{"fsGroup":100,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `prometheus` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | prometheus.privileged | bool | `true` | Enable RBAC for `prometheus` |
-| prometheus.replicaCount | int | `1` | Number of `prometheus` pod |
 | prometheus.resources | object | `{"limits":{"cpu":"2","memory":"6G"},"requests":{"cpu":"500m","memory":"6G"}}` | Resource requests & limits for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) Prometheus is relied upon to monitor services for sending alerts to site admins when something is wrong with Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough memory to perform its job reliably and prevent conflicts with other pods on the same host node. The limit chosen here is based on what works reliably on Sourcegraph.com with lots of traffic. |
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -313,7 +311,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
-| storageClass.allowedTopologies | object | `{}` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
+| storageClass.allowedTopologies | list | `[]` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
 | storageClass.create | bool | `true` | Enable creation of storageClass. Disable if you have your own existing storage class |
 | storageClass.name | string | `"sourcegraph"` | Name of the storageClass. Use to customize to the existing storage class name |
 | storageClass.parameters | object | `{}` | Extra parameters of storageClass, consult your cloud provider persistent storage documentation |
