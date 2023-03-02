@@ -4,7 +4,6 @@
 - [ ] Update [changelog](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/CHANGELOG.md)
 - [ ] Update [Kubernetes update doc](https://docs.sourcegraph.com/admin/updates/kubernetes)
 
-
 ### Test plan
 
 <!--
