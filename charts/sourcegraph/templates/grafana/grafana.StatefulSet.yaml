@@ -13,7 +13,6 @@ metadata:
     app.kubernetes.io/component: grafana
   name: {{ .Values.grafana.name }}
 spec:
-  replicas: {{ .Values.grafana.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:

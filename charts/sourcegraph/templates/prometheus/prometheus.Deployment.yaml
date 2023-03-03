@@ -14,7 +14,6 @@ metadata:
   name: {{ .Values.prometheus.name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ .Values.prometheus.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
