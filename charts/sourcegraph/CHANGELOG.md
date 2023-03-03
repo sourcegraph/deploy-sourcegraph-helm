@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Hotfix: Update Symbols ENV variable for cache directory [#259](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/259)
 
 ## 4.5.0
 
