@@ -12,7 +12,6 @@ metadata:
     app.kubernetes.io/component: symbols
   name: {{ .Values.symbols.name }}
 spec:
-  minReadySeconds: 10
   replicas: {{ .Values.symbols.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
