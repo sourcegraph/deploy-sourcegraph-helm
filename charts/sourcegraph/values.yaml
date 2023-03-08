@@ -474,8 +474,6 @@ grafana:
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "grafana"
-  # -- Number of `grafana` pod
-  replicaCount: 1
   # -- Resource requests & limits for the `grafana` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -855,8 +853,6 @@ prometheus:
   name: "prometheus"
   # -- Enable RBAC for `prometheus`
   privileged: true
-  # -- Number of `prometheus` pod
-  replicaCount: 1
   # -- Resource requests & limits for the `prometheus` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   # Prometheus is relied upon to monitor services for sending alerts to site admins when
@@ -1093,7 +1089,7 @@ storageClass:
   parameters: {}
   # -- Persistent volumes topology configuration,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
-  allowedTopologies: {}
+  allowedTopologies: []
 
 symbols:
   image:

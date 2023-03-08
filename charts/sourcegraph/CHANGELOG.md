@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Change CACHE_DIR env var to SYMBOLS_CACHE_DIR in symbols template [#258](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/258)
 
 ## 4.5.0
 
