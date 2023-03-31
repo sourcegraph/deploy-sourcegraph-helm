@@ -12,7 +12,6 @@ metadata:
     app.kubernetes.io/component: symbols
   name: {{ .Values.symbols.name }}
 spec:
-  minReadySeconds: 10
   replicas: {{ .Values.symbols.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
@@ -65,7 +64,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        - name: CACHE_DIR
+        - name: SYMBOLS_CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
         - name: TMPDIR
           value: /mnt/tmp
