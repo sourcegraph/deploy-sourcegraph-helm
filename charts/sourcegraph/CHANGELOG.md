@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added ephemeral storage requests to worker and an emptyDir mount by default to provide writable temporary storage. [#XXX](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/258)
+
 
 ## 5.0.0
 

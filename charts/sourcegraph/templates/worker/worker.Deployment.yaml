@@ -60,6 +60,8 @@ spec:
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
         {{- end }}
+        - name: TMPDIR
+          value: {{ .Values.sourcegraph.tmpDir }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -100,6 +102,8 @@ spec:
         securityContext:
           {{- toYaml .Values.worker.containerSecurityContext | nindent 10 }}
         volumeMounts:
+        - mountPath: /mnt/tmp
+          name: tmp
         {{- if .Values.worker.extraVolumeMounts }}
         {{- toYaml .Values.worker.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -117,6 +121,8 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "worker") | trim | nindent 6 }}
       volumes:
+      - emptyDir: {}
+        name: tmp
       {{- if .Values.worker.extraVolumes }}
       {{- toYaml .Values.worker.extraVolumes | nindent 6 }}
       {{- end }}

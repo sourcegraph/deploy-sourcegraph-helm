@@ -1245,14 +1245,20 @@ worker:
   podSecurityContext: {}
   # -- Number of `worker` pod
   replicaCount: 1
+  # -- By default, use an emptyDir mount. If you wish to use a larger non-ephemeral volume,
+  # use .extraVolumes and .extraVolumeMounts to add a tmp volume and set the tmpDir here to
+  # its mount path.
+  tmpDir: /mnt/tmp
   # -- Resource requests & limits for the `worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
       cpu: "2"
+      ephemeral-storage: 50Gi
       memory: 4G
     requests:
       cpu: 500m
+      ephemeral-storage: 10Gi
       memory: 2G
   serviceAccount:
     # -- Enable creation of ServiceAccount for `worker`
