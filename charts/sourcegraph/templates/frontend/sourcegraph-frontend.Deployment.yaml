@@ -67,8 +67,10 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- if not .Values.sourcegraph.localDevMode}}
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
+        {{- end }}
         securityContext:
           {{- toYaml .Values.migrator.containerSecurityContext | nindent 10 }}
       {{- end }}
