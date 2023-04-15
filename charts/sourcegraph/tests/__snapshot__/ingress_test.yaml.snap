@@ -1,0 +1,60 @@
+should render ingress with a one tls secret:
+  1: |
+    - hosts:
+      - chart-example.local
+      secretName: chart-example-tls
+should render ingress with many hosts when extraHosts is set:
+  1: |
+    - host: chart-example.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: sourcegraph-frontend
+              port:
+                number: 30080
+          path: /
+          pathType: Prefix
+    - host: chart-example-1.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: sourcegraph-frontend
+              port:
+                number: 30080
+          path: /
+          pathType: Prefix
+    - host: chart-example-2.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: sourcegraph-frontend
+              port:
+                number: 30080
+          path: /
+          pathType: Prefix
+should render ingress with many tls secrets when extraTLSSecrets is set:
+  1: |
+    - hosts:
+      - chart-example.local
+      secretName: chart-example-tls
+    - hosts:
+      - chart-example-1.local
+      secretName: chart-example-tls-1
+    - hosts:
+      - chart-example-2.local
+      secretName: chart-example-tls-2
+should render ingress with only one host:
+  1: |
+    - host: chart-example.local
+      http:
+        paths:
+        - backend:
+            service:
+              name: sourcegraph-frontend
+              port:
+                number: 30080
+          path: /
+          pathType: Prefix

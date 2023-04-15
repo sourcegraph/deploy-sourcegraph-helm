@@ -98,6 +98,8 @@ In addition to the documented values, all services also support the following va
 | frontend.ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
 | frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
 | frontend.ingress.enabled | bool | `true` | Enable ingress for the Sourcegraph server |
+| frontend.ingress.extraHosts | list | `[]` | Additional hostnames for the Sourcegraph server ingress Note this is additional to the `host` field |
+| frontend.ingress.extraTLSSecrets | list | `[]` | Secret configuration when extra hosts are used Note this is additional to the `tlsSecret` field |
 | frontend.ingress.host | string | `""` | External hostname for the Sourcegraph server ingress (SSL) |
 | frontend.ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null` |
 | frontend.ingress.tlsSecret | string | `""` | Secret containing SSL cert |

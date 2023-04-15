@@ -6,6 +6,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 
+- Added support for additional hostnames for Ingress [#271](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/271)
+
 ## Unreleased
 
 ## 5.0.1

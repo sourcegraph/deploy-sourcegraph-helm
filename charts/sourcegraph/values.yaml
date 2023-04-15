@@ -311,11 +311,21 @@ frontend:
       nginx.ingress.kubernetes.io/proxy-body-size: 150m
     # -- External hostname for the Sourcegraph server ingress (SSL)
     host: ""
+    # -- Additional hostnames for the Sourcegraph server ingress
+    # Note this is additional to the `host` field
+    extraHosts: []
+    #  - "chart-example.local"
     # -- IngressClassName for the Ingress (Available in Kubernetes 1.18+)
     # If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null`
     ingressClassName: null
     # -- Secret containing SSL cert
     tlsSecret: ""
+    # -- Secret configuration when extra hosts are used
+    # Note this is additional to the `tlsSecret` field
+    extraTLSSecrets: []
+    #  - secretName: chart-example-tls
+    #    hosts:
+    #      - chart-example.local
   # -- Security context for the `frontend` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:

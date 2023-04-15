@@ -1,0 +1,11 @@
+frontend:
+  ingress:
+    enabled: true
+    host: chart-example.local
+    extraHosts:
+      - chart-example-02.local
+    tlsSecret: chart-example-local
+    extraTLSSecrets:
+      - secretName: chart-example-02-local
+        hosts:
+          - chart-example-02.local

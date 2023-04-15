@@ -1,0 +1,55 @@
+suite: ingress
+templates:
+  - frontend/sourcegraph-frontend.Ingress.yaml
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+  - it: should render ingress with only one host
+    set:
+      frontend:
+        ingress:
+          enabled: true
+          host: "chart-example.local"
+    asserts:
+      - matchSnapshot:
+          path: spec.rules
+  - it: should render ingress with many hosts when extraHosts is set
+    set:
+      frontend:
+        ingress:
+          enabled: true
+          host: "chart-example.local"
+          extraHosts:
+            - chart-example-1.local
+            - chart-example-2.local
+    asserts:
+      - matchSnapshot:
+          path: spec.rules
+  - it: should render ingress with a one tls secret
+    set:
+      frontend:
+        ingress:
+          enabled: true
+          host: "chart-example.local"
+          tlsSecret: "chart-example-tls"
+    asserts:
+      - matchSnapshot:
+          path: spec.tls
+  - it: should render ingress with many tls secrets when extraTLSSecrets is set
+    set:
+      frontend:
+        ingress:
+          enabled: true
+          host: "chart-example.local"
+          tlsSecret: "chart-example-tls"
+          extraTLSSecrets:
+            - secretName: chart-example-tls-1
+              hosts:
+                - chart-example-1.local
+            - secretName: chart-example-tls-2
+              hosts:
+                - chart-example-2.local
+    asserts:
+      - matchSnapshot:
+          path: spec.tls
