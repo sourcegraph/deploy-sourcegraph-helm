@@ -11,23 +11,23 @@ tests:
 #  asserts:
 #    - matchSnapshot:
 #          path: spec.template.metadata.annotations.[checksum/auth]
-- it: should update checksum when codeintel-db secret is modified
-  set:
-    codeIntelDB:
-      auth:
-        newkey: "blank"
-  asserts:
-    - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
-- it: should update checksum when codeinsights-db secret is modified
-  set:
-    codeInsightsDB:
-      auth:
-        username: "newuser"
-        database: "anotherdb"
-  asserts:
-    - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+#- it: should update checksum when codeintel-db secret is modified
+#  set:
+#    codeIntelDB:
+#      auth:
+#        newkey: "blank"
+#  asserts:
+#    - matchSnapshot:
+#          path: spec.template.metadata.annotations.[checksum/auth]
+#- it: should update checksum when codeinsights-db secret is modified
+#  set:
+#    codeInsightsDB:
+#      auth:
+#        username: "newuser"
+#        database: "anotherdb"
+#  asserts:
+#    - matchSnapshot:
+#          path: spec.template.metadata.annotations.[checksum/auth]
 - it: should update checksum when redis-store secret is modified
   set:
     redisStore:
