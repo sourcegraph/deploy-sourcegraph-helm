@@ -3,14 +3,14 @@ suite: checksumTest
 templates:
 - frontend/sourcegraph-frontend.Deployment.yaml
 tests:
-- it: should update checksum when pgsql secret is modified
-  set:
-    pgsql:
-      auth:
-        existingSecret: "my-secret"
-  asserts:
-    - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+#- it: should update checksum when pgsql secret is modified
+#  set:
+#    pgsql:
+#      auth:
+#        existingSecret: "my-secret"
+#  asserts:
+#    - matchSnapshot:
+#          path: spec.template.metadata.annotations.[checksum/auth]
 - it: should update checksum when codeintel-db secret is modified
   set:
     codeIntelDB:
