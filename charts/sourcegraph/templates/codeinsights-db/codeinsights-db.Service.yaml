@@ -18,9 +18,9 @@ metadata:
   name: codeinsights-db
 spec:
   ports:
-  - name: codeinsights-db
+  - name: postgres
     port: 5432
-    targetPort: codeinsights-db
+    targetPort: postgres
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeinsights-db

@@ -18,9 +18,9 @@ metadata:
   name: codeintel-db
 spec:
   ports:
-  - name: codeintel-db
+  - name: postgres
     port: 5432
-    targetPort: codeintel-db
+    targetPort: postgres
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeintel-db

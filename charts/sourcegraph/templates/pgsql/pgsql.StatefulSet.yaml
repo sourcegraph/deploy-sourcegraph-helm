@@ -91,7 +91,7 @@ spec:
         {{- end }}
         ports:
         - containerPort: 5432
-          name: pgsql
+          name: postgres
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.pgsql.resources | nindent 10 }}
