@@ -91,7 +91,7 @@ spec:
           periodSeconds: 10
         ports:
         - containerPort: 5432
-          name: pgsql
+          name: postgres
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}

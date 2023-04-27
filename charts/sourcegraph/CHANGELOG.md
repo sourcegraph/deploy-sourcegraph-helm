@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Port names for all the DBs are renamed to `postgres` to create consistency across the deployments [#275](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/275)
 
 ## 5.0.0
 

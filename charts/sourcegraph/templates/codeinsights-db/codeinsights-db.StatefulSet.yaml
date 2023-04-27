@@ -80,7 +80,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 5432
-          name: codeinsights-db
+          name: postgres
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
