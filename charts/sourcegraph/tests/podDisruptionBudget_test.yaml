@@ -33,3 +33,4 @@ tests:
   - equal:
       path: spec.minAvailable
       value: 10%
+  
