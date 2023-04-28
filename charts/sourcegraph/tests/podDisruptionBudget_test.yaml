@@ -16,7 +16,7 @@ tests:
 - it: should render podDisruptionBudget for gitserver
   template: gitserver/gitserver.PodDisruptionBudget.yaml
   set:
-    frontend:
+    gitserver:
       podDisruptionBudget:
         maxUnavailable: 1
   asserts:
@@ -26,7 +26,7 @@ tests:
 - it: should render podDisruptionBudget for indexed-search
   template: indexed-search/indexed-search.PodDisruptionBudget.yaml
   set:
-    frontend:
+    indexedSearch:
       podDisruptionBudget:
         minAvailable: 10%
   asserts:

@@ -4,7 +4,7 @@ kind: PodDisruptionBudget
 metadata:
   name: sourcegraph-frontend
 spec:
-  {{- toYaml .Values.frontend.podDisruptionBudget | nindent 4 }}
+  {{- toYaml .Values.frontend.podDisruptionBudget | nindent 2 }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: sourcegraph-frontend

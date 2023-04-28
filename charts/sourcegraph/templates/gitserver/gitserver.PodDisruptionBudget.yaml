@@ -4,7 +4,7 @@ kind: PodDisruptionBudget
 metadata:
   name: gitserver
 spec:
-  {{- toYaml .Values.gitserver.podDisruptionBudget | nindent 4 }}
+  {{- toYaml .Values.gitserver.podDisruptionBudget | nindent 2 }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: gitserver
