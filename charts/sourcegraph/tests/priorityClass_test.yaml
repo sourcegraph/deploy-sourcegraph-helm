@@ -1,11 +1,10 @@
 suite: priorityClass
-templates:
-- priorityClass.yaml
 release:
   name: sourcegraph
   namespace: sourcegraph
 tests:
 - it: should render single priority class
+  template: priorityClass.yaml
   set:
     priorityClasses:
     - name: gitserver-class
@@ -26,6 +25,7 @@ tests:
       path: description
       value: "gitserver priority class"
 - it: should render two priority classes
+  template: priorityClass.yaml
   set:
     priorityClasses:
     - name: gitserver-class
