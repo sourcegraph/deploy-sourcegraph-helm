@@ -1,0 +1,35 @@
+suite: podDisruptionBudget
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render podDisruptionBudget for frontend
+  template: frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
+  set:
+    frontend:
+      podDisruptionBudget:
+        minAvailable: 1
+  asserts:
+  - equal:
+      path: spec.minAvailable
+      value: 1
+- it: should render podDisruptionBudget for gitserver
+  template: gitserver/gitserver.PodDisruptionBudget.yaml
+  set:
+    frontend:
+      podDisruptionBudget:
+        maxUnavailable: 1
+  asserts:
+  - equal:
+      path: spec.maxUnavailable
+      value: 1
+- it: should render podDisruptionBudget for indexed-search
+  template: indexed-search/indexed-search.PodDisruptionBudget.yaml
+  set:
+    frontend:
+      podDisruptionBudget:
+        minAvailable: 10%
+  asserts:
+  - equal:
+      path: spec.minAvailable
+      value: 10%

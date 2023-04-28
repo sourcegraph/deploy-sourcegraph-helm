@@ -1,0 +1,11 @@
+{{- if .Values.indexedSearch.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: indexed-search
+spec:
+  {{- toYaml .Values.indexedSearch.podDisruptionBudget | nindent 4 }}
+  selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    app: indexed-search
+{{- end }}
