@@ -1,0 +1,128 @@
+# These values are dervied from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
+
+### Common Configuration ###
+sourcegraph:
+  image:
+    # -- Global docker image tag
+    defaultTag: '{{ .Chart.AppVersion }}'
+    # -- Global docker image pull policy
+    pullPolicy: IfNotPresent
+    # -- Global docker image registry or prefix
+    repository: index.docker.io/sourcegraph
+    # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
+    useGlobalTagAsDefault: false
+  # -- Mount named secrets containing docker credentials
+  imagePullSecrets: []
+  # -- Add a global label to all resources
+  labels: {}
+  # -- Set a custom name for the app.kubernetes.io/name annotation
+  nameOverride: ""
+  # -- Affinity,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- NodeSelector,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Tolerations,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []
+  # -- Add extra annotations to attach to all pods
+  podAnnotations: {}
+  # -- Add extra labels to attach to all pods
+  podLabels: {}
+
+
+storageClass:
+  # -- Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class
+  create: false
+  # -- Name of the storageClass.
+  # Use to customize to the existing storage class name
+  name: sourcegraph
+  # -- Name of the storageClass provisioner,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
+  # and consult your cloud provider persistent storage documentation
+  provisioner: kubernetes.io/gce-pd
+  # -- Value of `type` key in storageClass `parameters`,
+  # consult your cloud provider persistent storage documentation
+  type: pd-ssd
+  # -- Extra parameters of storageClass,
+  # consult your cloud provider persistent storage documentation
+  parameters: {}
+  # -- Persistent volumes topology configuration,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
+  allowedTopologies: {}
+
+
+# Generic application configuration options, used by most applications below
+# app: # Generally matches directory name
+#   replicaCount: 1
+#
+#   image:
+#     # Application-specific default tag. Overrides the global tag. Do not modify - use tag instead
+#     defaultTag:
+#     # Override the default tag on a service-specific basis
+#     tag:
+#     # Override the default docker image name
+#     name:
+#
+#   # Add additional labels and annotations to various resources
+#   labels: {}
+#   podLabels: {}
+#   podAnnotations: {}
+#   serviceLabels: {}
+#   serviceAnnotations: {}
+#   # Override default service/deployment names
+#   name: ""
+#   # Provide custom environment variables
+#   env: {}
+#   # Set resource requests / limits
+#   resources: {}
+#   podSecurityContext: {}
+#   securityContext: {}
+#   # Add additional volumes and mounts to deployments
+#   extraVolumeMounts: {}
+#   extraVolumes: {}
+#   # Add sidecars
+#   extraContainers: {}
+#   # Toggle serviceAccount creation
+#   serviceAccount.create: true
+#   # Customize service account name
+#   serviceAccount.name: ""
+#   # Override service type (defaults to ClusterIP)
+#   serviceType: ""
+#   # Set disk size on PVC's for stateful deployments
+#   storageSize: ""
+#   # Optionally bind PVC's to an existing PV
+#   volumeName: ""
+#   # Use an existing configmap (specified by name) instead of creating one
+#   existingConfig: ""
+#   # Toggle deployment of applications on/off. Applies to databases and third-party applications
+#   enabled: true
+
+executor:
+  enabled: true
+  image:
+    defaultTag: 5.0.2@sha256:72ec1236d831146dda4061276637cc215545df273d1911934e6606eed44d71eb
+    name: "executor"
+  env:
+    # -- The external URL of the Sourcegraph instance. Required.
+    EXECUTOR_FRONTEND_URL:
+      value: ""
+    # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
+    EXECUTOR_FRONTEND_PASSWORD:
+      value: ""
+    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required.
+    EXECUTOR_QUEUE_NAME:
+      value: ""
+
+dind:
+  image:
+    registry: index.docker.io
+    repository: docker
+    tag: 20.10.22-dind
+
+privateDockerRegistry:
+  image:
+    registry: index.docker.io
+    repository: docker/regisry
+    tag: 2
