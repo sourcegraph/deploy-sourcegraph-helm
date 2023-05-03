@@ -1,0 +1,11 @@
+apiVersion: v2
+name: sourcegraph-native-executor-rbac
+description: Chart for installing Sourcegraph native executors rbac
+icon: https://sourcegraph.com/favicon.ico
+type: application
+
+# Chart version, separate from Sourcegraph
+version: "5.0.2"
+
+# Version of Sourcegraph release
+appVersion: "5.0.2"

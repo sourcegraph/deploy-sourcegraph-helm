@@ -1,0 +1,71 @@
+<!--
+  DO NOT EDIT README.md directly.
+  README.md is automatically generated from README.md.gotmpl
+-->
+
+# Sourcegraph Executor Helm Chart
+
+This chart contains two deployments, Sourcegraph Kubernetes native Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy Kubernetes native executors.
+
+Use cases:
+
+- Deploy Sourcegraph Kubernetes native Executors on Kubernetes
+
+## Requirements
+
+* [Helm 3 CLI](https://helm.sh/docs/intro/install/)
+* Kubernetes 1.19 or greater
+
+## Installation
+
+Add the Sourcegraph charts repo to Helm:
+
+```sh
+helm repo add sourcegraph https://helm.sourcegraph.com/release
+```
+
+## Usage
+
+> The chart has to be installed in the same namespace as the parent [sourcegraph/sourcegraph] chart
+
+## Rendering manifests for kubectl deployment
+
+Manifests rendered using the `helm template` command can be used for direct deployment using `kubectl`.
+
+## Configuration Options
+
+Reference the table below for available configuration parameters and consult [executor] documentation.
+
+In addition to the documented values, the `executor` and `private-docker-registry` services also supports the following values
+
+- `executor.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+- `executor.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+- `executor.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+- `executor.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `executor.env` - consult `values.yaml`
+
+- `privateDockerRegistry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+- `privateDockerRegistry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+- `privateDockerRegistry.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+- `privateDockerRegistry.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `privateDockerRegistry.env` - consult `values.yaml` file
+
+{{ template "chart.valuesTable" . }}
+
+## Troubleshooting
+
+See a list of running executor pods
+
+```sh
+kubectl get pods -l app=executor
+```
+
+Check logs of the executor container
+
+```sh
+kubectl logs -l app=executor -c executor
+```
+
+[sourcegraph/sourcegraph]: ../sourcegraph/
+[sourcegraph/sourcegraph-executor]: ./
+[executor]: https://docs.sourcegraph.com/admin/executors

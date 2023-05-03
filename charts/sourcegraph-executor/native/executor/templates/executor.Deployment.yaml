@@ -1,0 +1,101 @@
+{{- if .Values.executor.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: executors-{{ .Values.executor.queueName }}
+  annotations:
+    description: Runs sourcegraph executors
+    kubectl.kubernetes.io/default-container: executor
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.executor.labels }}
+      {{- toYaml .Values.executor.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: executor
+spec:
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: executor-{{ .Values.executor.queueName }}
+  minReadySeconds: 10
+  replicas: {{ .Values.executor.replicaCount }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: executor
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.executor.podAnnotations }}
+      {{- toYaml .Values.executor.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.executor.podLabels }}
+      {{- toYaml .Values.executor.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: executor-{{ .Values.executor.queueName }}
+    spec:
+      securityContext:
+        # TODO: not allowed to create dirs with default sourcegraph user
+        fsGroup: 1000 # GID of user "sourcegraph"
+      serviceAccountName: sg-executor-service-account
+      containers:
+        - name: executor
+          image: {{ include "sourcegraph.image" (list . "executor") }}
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          ports:
+            - containerPort: 6060
+              name: debug
+          terminationMessagePolicy: FallbackToLogsOnError
+          env:
+            {{- range $name, $item := .Values.executor.env }}
+            - name: {{ $name }}
+              {{- $item | toYaml | nindent 14 }}
+            {{- end }}
+            - name: EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME
+              value: sg-executor-pvc-{{ .Values.executor.queueName }}
+            - name: EXECUTOR_KUBERNETES_NODE_SELECTOR
+              value: sourcegraph-executors=true
+          volumeMounts:
+            - mountPath: /etc/docker/daemon.json
+              subPath: daemon.json
+              name: docker-config
+            - mountPath: /data
+              name: sg-executor-volume-{{ .Values.executor.queueName }}
+      {{- with .Values.executor.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.executor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.executor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: docker-config
+          configMap:
+            defaultMode: 420
+            name: docker-config
+        - name: sg-executor-volume-{{ .Values.executor.queueName }}
+          persistentVolumeClaim:
+            claimName: sg-executor-pvc-{{ .Values.executor.queueName }}
+{{- end }}
