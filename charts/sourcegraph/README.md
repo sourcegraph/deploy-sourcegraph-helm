@@ -90,6 +90,20 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
+| embeddings.backend | object | `{"EMBEDDINGS_UPLOAD_AWS_ENDPOINT":"http://blobstore:9000","EMBEDDINGS_UPLOAD_BACKEND":"blobstore"}` | Configure the storage backend for embeddings |
+| embeddings.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| embeddings.enabled | bool | `false` | Enable `embeddings` |
+| embeddings.env | object | `{}` | Environment variables for the `embeddings` container |
+| embeddings.extraVolumeMounts | object | `{}` |  |
+| embeddings.extraVolumes | object | `{}` |  |
+| embeddings.image.defaultTag | string | `"5.0.2@sha256:fac554b8dc22ee2842228ed56eac059a3671a8ad8d246c8120106508b74bc621"` | Docker image tag for the `embeddings` image |
+| embeddings.image.name | string | `"embeddings"` | Docker image name for the `embeddings` image |
+| embeddings.name | string | `"embeddings"` | Name of the `embeddings` service |
+| embeddings.podSecurityContext | object | `{}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| embeddings.serviceAccount.annotations | object | `{}` |  |
+| embeddings.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
+| embeddings.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
@@ -152,7 +166,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearchIndexer.image.defaultTag | string | `"5.0.2@sha256:7a770bfebd2c4d0eeaccb2ae3c7b93208514910d39a13e6289cc0db66b6b444e"` | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
-| jaeger.collector.name | string | `""` | Name of jaeger `collector` service  |
+| jaeger.collector.name | string | `""` | Name of jaeger `collector` service |
 | jaeger.collector.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `collector` service |
 | jaeger.collector.serviceLabels | object | `{}` | Add extra labels to jaeger `collector` service |
 | jaeger.collector.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `collector` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
@@ -162,7 +176,7 @@ In addition to the documented values, all services also support the following va
 | jaeger.image.name | string | `"jaeger-all-in-one"` | Docker image name for the `jaeger` image |
 | jaeger.name | string | `"jaeger"` | Name used by resources. Does not affect service names or PVCs. |
 | jaeger.podSecurityContext | object | `{}` | Security context for the `jaeger` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| jaeger.query.name | string | `""` | Name of jaeger `query` service  |
+| jaeger.query.name | string | `""` | Name of jaeger `query` service |
 | jaeger.query.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `query` service |
 | jaeger.query.serviceLabels | object | `{}` | Add extra labels to jaeger `query` service |
 | jaeger.query.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `query` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
@@ -197,7 +211,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.agent.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-agent` |
 | openTelemetry.agent.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | openTelemetry.enabled | bool | `true` |  |
-| openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to.  Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
+| openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to. Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
 | openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |

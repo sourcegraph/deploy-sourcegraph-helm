@@ -5,7 +5,7 @@
 sourcegraph:
   image:
     # -- Global docker image tag
-    defaultTag: '{{ .Chart.AppVersion }}'
+    defaultTag: "{{ .Chart.AppVersion }}"
     # -- Global docker image pull policy
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
@@ -38,7 +38,6 @@ sourcegraph:
   revisionHistoryLimit: 10
   # -- Add extra labels to all services
   serviceLabels: {}
-
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
@@ -282,6 +281,50 @@ codeIntelDB:
     name: ""
   # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
+
+embeddings:
+  # -- Enable `embeddings`
+  enabled: false
+  # -- Name of the `embeddings` service
+  name: embeddings
+  image:
+    # -- Docker image name for the `embeddings` image
+    name: "embeddings"
+    # -- Docker image tag for the `embeddings` image
+    defaultTag: "5.0.2@sha256:fac554b8dc22ee2842228ed56eac059a3671a8ad8d246c8120106508b74bc621"
+  # -- Resource requests & limits for the `worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: "8"
+      memory: 64G
+    requests:
+      cpu: "4"
+      memory: 32G
+  # -- Configure the storage backend for embeddings
+  backend:
+    EMBEDDINGS_UPLOAD_BACKEND: "blobstore"
+    EMBEDDINGS_UPLOAD_AWS_ENDPOINT: "http://blobstore:9000"
+  # -- Environment variables for the `embeddings` container
+  env: {}
+  # -- Security context for the `worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  # -- Security context for the `embeddings` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  podSecurityContext: {}
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `embeddings`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
+    annotations: {}
+  extraVolumeMounts: {}
+  extraVolumes: {}
 
 frontend:
   # -- Environment variables for the `frontend` container
@@ -628,7 +671,7 @@ openTelemetry:
         # -- Define trace processors.
         # Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces)
         processors: {}
-        # -- Define where traces should be exported to. 
+        # -- Define where traces should be exported to.
         # Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters)
         exporters: {}
         # -- Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls".
@@ -639,7 +682,7 @@ openTelemetry:
       create: false
       # -- Name of the ServiceAccount to be created or an existing ServiceAccount
       name: ""
-      
+
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-agent"
@@ -679,17 +722,17 @@ nodeExporter:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
-      cpu: '1'
+      cpu: "1"
       memory: 1Gi
     requests:
-      cpu: '.2'
+      cpu: ".2"
       memory: 100Mi
   serviceAccount:
     # -- Enable creation of ServiceAccount for `node-exporter`
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: node-exporter
-  # Share the host process ID namespace. 
+  # Share the host process ID namespace.
   hostPID: true
   ## Additional container arguments for the node-exporter container
   extraArgs: []
@@ -709,7 +752,7 @@ nodeExporter:
     runAsGroup: 65534
     runAsNonRoot: true
     runAsUser: 65534
-    
+
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
   enabled: true
@@ -1168,7 +1211,7 @@ syntectServer:
 
 jaeger:
   collector:
-    # -- Name of jaeger `collector` service 
+    # -- Name of jaeger `collector` service
     name: ""
     # -- Add extra annotations to jaeger `collector` service
     serviceAnnotations: {}
@@ -1198,7 +1241,7 @@ jaeger:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
   query:
-    # -- Name of jaeger `query` service 
+    # -- Name of jaeger `query` service
     name: ""
     # -- Add extra annotations to jaeger `query` service
     serviceAnnotations: {}

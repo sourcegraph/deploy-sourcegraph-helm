@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Add Embeddings service (disabled by default) for Cody embeddings
+
 ## 5.0.1
 
 - Sourcegraph 5.0.1 is now available!
