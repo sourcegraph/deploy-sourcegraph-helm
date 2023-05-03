@@ -69,6 +69,7 @@ spec:
             - name: EXECUTOR_KUBERNETES_NODE_SELECTOR
               value: sourcegraph-executors=true
           volumeMounts:
+            # TODO: make conditional on whether private registry is deployed
             - mountPath: /etc/docker/daemon.json
               subPath: daemon.json
               name: docker-config
@@ -91,6 +92,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
+        # TODO: make conditional on whether private registry is deployed
         - name: docker-config
           configMap:
             defaultMode: 420
