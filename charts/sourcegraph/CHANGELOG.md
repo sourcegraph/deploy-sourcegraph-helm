@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Add support for PodDisruptionBudget in frontend
+
 ## 5.0.3
 
 - Add Embeddings service (disabled by default) for Cody embeddings
