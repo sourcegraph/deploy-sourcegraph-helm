@@ -90,7 +90,7 @@ tests:
 - it: set priority class on searcher
   template: searcher/searcher.StatefulSet.yaml
   set:
-    indexedSearch:
+    searcher:
       priorityClassName: searcher-class
   asserts:
   - equal:
@@ -99,7 +99,7 @@ tests:
 - it: set priority class on symbols
   template: symbols/symbols.StatefulSet.yaml
   set:
-    indexedSearch:
+    symbols:
       priorityClassName: symbols-class
   asserts:
   - equal:
