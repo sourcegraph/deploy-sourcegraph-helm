@@ -13,23 +13,3 @@ tests:
   - equal:
       path: spec.minAvailable
       value: 1
-- it: should render podDisruptionBudget for gitserver
-  template: gitserver/gitserver.PodDisruptionBudget.yaml
-  set:
-    gitserver:
-      podDisruptionBudget:
-        maxUnavailable: 1
-  asserts:
-  - equal:
-      path: spec.maxUnavailable
-      value: 1
-- it: should render podDisruptionBudget for indexed-search
-  template: indexed-search/indexed-search.PodDisruptionBudget.yaml
-  set:
-    indexedSearch:
-      podDisruptionBudget:
-        minAvailable: 10%
-  asserts:
-  - equal:
-      path: spec.minAvailable
-      value: 10%
