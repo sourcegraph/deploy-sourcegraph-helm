@@ -8,7 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
-- Add support for PriotyClass in StatefulSets
+- Add support for PriorityClass in StatefulSets
 
 ## 5.0.3
 
