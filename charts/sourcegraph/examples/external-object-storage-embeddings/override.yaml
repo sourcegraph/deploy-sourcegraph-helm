@@ -1,0 +1,36 @@
+# Override file demonstrating the use of external Object Storage services
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/cody/explanations/code_graph_context#storing-embedding-indexes
+
+# Disable deployment of the built-in object storage
+# Only disable if also using external storage for SCIP indexes
+blobstore:
+  enabled: false
+
+# we use YAML anchors and alias to keep override file clean
+objectStorageEnv: &objectStorageEnv
+  EMBEDDINGS_UPLOAD_BACKEND:
+    value: S3 # external object stoage type, one of "S3" or "GCS"
+  EMBEDDINGS_UPLOAD_BUCKET:
+    value: embedings-uploads # external object storage bucket name
+  EMBEDDINGS_UPLOAD_AWS_ENDPOINT:
+    value: https://s3.us-east-1.amazonaws.com
+  EMBEDDINGS_UPLOAD_AWS_REGION:
+    value: us-east-1
+  EMBEDDINGS_UPLOAD_AWS_ACCESS_KEY_ID:
+    secretKeyRef: # Pre-existing secret, not created by this chart
+      name: sourcegraph-s3-credentials
+      key: EMBEDDINGS_UPLOAD_AWS_ACCESS_KEY_ID
+  EMBEDDINGS_UPLOAD_AWS_SECRET_ACCESS_KEY:
+    secretKeyRef: # Pre-existing secret, not created by this chart
+      name: sourcegraph-s3-credentials
+      key: EMBEDDINGS_UPLOAD_AWS_SECRET_ACCESS_KEY
+
+embeddings:
+  enabled: true
+  env:
+    <<: *objectStorageEnv
+
+worker:
+  env:
+    <<: *objectStorageEnv
