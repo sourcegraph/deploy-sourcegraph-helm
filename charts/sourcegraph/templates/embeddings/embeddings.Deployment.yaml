@@ -55,9 +55,13 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        {{- range $name, $item := .Values.embeddings.backend }}
-        - name: {{ $name }}
-          value: {{ $item | quote }}
+        {{- if not .Values.embeddings.env.EMBEDDINGS_UPLOAD_BACKEND }}
+        - name: EMBEDDINGS_UPLOAD_BACKEND
+          value: blobstore
+        {{- end }}
+        {{- if not .Values.embeddings.env.EMBEDDINGS_UPLOAD_AWS_ENDPOINT }}
+        - name: EMBEDDINGS_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
         {{- end }}
         ports:
         - containerPort: 9991
