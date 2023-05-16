@@ -1305,3 +1305,12 @@ worker:
 
 # -- Additional resources to include in the rendered manifest. Templates are supported.
 extraResources: []
+
+# -- Additional priorityClasses minimise re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class.
+# learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass)
+# Sample class definition:
+# - name: gitserver-class
+#   value: 100
+#   preemptionPolicy: Never
+#   description: "gitserver priority class"
+priorityClasses: []

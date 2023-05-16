@@ -9,6 +9,7 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Add support for PodDisruptionBudget in frontend
+- Add support for PriorityClass in StatefulSets
 
 ## 5.0.3
 

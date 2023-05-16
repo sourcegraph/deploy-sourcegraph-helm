@@ -130,6 +130,9 @@ spec:
       {{- if .Values.symbols.extraVolumes }}
       {{- toYaml .Values.symbols.extraVolumes | nindent 6 }}
       {{- end }}
+      {{- if .Values.symbols.priorityClassName }}
+      priorityClassName: {{ .Values.symbols.priorityClassName }}
+      {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: cache

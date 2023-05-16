@@ -1,0 +1,11 @@
+{{- range $class := .Values.priorityClasses }}
+apiVersion: scheduling.k8s.io/v1
+kind: PriorityClass
+metadata:
+  name: {{ $class.name }}
+value: {{ $class.value }}
+preemptionPolicy: {{ $class.preemptionPolicy }}
+globalDefault: false
+description: {{ $class.description | default "missing" }}
+---
+{{- end }}
