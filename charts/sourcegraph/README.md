@@ -90,7 +90,6 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
-| embeddings.backend | object | `{"EMBEDDINGS_UPLOAD_AWS_ENDPOINT":"http://blobstore:9000","EMBEDDINGS_UPLOAD_BACKEND":"blobstore"}` | Configure the storage backend for embeddings |
 | embeddings.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | embeddings.enabled | bool | `false` | Enable `embeddings` |
 | embeddings.env | object | `{}` | Environment variables for the `embeddings` container |
@@ -352,6 +351,7 @@ In addition to the documented values, all services also support the following va
 | syntectServer.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntect-server` |
 | syntectServer.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | worker.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| worker.env | object | `{}` | Environment variables for the `worker` container |
 | worker.image.defaultTag | string | `"5.0.2@sha256:83f1e1d30bad33a311e8e0c0c9e7995ef7b7df9a1135ac0ff5e5c9561c7b74c4"` | Docker image tag for the `worker` image |
 | worker.image.name | string | `"worker"` | Docker image name for the `worker` image |
 | worker.name | string | `"worker"` | Name used by resources. Does not affect service names or PVCs. |
