@@ -90,6 +90,19 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
+| embeddings.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| embeddings.enabled | bool | `false` | Enable `embeddings` |
+| embeddings.env | object | `{}` | Environment variables for the `embeddings` container |
+| embeddings.extraVolumeMounts | object | `{}` |  |
+| embeddings.extraVolumes | object | `{}` |  |
+| embeddings.image.defaultTag | string | `"5.0.3@sha256:1d8f05ed57e361451d92eabbb3a0d90169c1108f48a274d556e43f541190e01a"` | Docker image tag for the `embeddings` image |
+| embeddings.image.name | string | `"embeddings"` | Docker image name for the `embeddings` image |
+| embeddings.name | string | `"embeddings"` | Name of the `embeddings` service |
+| embeddings.podSecurityContext | object | `{}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| embeddings.serviceAccount.annotations | object | `{}` |  |
+| embeddings.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
+| embeddings.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
@@ -337,6 +350,7 @@ In addition to the documented values, all services also support the following va
 | syntectServer.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntect-server` |
 | syntectServer.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | worker.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| worker.env | object | `{}` | Environment variables for the `worker` container |
 | worker.image.defaultTag | string | `"5.0.3@sha256:85016eadcb12a5d94b8ff47192899572bbd33cbc19769b5b1c7c3cc48ca5a914"` | Docker image tag for the `worker` image |
 | worker.image.name | string | `"worker"` | Docker image name for the `worker` image |
 | worker.name | string | `"worker"` | Name used by resources. Does not affect service names or PVCs. |

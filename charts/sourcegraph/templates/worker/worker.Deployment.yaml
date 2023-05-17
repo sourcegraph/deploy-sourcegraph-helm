@@ -60,6 +60,14 @@ spec:
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
         {{- end }}
+        {{- if and .Values.embeddings.enabled (not .Values.worker.env.EMBEDDINGS_UPLOAD_BACKEND) }}
+        - name: EMBEDDINGS_UPLOAD_BACKEND
+          value: blobstore
+        {{- end }}
+        {{- if and .Values.embeddings.enabled (not .Values.worker.env.EMBEDDINGS_UPLOAD_AWS_ENDPOINT) }}
+        - name: EMBEDDINGS_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
