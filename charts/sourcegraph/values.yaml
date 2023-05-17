@@ -283,6 +283,46 @@ codeIntelDB:
   # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
 
+embeddings:
+  # -- Enable `embeddings`
+  enabled: false
+  # -- Name of the `embeddings` service
+  name: embeddings
+  image:
+    # -- Docker image name for the `embeddings` image
+    name: "embeddings"
+    # -- Docker image tag for the `embeddings` image
+    defaultTag: "5.0.3@sha256:1d8f05ed57e361451d92eabbb3a0d90169c1108f48a274d556e43f541190e01a"
+  # -- Resource requests & limits for the `worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: "8"
+      memory: 64G
+    requests:
+      cpu: "4"
+      memory: 32G
+  # -- Environment variables for the `embeddings` container
+  env: {}
+  # -- Security context for the `worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  # -- Security context for the `embeddings` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  podSecurityContext: {}
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `embeddings`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
+    annotations: {}
+  extraVolumeMounts: {}
+  extraVolumes: {}
+
 frontend:
   # -- Environment variables for the `frontend` container
   # @default -- the chart will add some default environment values
@@ -1240,6 +1280,8 @@ worker:
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "worker"
+  # -- Environment variables for the `worker` container
+  env: {}
   # -- Security context for the `worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
