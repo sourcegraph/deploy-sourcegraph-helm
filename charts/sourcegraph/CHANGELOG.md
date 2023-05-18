@@ -8,7 +8,10 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 5.0.4
+
 - Add support for PriorityClass in StatefulSets
+- Add optional support for the embeddings service
 
 ## 5.0.3
 
