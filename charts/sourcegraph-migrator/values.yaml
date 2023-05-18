@@ -102,7 +102,7 @@ pgsql:
 migrator:
   image:
     # -- Docker image tag for the `migrator` image
-    defaultTag: 5.0.2@sha256:7099095e9b87dcc570c403ef92258b70eff0308cb8474e37911df4f37a89a5c4
+    defaultTag: 5.0.4@sha256:46baf0caa8dde3bfe5b302158b595be9a4c8233cae83dccc18279d91157d39c4
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
