@@ -5,6 +5,7 @@ Use `**BREAKING**:` to denote a breaking change
 # Changelog
 
 <!-- START CHANGELOG -->
+- Fix erroneous indentation of `deploy`, `app.kubernetes.io/component` labels and `volumes` in Embeddings deployment
 
 ## Unreleased
 
