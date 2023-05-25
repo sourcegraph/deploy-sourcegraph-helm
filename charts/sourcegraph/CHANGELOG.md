@@ -5,11 +5,16 @@ Use `**BREAKING**:` to denote a breaking change
 # Changelog
 
 <!-- START CHANGELOG -->
+- Fix erroneous indentation of `deploy`, `app.kubernetes.io/component` labels and `volumes` in Embeddings deployment
 
 ## Unreleased
 
 - Add support for PodDisruptionBudget in frontend
+
+## 5.0.4
+
 - Add support for PriorityClass in StatefulSets
+- Add optional support for the embeddings service
 
 ## 5.0.3
 

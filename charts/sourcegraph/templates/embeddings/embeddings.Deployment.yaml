@@ -10,8 +10,8 @@ metadata:
     {{- if .Values.embeddings.labels }}
       {{- toYaml .Values.embeddings.labels | nindent 4 }}
     {{- end }}
-  deploy: sourcegraph
-  app.kubernetes.io/component: embeddings
+    deploy: sourcegraph
+    app.kubernetes.io/component: embeddings
 spec:
   minReadySeconds: 10
   replicas: 1
@@ -55,9 +55,13 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        {{- range $name, $item := .Values.embeddings.backend }}
-        - name: {{ $name }}
-          value: {{ $item | quote }}
+        {{- if not .Values.embeddings.env.EMBEDDINGS_UPLOAD_BACKEND }}
+        - name: EMBEDDINGS_UPLOAD_BACKEND
+          value: blobstore
+        {{- end }}
+        {{- if not .Values.embeddings.env.EMBEDDINGS_UPLOAD_AWS_ENDPOINT }}
+        - name: EMBEDDINGS_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
         {{- end }}
         ports:
         - containerPort: 9991
@@ -81,8 +85,8 @@ spec:
       {{- if .Values.embeddings.serviceAccount.create }}
       serviceAccountName: {{ .Values.embeddings.serviceAccount.name }}
       {{- end}}
-    volumes:
-      {{- if .Values.embeddings.extraVolumes }}
-      {{- toYaml .Values.embeddings.extraVolumes | nindent 6 }}
-      {{- end }}
+      volumes:
+        {{- if .Values.embeddings.extraVolumes }}
+        {{- toYaml .Values.embeddings.extraVolumes | nindent 6 }}
+        {{- end }}
 {{- end }}
