@@ -9,6 +9,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 5.0.5
+
 - Add support for PodDisruptionBudget in frontend
 
 ## 5.0.4
