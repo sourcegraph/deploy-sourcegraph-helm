@@ -100,9 +100,10 @@ useGlobalTagAsDefault configuration
 {{- $service := index . 1 }}
 {{- $imageName := (index $top.Values $service "image" "name")}}
 {{- $defaultTag := (index $top.Values $service "image" "defaultTag")}}
+{{- $defaultTagPrefix := (index $top.Values $service "image" "defaultTagPrefix")}}
 {{- if $top.Values.sourcegraph.image.useGlobalTagAsDefault }}{{ $defaultTag = (tpl $top.Values.sourcegraph.image.defaultTag $top) }}{{ end }}
 
-{{- $top.Values.sourcegraph.image.repository }}/{{ $imageName }}:{{ default $defaultTag (index $top.Values $service "image" "tag") }}
+{{- $top.Values.sourcegraph.image.repository }}/{{ $imageName }}:{{ $defaultTagPrefix }}{{ default $defaultTag (index $top.Values $service "image" "tag") }}
 {{- end }}
 
 {{- define "sourcegraph.nodeSelector" -}}
