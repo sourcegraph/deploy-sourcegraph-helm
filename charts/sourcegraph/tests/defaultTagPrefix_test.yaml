@@ -1,4 +1,4 @@
-suite: priorityClass
+suite: defaultTagPrefix
 release:
   name: sourcegraph
   namespace: sourcegraph
@@ -11,8 +11,8 @@ tests:
         defaultTag: test
   asserts:
   - equal:
-      path: spec.template.spec.containers[0].image.tag
-      value: test
+      path: spec.template.spec.containers[0].image
+      value: "frontend:test"
 - it: should add defaultTagPrefix
   template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
@@ -22,5 +22,5 @@ tests:
         defaultTagPrefix: "prefix-"
   asserts:
   - equal:
-      path: spec.template.spec.containers[0].image.tag
-      value: prefix-test
+      path: spec.template.spec.containers[0].image
+      value: "frontend:prefix-test"
