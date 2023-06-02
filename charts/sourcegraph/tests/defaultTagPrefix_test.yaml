@@ -12,7 +12,7 @@ tests:
   asserts:
   - equal:
       path: spec.template.spec.containers[0].image
-      value: "frontend:test"
+      value: "index.docker.io/sourcegraph/frontend:test"
 - it: should add defaultTagPrefix
   template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
@@ -23,4 +23,4 @@ tests:
   asserts:
   - equal:
       path: spec.template.spec.containers[0].image
-      value: "frontend:prefix-test"
+      value: "index.docker.io/sourcegraph/frontend:prefix-test"
