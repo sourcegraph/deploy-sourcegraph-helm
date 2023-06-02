@@ -1,0 +1,26 @@
+suite: defaultTagPrefix
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should not add defaultTagPrefix
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend:
+      image:
+        defaultTag: test
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].image
+      value: "index.docker.io/sourcegraph/frontend:test"
+- it: should add defaultTagPrefix
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend:
+      image:
+        defaultTag: test
+        defaultTagPrefix: "prefix-"
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].image
+      value: "index.docker.io/sourcegraph/frontend:prefix-test"
