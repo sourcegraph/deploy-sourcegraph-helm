@@ -12,6 +12,7 @@ metadata:
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: executor
+  name: executor
 spec:
   selector:
     matchLabels:
