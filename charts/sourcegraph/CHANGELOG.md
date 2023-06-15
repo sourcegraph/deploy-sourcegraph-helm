@@ -9,7 +9,9 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
-- Add defaultTagPrefix per service
+## 5.0.6
+
+- Add `defaultTagPrefix` per service
 
 ## 5.0.5
 
