@@ -6,6 +6,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 - Fix erroneous indentation of `deploy`, `app.kubernetes.io/component` labels and `volumes` in Embeddings deployment
+- Add `.Values.postgresExporter.containerSecurityContext` to `codeintel-db` and `codensights-db`
 
 ## Unreleased
 

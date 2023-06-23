@@ -112,6 +112,8 @@ spec:
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
+        securityContext:
+          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
       {{- if .Values.codeInsightsDB.extraContainers }}
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
       {{- end }}
