@@ -10,6 +10,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Updated redis readiness check to fix NOAUTH on password'd redis servers #458, #471
 - Removed qdrant from deployment #459
+- Add `.Values.postgresExporter.containerSecurityContext` to `codeintel-db` and `codensights-db`
 
 ## 5.3.3
 
