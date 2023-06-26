@@ -10,13 +10,12 @@ metadata:
     {{- if .Values.executor.labels }}
       {{- toYaml .Values.executor.labels | nindent 4 }}
     {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: executor
+    {{- include "executor.labels" . | nindent 4 }}
 spec:
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: executor
+      app: {{ include "executor.name" . }}
   minReadySeconds: 10
   replicas: {{ .Values.executor.replicaCount }}
   revisionHistoryLimit: 10
@@ -43,8 +42,7 @@ spec:
       {{- if .Values.executor.podLabels }}
       {{- toYaml .Values.executor.podLabels | nindent 8 }}
       {{- end }}
-        deploy: sourcegraph
-        app: executor
+        {{- include "executor.labels" . | nindent 8 }}
     spec:
       containers:
         - name: executor
@@ -87,7 +85,7 @@ spec:
             - mountPath: /scratch
               name: executor-scratch
         - name: dind
-          image: {{ .Values.dind.image.registry}}/{{ .Values.dind.image.repository}}:{{ .Values.dind.image.tag}}
+          image: "{{ .Values.dind.image.registry}}/{{ .Values.dind.image.repository}}:{{ .Values.dind.image.tag}}"
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           securityContext:
             privileged: true

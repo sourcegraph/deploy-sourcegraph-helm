@@ -97,3 +97,19 @@ tolerations:
 {{- $globalTolerations | toYaml | trim | nindent 2 }}
 {{- end }}
 {{- end }}
+
+
+{{- define "executor.name" -}}
+{{- if .Values.executor.env.EXECUTOR_QUEUE_NAME.value -}}
+executor-{{.Values.executor.env.EXECUTOR_QUEUE_NAME.value}}
+{{- else if .Values.executor.env.EXECUTOR_QUEUE_NAMES.value -}}
+executor-{{replace "," "-" .Values.executor.env.EXECUTOR_QUEUE_NAMES.value }}
+{{- end }}
+{{- end }}
+
+{{- define "executor.labels" -}}
+app: {{ include "executor.name" . }}
+deploy: sourcegraph
+sourcegraph-resource-requires: no-cluster-admin
+app.kubernetes.io/component: executor
+{{- end}}

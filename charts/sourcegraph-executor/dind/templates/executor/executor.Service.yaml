@@ -9,20 +9,18 @@ metadata:
     {{- toYaml .Values.executor.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: executor
-    deploy: sourcegraph
-    app.kubernetes.io/component: executor
+    {{- include "executor.labels" . | nindent 4 }}
     {{- if .Values.executor.serviceLabels }}
     {{- toYaml .Values.executor.serviceLabels | nindent 4 }}
     {{- end }}
   name: executor
 spec:
   ports:
-  - name: debug
-    port: 6060
-    targetPort: debug
+    - name: debug
+      port: 6060
+      targetPort: debug
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: executor
+    app: {{include "executor.name" . }}
   type: {{ .Values.executor.serviceType | default "ClusterIP" }}
 {{- end }}

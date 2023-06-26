@@ -52,58 +52,12 @@ storageClass:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: {}
 
-
-# Generic application configuration options, used by most applications below
-# app: # Generally matches directory name
-#   replicaCount: 1
-#
-#   image:
-#     # Application-specific default tag. Overrides the global tag. Do not modify - use tag instead
-#     defaultTag:
-#     # Override the default tag on a service-specific basis
-#     tag:
-#     # Override the default docker image name
-#     name:
-#
-#   # Add additional labels and annotations to various resources
-#   labels: {}
-#   podLabels: {}
-#   podAnnotations: {}
-#   serviceLabels: {}
-#   serviceAnnotations: {}
-#   # Override default service/deployment names
-#   name: ""
-#   # Provide custom environment variables
-#   env: {}
-#   # Set resource requests / limits
-#   resources: {}
-#   podSecurityContext: {}
-#   securityContext: {}
-#   # Add additional volumes and mounts to deployments
-#   extraVolumeMounts: {}
-#   extraVolumes: {}
-#   # Add sidecars
-#   extraContainers: {}
-#   # Toggle serviceAccount creation
-#   serviceAccount.create: true
-#   # Customize service account name
-#   serviceAccount.name: ""
-#   # Override service type (defaults to ClusterIP)
-#   serviceType: ""
-#   # Set disk size on PVC's for stateful deployments
-#   storageSize: ""
-#   # Optionally bind PVC's to an existing PV
-#   volumeName: ""
-#   # Use an existing configmap (specified by name) instead of creating one
-#   existingConfig: ""
-#   # Toggle deployment of applications on/off. Applies to databases and third-party applications
-#   enabled: true
-
 executor:
   enabled: true
   image:
     defaultTag: 5.0.6@sha256:f78a0ba3d84941ec3577f19075e935bec34a9bfaa9dcb85908142fff017e9d6d
     name: "executor"
+  replicaCount: 1
   env:
     # -- The external URL of the Sourcegraph instance. Required.
     EXECUTOR_FRONTEND_URL:
@@ -111,8 +65,11 @@ executor:
     # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
     EXECUTOR_FRONTEND_PASSWORD:
       value: ""
-    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required.
+    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAMES is required.**
     EXECUTOR_QUEUE_NAME:
+      value: ""
+    # -- The comma-separated list of names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAME is required.**
+    EXECUTOR_QUEUE_NAMES:
       value: ""
 
 dind:
@@ -122,6 +79,9 @@ dind:
     tag: 20.10.22-dind
 
 privateDockerRegistry:
+  # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
+  # More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries
+  enabled: true
   image:
     registry: index.docker.io
     repository: docker/regisry
