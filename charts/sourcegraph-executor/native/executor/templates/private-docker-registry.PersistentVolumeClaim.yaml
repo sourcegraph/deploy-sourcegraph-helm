@@ -1,3 +1,4 @@
+{{ if .Values.privateDockerRegistry.enabled }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -15,3 +16,4 @@ spec:
   {{- if .Values.privateDockerRegistry.volumeName }}
   volumeName: {{ .Values.privateDockerRegistry.volumeName }}
   {{- end }}
+{{-end }}

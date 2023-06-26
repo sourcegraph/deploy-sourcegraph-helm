@@ -1,3 +1,4 @@
+{{ if .Values.privateDockerRegistry.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -19,3 +20,4 @@ spec:
   selector:
     app: private-docker-registry
   type: ClusterIP
+{{- end }}

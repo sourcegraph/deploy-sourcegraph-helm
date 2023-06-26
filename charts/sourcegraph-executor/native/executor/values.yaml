@@ -99,6 +99,16 @@ storageClass:
 #   # Toggle deployment of applications on/off. Applies to databases and third-party applications
 #   enabled: true
 
+# -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
+# More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries
+privateDockerRegistry:
+  enabled: true
+  image:
+    registry: index.docker.io
+    repository: registry
+    tag: 2
+  storageSize: 1Gi
+
 executor:
   replicas: 1
   enabled: true
