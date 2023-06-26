@@ -2,24 +2,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: executors-{{ .Values.executor.queueName }}
+  name: {{ include "executor.name" . }}
   annotations:
-    description: Runs sourcegraph executors
+    description: Runs a sourcegraph executor
     kubectl.kubernetes.io/default-container: executor
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "executor.labels" . | nindent 4 }}
     {{- if .Values.executor.labels }}
       {{- toYaml .Values.executor.labels | nindent 4 }}
     {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: executor
 spec:
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: executor-{{ .Values.executor.queueName }}
+      app: {{ include "executor.name" . }}
   minReadySeconds: 10
-  replicas: {{ .Values.executor.replicaCount }}
+  replicas: {{ .Values.executor.replicas }}
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -44,13 +42,11 @@ spec:
       {{- if .Values.executor.podLabels }}
       {{- toYaml .Values.executor.podLabels | nindent 8 }}
       {{- end }}
-        deploy: sourcegraph
-        app: executor-{{ .Values.executor.queueName }}
+        {{- include "executor.labels" . | nindent 8 }}
     spec:
       securityContext:
-        # TODO: not allowed to create dirs with default sourcegraph user
-        fsGroup: 1000 # GID of user "sourcegraph"
-      serviceAccountName: sg-executor-service-account
+        fsGroup: {{ .Values.executor.kubernetesJob.fsGroup }}
+      serviceAccountName: sg-executor
       containers:
         - name: executor
           image: {{ include "sourcegraph.image" (list . "executor") }}
@@ -58,23 +54,38 @@ spec:
           ports:
             - containerPort: 6060
               name: debug
-          terminationMessagePolicy: FallbackToLogsOnError
+          envFrom:
+            - configMapRef:
+                name: {{ include "executor.name" . }}
+          {{- if .Values.executor.extraEnv }}
           env:
-            {{- range $name, $item := .Values.executor.env }}
-            - name: {{ $name }}
-              {{- $item | toYaml | nindent 14 }}
-            {{- end }}
-            - name: EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME
-              value: sg-executor-pvc-{{ .Values.executor.queueName }}
-            - name: EXECUTOR_KUBERNETES_NODE_SELECTOR
-              value: sourcegraph-executors=true
+          {{- with .Values.executor.extraEnv }}
+          {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/pgrep
+                - -f
+                - /usr/local/bin/executor
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /usr/bin/pgrep
+                - -f
+                - /usr/local/bin/executor
+            periodSeconds: 5
           volumeMounts:
             # TODO: make conditional on whether private registry is deployed
             - mountPath: /etc/docker/daemon.json
               subPath: daemon.json
               name: docker-config
             - mountPath: /data
-              name: sg-executor-volume-{{ .Values.executor.queueName }}
+              name: "sg-{{include "executor.name" . }}"
+          terminationMessagePolicy: FallbackToLogsOnError
       {{- with .Values.executor.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -97,7 +108,7 @@ spec:
           configMap:
             defaultMode: 420
             name: docker-config
-        - name: sg-executor-volume-{{ .Values.executor.queueName }}
+        - name: "sg-{{include "executor.name" . }}"
           persistentVolumeClaim:
-            claimName: sg-executor-pvc-{{ .Values.executor.queueName }}
+            claimName: "sg-{{include "executor.name" . }}"
 {{- end }}

@@ -9,13 +9,11 @@ metadata:
     {{- toYaml .Values.executor.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: executor-{{ .Values.executor.queueName }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: executor
+{{ include "executor.labels" . | indent 4 }}
     {{- if .Values.executor.serviceLabels }}
     {{- toYaml .Values.executor.serviceLabels | nindent 4 }}
     {{- end }}
-  name: executor-{{ .Values.executor.queueName }}
+  name: {{ include "executor.name" . }}
 spec:
   ports:
   - name: debug
@@ -23,6 +21,6 @@ spec:
     targetPort: debug
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: executor-{{ .Values.executor.queueName }}
+    app: {{ include "executor.name" . }}
   type: {{ .Values.executor.serviceType | default "ClusterIP" }}
 {{- end }}

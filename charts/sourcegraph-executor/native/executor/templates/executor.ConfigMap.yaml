@@ -1,0 +1,46 @@
+{{- if .Values.executor.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "executor.name" . }}
+  labels:
+{{- include "executor.labels" . | nindent 4 }}
+data:
+  EXECUTOR_USE_FIRECRACKER: "false"
+  EXECUTOR_FRONTEND_URL: "{{ .Values.executor.frontendUrl }}"
+  EXECUTOR_MAXIMUM_NUM_JOBS: "{{ .Values.executor.maximumNumJobs }}"
+  EXECUTOR_MAXIMUM_RUNTIME_PER_JOB: "{{ .Values.executor.maximumRuntimePerJob }}"
+  EXECUTOR_QUEUE_NAME: "{{ .Values.executor.queueName }}"
+  EXECUTOR_QUEUE_NAMES: "{{join "," .Values.executor.queueNames }}"
+  
+  SRC_LOG_LEVEL: "{{ .Values.executor.log.level }}"
+  SRC_LOG_FORMAT: "{{ .Values.executor.log.format }}"
+  SRC_TRACE_LOG: "{{ .Values.executor.log.trace }}"
+
+  EXECUTOR_KUBERNETES_NAMESPACE: "{{ .Values.executor.namespace }}"
+  EXECUTOR_KUBERNETES_CONFIG_PATH: "{{ .Values.executor.kubeconfigPath }}"
+  EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME: "sg-{{include "executor.name" . }}"
+
+  EXECUTOR_KUBERNETES_NODE_NAME: "{{ .Values.executor.kubernetesJob.node.name }}"
+  EXECUTOR_KUBERNETES_NODE_SELECTOR: "{{ .Values.executor.kubernetesJob.node.selector }}"
+  EXECUTOR_KUBERNETES_NODE_TOLERATIONS: "{{ .Values.executor.kubernetesJob.node.tolerations }}"
+  EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_EXPRESSIONS: "{{ .Values.executor.kubernetesJob.node.requiredAffinityMatchExpressions }}"
+  EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_FIELDS: "{{ .Values.executor.kubernetesJob.node.requiredAffinityMatchFields }}"
+
+  EXECUTOR_KUBERNETES_POD_AFFINITY: "{{ .Values.executor.kubernetesJob.pod.affinity }}"
+  EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY: "{{ .Values.executor.kubernetesJob.pod.antiAffinity }}"
+
+  EXECUTOR_KUBERNETES_RESOURCE_REQUEST_CPU: "{{ .Values.executor.kubernetesJob.resources.requests.cpu }}"
+  EXECUTOR_KUBERNETES_RESOURCE_REQUEST_MEMORY: "{{ .Values.executor.kubernetesJob.resources.requests.memory }}"
+  EXECUTOR_KUBERNETES_RESOURCE_LIMIT_CPU: "{{ .Values.executor.kubernetesJob.resources.limits.cpu }}"
+  EXECUTOR_KUBERNETES_RESOURCE_LIMIT_MEMORY: "{{ .Values.executor.kubernetesJob.resources.limits.memory }}"
+
+  KUBERNETES_JOB_DEADLINE: "{{ .Values.executor.kubernetesJob.deadline }}"
+  KUBERNETES_RUN_AS_USER: "{{ .Values.executor.kubernetesJob.runAsUser }}"
+  KUBERNETES_RUN_AS_GROUP: "{{ .Values.executor.kubernetesJob.runAsGroup }}"
+  KUBERNETES_FS_GROUP: "{{ .Values.executor.kubernetesJob.fsGroup }}"
+
+  EXECUTOR_DOCKER_ADD_HOST_GATEWAY: "false"
+  KUBERNETES_KEEP_JOBS: "{{ .Values.executor.debug.keepJobs }}"
+  EXECUTOR_KEEP_WORKSPACES: "{{ .Values.executor.debug.keepWorkspaces }}"
+{{- end }}

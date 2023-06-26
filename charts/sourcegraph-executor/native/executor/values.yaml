@@ -12,24 +12,24 @@ sourcegraph:
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
-  imagePullSecrets: []
+  imagePullSecrets: [ ]
   # -- Add a global label to all resources
-  labels: {}
+  labels: { }
   # -- Set a custom name for the app.kubernetes.io/name annotation
   nameOverride: ""
   # -- Affinity,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-  affinity: {}
+  affinity: { }
   # -- NodeSelector,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
-  nodeSelector: {}
+  nodeSelector: { }
   # -- Tolerations,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-  tolerations: []
+  tolerations: [ ]
   # -- Add extra annotations to attach to all pods
-  podAnnotations: {}
+  podAnnotations: { }
   # -- Add extra labels to attach to all pods
-  podLabels: {}
+  podLabels: { }
 
 
 storageClass:
@@ -47,10 +47,10 @@ storageClass:
   type: pd-ssd
   # -- Extra parameters of storageClass,
   # consult your cloud provider persistent storage documentation
-  parameters: {}
+  parameters: { }
   # -- Persistent volumes topology configuration,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
-  allowedTopologies: {}
+  allowedTopologies: { }
 
 
 # Generic application configuration options, used by most applications below
@@ -100,43 +100,59 @@ storageClass:
 #   enabled: true
 
 executor:
+  replicas: 1
   enabled: true
   image:
     defaultTag: main-dry-run-rc-k8s-directory-creation_215977_2023-04-28_5.0-9b4f55fbff85@sha256:e11a50201f4e619f25b35edc26b037dc4f931073dc1bb10f34bbc17d670bd88d
     name: "executor-kubernetes"
+  # -- The external URL of the Sourcegraph instance. Required.
+  frontendUrl: ""
+  # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
+  frontendPassword: ""
+  # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. Either this or queueNames is required.
   queueName: ""
+  # -- The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. Either this or queueName is required.
+  queueNames: [ ]
+  maximumNumJobs: 10
+  maximumRuntimePerJob: "30m"
+  
+  log:
+    level: "info"
+    format: "condensed"
+    trace: "false"
+  
   storageSize: 10Gi
-  env:
-    # -- The external URL of the Sourcegraph instance. Required.
-    EXECUTOR_FRONTEND_URL:
-      value: ""
-    # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
-    EXECUTOR_FRONTEND_PASSWORD:
-      value: ""
-    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required.
-    EXECUTOR_QUEUE_NAME:
-      value: ""
-    EXECUTOR_MAXIMUM_NUM_JOBS:
-      value: "10"
-    SRC_LOG_LEVEL:
-      value: info
-    SRC_LOG_FORMAT:
-      value: condensed
-    SRC_TRACE_LOG:
-      value: "false"
-    EXECUTOR_KUBERNETES_RESOURCE_REQUEST_MEMORY:
-      value: 1Gi
-    # For local deployments the host is 'host.docker.internal' and this needs to be true
-    EXECUTOR_DOCKER_ADD_HOST_GATEWAY:
-      value: "false"
-    # Useful for debugging.
-    EXECUTOR_KUBERNETES_NAMESPACE:
-      value: sourcegraph
-    KUBERNETES_KEEP_JOBS:
-      value: "false"
-    EXECUTOR_KEEP_WORKSPACES:
-      value: "false"
-      
+  namespace: "default"
+  kubeconfigPath: ""
+  
+  kubernetesJob:
+    deadline: "1200"
+    runAsUser: ""
+    runAsGroup: ""
+    fsGroup: "1000"
+    resources:
+      requests:
+        cpu: ""
+        memory: "1Gi"
+      limits:
+        cpu: ""
+        memory: "12Gi"
+    
+    node:
+      name: ""
+      selector: ""
+      tolerations: ""
+      requiredAffinityMatchExpressions: ""
+      requiredAffinityMatchFields: ""
+
+    pod:
+      affinity: ""
+      antiAffinity: ""
+  
+  debug:
+    keepJobs: "false"
+    keepWorkspaces: "false"
+  
   # -- Affinity,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
@@ -148,3 +164,10 @@ executor:
   # -- Tolerations,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: [ ]
+  
+  extraEnv:
+#   - name: MY_ENV
+#     value: my_value
+  
+  # -- For local deployments the host is 'host.docker.internal' and this needs to be true
+  dockerAddHostGateway: "false"
