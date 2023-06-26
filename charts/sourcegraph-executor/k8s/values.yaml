@@ -60,7 +60,7 @@ privateDockerRegistry:
     registry: index.docker.io
     repository: registry
     tag: 2
-  storageSize: 1Gi
+  storageSize: 10Gi
 
 executor:
   # -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
