@@ -42,7 +42,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 - `executor.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 - `executor.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 - `executor.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `executor.env` - consult `values.yaml`
+- `executor.extraEnv` - consult `values.yaml`
 
 - `privateDockerRegistry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
 - `privateDockerRegistry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
@@ -51,21 +51,3 @@ In addition to the documented values, the `executor` and `private-docker-registr
 - `privateDockerRegistry.env` - consult `values.yaml` file
 
 {{ template "chart.valuesTable" . }}
-
-## Troubleshooting
-
-See a list of running executor pods
-
-```sh
-kubectl get pods -l app=executor
-```
-
-Check logs of the executor container
-
-```sh
-kubectl logs -l app=executor -c executor
-```
-
-[sourcegraph/sourcegraph]: ../sourcegraph/
-[sourcegraph/sourcegraph-executor]: ./
-[executor]: https://docs.sourcegraph.com/admin/executors
