@@ -60,7 +60,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.extraEnv | string | `nil` |  |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. |
-| executor.image.defaultTag | string | `"main-dry-run-rc-k8s-directory-creation_215977_2023-04-28_5.0-9b4f55fbff85@sha256:e11a50201f4e619f25b35edc26b037dc4f931073dc1bb10f34bbc17d670bd88d"` |  |
+| executor.image.defaultTag | string | `"executor-kubernetes:5.1_230340_2023-06-23_5.0-93d39d620e83@sha256:172770133661d4d148327d2cac87c051a6409871ee6f6e28ce3495b60f883ad5"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
 | executor.kubeconfigPath | string | `""` |  |
 | executor.kubernetesJob.deadline | string | `"1200"` |  |
@@ -87,11 +87,11 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Either this or queueNames is required. |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. Either this or queueName is required. |
+| executor.rbac | object | `{"enabled":true}` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
 | executor.replicas | int | `1` |  |
 | executor.storageSize | string | `"10Gi"` |  |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | privateDockerRegistry | object | `{"enabled":true,"image":{"registry":"index.docker.io","repository":"registry","tag":2},"storageSize":"1Gi"}` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
-| rbac | object | `{"enabled":true}` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |

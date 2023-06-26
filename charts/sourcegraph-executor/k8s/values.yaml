@@ -109,12 +109,9 @@ privateDockerRegistry:
     tag: 2
   storageSize: 1Gi
 
-# -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
-rbac:
-  enabled: true
-
-
 executor:
+  # -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
+  configureRbac: true
   replicas: 1
   enabled: true
   image:
