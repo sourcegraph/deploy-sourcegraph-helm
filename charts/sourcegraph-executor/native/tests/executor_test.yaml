@@ -1,33 +1,42 @@
 suite: executor
 templates:
-  - executor/docker-daemon.ConfigMap.yaml
-  - executor/executor.Deployment.yaml
-  - executor/executor.Service.yaml
+  - docker-daemon.ConfigMap.yaml
+  - executor.Deployment.yaml
+  - executor.Service.yaml
 tests:
   - it: should render the Deployment and Service if executor is enabled
     set:
       executor:
         enabled: true
+        queueName: "test"
+      privateDockerRegistry:
+        enabled: true
+      rbac:
+        enabled: true
     asserts:
       - containsDocument:
           kind: Deployment
           apiVersion: apps/v1
-          name: executor
-        template: executor/executor.Deployment.yaml
+          name: executor-test
+        template: executor.Deployment.yaml
       - containsDocument:
           kind: Service
           apiVersion: v1
-          name: executor
-        template: executor/executor.Service.yaml
+          name: executor-test
+        template: executor.Service.yaml
 
   - it: should not render any resources if executor is disabled
     set:
       executor:
         enabled: false
+      privateDockerRegistry:
+        enabled: false
+      rbac:
+        enabled: false
     asserts:
       - hasDocuments:
           count: 0
     templates:
-      - executor/docker-daemon.ConfigMap.yaml
-      - executor/executor.Deployment.yaml
-      - executor/executor.Service.yaml
+      - docker-daemon.ConfigMap.yaml
+      - executor.Deployment.yaml
+      - executor.Service.yaml
