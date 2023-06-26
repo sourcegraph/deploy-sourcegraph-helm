@@ -67,6 +67,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
 | privateDockerRegistry.image.repository | string | `"docker/regisry"` |  |
 | privateDockerRegistry.image.tag | int | `2` |  |
+| privateDockerRegistry.storageSize | string | `"10Gi"` |  |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
