@@ -79,10 +79,11 @@ spec:
                 - /usr/local/bin/executor
             periodSeconds: 5
           volumeMounts:
-            # TODO: make conditional on whether private registry is deployed
+            {{- if .Values.privateDockerRegistry.enabled }}
             - mountPath: /etc/docker/daemon.json
               subPath: daemon.json
               name: docker-config
+            {{- end }}
             - mountPath: /data
               name: "sg-{{include "executor.name" . }}"
           terminationMessagePolicy: FallbackToLogsOnError
@@ -103,11 +104,12 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       volumes:
-        # TODO: make conditional on whether private registry is deployed
+        {{- if .Values.privateDockerRegistry.enabled }}
         - name: docker-config
           configMap:
             defaultMode: 420
             name: docker-config
+        {{- end }}
         - name: "sg-{{include "executor.name" . }}"
           persistentVolumeClaim:
             claimName: "sg-{{include "executor.name" . }}"

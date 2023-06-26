@@ -16,4 +16,4 @@ spec:
   {{- if .Values.privateDockerRegistry.volumeName }}
   volumeName: {{ .Values.privateDockerRegistry.volumeName }}
   {{- end }}
-{{-end }}
+{{- end }}
