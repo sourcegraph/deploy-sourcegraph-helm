@@ -3,13 +3,13 @@
   README.md is automatically generated from README.md.gotmpl
 -->
 
-# Sourcegraph Exexutor Helm Chart
+# Sourcegraph Executor Helm Chart
 
-This chart contains two deployments, Sourcegraph Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy executors
+This chart contains two deployments, Sourcegraph Kubernetes native Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy Kubernetes native executors.
 
 Use cases:
 
-- Deploy Sourcegraph Executors on Kubernetes
+- Deploy Sourcegraph Kubernetes native Executors on Kubernetes
 
 ## Requirements
 
@@ -52,18 +52,46 @@ In addition to the documented values, the `executor` and `private-docker-registr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| dind.image.registry | string | `"index.docker.io"` |  |
-| dind.image.repository | string | `"docker"` |  |
-| dind.image.tag | string | `"20.10.22-dind"` |  |
+| executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| executor.debug.keepJobs | string | `"false"` |  |
+| executor.debug.keepWorkspaces | string | `"false"` |  |
+| executor.dockerAddHostGateway | string | `"false"` | For local deployments the host is 'host.docker.internal' and this needs to be true |
 | executor.enabled | bool | `true` |  |
-| executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":""}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
-| executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":""}` | The external URL of the Sourcegraph instance. Required. |
-| executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":""}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Required. |
-| executor.image.defaultTag | string | `"5.0.2@sha256:72ec1236d831146dda4061276637cc215545df273d1911934e6606eed44d71eb"` |  |
-| executor.image.name | string | `"executor"` |  |
-| privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
-| privateDockerRegistry.image.repository | string | `"docker/regisry"` |  |
-| privateDockerRegistry.image.tag | int | `2` |  |
+| executor.extraEnv | string | `nil` |  |
+| executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
+| executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. |
+| executor.image.defaultTag | string | `"main-dry-run-rc-k8s-directory-creation_215977_2023-04-28_5.0-9b4f55fbff85@sha256:e11a50201f4e619f25b35edc26b037dc4f931073dc1bb10f34bbc17d670bd88d"` |  |
+| executor.image.name | string | `"executor-kubernetes"` |  |
+| executor.kubeconfigPath | string | `""` |  |
+| executor.kubernetesJob.deadline | string | `"1200"` |  |
+| executor.kubernetesJob.fsGroup | string | `"1000"` |  |
+| executor.kubernetesJob.node.name | string | `""` |  |
+| executor.kubernetesJob.node.requiredAffinityMatchExpressions | string | `""` |  |
+| executor.kubernetesJob.node.requiredAffinityMatchFields | string | `""` |  |
+| executor.kubernetesJob.node.selector | string | `""` |  |
+| executor.kubernetesJob.node.tolerations | string | `""` |  |
+| executor.kubernetesJob.pod.affinity | string | `""` |  |
+| executor.kubernetesJob.pod.antiAffinity | string | `""` |  |
+| executor.kubernetesJob.resources.limits.cpu | string | `""` |  |
+| executor.kubernetesJob.resources.limits.memory | string | `"12Gi"` |  |
+| executor.kubernetesJob.resources.requests.cpu | string | `""` |  |
+| executor.kubernetesJob.resources.requests.memory | string | `"1Gi"` |  |
+| executor.kubernetesJob.runAsGroup | string | `""` |  |
+| executor.kubernetesJob.runAsUser | string | `""` |  |
+| executor.log.format | string | `"condensed"` |  |
+| executor.log.level | string | `"info"` |  |
+| executor.log.trace | string | `"false"` |  |
+| executor.maximumNumJobs | int | `10` |  |
+| executor.maximumRuntimePerJob | string | `"30m"` |  |
+| executor.namespace | string | `"default"` |  |
+| executor.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. Either this or queueNames is required. |
+| executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. Either this or queueName is required. |
+| executor.replicas | int | `1` |  |
+| executor.storageSize | string | `"10Gi"` |  |
+| executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| privateDockerRegistry | object | `{"enabled":true,"image":{"registry":"index.docker.io","repository":"registry","tag":2},"storageSize":"1Gi"}` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
+| rbac | object | `{"enabled":true}` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |

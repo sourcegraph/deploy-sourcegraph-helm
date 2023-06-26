@@ -118,7 +118,7 @@ executor:
   replicas: 1
   enabled: true
   image:
-    defaultTag: main-dry-run-rc-k8s-directory-creation_215977_2023-04-28_5.0-9b4f55fbff85@sha256:e11a50201f4e619f25b35edc26b037dc4f931073dc1bb10f34bbc17d670bd88d
+    defaultTag: executor-kubernetes:5.1_230340_2023-06-23_5.0-93d39d620e83@sha256:172770133661d4d148327d2cac87c051a6409871ee6f6e28ce3495b60f883ad5
     name: "executor-kubernetes"
   # -- The external URL of the Sourcegraph instance. Required.
   frontendUrl: ""
