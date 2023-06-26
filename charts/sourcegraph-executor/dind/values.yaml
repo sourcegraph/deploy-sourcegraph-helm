@@ -102,7 +102,7 @@ storageClass:
 executor:
   enabled: true
   image:
-    defaultTag: 5.0.2@sha256:72ec1236d831146dda4061276637cc215545df273d1911934e6606eed44d71eb
+    defaultTag: 5.0.6@sha256:f78a0ba3d84941ec3577f19075e935bec34a9bfaa9dcb85908142fff017e9d6d
     name: "executor"
   env:
     # -- The external URL of the Sourcegraph instance. Required.

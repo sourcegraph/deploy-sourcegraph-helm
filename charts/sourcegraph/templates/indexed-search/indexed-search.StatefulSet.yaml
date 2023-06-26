@@ -130,6 +130,9 @@ spec:
       {{- if .Values.indexedSearch.extraVolumes }}
       {{- toYaml .Values.indexedSearch.extraVolumes | nindent 6 }}
       {{- end }}
+      {{- if .Values.indexedSearch.priorityClassName }}
+      priorityClassName: {{ .Values.indexedSearch.priorityClassName }}
+      {{- end }}
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
