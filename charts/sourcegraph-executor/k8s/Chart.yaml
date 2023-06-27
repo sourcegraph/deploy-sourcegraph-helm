@@ -1,6 +1,6 @@
 apiVersion: v2
-name: sourcegraph-executor
-description: Chart for installing Sourcegraph executors
+name: sourcegraph-executor-k8s
+description: Chart for installing Sourcegraph executors using Kubernetes jobs
 icon: https://sourcegraph.com/favicon.ico
 type: application
 

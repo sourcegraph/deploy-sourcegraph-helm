@@ -1,6 +1,6 @@
 apiVersion: v2
-name: sourcegraph-executor
-description: Chart for installing Sourcegraph executors
+name: sourcegraph-executor-dind
+description: Chart for installing Sourcegraph executors using Docker in Docker (dind)
 icon: https://sourcegraph.com/favicon.ico
 type: application
 
