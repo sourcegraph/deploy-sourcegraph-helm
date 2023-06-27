@@ -57,6 +57,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: {{ include "executor.name" . }}
+            - secretRef:
+                name: {{ include "executor.name" . }}
           {{- if .Values.executor.extraEnv }}
           env:
           {{- with .Values.executor.extraEnv }}
