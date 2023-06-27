@@ -60,7 +60,8 @@ executor:
   image:
     defaultTag: 5.1_230340_2023-06-23_5.0-93d39d620e83@sha256:172770133661d4d148327d2cac87c051a6409871ee6f6e28ce3495b60f883ad5
     name: "executor-kubernetes"
-  # -- The external URL of the Sourcegraph instance. Required.
+  # -- The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace). 
+  # This will avoid unnecessary network charges as traffic will stay within the local network.
   frontendUrl: ""
   # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
   frontendPassword: ""
