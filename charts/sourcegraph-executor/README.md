@@ -2,7 +2,7 @@
 
 This directory contains two Helm charts for deploying executors on Kubernetes. [Read the docs](doc/admin/executors/deploy_executors_kubernetes.md) for more information on executors on Kubernetes.
 
-## k8s
+## Native Kubernetes (k8s)
 This chart deploys executors that interact with the Kubernetes API to handle jobs. This is the preferred deployment option.  
 Your cluster will need to allow configuration of the following RBAC rules:
 
