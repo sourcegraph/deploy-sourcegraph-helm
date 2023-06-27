@@ -1,21 +1,15 @@
 suite: executor
 templates:
-  - docker-daemon.ConfigMap.yaml
   - executor.Deployment.yaml
   - executor.Service.yaml
   - executor.ConfigMap.yaml
   - executor.PersistentVolumeClaim.yaml
-  - private-docker-registry.Deployment.yaml
-  - private-docker-registry.PersistentVolumeClaim.yaml
-  - private-docker-registry.Service.yaml
 tests:
   - it: should render the Deployment, Service, ConfigMap, PVC if executor is enabled
     set:
       executor:
         enabled: true
         queueName: "test"
-      privateDockerRegistry:
-        enabled: true
       rbac:
         enabled: true
     asserts:
@@ -44,84 +38,11 @@ tests:
     set:
       executor:
         enabled: false
-      privateDockerRegistry:
-        enabled: false
       rbac:
         enabled: false
     asserts:
       - hasDocuments:
           count: 0
     templates:
-      - docker-daemon.ConfigMap.yaml
       - executor.Deployment.yaml
       - executor.Service.yaml
-
-  - it: should not set docker volumes on executor deployment if registry is disabled
-    set:
-      executor:
-        enabled: true
-        queueName: "test"
-      privateDockerRegistry:
-        enabled: false
-    asserts:
-      - lengthEqual:
-          path: spec.template.spec.containers[0].volumeMounts
-          count: 1
-      - lengthEqual:
-          path: spec.template.spec.volumes
-          count: 1
-    template: executor.Deployment.yaml
-
-  - it: should set docker volumes on executor deployment if registry is disabled
-    set:
-      executor:
-        enabled: true
-        queueName: "test"
-      privateDockerRegistry:
-        enabled: true
-    asserts:
-      - lengthEqual:
-          path: spec.template.spec.containers[0].volumeMounts
-          count: 2
-      - lengthEqual:
-          path: spec.template.spec.volumes
-          count: 2
-    template: executor.Deployment.yaml
-
-  - it: should render the Deployment, Service, ConfigMap and PVC if registry is enabled
-    set:
-      privateDockerRegistry:
-        enabled: true
-    asserts:
-      - containsDocument:
-          kind: Deployment
-          apiVersion: apps/v1
-          name: private-docker-registry
-        template:  private-docker-registry.Deployment.yaml
-      - containsDocument:
-          kind: Service
-          apiVersion: v1
-          name: private-docker-registry
-        template: private-docker-registry.Service.yaml
-      - containsDocument:
-          kind: PersistentVolumeClaim
-          apiVersion: v1
-          name: private-docker-registry
-        template: private-docker-registry.PersistentVolumeClaim.yaml
-      - containsDocument:
-          kind: ConfigMap
-          apiVersion: v1
-          name: docker-config
-        template: docker-daemon.ConfigMap.yaml
-
-  - it: should not render any resources if registry is disabled
-    set:
-      privateDockerRegistry:
-        enabled: false
-    asserts:
-      - hasDocuments:
-          count: 0
-    templates:
-      - private-docker-registry.Deployment.yaml
-      - private-docker-registry.PersistentVolumeClaim.yaml
-      - private-docker-registry.Service.yaml

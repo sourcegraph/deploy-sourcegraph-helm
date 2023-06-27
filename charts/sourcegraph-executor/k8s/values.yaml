@@ -52,16 +52,6 @@ storageClass:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: { }
 
-# -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
-# More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries
-privateDockerRegistry:
-  enabled: true
-  image:
-    registry: index.docker.io
-    repository: registry
-    tag: 2
-  storageSize: 10Gi
-
 executor:
   # -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
   configureRbac: true
