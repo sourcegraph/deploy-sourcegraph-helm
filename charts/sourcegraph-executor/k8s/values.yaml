@@ -148,5 +148,8 @@ executor:
 #   - name: MY_ENV
 #     value: my_value
   
-  # -- For local deployments the host is 'host.docker.internal' and this needs to be true
+  # -- For local deployments the host is 'host.docker.internal' and this needs to be true.
   dockerAddHostGateway: "false"
+
+  # -- Which storage class to use for PVCs.
+  storageClassName: "sourcegraph"

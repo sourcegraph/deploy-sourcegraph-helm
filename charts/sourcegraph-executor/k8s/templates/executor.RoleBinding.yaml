@@ -10,7 +10,7 @@ metadata:
     app.kubernetes.io/component: executor
 subjects:
   - kind: ServiceAccount
-    name: sg-executor-service-account
+    name: sg-executor
 roleRef:
   kind: Role
   name: sg-executor-role
