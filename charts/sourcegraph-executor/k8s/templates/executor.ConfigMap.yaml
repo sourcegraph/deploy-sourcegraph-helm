@@ -40,7 +40,7 @@ data:
   KUBERNETES_RUN_AS_GROUP: "{{ .Values.executor.kubernetesJob.runAsGroup }}"
   KUBERNETES_FS_GROUP: "{{ .Values.executor.kubernetesJob.fsGroup }}"
 
-  EXECUTOR_DOCKER_ADD_HOST_GATEWAY: "false"
+  EXECUTOR_DOCKER_ADD_HOST_GATEWAY: "{{.Values.executor.dockerAddHostGateway }}"
   KUBERNETES_KEEP_JOBS: "{{ .Values.executor.debug.keepJobs }}"
   EXECUTOR_KEEP_WORKSPACES: "{{ .Values.executor.debug.keepWorkspaces }}"
 {{- end }}
