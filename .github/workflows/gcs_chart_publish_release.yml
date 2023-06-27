@@ -44,8 +44,11 @@ jobs:
       - name: Set up helm repo
         run: helm repo add sg gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}
 
-      - name: Package helm charts
-        run: for i in charts/*; do helm package -u $i; done
+      - name: Package Sourcegraph helm charts
+        run: for i in charts/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
+        
+      - name: Package Sourcegraph executor helm charts
+        run: for i in charts/sourcegraph-executor/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
 
       - name: Publish chart if it doesn't already exist in the repository
         run: |
