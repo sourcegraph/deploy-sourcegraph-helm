@@ -60,7 +60,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.enabled | bool | `true` |  |
 | executor.extraEnv | string | `nil` | Sets extra environment variables on the executor deployment. See `values.yaml` for the format. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
-| executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
+| executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
 | executor.image.defaultTag | string | `"5.1_230340_2023-06-23_5.0-93d39d620e83@sha256:172770133661d4d148327d2cac87c051a6409871ee6f6e28ce3495b60f883ad5"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
 | executor.kubeconfigPath | string | `""` | The path to the kubeconfig file. If not specified, the in-cluster config is used. |
@@ -77,8 +77,8 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.kubernetesJob.resources.limits.memory | string | `"12Gi"` | The maximum memory for a job. |
 | executor.kubernetesJob.resources.requests.cpu | string | `""` | The requested CPU for a job. |
 | executor.kubernetesJob.resources.requests.memory | string | `"1Gi"` | The requested memory for a job. |
-| executor.kubernetesJob.runAsGroup | string | `""` | The group ID to run Kubernetes jobs as. |
-| executor.kubernetesJob.runAsUser | string | `""` | The user ID to run Kubernetes jobs as. |
+| executor.kubernetesJob.runAsGroup | int | `-1` | The group ID to run Kubernetes jobs as. |
+| executor.kubernetesJob.runAsUser | int | `-1` | The user ID to run Kubernetes jobs as. |
 | executor.log.format | string | `"condensed"` |  |
 | executor.log.level | string | `"warn"` | Possible values are `dbug`, `info`, `warn`, `eror`, `crit`. |
 | executor.log.trace | string | `"false"` |  |
