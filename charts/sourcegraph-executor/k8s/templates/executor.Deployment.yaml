@@ -1,0 +1,107 @@
+{{- if .Values.executor.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "executor.name" . }}
+  annotations:
+    description: Runs a sourcegraph executor
+    kubectl.kubernetes.io/default-container: executor
+  labels:
+    {{- include "executor.labels" . | nindent 4 }}
+    {{- if .Values.executor.labels }}
+      {{- toYaml .Values.executor.labels | nindent 4 }}
+    {{- end }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: {{ include "executor.name" . }}
+  minReadySeconds: 10
+  replicas: {{ .Values.executor.replicas }}
+  revisionHistoryLimit: 10
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: executor
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.executor.podAnnotations }}
+      {{- toYaml .Values.executor.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.executor.podLabels }}
+      {{- toYaml .Values.executor.podLabels | nindent 8 }}
+      {{- end }}
+        {{- include "executor.labels" . | nindent 8 }}
+    spec:
+      securityContext:
+        fsGroup: {{ .Values.executor.kubernetesJob.fsGroup }}
+      serviceAccountName: sg-executor
+      containers:
+        - name: executor
+          image: {{ include "sourcegraph.image" (list . "executor") }}
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          ports:
+            - containerPort: 6060
+              name: debug
+          envFrom:
+            - configMapRef:
+                name: {{ include "executor.name" . }}
+            - secretRef:
+                name: {{ include "executor.name" . }}
+          {{- if .Values.executor.extraEnv }}
+          env:
+          {{- with .Values.executor.extraEnv }}
+          {{- toYaml . | trim | nindent 12 }}
+          {{- end }}
+          {{- end }}
+          livenessProbe:
+            exec:
+              command:
+                - /usr/bin/pgrep
+                - -f
+                - /usr/local/bin/executor
+            initialDelaySeconds: 15
+            timeoutSeconds: 5
+          readinessProbe:
+            exec:
+              command:
+                - /usr/bin/pgrep
+                - -f
+                - /usr/local/bin/executor
+            periodSeconds: 5
+          volumeMounts:
+            - mountPath: /data
+              name: "sg-{{include "executor.name" . }}"
+          terminationMessagePolicy: FallbackToLogsOnError
+      {{- with .Values.executor.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.executor.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.executor.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        - name: "sg-{{include "executor.name" . }}"
+          persistentVolumeClaim:
+            claimName: "sg-{{include "executor.name" . }}"
+{{- end }}
