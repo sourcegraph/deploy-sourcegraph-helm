@@ -5,13 +5,25 @@ Use `**BREAKING**:` to denote a breaking change
 # Changelog
 
 <!-- START CHANGELOG -->
-- Fix erroneous indentation of `deploy`, `app.kubernetes.io/component` labels and `volumes` in Embeddings deployment
 
 ## Unreleased
+
+## 5.1.2
+
+- Sourcegraph 5.1.2 is now available!
+
+## 5.1.1
+
+- Sourcegraph 5.1.1 is now available!
+
+## 5.1.0
+
+- Sourcegraph 5.1.0 is now available!
 
 ## 5.0.6
 
 - Add `defaultTagPrefix` per service
+- Fix erroneous indentation of `deploy`, `app.kubernetes.io/component` labels and `volumes` in Embeddings deployment
 
 ## 5.0.5
 
