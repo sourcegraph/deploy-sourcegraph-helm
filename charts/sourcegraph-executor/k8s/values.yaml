@@ -58,7 +58,7 @@ executor:
   replicas: 1
   enabled: true
   image:
-    defaultTag: 5.1.1@sha256:b0358c3cdea243a8796abfaa585e93c005ab2f719761bab75daf919125e7345f
+    defaultTag: 5.1.2@sha256:8e485d5fa922cd7c34991b6b0e44690ae75dff409ab81af822887c04f6d6ad95
     name: "executor-kubernetes"
   # -- The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace). 
   # This will avoid unnecessary network charges as traffic will stay within the local network.
