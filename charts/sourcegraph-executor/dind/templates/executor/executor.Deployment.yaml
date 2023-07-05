@@ -1,4 +1,7 @@
 {{- if .Values.executor.enabled -}}
+{{- if and (empty .Values.executor.env.EXECUTOR_QUEUE_NAME.value) (empty .Values.executor.env.EXECUTOR_QUEUE_NAMES.value) }}
+{{- fail "You must set either executor.env.EXECUTOR_QUEUE_NAME.value or executor.env.EXECUTOR_QUEUE_NAMES.value" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
