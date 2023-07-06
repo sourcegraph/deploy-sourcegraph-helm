@@ -5,6 +5,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: {{ include "executor.name" . }}
   annotations:
     description: Runs sourcegraph executors
     kubectl.kubernetes.io/default-container: executor
