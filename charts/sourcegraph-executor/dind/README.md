@@ -60,7 +60,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":""}` | The external URL of the Sourcegraph instance. Required. |
 | executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":""}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAMES is required.** |
 | executor.env.EXECUTOR_QUEUE_NAMES | object | `{"value":""}` | The comma-separated list of names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAME is required.** |
-| executor.image.defaultTag | string | `"5.1.2@sha256:42601c506d573fae53dcff5d9c0ef7a9575ccabee0d47b9eef48d0a6997d54bb"` |  |
+| executor.image.defaultTag | string | `"5.1.3@sha256:1c84d011591fe74d6c1cf5ded83b4f7b829e098a24adba708f43bac67d057e6d"` |  |
 | executor.image.name | string | `"executor"` |  |
 | executor.replicaCount | int | `1` |  |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
