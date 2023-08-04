@@ -11,6 +11,9 @@ frontend:
     cloud.google.com/neg: '{"ingress": true}'
     # Reference the `BackendConfig` CR created below
     beta.cloud.google.com/backend-config: '{"default": "sourcegraph-frontend"}'
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
 
 storageClass:
   create: true
@@ -30,3 +33,68 @@ extraResources:
         timeoutSec: 5
         requestPath: /ready
         port: 6060 # we use a custom port to perform healthcheck
+
+migrator:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+githubProxy:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+gitserver:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+grafana:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+indexedSearch:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+indexedSearchIndexer:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+blobstore:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+preciseCodeIntel:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+repoUpdater:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+searcher:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+symbols:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+syntectServer:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
+worker:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp

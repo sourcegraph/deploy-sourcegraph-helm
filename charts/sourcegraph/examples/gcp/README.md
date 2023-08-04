@@ -2,6 +2,8 @@
 
 Deploy Sourcegraph on GKE and use [Container-native load balancing through Ingress] to make Sourcegraph publicly accessible.
 
+Additionally, it will configure output logs format that works better with GCP Logging by setting `SRC_LOG_FORMAT=json_gcp` in all services.
+
 ## Get started
 
 Deploy or upgrade Sourcegraph Helm chart with the provided [override.yaml](./override.yaml). This will create a public-facing load balancer that supports HTTP traffic. You can then access your deployment via the IP of the load balancer.
