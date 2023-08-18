@@ -90,7 +90,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
-| embeddings.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| embeddings.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | embeddings.enabled | bool | `false` | Enable `embeddings` |
 | embeddings.env | object | `{}` | Environment variables for the `embeddings` container |
 | embeddings.extraVolumeMounts | object | `{}` |  |
@@ -99,7 +99,7 @@ In addition to the documented values, all services also support the following va
 | embeddings.image.name | string | `"embeddings"` | Docker image name for the `embeddings` image |
 | embeddings.name | string | `"embeddings"` | Name of the `embeddings` service |
 | embeddings.podSecurityContext | object | `{}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | embeddings.serviceAccount.annotations | object | `{}` |  |
 | embeddings.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
 | embeddings.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -272,7 +272,7 @@ In addition to the documented values, all services also support the following va
 | qdrant.image.defaultTag | string | `"239247_2023-08-18_5.1-433e1b1c997f@sha256:eafcd7af2aca699fa9c9ce8e6aa674cc0470441f794baf031296d5d1cdadd0bc"` | Docker image tag for the `embeddings` image |
 | qdrant.image.name | string | `"qdrant"` | Docker image name for the `embeddings` image |
 | qdrant.name | string | `"qdrant"` | Name of the `qdrant` service |
-| qdrant.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"Always","runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| qdrant.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | qdrant.resources | object | `{"limits":{"cpu":"4","memory":"16G"},"requests":{"cpu":"4","memory":"16G"}}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | qdrant.serviceAccount.annotations | object | `{}` |  |
 | qdrant.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
