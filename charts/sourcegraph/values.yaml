@@ -361,6 +361,8 @@ qdrant:
     annotations: {}
   extraVolumeMounts: {}
   extraVolumes: {}
+  # -- PVC Storage Request for `qdrant` data volume
+  storageSize: 100Gi
 
 frontend:
   # -- Environment variables for the `frontend` container

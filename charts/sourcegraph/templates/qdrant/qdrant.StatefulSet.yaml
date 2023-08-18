@@ -1,8 +1,8 @@
-{{- if .Values.embeddings.enabled -}}
+{{- if .Values.qdrant.enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Values.embeddings.name }}
+  name: {{ .Values.qdrant.name }}
   annotations:
     description: Backend for vector search operations.
   labels:
@@ -21,13 +21,11 @@ spec:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: {{ .Values.qdrant.name }}
   strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 0
-    type: RollingUpdate
+    type: Recreate
   template:
     metadata:
       annotations:
+        kubectl.kubernetes.io/default-container: qdrant
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -35,9 +33,6 @@ spec:
       {{- toYaml .Values.qdrant.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        app: {{ .Values.embeddings.name }}
-        app.kubernetes.io/component: qdrant
-        deploy: sourcegraph
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
@@ -45,14 +40,18 @@ spec:
       {{- if .Values.qdrant.podLabels }}
       {{- toYaml .Values.qdrant.podLabels | nindent 8 }}
       {{- end }}
+        app: {{ .Values.qdrant.name }}
+        app.kubernetes.io/component: qdrant
+        deploy: sourcegraph
       # TODO: should these live in pod labels?
         sourcegraph.prometheus/scrape: "true"
         prometheus.io/port: "6333"
     spec:
       containers:
-      - name: {{ .Values.embeddings.name }}
+      - name: {{ .Values.qdrant.name }}
         image: {{ include "sourcegraph.image" (list . "qdrant") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.qdrant.env }}
         - name: {{ $name }}
@@ -65,16 +64,24 @@ spec:
           - containerPort: 6334
             name: grpc
             protocol: TCP
+        readinessProbe:
+          grpc:
+            port: grpc
+          periodSeconds: 5
+          timeoutSeconds: 5
+        liveness:
+          grpc:
+            port: grpc
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
         volumeMounts:
-          {{- if .Values.qdrant.extraVolumeMounts }}
-          {{- toYaml .Values.qdrant.extraVolumeMounts | nindent 8 }}
-          {{- end }}
-          # TODO: move these to extraVolumeMounts?
           - mountPath: /data
             name: data
           - name: config
             mountPath: /etc/qdrant/config.yaml
-        # TODO: what is this?
+          {{- if .Values.qdrant.extraVolumeMounts }}
+          {{- toYaml .Values.qdrant.extraVolumeMounts | nindent 8 }}
+          {{- end }}
         {{- if not .Values.sourcegraph.localDevMode}}
         resources:
           {{- toYaml .Values.qdrant.resources | nindent 10 }}
@@ -88,38 +95,32 @@ spec:
           requests:
             cpu: "8"
             memory: 32Gi
+      {{- if .Values.blobstore.extraContainers }}
+        {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
+      {{- end }}
       securityContext:
-        {{- toYaml .Values.embeddings.podSecurityContext | nindent 8 }}
+        {{- toYaml .Values.qdrant.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "qdrant" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "qdrant" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "qdrant" ) | trim | nindent 6 }}
       {{- if .Values.qdrant.serviceAccount.create }}
       serviceAccountName: {{ .Values.qdrant.serviceAccount.name }}
       {{- end}}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
-        {{- if .Values.embeddings.extraVolumes }}
-        {{- toYaml .Values.embeddings.extraVolumes | nindent 6 }}
+        {{- if .Values.qdrant.extraVolumes }}
+        {{- toYaml .Values.qdrant.extraVolumes | nindent 6 }}
         {{- end }}
-        # TODO: move this to extraVolumes?
         - name: data
+          persistentVolumeClaim:
+            claimName: data
         - name: config
           configMap:
             name: qdrant
             items:
               - key: config.yaml
                 path: config.yaml
-  # TODO: do I need this?
-  volumeClaimTemplates:
-    - metadata:
-        labels:
-          deploy: sourcegraph
-        name: data
-      spec:
-        accessModes:
-          - ReadWriteOnce
-        resources:
-          requests:
-            # The size of disk to be used for search indexes.
-            storage: 2Ti
-        storageClassName: sourcegraph
 {{- end }}

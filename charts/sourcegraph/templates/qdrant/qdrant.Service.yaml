@@ -1,29 +1,29 @@
-{{- if .Values.embeddings.enabled -}}
+{{- if .Values.qdrant.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/port: "6060"
-    sourcegraph.prometheus/scrape: "true"
-    {{- if .Values.frontend.serviceAnnotations }}
-    {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
+    {{- if .Values.qdrant.serviceAnnotations }}
+    {{- toYaml .Values.qdrant.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: {{ .Values.embeddings.name }}
+    app: qdrant
     deploy: sourcegraph
-    app.kubernetes.io/component: embeddings
-    {{- if .Values.sourcegraph.serviceLabels }}
-      {{- toYaml .Values.sourcegraph.serviceLabels | nindent 4 }}
+    app.kubernetes.io/component: qdrant
+    {{- if .Values.qdrant.serviceLabels }}
+      {{- toYaml .Values.qdrant.serviceLabels | nindent 4 }}
     {{- end }}
-  name: {{ .Values.embeddings.name }}
+  name: qdrant
 spec:
   ports:
+  - name: grpc
+    port: 6333
+    targetPort: grpc
   - name: http
-    port: 9991
-    protocol: TCP
+    port: 6334 
     targetPort: http
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: {{ .Values.embeddings.name }}
-  type: {{ .Values.embeddings.serviceType | default "ClusterIP" }}
+    app: qdrant
+  type: {{ .Values.qdrant.serviceType | default "ClusterIP" }}
 {{- end }}
