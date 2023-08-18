@@ -1,0 +1,29 @@
+{{- if .Values.embeddings.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.frontend.serviceAnnotations }}
+    {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
+    {{- end }}
+  labels:
+    app: {{ .Values.embeddings.name }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: embeddings
+    {{- if .Values.sourcegraph.serviceLabels }}
+      {{- toYaml .Values.sourcegraph.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: {{ .Values.embeddings.name }}
+spec:
+  ports:
+  - name: http
+    port: 9991
+    protocol: TCP
+    targetPort: http
+  selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    app: {{ .Values.embeddings.name }}
+  type: {{ .Values.embeddings.serviceType | default "ClusterIP" }}
+{{- end }}
