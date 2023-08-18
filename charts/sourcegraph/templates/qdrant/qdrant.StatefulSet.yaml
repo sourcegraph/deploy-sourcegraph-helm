@@ -64,16 +64,6 @@ spec:
           - containerPort: 6334
             name: grpc
             protocol: TCP
-        readinessProbe:
-          grpc:
-            port: 6334
-          periodSeconds: 5
-          timeoutSeconds: 5
-        liveness:
-          grpc:
-            port: 6334
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
         volumeMounts:
           - name: qdrant-data
             mountPath: /data

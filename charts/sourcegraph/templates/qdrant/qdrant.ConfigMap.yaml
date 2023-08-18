@@ -12,6 +12,7 @@ data:
     log_level: INFO
     storage:
       storage_path: /data
+      snapshots_path: /data/storage
       on_disk_payload: true
     performance:
       max_optimization_threads: 4
