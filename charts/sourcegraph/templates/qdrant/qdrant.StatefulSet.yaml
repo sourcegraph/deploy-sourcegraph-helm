@@ -64,6 +64,7 @@ spec:
           - containerPort: 6334
             name: grpc
             protocol: TCP
+        # TODO: add readiness probe once this PR lands: https://github.com/qdrant/qdrant/pull/2409
         volumeMounts:
           - name: qdrant-data
             mountPath: /data
