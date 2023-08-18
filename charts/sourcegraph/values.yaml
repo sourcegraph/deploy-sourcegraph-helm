@@ -336,11 +336,11 @@ qdrant:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
-      cpu: "8"
-      memory: 32G
+      cpu: "4"
+      memory: 16G
     requests:
-      cpu: "8"
-      memory: 32G
+      cpu: "4"
+      memory: 16G
   # -- Environment variables for the `qdrant` container
   env: {}
   # -- Security context for the `qdrant` container,
@@ -349,10 +349,14 @@ qdrant:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
-    readOnlyRootFilesystem: true
+    fsGroup: 101
   # -- Security context for the `qdrant` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  podSecurityContext: {}
+  podSecurityContext:
+    runAsUser: 100
+    runAsGroup: 101
+    fsGroup: 101
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount for `embeddings`
     create: false

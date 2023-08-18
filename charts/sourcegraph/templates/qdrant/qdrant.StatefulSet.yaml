@@ -66,19 +66,19 @@ spec:
             protocol: TCP
         readinessProbe:
           grpc:
-            port: grpc
+            port: 6334
           periodSeconds: 5
           timeoutSeconds: 5
         liveness:
           grpc:
-            port: grpc
+            port: 6334
           initialDelaySeconds: 60
           timeoutSeconds: 5
         volumeMounts:
-          - mountPath: /data
-            name: data
+          - name: qdrant-data
+            mountPath: /data
           - name: config
-            mountPath: /etc/qdrant/config.yaml
+            mountPath: /etc/qdrant
           {{- if .Values.qdrant.extraVolumeMounts }}
           {{- toYaml .Values.qdrant.extraVolumeMounts | nindent 8 }}
           {{- end }}
@@ -90,11 +90,11 @@ spec:
           {{- toYaml .Values.qdrant.containerSecurityContext | nindent 10 }}
         resources:
           limits:
-            cpu: "8"
-            memory: 32Gi
+            cpu: "1"
+            memory: 8Gi
           requests:
-            cpu: "8"
-            memory: 32Gi
+            cpu: "1"
+            memory: 8Gi
       {{- if .Values.blobstore.extraContainers }}
         {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
       {{- end }}
@@ -114,9 +114,9 @@ spec:
         {{- if .Values.qdrant.extraVolumes }}
         {{- toYaml .Values.qdrant.extraVolumes | nindent 6 }}
         {{- end }}
-        - name: data
+        - name: qdrant-data
           persistentVolumeClaim:
-            claimName: data
+            claimName: qdrant
         - name: config
           configMap:
             name: qdrant
