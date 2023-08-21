@@ -336,11 +336,11 @@ qdrant:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
-      cpu: "4"
-      memory: 16G
+      cpu: "2"
+      memory: 8G
     requests:
-      cpu: "4"
-      memory: 16G
+      cpu: "500m"
+      memory: 2G
   # -- Environment variables for the `qdrant` container
   env: {}
   # -- Security context for the `qdrant` container,

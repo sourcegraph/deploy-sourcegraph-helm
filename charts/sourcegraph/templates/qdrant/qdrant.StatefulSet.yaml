@@ -79,13 +79,6 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.qdrant.containerSecurityContext | nindent 10 }}
-        resources:
-          limits:
-            cpu: "1"
-            memory: 8Gi
-          requests:
-            cpu: "1"
-            memory: 8Gi
       {{- if .Values.blobstore.extraContainers }}
         {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
       {{- end }}

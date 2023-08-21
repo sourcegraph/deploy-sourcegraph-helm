@@ -16,12 +16,12 @@ metadata:
   name: qdrant
 spec:
   ports:
-  - name: grpc
-    port: 6333
-    targetPort: grpc
   - name: http
-    port: 6334 
+    port: 6333
     targetPort: http
+  - name: grpc
+    port: 6334
+    targetPort: grpc
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: qdrant
