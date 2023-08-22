@@ -292,7 +292,7 @@ embeddings:
     name: "embeddings"
     # -- Docker image tag for the `embeddings` image
     defaultTag: "5.1.6@sha256:e849f52e38637882e5d2ba3d7d27a656d897c4b4e2905e1fdb843536d9c948ab"
-  # -- Resource requests & limits for the `worker` container,
+  # -- Resource requests & limits for the `embeddings` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
@@ -303,7 +303,7 @@ embeddings:
       memory: 32G
   # -- Environment variables for the `embeddings` container
   env: {}
-  # -- Security context for the `worker` container,
+  # -- Security context for the `embeddings` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
@@ -321,6 +321,55 @@ embeddings:
     annotations: {}
   extraVolumeMounts: {}
   extraVolumes: {}
+
+qdrant:
+  # -- Enable `qdrant`
+  enabled: false
+  # -- Name of the `qdrant` service
+  name: qdrant
+  image:
+    # -- Docker image name for the `embeddings` image
+    name: "qdrant"
+    # -- Docker image tag for the `embeddings` image
+    defaultTag: "239247_2023-08-18_5.1-433e1b1c997f@sha256:eafcd7af2aca699fa9c9ce8e6aa674cc0470441f794baf031296d5d1cdadd0bc"
+  # -- Resource requests & limits for the `qdrant` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  config:
+    debug: true
+    log_level: INFO
+  resources:
+    limits:
+      cpu: "2"
+      memory: 8G
+    requests:
+      cpu: "500m"
+      memory: 2G
+  # -- Environment variables for the `qdrant` container
+  env: {}
+  # -- Security context for the `qdrant` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    fsGroup: 101
+  # -- Security context for the `qdrant` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  podSecurityContext:
+    runAsUser: 100
+    runAsGroup: 101
+    fsGroup: 101
+    fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `embeddings`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
+    annotations: {}
+  extraVolumeMounts: {}
+  extraVolumes: {}
+  # -- PVC Storage Request for `qdrant` data volume
+  storageSize: 100Gi
 
 frontend:
   # -- Environment variables for the `frontend` container
