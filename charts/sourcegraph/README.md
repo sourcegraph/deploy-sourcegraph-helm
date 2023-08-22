@@ -264,6 +264,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
+| qdrant.config | object | `{"debug":true,"log_level":"INFO"}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | qdrant.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"fsGroup":101,"runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | qdrant.enabled | bool | `false` | Enable `qdrant` |
 | qdrant.env | object | `{}` | Environment variables for the `qdrant` container |
@@ -273,7 +274,10 @@ In addition to the documented values, all services also support the following va
 | qdrant.image.name | string | `"qdrant"` | Docker image name for the `embeddings` image |
 | qdrant.name | string | `"qdrant"` | Name of the `qdrant` service |
 | qdrant.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| qdrant.resources | object | `{"limits":{"cpu":"2","memory":"8G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| qdrant.resources.limits.cpu | string | `"2"` |  |
+| qdrant.resources.limits.memory | string | `"8G"` |  |
+| qdrant.resources.requests.cpu | string | `"500m"` |  |
+| qdrant.resources.requests.memory | string | `"2G"` |  |
 | qdrant.serviceAccount.annotations | object | `{}` |  |
 | qdrant.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
 | qdrant.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
