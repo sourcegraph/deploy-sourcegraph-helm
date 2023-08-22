@@ -3,6 +3,8 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
+    sourcegraph.prometheus/scrape: "true"
+    prometheus.io/port: "6333"
     {{- if .Values.qdrant.serviceAnnotations }}
     {{- toYaml .Values.qdrant.serviceAnnotations | nindent 4 }}
     {{- end }}

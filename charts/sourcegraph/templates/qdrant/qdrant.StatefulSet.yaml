@@ -44,8 +44,6 @@ spec:
         app.kubernetes.io/component: qdrant
         deploy: sourcegraph
       # TODO: should these live in pod labels?
-        sourcegraph.prometheus/scrape: "true"
-        prometheus.io/port: "6333"
     spec:
       containers:
       - name: {{ .Values.qdrant.name }}
