@@ -43,7 +43,6 @@ spec:
         app: {{ .Values.qdrant.name }}
         app.kubernetes.io/component: qdrant
         deploy: sourcegraph
-      # TODO: should these live in pod labels?
     spec:
       containers:
       - name: {{ .Values.qdrant.name }}
