@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added a service for the Qdrant vector database
+
 ## 5.1.6
 
 - Sourcegraph 5.1.6 is now available!
