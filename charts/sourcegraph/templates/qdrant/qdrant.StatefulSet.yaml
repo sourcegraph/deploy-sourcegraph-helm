@@ -61,7 +61,25 @@ spec:
           - containerPort: 6334
             name: grpc
             protocol: TCP
-        # TODO: add readiness probe once this PR lands: https://github.com/qdrant/qdrant/pull/2409
+        # TODO: use gRPC liveness/readiness probe once this PR lands: https://github.com/qdrant/qdrant/pull/2409
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            scheme: HTTP
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            scheme: HTTP
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
         volumeMounts:
           - name: qdrant-data
             mountPath: /data
