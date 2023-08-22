@@ -8,18 +8,24 @@ metadata:
     app.kubernetes.io/component: qdrant
 data:
   config.yaml: |
-    debug: true
-    log_level: INFO
+    debug: {{ .Values.qdrant.config.debug }}
+    log_level: {{ .Values.qdrant.config.log_level }}
     storage:
       storage_path: /data
       snapshots_path: /data/storage
       on_disk_payload: true
+    service:
+      http_port: 6333
+      grpc_port: 6334
+    telemetry_disabled: true
+    # The following parameters can be configured
+    # on a per-collection basis, so these are just defaults.
     performance:
       max_optimization_threads: 4
     optimizers:
       max_optimization_threads: 4
       mmap_threshold_kb: 1
-      indexing_threshold_kb: 0
+      indexing_threshold_kb: 0 # disable indexing
     hnsw_index:
       m: 8
       ef_construct: 100
@@ -27,8 +33,4 @@ data:
       max_indexing_threads: 4
       on_disk: true
       payload_m: 8
-    service:
-      http_port: 6333
-      grpc_port: 6334
-    telemetry_disabled: true
 {{- end }}

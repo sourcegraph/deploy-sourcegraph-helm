@@ -334,6 +334,9 @@ qdrant:
     defaultTag: "239247_2023-08-18_5.1-433e1b1c997f@sha256:eafcd7af2aca699fa9c9ce8e6aa674cc0470441f794baf031296d5d1cdadd0bc"
   # -- Resource requests & limits for the `qdrant` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  config:
+    debug: true
+    log_level: INFO
   resources:
     limits:
       cpu: "2"
