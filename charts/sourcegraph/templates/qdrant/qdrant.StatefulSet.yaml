@@ -115,11 +115,21 @@ spec:
         {{- end }}
         - name: qdrant-data
           persistentVolumeClaim:
-            claimName: qdrant
+            claimName: qdrant-data
         - name: config
           configMap:
             name: qdrant
             items:
               - key: config.yaml
                 path: config.yaml
+  volumeClaimTemplates:
+  - metadata:
+      name: qdrant-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.qdrant.storageSize }}
+      storageClassName: {{ .Values.storageClass.name }}
 {{- end }}
