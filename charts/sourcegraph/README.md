@@ -273,7 +273,7 @@ In addition to the documented values, all services also support the following va
 | qdrant.image.name | string | `"qdrant"` | Docker image name for the `embeddings` image |
 | qdrant.name | string | `"qdrant"` | Name of the `qdrant` service |
 | qdrant.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| qdrant.resources | object | `{"limits":{"cpu":"4","memory":"16G"},"requests":{"cpu":"4","memory":"16G"}}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| qdrant.resources | object | `{"limits":{"cpu":"2","memory":"8G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | qdrant.serviceAccount.annotations | object | `{}` |  |
 | qdrant.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
 | qdrant.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
