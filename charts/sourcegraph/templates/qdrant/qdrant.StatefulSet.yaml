@@ -20,8 +20,9 @@ spec:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: {{ .Values.qdrant.name }}
-  strategy:
-    type: Recreate
+  serviceName: qdrant
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       annotations:
