@@ -265,7 +265,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
 | qdrant.config | object | `{"debug":true,"log_level":"INFO"}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| qdrant.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"fsGroup":101,"runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| qdrant.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | qdrant.enabled | bool | `false` | Enable `qdrant` |
 | qdrant.env | object | `{}` | Environment variables for the `qdrant` container |
 | qdrant.extraVolumeMounts | object | `{}` |  |
