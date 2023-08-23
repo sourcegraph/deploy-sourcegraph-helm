@@ -20,6 +20,7 @@ spec:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: {{ .Values.qdrant.name }}
+  serviceName: qdrant
   updateStrategy:
     type: RollingUpdate
   template:

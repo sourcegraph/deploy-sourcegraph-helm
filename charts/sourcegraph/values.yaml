@@ -352,7 +352,6 @@ qdrant:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
-    fsGroup: 101
   # -- Security context for the `qdrant` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   podSecurityContext:
