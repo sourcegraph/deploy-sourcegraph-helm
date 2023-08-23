@@ -1,0 +1,30 @@
+# Disable SC creation
+storageClass:
+  create: true
+  name: standard
+  provisioner: docker.io/hostpath
+  parameters:
+    reclaimPolicy: Retain
+
+
+# Disable resources requests/limits
+sourcegraph:
+  localDevMode: true
+  image:
+    defaultTag: insiders
+    useGlobalTagAsDefault: true
+# More values to be added in order to test your change
+
+qdrant:
+  enabled: true
+
+gitserver:
+  env:
+    SRC_REPOS_DESIRED_PERCENT_FREE:
+      value: "0"
+
+frontend:
+  env:
+    QDRANT_ENDPOINT:
+      value: "qdrant:6334"
+
