@@ -99,7 +99,7 @@ In addition to the documented values, all services also support the following va
 | embeddings.image.name | string | `"embeddings"` | Docker image name for the `embeddings` image |
 | embeddings.name | string | `"embeddings"` | Name of the `embeddings` service |
 | embeddings.podSecurityContext | object | `{}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | embeddings.serviceAccount.annotations | object | `{}` |  |
 | embeddings.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
 | embeddings.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
