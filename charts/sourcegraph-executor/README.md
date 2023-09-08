@@ -1,6 +1,6 @@
 # Sourcegraph executor helm charts
 
-This directory contains two Helm charts for deploying executors on Kubernetes. [Read the docs](https://docs.sourcegraph.com/admin/executors/deploy_executors_kubernetes) for more information on executors on Kubernetes.
+This directory contains two Helm charts for deploying executors on Kubernetes. [See the docs](https://docs.sourcegraph.com/admin/executors/deploy_executors_kubernetes) for more information on executors on Kubernetes.
 
 ## Native Kubernetes (k8s)
 This chart deploys executors that interact with the Kubernetes API to handle jobs. This is the preferred deployment option.  
