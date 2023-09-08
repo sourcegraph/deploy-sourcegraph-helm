@@ -8,6 +8,65 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 5.1.8
+
+- Sourcegraph 5.1.8 is now available!
+
+## 5.1.7
+
+- Sourcegraph 5.1.7 is now available!
+- Added a service for the Qdrant vector database
+
+## 5.1.6
+
+- Sourcegraph 5.1.6 is now available!
+
+## 5.1.5
+
+- Sourcegraph 5.1.5 is now available!
+
+## 5.1.4
+
+- Sourcegraph 5.1.4 is now available!
+
+## 5.1.3
+
+- Sourcegraph 5.1.3 is now available!
+
+## 5.1.2
+
+- Sourcegraph 5.1.2 is now available!
+
+## 5.1.1
+
+- Sourcegraph 5.1.1 is now available!
+
+## 5.1.0
+
+- Sourcegraph 5.1.0 is now available!
+
+## 5.0.6
+
+- Add `defaultTagPrefix` per service
+- Fix erroneous indentation of `deploy`, `app.kubernetes.io/component` labels and `volumes` in Embeddings deployment
+
+## 5.0.5
+
+- Add support for PodDisruptionBudget in frontend
+
+## 5.0.4
+
+- Add support for PriorityClass in StatefulSets
+- Add optional support for the embeddings service
+
+## 5.0.3
+
+- Add Embeddings service (disabled by default) for Cody embeddings
+
+## 5.0.1
+
+- Sourcegraph 5.0.1 is now available!
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#5-0-1)
 
 ## 5.0.0
 

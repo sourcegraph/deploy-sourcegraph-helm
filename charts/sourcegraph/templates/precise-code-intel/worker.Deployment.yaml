@@ -96,6 +96,8 @@ spec:
         securityContext:
           {{- toYaml .Values.preciseCodeIntel.containerSecurityContext | nindent 10 }}
         volumeMounts:
+        - mountPath: /tmp
+          name: tmpdir
         {{- if .Values.preciseCodeIntel.extraVolumeMounts }}
         {{- toYaml .Values.preciseCodeIntel.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -113,6 +115,8 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "preciseCodeIntel") | trim | nindent 6 }}
       volumes:
+      - emptyDir: {}
+        name: tmpdir
       {{- if .Values.preciseCodeIntel.extraVolumes }}
       {{- toYaml .Values.preciseCodeIntel.extraVolumes | nindent 6 }}
       {{- end }}

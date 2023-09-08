@@ -53,8 +53,11 @@ jobs:
           sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml
           sed -i '/^version:/ s/"$/-insiders.${{ steps.metadata.outputs.shortSHA }}"/' charts/*/Chart.yaml
 
-      - name: Package helm charts
-        run: for i in charts/*; do helm package -u $i; done
+      - name: Package Sourcegraph helm charts
+        run: for i in charts/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
+
+      - name: Package Sourcegraph executor helm charts
+        run: for i in charts/sourcegraph-executor/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
 
       - name: Publish chart if it doesn't already exist in the repository
         run: |

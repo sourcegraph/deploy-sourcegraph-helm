@@ -122,6 +122,9 @@ spec:
       {{- if .Values.searcher.extraVolumes }}
       {{- toYaml .Values.searcher.extraVolumes | nindent 6 }}
       {{- end }}
+      {{- if .Values.searcher.priorityClassName }}
+      priorityClassName: {{ .Values.searcher.priorityClassName }}
+      {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: cache

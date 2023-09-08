@@ -1,0 +1,48 @@
+suite: executor
+templates:
+  - executor.Deployment.yaml
+  - executor.Service.yaml
+  - executor.ConfigMap.yaml
+  - executor.PersistentVolumeClaim.yaml
+tests:
+  - it: should render the Deployment, Service, ConfigMap, PVC if executor is enabled
+    set:
+      executor:
+        enabled: true
+        queueName: "test"
+      rbac:
+        enabled: true
+    asserts:
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+          name: executor-test
+        template: executor.Deployment.yaml
+      - containsDocument:
+          kind: Service
+          apiVersion: v1
+          name: executor-test
+        template: executor.Service.yaml
+      - containsDocument:
+          kind: ConfigMap
+          apiVersion: v1
+          name: executor-test
+        template: executor.ConfigMap.yaml
+      - containsDocument:
+          kind: PersistentVolumeClaim
+          apiVersion: v1
+          name: sg-executor-test
+        template: executor.PersistentVolumeClaim.yaml                
+
+  - it: should not render any resources if executor is disabled
+    set:
+      executor:
+        enabled: false
+      rbac:
+        enabled: false
+    asserts:
+      - hasDocuments:
+          count: 0
+    templates:
+      - executor.Deployment.yaml
+      - executor.Service.yaml

@@ -67,7 +67,7 @@ helm template -f ./override.yaml sourcegraph charts/sourcegraph/.
 Perform a diff of the rendered helm manifests before and after your change. There're many ways to produce the diff:
 
 - Run `helm template` before and after the change, then run `diff bundle.old.yaml bundle.new.yaml`.
-- Run `helm install` before the change, then run `helm diff` to inspecth the diff.
+- Run `helm install` before the change, then run `helm diff` to inspect the diff.
 
 ### Deploy the chart
 

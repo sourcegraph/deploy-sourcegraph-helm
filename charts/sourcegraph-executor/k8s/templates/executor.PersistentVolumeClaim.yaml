@@ -1,0 +1,15 @@
+{{- if .Values.executor.enabled -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "sg-{{include "executor.name" . }}"
+  labels: 
+{{ include "executor.labels" . | indent 4 }}
+spec:
+  storageClassName: {{ .Values.storageClass.name }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.executor.storageSize }}
+{{- end}}

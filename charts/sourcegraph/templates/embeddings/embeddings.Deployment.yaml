@@ -1,0 +1,92 @@
+{{- if .Values.embeddings.enabled -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.embeddings.name }}
+  annotations:
+    description: Handles embeddings which enhance Cody's context fetching
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.embeddings.labels }}
+      {{- toYaml .Values.embeddings.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: embeddings
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.embeddings.name }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.embeddings.podAnnotations }}
+      {{- toYaml .Values.embeddings.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+        app: {{ .Values.embeddings.name }}
+        app.kubernetes.io/component: embeddings
+        deploy: sourcegraph
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.embeddings.podLabels }}
+      {{- toYaml .Values.embeddings.podLabels | nindent 8 }}
+      {{- end }}
+    spec:
+      containers:
+      - name: {{ .Values.embeddings.name }}
+        image: {{ include "sourcegraph.image" (list . "embeddings") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        env:
+        {{- range $name, $item := .Values.embeddings.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        {{- if not .Values.embeddings.env.EMBEDDINGS_UPLOAD_BACKEND }}
+        - name: EMBEDDINGS_UPLOAD_BACKEND
+          value: blobstore
+        {{- end }}
+        {{- if not .Values.embeddings.env.EMBEDDINGS_UPLOAD_AWS_ENDPOINT }}
+        - name: EMBEDDINGS_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        {{- end }}
+        ports:
+        - containerPort: 9991
+          name: http
+          protocol: TCP
+        volumeMounts:
+          {{- if .Values.embeddings.extraVolumeMounts }}
+          {{- toYaml .Values.embeddings.extraVolumeMounts | nindent 8 }}
+          {{- end }}
+        {{- if not .Values.sourcegraph.localDevMode}}
+        resources:
+          {{- toYaml .Values.embeddings.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.embeddings.containerSecurityContext | nindent 10 }}
+      securityContext:
+        {{- toYaml .Values.embeddings.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "embeddings" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "embeddings" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "embeddings" ) | trim | nindent 6 }}
+      {{- if .Values.embeddings.serviceAccount.create }}
+      serviceAccountName: {{ .Values.embeddings.serviceAccount.name }}
+      {{- end}}
+      volumes:
+        {{- if .Values.embeddings.extraVolumes }}
+        {{- toYaml .Values.embeddings.extraVolumes | nindent 6 }}
+        {{- end }}
+{{- end }}

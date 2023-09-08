@@ -1,0 +1,107 @@
+suite: priorityClass
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render single priority class
+  template: priorityClass.yaml
+  set:
+    priorityClasses:
+    - name: gitserver-class
+      value: 100
+      preemptionPolicy: Never
+      description: "gitserver priority class"
+  asserts:
+  - equal:
+      path: metadata.name
+      value: gitserver-class
+  - equal:
+      path: value
+      value: 100
+  - equal:
+      path: preemptionPolicy
+      value: Never
+  - equal:
+      path: description
+      value: "gitserver priority class"
+- it: should render two priority classes
+  template: priorityClass.yaml
+  set:
+    priorityClasses:
+    - name: gitserver-class
+      value: 100
+      preemptionPolicy: Never
+      description: "gitserver priority class"
+    - name: indexed-search-class
+      value: 101
+      preemptionPolicy: PreemptLowerPriority
+      description: "indexed-search priority class"
+  asserts:
+  - equal:
+      path: metadata.name
+      value: gitserver-class
+    documentIndex: 0
+  - equal:
+      path: value
+      value: 100
+    documentIndex: 0
+  - equal:
+      path: preemptionPolicy
+      value: Never
+    documentIndex: 0
+  - equal:
+      path: description
+      value: "gitserver priority class"
+    documentIndex: 0
+  - equal:
+      path: metadata.name
+      value: indexed-search-class
+    documentIndex: 1
+  - equal:
+      path: value
+      value: 101
+    documentIndex: 1
+  - equal:
+      path: preemptionPolicy
+      value: PreemptLowerPriority
+    documentIndex: 1
+  - equal:
+      path: description
+      value: "indexed-search priority class"
+    documentIndex: 1
+- it: set priority class on gitserver
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    gitserver:
+      priorityClassName: gitserver-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: gitserver-class
+- it: set priority class on indexed-search
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  set:
+    indexedSearch:
+      priorityClassName: indexed-search-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: indexed-search-class
+- it: set priority class on searcher
+  template: searcher/searcher.StatefulSet.yaml
+  set:
+    searcher:
+      priorityClassName: searcher-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: searcher-class
+- it: set priority class on symbols
+  template: symbols/symbols.StatefulSet.yaml
+  set:
+    symbols:
+      priorityClassName: symbols-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: symbols-class
