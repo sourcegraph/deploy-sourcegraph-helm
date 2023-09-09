@@ -121,14 +121,6 @@ In addition to the documented values, all services also support the following va
 | frontend.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"4G"},"requests":{"cpu":"2","ephemeral-storage":"4Gi","memory":"2G"}}` | Resource requests & limits for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| githubProxy.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `github-proxy` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| githubProxy.image.defaultTag | string | `"5.1.8@sha256:809999572954eea151b859560030a0489f7033b808fe7104acde75240aa42437"` | Docker image tag for the `github-proxy` image |
-| githubProxy.image.name | string | `"github-proxy"` | Docker image name for the `github-proxy` image |
-| githubProxy.name | string | `"github-proxy"` | Name used by resources. Does not affect service names or PVCs. |
-| githubProxy.podSecurityContext | object | `{}` | Security context for the `github-proxy` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| githubProxy.resources | object | `{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"100m","memory":"250M"}}` | Resource requests & limits for the `github-proxy` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| githubProxy.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `github-proxy` |
-| githubProxy.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | gitserver.image.defaultTag | string | `"5.1.8@sha256:775bc34a835718470548759acdc1396a850429770e7e180d93adb19ebbae5226"` | Docker image tag for the `gitserver` image |
 | gitserver.image.name | string | `"gitserver"` | Docker image name for the `gitserver` image |
