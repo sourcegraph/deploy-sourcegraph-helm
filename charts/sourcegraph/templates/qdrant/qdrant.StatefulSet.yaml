@@ -64,7 +64,7 @@ spec:
             protocol: TCP
         # TODO: use gRPC liveness/readiness probe once this PR lands: https://github.com/qdrant/qdrant/pull/2409
         readinessProbe:
-          failureThreshold: 3
+          failureThreshold: 30
           httpGet:
             scheme: HTTP
             port: http
@@ -73,7 +73,7 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         livenessProbe:
-          failureThreshold: 3
+          failureThreshold: 30
           httpGet:
             scheme: HTTP
             port: http
