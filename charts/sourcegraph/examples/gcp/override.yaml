@@ -39,11 +39,6 @@ migrator:
     SRC_LOG_FORMAT: 
       value: json_gcp
 
-githubProxy:
-  env:
-    SRC_LOG_FORMAT: 
-      value: json_gcp
-
 gitserver:
   env:
     SRC_LOG_FORMAT: 
