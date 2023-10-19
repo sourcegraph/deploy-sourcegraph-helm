@@ -464,39 +464,6 @@ migrator:
     runAsGroup: 101
     readOnlyRootFilesystem: true
 
-githubProxy:
-  image:
-    # -- Docker image tag for the `github-proxy` image
-    defaultTag: 5.2.1@sha256:0a61f8f676de47348d08187c870289c9cd60964d9a4b26c4994b4f76e4628604
-    # -- Docker image name for the `github-proxy` image
-    name: "github-proxy"
-  # -- Security context for the `github-proxy` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  # -- Name used by resources. Does not affect service names or PVCs.
-  name: "github-proxy"
-  # -- Security context for the `github-proxy` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
-  # -- Resource requests & limits for the `github-proxy` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1G
-    requests:
-      cpu: 100m
-      memory: 250M
-  serviceAccount:
-    # -- Enable creation of ServiceAccount for `github-proxy`
-    create: false
-    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
-    name: ""
-
 gitserver:
   image:
     # -- Docker image tag for the `gitserver` image
