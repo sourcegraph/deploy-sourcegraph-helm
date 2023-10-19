@@ -8,11 +8,12 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- The GitHub Proxy service has been removed and is no longer required. Remove all `githubProxy` fields from config, if set.
+
 
 ## 5.2.1
 
 - Sourcegraph 5.2.1 is now available
-- The GitHub Proxy service has been removed and is no longer required. Remove all `githubProxy` fields from config, if set.
 
 
 ## 5.2.0
