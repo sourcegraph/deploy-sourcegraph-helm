@@ -61,7 +61,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.extraEnv | string | `nil` | Sets extra environment variables on the executor deployment. See `values.yaml` for the format. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
-| executor.image.defaultTag | string | `"5.2.1@sha256:f8262493086be3641252955fb2b958cfefe50305d7091225da022e644e7443eb"` |  |
+| executor.image.defaultTag | string | `"5.2.2@sha256:1b616050b86131a6f1ce694c221585c9800029858d75e0c4973776fc8cc0c3cd"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
 | executor.kubeconfigPath | string | `""` | The path to the kubeconfig file. If not specified, the in-cluster config is used. |
 | executor.kubernetesJob.deadline | string | `"1200"` | The number of seconds after which a Kubernetes job will be terminated. |
