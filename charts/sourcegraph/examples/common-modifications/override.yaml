@@ -52,15 +52,6 @@ migrator:
       cpu: 100m
       memory: 50M
 
-githubProxy:
-  resources:
-    limits:
-      cpu: "1"
-      memory: 1G
-    requests:
-      cpu: 100m
-      memory: 250M
-
 gitserver:
   replicaCount: 1
   resources:
