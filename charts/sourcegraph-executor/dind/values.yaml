@@ -55,7 +55,7 @@ storageClass:
 executor:
   enabled: true
   image:
-    defaultTag: 5.2.3@sha256:9ef83815addc975dd42757f00eb5dfcc73a99f282b703d826c2bc546e78223cb
+    defaultTag: 5.2.4@sha256:e6f82e8bb02b2c83d9ef8a90bf500f8756defd0cb36fa778263e0f7680138796
     name: "executor"
   replicaCount: 1
   env:
