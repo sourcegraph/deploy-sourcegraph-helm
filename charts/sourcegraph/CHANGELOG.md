@@ -6,6 +6,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 
+- Fixed unable to scrape `syntect-server` metrics [#385](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/385)
+
 ## 5.2.5
 
 - Sourcegraph 5.2.5 is now available
