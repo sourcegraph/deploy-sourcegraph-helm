@@ -8,6 +8,36 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Fixed unable to scrape `syntect-server` metrics [#385](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/385)
+
+- Add `volumeMounts` option to frontend init container [#387](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/387)
+
+## 5.2.5
+
+- Sourcegraph 5.2.5 is now available
+
+## 5.2.4
+
+- Sourcegraph 5.2.4 is now available
+
+## 5.2.3
+
+- Sourcegraph 5.2.3 is now available
+
+## 5.2.2
+
+- Sourcegraph 5.2.2 is now available
+
+## 5.2.1
+
+- Sourcegraph 5.2.1 is now available
+- The GitHub Proxy service has been removed and is no longer required. Remove all `githubProxy` fields from config, if set.
+
+
+## 5.2.0
+
+- Sourcegraph 5.2.0 is now available
+
 
 ## 5.1.9
 
