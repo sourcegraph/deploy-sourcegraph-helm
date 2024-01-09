@@ -1,0 +1,113 @@
+---
+meta:
+  productName: "deploy-sourcegraph-helm"
+  owners:
+    - "@sourcegraph/release"
+  repository: "github.com/sourcegraph/deploy-sourcegraph-helm"
+inputs:
+  releaseId: server
+requirements:
+  - name: "comby exists"
+    cmd: "which comby"
+    fixInstructions: "install comby"
+  - name: "GitHub cli exists"
+    cmd: "which gh"
+    fixInstructions: "install GitHub cli"
+  - name: "sg exists"
+    cmd: "which sg"
+    fixInstructions: "install sg"
+  - name: "DOCKER_USERNAME exported"
+    env: "DOCKER_USERNAME"
+  - name: "DOCKER_PASSWORD exported"
+    env: "DOCKER_PASSWORD"
+internal:
+  create:
+    steps:
+      minor:
+          - name: sg ops update-images tag
+            cmd: |
+              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph/
+              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/
+              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-migrator/
+          - name: "update Chart version in Chart.yaml"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+          - name: "update appVersion version in Chart.yaml"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+          - name: "git:branch"
+            cmd: |
+              branch="wb/wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release-major: {{version}}' -m '{{config}}'
+      major:
+          - name: sg ops update-images with tag
+            cmd: |
+              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph/
+              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/
+              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-migrator/
+          - name: "update Chart version in Chart.yaml"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+          - name: "update appVersion version in Chart.yaml"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+          - name: "git:branch"
+            cmd: |
+              branch="wb/wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release-major: {{version}}' -m '{{config}}'
+  finalize:
+    steps:
+      - name: "git:finalize"
+        cmd: |
+          git checkout wb/wip_{{version}}
+          git push origin wb/wip_{{version}}
+
+          gh pr create -f -t "PRETEND RELEASE - release-major: build {{version}}"
+
+          git switch -c "wb/release-{{version}}"
+          git push origin wb/release-{{version}}
+          git checkout -
+test:
+  steps:
+    - name: "foo"
+      cmd: |
+        echo "Test"
+
+promoteToPublic:
+  create:
+    steps:
+      - name: sg ops update-images with tag
+        cmd: |
+          sg-rfc ops update-images -t insiders -k helm --registry public --skip codeintel-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+          sg-rfc ops update-images -t insiders -k helm --registry public charts/sourcegraph-executor/
+          sg-rfc ops update-images -t insiders -k helm --registry public charts/sourcegraph-migrator/
+      - name: "update Chart version in Chart.yaml"
+        cmd: |
+          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+      - name: "update appVersion version in Chart.yaml"
+        cmd: |
+          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+      - name: "git:branch"
+        cmd: |
+          branch="wb/promote_wip_{{version}}"
+          git switch -c "${branch}"
+          git commit -am 'promote-release: {{version}}' -m '{{config}}'
+      # - name: "git:push"
+      #   cmd: git push origin wb/promote_wip_{{version}}
+      # - name: "GitHub:create PR"
+      #   cmd: |
+      #     gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}"
