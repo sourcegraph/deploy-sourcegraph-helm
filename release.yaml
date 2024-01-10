@@ -69,13 +69,17 @@ internal:
           - name: "update Chart version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
           - name: "update appVersion version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "update helm docs"
+            cmd: ./scripts/helm-docs.sh
           - name: "git:branch"
             cmd: |
               branch="wb/wip_{{version}}"
@@ -143,20 +147,24 @@ promoteToPublic:
       - name: "update Chart version in Chart.yaml"
         cmd: |
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
       - name: "update appVersion version in Chart.yaml"
         cmd: |
           comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
           comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+      - name: "update helm docs"
+        cmd: ./scripts/helm-docs.sh
       - name: "git:branch"
         cmd: |
           branch="wb/promote_wip_{{version}}"
           git switch -c "${branch}"
           git commit -am 'promote-release: {{version}}' -m '{{config}}'
-      # - name: "git:push"
-      #   cmd: git push origin wb/promote_wip_{{version}}
-      # - name: "GitHub:create PR"
-      #   cmd: |
-      #     gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}"
+      - name: "git:push"
+        cmd: git push origin wb/promote_wip_{{version}}
+      - name: "GitHub:create PR"
+        cmd: |
+          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}"
