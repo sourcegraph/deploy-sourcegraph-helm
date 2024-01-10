@@ -13,8 +13,8 @@ requirements:
   - name: "GitHub cli exists"
     cmd: "which gh"
     fixInstructions: "install GitHub cli"
-  - name: "sg exists"
-    cmd: "which sg"
+  - name: "sg-rfc exists"
+    cmd: "which sg-rfc"
     fixInstructions: "install sg"
   - name: "DOCKER_USERNAME exported"
     env: "DOCKER_USERNAME"
@@ -26,19 +26,28 @@ internal:
       minor:
           - name: sg ops update-images tag
             cmd: |
-              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph/
-              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/
-              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-migrator/
+              echo "updating sourcegraph images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal --skip codeintel-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+
+              echo "updating sourcegraph-executor (dind) images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/dind/
+              echo "updating sourcegraph-executor (k8s) images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/k8s/
+
+              echo "updating sourcegraph-migrator images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-migrator/
           - name: "update Chart version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
           - name: "update appVersion version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
           - name: "git:branch"
             cmd: |
               branch="wb/wip_{{version}}"
@@ -47,19 +56,26 @@ internal:
       major:
           - name: sg ops update-images with tag
             cmd: |
-              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph/
-              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/
-              sg ops update-images -t insiders -k helm --registry internal charts/sourcegraph-migrator/
+              echo "updating sourcegraph images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal --skip codeintel-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+
+              echo "updating sourcegraph-executor (dind) images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/dind/
+              echo "updating sourcegraph-executor (k8s) images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/k8s/
+
+              echo "updating sourcegraph-migrator images"
+              sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-migrator/
           - name: "update Chart version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
           - name: "update appVersion version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
           - name: "git:branch"
             cmd: |
               branch="wb/wip_{{version}}"
@@ -88,9 +104,42 @@ promoteToPublic:
     steps:
       - name: sg ops update-images with tag
         cmd: |
-          sg-rfc ops update-images -t insiders -k helm --registry public --skip codeintel-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
-          sg-rfc ops update-images -t insiders -k helm --registry public charts/sourcegraph-executor/
-          sg-rfc ops update-images -t insiders -k helm --registry public charts/sourcegraph-migrator/
+          echo "updating sourcegraph images"
+          sg-rfc ops update-images \
+          -t insiders \
+          -k helm \
+          --registry public \
+          --skip codeintel-db,alpine-3.14,postgres-12-alpine \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph/
+
+          echo "updating sourcegraph-executor (dind) images"
+          sg-rfc ops update-images \
+          -t insiders \
+          -k helm \
+          --registry public \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph-executor/dind/
+
+          echo "updating sourcegraph-executor (k8s) images"
+          sg-rfc ops update-images \
+          -t insiders \
+          -k helm \
+          --registry public \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph-executor/k8s/
+
+          echo "updating sourcegraph-migrator images"
+          sg-rfc ops update-images \
+          -t insiders \
+          -k helm \
+          --registry public \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph-migrator/
       - name: "update Chart version in Chart.yaml"
         cmd: |
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
