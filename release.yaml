@@ -27,7 +27,7 @@ internal:
           - name: sg ops update-images tag
             cmd: |
               echo "updating sourcegraph images"
-              sg-rfc ops update-images -t insiders -k helm --registry internal --skip codeintel-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+              sg-rfc ops update-images -t insiders -k helm --registry internal --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
 
               echo "updating sourcegraph-executor (dind) images"
               sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/dind/
@@ -57,7 +57,7 @@ internal:
           - name: sg ops update-images with tag
             cmd: |
               echo "updating sourcegraph images"
-              sg-rfc ops update-images -t insiders -k helm --registry internal --skip codeintel-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+              sg-rfc ops update-images -t insiders -k helm --registry internal --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
 
               echo "updating sourcegraph-executor (dind) images"
               sg-rfc ops update-images -t insiders -k helm --registry internal charts/sourcegraph-executor/dind/
@@ -109,7 +109,7 @@ promoteToPublic:
           -t insiders \
           -k helm \
           --registry public \
-          --skip codeintel-db,alpine-3.14,postgres-12-alpine \
+          --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph/
