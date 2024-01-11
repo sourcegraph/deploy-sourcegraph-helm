@@ -25,3 +25,16 @@ steps:
       - "echo \"checking for uncommitted changes\""
       - "[[ -z $(git status -s) ]]"
     agents: { queue: standard }
+
+  - label: ":book: Verify helm-docs is up-to-date"
+    commands:
+      - "./scripts/helm-docs.sh"
+      - "echo \"checking for uncommitted changes\""
+      - "[[ -z $(git status -s) ]]"
+    agents: { queue: standard }
+
+  - label: ":jigsaw: Helm Integration"
+    commands:
+      #      - "./scripts/ci/install-helm-env.sh"
+      - "./scripts/ci/helm-integration.sh" 
+    agents: { queue: standard }
