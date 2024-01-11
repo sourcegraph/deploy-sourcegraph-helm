@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 5.2.6
+
 - Fixed unable to scrape `syntect-server` metrics [#385](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/385)
 
 - Add `volumeMounts` option to frontend init container [#387](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/387)
