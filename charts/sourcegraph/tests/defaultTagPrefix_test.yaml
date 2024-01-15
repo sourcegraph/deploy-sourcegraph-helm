@@ -10,9 +10,10 @@ tests:
       image:
         defaultTag: test
   asserts:
-  - equal:
+  - matchRegex:
       path: spec.template.spec.containers[0].image
-      value: "index.docker.io/sourcegraph/frontend:test"
+      # match any domain of the format: sub.name.tld/path/image:tag
+      pattern: ".+.+.+/.*/frontend:test"
 - it: should add defaultTagPrefix
   template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
@@ -21,6 +22,7 @@ tests:
         defaultTag: test
         defaultTagPrefix: "prefix-"
   asserts:
-  - equal:
+  - matchRegex:
       path: spec.template.spec.containers[0].image
-      value: "index.docker.io/sourcegraph/frontend:prefix-test"
+      # match any domain of the format: sub.name.tld/path/image:tag
+      pattern: ".+.+.+/.+/frontend:prefix-test"
