@@ -201,10 +201,10 @@ promoteToPublic:
           branch="promote-release_{{version}}"
           git switch -c "${branch}"
           git commit -am "promote_release: {{version}}" -m '{{config}}'
-          git push origin promote-release_{{version}}
+          git push origin "${branch}"
       - name: "gh cli"
         cmd: |
-          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base "wip-release-{{version}}"
+          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base wip-release-{{version}}
   finalize:
     steps:
       - name: git:tag
