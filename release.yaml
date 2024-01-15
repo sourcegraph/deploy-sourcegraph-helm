@@ -139,7 +139,7 @@ internal:
       - name: "git:finalize"
         cmd: |
           git switch -c "wip-release-{{version}}"
-          git push origin wip-release-{{version}}
+          git push origin "wip-release-{{version}}"
           git checkout -
 test:
   steps:
@@ -195,11 +195,11 @@ promoteToPublic:
         cmd: |
           branch="promote-release_{{version}}"
           git switch -c "${branch}"
-          git commit -am 'promote_release: {{version}}' -m '{{config}}'
+          git commit -am "promote_release: {{version}}" -m '{{config}}'
           git push origin promote-release_{{version}}
       - name: "gh cli"
         cmd: |
-          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base wip-release-{{version}}
+          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base "wip-release-{{version}}"
   finalize:
     steps:
       - name: git:tag
