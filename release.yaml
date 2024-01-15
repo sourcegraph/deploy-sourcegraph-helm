@@ -204,7 +204,11 @@ promoteToPublic:
           git push origin "${branch}"
       - name: "gh cli"
         cmd: |
-          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base wip-release-{{version}}
+          set -x
+          branch="wip-release-{{version}}"
+          # we need to fetch from origin just in case this branch doesn't exist locally, so that the PR can find the base
+          git fetch origin "${branch}"
+          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base "${branch}"
   finalize:
     steps:
       - name: git:tag
