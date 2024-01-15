@@ -8,7 +8,7 @@ sourcegraph:
     # -- Global docker image pull policy
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
-    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
@@ -102,7 +102,7 @@ pgsql:
 migrator:
   image:
     # -- Docker image tag for the `migrator` image
-    defaultTag: insiders@sha256:f56875f444d3467e5e306f682f68249965e85b6fbf0af65513981ffb87d2f328
+    defaultTag: 5.3.666@sha256:288f4261a70ed921f7b1f82b73e12a410d12e332ba3371c24a8278d8ad07826c
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
