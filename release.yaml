@@ -139,8 +139,10 @@ internal:
       - name: "git:finalize"
         cmd: |
           set -e
-          git switch -c "wip-release-{{version}}"
-          git push origin "wip-release-{{version}}"
+          branch="wip-release-{{version}}"
+          git switch -c "${branch}"
+          echo "pushing branch ${branch}"
+          git push origin "${branch}"
           git checkout -
 
 test:
