@@ -23,19 +23,20 @@ requirements:
 internal:
   create:
     steps:
-      minor:
-          - name: sg ops update-images tag
+      patch:
+          - name: sg ops update-images
             cmd: |
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
               echo "updating sourcegraph images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
 
               echo "updating sourcegraph-executor (dind) images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public charts/sourcegraph-executor/dind/
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/dind/
               echo "updating sourcegraph-executor (k8s) images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public charts/sourcegraph-executor/k8s/
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/k8s/
 
               echo "updating sourcegraph-migrator images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public charts/sourcegraph-migrator/
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-migrator/
           - name: "update Chart version in Chart.yaml"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -48,54 +49,97 @@ internal:
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
               comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-          - name: "git:branch"
-            cmd: |
-              branch="wb/wip_{{version}}"
-              git switch -c "${branch}"
-              git commit -am 'release-major: {{version}}' -m '{{config}}'
-      major:
-          - name: sg ops update-images with tag
-            cmd: |
-              echo "updating sourcegraph images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
-
-              echo "updating sourcegraph-executor (dind) images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public charts/sourcegraph-executor/dind/
-              echo "updating sourcegraph-executor (k8s) images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public charts/sourcegraph-executor/k8s/
-
-              echo "updating sourcegraph-migrator images"
-              sg-rfc ops update-images -t insiders -k helm --registry us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public charts/sourcegraph-migrator/
-          - name: "update Chart version in Chart.yaml"
-            cmd: |
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
-              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-          - name: "update appVersion version in Chart.yaml"
-            cmd: |
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
-              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-          - name: "update helm docs"
+          - name: "helm:docs"
             cmd: ./scripts/helm-docs.sh
           - name: "git:branch"
             cmd: |
-              branch="wb/wip_{{version}}"
+              branch="wip_{{version}}"
               git switch -c "${branch}"
-              git commit -am 'release-major: {{version}}' -m '{{config}}'
+              git commit -am 'release_patch: {{version}}' -m '{{config}}'
+              git push origin ${branch}
+          - name: "gh"
+            cmd: |
+              gh pr create -f -t "PRETEND RELEASE WIP: release_patch: build {{version}}"
+      minor:
+          - name: sg ops update-images
+            cmd: |
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              echo "updating sourcegraph images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+
+              echo "updating sourcegraph-executor (dind) images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/dind/
+              echo "updating sourcegraph-executor (k8s) images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/k8s/
+
+              echo "updating sourcegraph-migrator images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-migrator/
+          - name: "update Chart version in Chart.yaml"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "update appVersion version in Chart.yaml"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "helm:docs"
+            cmd: ./scripts/helm-docs.sh
+          - name: "git:branch"
+            cmd: |
+              branch="wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release_minor: {{version}}' -m '{{config}}'
+              git push origin ${branch}
+          - name: "gh"
+            cmd: |
+              gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}"
+      major:
+          - name: sg ops update-images
+            cmd: |
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              echo "updating sourcegraph images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
+
+              echo "updating sourcegraph-executor (dind) images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/dind/
+              echo "updating sourcegraph-executor (k8s) images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/k8s/
+
+              echo "updating sourcegraph-migrator images"
+              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-migrator/
+          - name: "chart:version"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "chart:appVersion"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "helm:docs"
+            cmd: ./scripts/helm-docs.sh
+          - name: "git:branch"
+            cmd: |
+              branch="wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release_major: {{version}}' -m '{{config}}'
+              git push origin ${branch}
+          - name: "gh"
+            cmd: |
+              gh pr create -f -t "PRETEND RELEASE WIP: release_major: build {{version}}"
   finalize:
     steps:
       - name: "git:finalize"
         cmd: |
-          git checkout wb/wip_{{version}}
-          git push origin wb/wip_{{version}}
-
-          gh pr create -f -t "PRETEND RELEASE - release-major: build {{version}}"
-
-          git switch -c "wb/release-{{version}}"
-          git push origin wb/release-{{version}}
+          git switch -c "wip-release-{{version}}"
+          git push origin wip-release-{{version}}
           git checkout -
 test:
   steps:
@@ -108,11 +152,12 @@ promoteToPublic:
     steps:
       - name: sg ops update-images with tag
         cmd: |
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
           echo "updating sourcegraph images"
           sg-rfc ops update-images \
-          -t insiders \
+          -t {{tag}} \
           -k helm \
-          --registry public \
+          --registry "${registry}" \
           --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
@@ -120,51 +165,46 @@ promoteToPublic:
 
           echo "updating sourcegraph-executor (dind) images"
           sg-rfc ops update-images \
-          -t insiders \
+          -t {{tag}} \
           -k helm \
-          --registry public \
+          --registry "${registry}" \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph-executor/dind/
 
           echo "updating sourcegraph-executor (k8s) images"
           sg-rfc ops update-images \
-          -t insiders \
+          -t {{tag}} \
           -k helm \
-          --registry public \
+          --registry "${registry}" \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph-executor/k8s/
 
           echo "updating sourcegraph-migrator images"
           sg-rfc ops update-images \
-          -t insiders \
+          -t {{tag}} \
           -k helm \
-          --registry public \
+          --registry "${registry}" \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph-migrator/
-      - name: "update Chart version in Chart.yaml"
-        cmd: |
-          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
-          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
-          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
-          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-      - name: "update appVersion version in Chart.yaml"
-        cmd: |
-          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
-          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
-          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
       - name: "update helm docs"
         cmd: ./scripts/helm-docs.sh
       - name: "git:branch"
         cmd: |
-          branch="wb/promote_wip_{{version}}"
+          branch="promote-release_{{version}}"
           git switch -c "${branch}"
-          git commit -am 'promote-release: {{version}}' -m '{{config}}'
-      - name: "git:push"
-        cmd: git push origin wb/promote_wip_{{version}}
-      - name: "GitHub:create PR"
+          git commit -am 'promote_release: {{version}}' -m '{{config}}'
+          git push origin promote-release_{{version}}
+      - name: "gh cli"
         cmd: |
-          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}"
+          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base wip-release-{{version}}
+  finalize:
+    steps:
+      - name: git:tag
+        cmd: |
+          branch="wip-release-{{version}}"
+          git checkout "${branch}"
+          git tag wip-{{version}}
+          git push origin ${branch} --tags
