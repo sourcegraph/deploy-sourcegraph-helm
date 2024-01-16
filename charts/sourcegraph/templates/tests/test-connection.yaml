@@ -1,15 +1,20 @@
+{{- if .Values.testConnection.enabled -}}
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "sg-test-connection"
+  name: {{ .Values.testConnection.name }}
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.testConnection.labels }}
+      {{- toYaml .Values.testConnection.labels | nindent 4 }}
+    {{- end }}
   annotations:
     "helm.sh/hook": test
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: {{ .Values.testConnection.image.name }}:{{ .Values.testConnection.image.defaultTag }}
       command: ['wget']
       args: ['sourcegraph-frontend:30080/']
   restartPolicy: Never
+{{- end }}
