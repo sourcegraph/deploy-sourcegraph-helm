@@ -56,7 +56,6 @@ executor:
   # -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
   configureRbac: true
   replicas: 1
-  enabled: true
   image:
     defaultTag: 5.2.6@sha256:5f952f54885e1eb24d96d84f23a504f9885c19ad135128b270c44cba0eeacb56
     name: "executor-kubernetes"
