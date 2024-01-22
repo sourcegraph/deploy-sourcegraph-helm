@@ -57,9 +57,9 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.debug.keepJobs | string | `"false"` | If true, Kubernetes jobs will not be deleted after they complete. Not recommended for production use as it can hit cluster limits. |
 | executor.debug.keepWorkspaces | string | `"false"` |  |
 | executor.dockerAddHostGateway | string | `"false"` | For local deployments the host is 'host.docker.internal' and this needs to be true |
-| executor.enabled | bool | `true` |  |
 | executor.extraEnv | string | `nil` | Sets extra environment variables on the executor deployment. See `values.yaml` for the format. |
-| executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
+| executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password The name of the secret must match `executor.name"` The secret must contain the key `EXECUTOR_FRONTEND_PASSWORD` `executor.frontendPassword` is ignored if this is enabled |
+| executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if `executor.frontendExistingSecret`` is not configured. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
 | executor.image.defaultTag | string | `"5.2.6@sha256:5f952f54885e1eb24d96d84f23a504f9885c19ad135128b270c44cba0eeacb56"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
