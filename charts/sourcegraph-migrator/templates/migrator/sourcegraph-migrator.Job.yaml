@@ -51,6 +51,10 @@ spec:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
         securityContext:
           {{- toYaml .Values.migrator.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        {{- if .Values.migrator.extraVolumeMounts }}
+        {{- toYaml .Values.migrator.extraVolumeMounts | nindent 8 }}
+        {{- end }}
       {{- if .Values.migrator.extraContainers }}
         {{- toYaml .Values.migrator.extraContainers | nindent 6 }}
       {{- end }}
