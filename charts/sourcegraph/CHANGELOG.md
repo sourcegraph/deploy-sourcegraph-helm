@@ -12,6 +12,10 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Add `volumeMounts` option to frontend init container [#387](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/387)
 
+- Add `frontendExistingSecret` option for mounting an existing k8s Secret containing `EXECUTOR_FRONTEND_PASSWORD` to the executor deployment
+
+- Remove `enabled` option for `sourcegraph-executor-k8s` helm chart
+
 ## 5.2.5
 
 - Sourcegraph 5.2.5 is now available
