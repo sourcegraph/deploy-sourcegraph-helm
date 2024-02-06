@@ -231,7 +231,7 @@ internal:
               git push origin ${branch}
           - name: "gh"
             cmd: |
-              gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
+              gh pr create -f -t "PRETEND RELEASE WIP: release_major: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
   finalize:
     steps:
       - name: "git:finalize"
