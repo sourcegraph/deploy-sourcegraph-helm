@@ -32,7 +32,6 @@ internal:
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
-              --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
               --docker-username $DOCKER_USERNAME \
               --docker-password $DOCKER_PASSWORD \
               charts/sourcegraph/
@@ -103,7 +102,6 @@ internal:
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
-              --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
               --docker-username $DOCKER_USERNAME \
               --docker-password $DOCKER_PASSWORD \
               charts/sourcegraph/
@@ -172,7 +170,6 @@ internal:
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
-              --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
               --docker-username $DOCKER_USERNAME \
               --docker-password $DOCKER_PASSWORD \
               charts/sourcegraph/
@@ -260,7 +257,6 @@ promoteToPublic:
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
-          --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph/
