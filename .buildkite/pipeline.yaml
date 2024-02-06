@@ -29,10 +29,15 @@ steps:
   - label: "Release: test"
     if: "build.branch =~ /^wip_/"
     command: |
+      wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
+      chmod +x ./comby-1.8.1-x86_64-linux
+      mv comby-1.8.1-x86_64-linux comby
+
       wget https://storage.googleapis.com/buildkite_public_assets/sg-rfc795.tar.gz
       tar zxf sg-rfc795.tar.gz
       chmod +x ./sg-rfc795
 
+      export PATH=$PATH:$(pwd)
       ./sg-rfc795 release run test --workdir=. --config-from-commit
 
   - wait
@@ -40,16 +45,26 @@ steps:
   - label: "Release: finalize"
     if: "build.branch =~ /^wip_/"
     command: |
+      wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
+      chmod +x ./comby-1.8.1-x86_64-linux
+      mv comby-1.8.1-x86_64-linux comby
+
       wget https://storage.googleapis.com/buildkite_public_assets/sg-rfc795.tar.gz
       tar zxf sg-rfc795.tar.gz
       chmod +x ./sg-rfc795
 
+      export PATH=$PATH:$(pwd)
       ./sg-rfc795 release run internal finalize --workdir=. --config-from-commit
   - label: "Promote to public: finalize"
     if: build.message =~ /^promote_release/ && build.branch =~ /^wip-release/
     command: |
+      wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
+      chmod +x ./comby-1.8.1-x86_64-linux
+      mv comby-1.8.1-x86_64-linux comby
+
       wget https://storage.googleapis.com/buildkite_public_assets/sg-rfc795.tar.gz
       tar zxf sg-rfc795.tar.gz
       chmod +x ./sg-rfc795
 
+      export PATH=$PATH:$(pwd)
       ./sg-rfc795 release run promote-to-public finalize --workdir=. --config-from-commit
