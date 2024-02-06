@@ -13,8 +13,8 @@ requirements:
   - name: "GitHub cli exists"
     cmd: "which gh"
     fixInstructions: "install GitHub cli"
-  - name: "sg-rfc exists"
-    cmd: "which sg-rfc"
+  - name: "sg-rfc795 exists"
+    cmd: "which sg-rfc795"
     fixInstructions: "install sg"
   - name: "DOCKER_USERNAME exported"
     env: "DOCKER_USERNAME"
@@ -24,19 +24,51 @@ internal:
   create:
     steps:
       patch:
-          - name: sg ops(helm)
+          - name: sg ops:sourcegraph
             cmd: |
+              set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              echo "updating sourcegraph images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
-
-              echo "updating sourcegraph-executor (dind) images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/dind/
-              echo "updating sourcegraph-executor (k8s) images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/k8s/
-
-              echo "updating sourcegraph-migrator images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-migrator/
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
+          - name: sg ops:dind
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
+          - name: sg ops:k8s
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
+          - name: sg ops:migrator
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
           - name: "chart:version"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -61,19 +93,53 @@ internal:
             cmd: |
               gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
       minor:
-          - name: sg ops(helm)
+          - name: sg ops:sourcegraph
             cmd: |
+              set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+
               echo "updating sourcegraph images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
-
-              echo "updating sourcegraph-executor (dind) images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/dind/
-              echo "updating sourcegraph-executor (k8s) images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/k8s/
-
-              echo "updating sourcegraph-migrator images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-migrator/
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
+          - name: sg ops:dind
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
+          - name: sg ops:k8s
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
+          - name: sg ops:migrator
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
           - name: "chart:version"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -98,18 +164,51 @@ internal:
             cmd: |
               gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
       major:
-          - name: sg ops(helm)
+          - name: sg ops:sourcegraph
             cmd: |
+              set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine charts/sourcegraph/
-
-              echo "updating sourcegraph-executor (dind) images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/dind/
-              echo "updating sourcegraph-executor (k8s) images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-executor/k8s/
-
-              echo "updating sourcegraph-migrator images"
-              sg-rfc ops update-images -t {{tag}} -k helm --registry "${registry}" charts/sourcegraph-migrator/
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --skip codeintel-db,codeinsights-db,alpine-3.14,postgres-12-alpine \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
+          - name: sg ops:dind
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
+          - name: sg ops:k8s
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
+          - name: sg ops:migrator
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
           - name: "chart:version"
             cmd: |
               comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -153,13 +252,11 @@ test:
 promoteToPublic:
   create:
     steps:
-      - name: sg ops(helm)
+      - name: sg ops:sourcegraph
         cmd: |
           set -e
           registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
-
-          echo "updating sourcegraph images"
-          sg-rfc ops update-images \
+          sg-rfc795 ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
@@ -167,27 +264,33 @@ promoteToPublic:
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph/
-
-          echo "updating sourcegraph-executor (dind) images"
-          sg-rfc ops update-images \
+      - name: sg ops:dind
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph-executor/dind/
-
-          echo "updating sourcegraph-executor (k8s) images"
-          sg-rfc ops update-images \
+      - name: sg ops:k8s
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
           --docker-username $DOCKER_USERNAME \
           --docker-password $DOCKER_PASSWORD \
           charts/sourcegraph-executor/k8s/
-
-          echo "updating sourcegraph-migrator images"
-          sg-rfc ops update-images \
+      - name: sg ops:migrator
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
@@ -215,6 +318,7 @@ promoteToPublic:
         cmd: |
           set -e
           branch="wip-release-{{version}}"
+          git fetch origin
           git checkout "${branch}"
           git tag wip-{{version}}
           git push origin ${branch} --tags
