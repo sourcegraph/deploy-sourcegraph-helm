@@ -85,6 +85,7 @@ internal:
             cmd: ./scripts/helm-docs.sh
           - name: "git:branch"
             cmd: |
+              set -e
               branch="wip_{{version}}"
               git switch -c "${branch}"
               git commit -am 'release_patch: {{version}}' -m '{{config}}'
@@ -156,6 +157,7 @@ internal:
             cmd: ./scripts/helm-docs.sh
           - name: "git:branch"
             cmd: |
+              set -e
               branch="wip_{{version}}"
               git switch -c "${branch}"
               git commit -am 'release_minor: {{version}}' -m '{{config}}'
@@ -225,6 +227,7 @@ internal:
             cmd: ./scripts/helm-docs.sh
           - name: "git:branch"
             cmd: |
+              set -e
               branch="wip_{{version}}"
               git switch -c "${branch}"
               git commit -am 'release_major: {{version}}' -m '{{config}}'
@@ -301,6 +304,7 @@ promoteToPublic:
         cmd: ./scripts/helm-docs.sh
       - name: "git:branch"
         cmd: |
+          set -e
           branch="promote-release_{{version}}"
           git switch -c "${branch}"
           git commit -am "promote_release: {{version}}" -m '{{config}}'
