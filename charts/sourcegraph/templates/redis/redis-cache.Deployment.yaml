@@ -53,6 +53,13 @@ spec:
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          failureThreshold: 2
+          timeoutSeconds: 5
+          tcpSocket:
+            port: redis
+        readinessProbe:
           initialDelaySeconds: 5
           exec:
             command:
@@ -75,10 +82,6 @@ spec:
         ports:
         - containerPort: 6379
           name: redis
-        readinessProbe:
-          initialDelaySeconds: 5
-          tcpSocket:
-            port: redis
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.redisCache.resources | nindent 10 }}
