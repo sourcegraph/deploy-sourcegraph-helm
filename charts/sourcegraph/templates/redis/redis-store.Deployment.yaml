@@ -66,8 +66,10 @@ spec:
           name: redis
         readinessProbe:
           initialDelaySeconds: 5
-          tcpSocket:
-            port: redis
+          exec:
+            command:
+            - redis-cli
+            - ping
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.redisStore.resources | nindent 10 }}

@@ -53,9 +53,11 @@ spec:
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
-          initialDelaySeconds: 30
-          tcpSocket:
-            port: redis
+          initialDelaySeconds: 5
+          exec:
+            command:
+            - redis-cli
+            - ping
         env:
         {{- range $name, $item := .Values.redisCache.env}}
         - name: {{ $name }}
