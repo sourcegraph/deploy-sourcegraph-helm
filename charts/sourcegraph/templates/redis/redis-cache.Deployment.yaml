@@ -65,7 +65,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - readiness.sh
+            - /readiness.sh
         env:
         {{- range $name, $item := .Values.redisCache.env}}
         - name: {{ $name }}
