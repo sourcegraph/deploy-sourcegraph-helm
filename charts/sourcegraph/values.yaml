@@ -291,7 +291,7 @@ embeddings:
     # -- Docker image name for the `embeddings` image
     name: "embeddings"
     # -- Docker image tag for the `embeddings` image
-    defaultTag: "262142_2024-02-13_5.2-4db83b41b419
+    defaultTag: 262142_2024-02-13_5.2-4db83b41b419
   # -- Resource requests & limits for the `worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -331,7 +331,7 @@ qdrant:
     # -- Docker image name for the `qdrant` image
     name: "qdrant"
     # -- Docker image tag for the `qdrant` image
-    defaultTag: "262142_2024-02-13_5.2-4db83b41b419
+    defaultTag: 262142_2024-02-13_5.2-4db83b41b419
   # -- Resource requests & limits for the `qdrant` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   config:
