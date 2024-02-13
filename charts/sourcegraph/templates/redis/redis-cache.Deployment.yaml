@@ -65,7 +65,15 @@ spec:
             command:
             - /bin/sh
             - -c
-            - readiness.sh
+            - |
+              #!/bin/bash
+              response=$(
+                redis-cli ping
+              )
+              if [ "$response" != "PONG" ]; then
+                echo "$response"
+                exit 1
+              fi
         env:
         {{- range $name, $item := .Values.redisCache.env}}
         - name: {{ $name }}
