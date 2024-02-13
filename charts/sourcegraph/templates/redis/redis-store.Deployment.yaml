@@ -70,7 +70,7 @@ spec:
             command:
             - /bin/sh
             - -c
-            - /readiness.sh
+            - readiness.sh
         ports:
         - containerPort: 6379
           name: redis
