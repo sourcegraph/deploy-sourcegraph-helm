@@ -18,3 +18,4 @@ helm upgrade --install --create-namespace -n sourcegraph sourcegraph sourcegraph
 [strategic merge patch]: https://github.com/kubernetes/community/blob/master/contributors/devel/sig-api-machinery/strategic-merge-patch.md
 [json patch]: https://kubernetes.io/docs/tasks/manage-kubernetes-objects/update-api-object-kubectl-patch/#use-a-json-merge-patch-to-update-a-deployment
 [post renderering]: https://helm.sh/docs/topics/advanced/#post-rendering
+Hello World

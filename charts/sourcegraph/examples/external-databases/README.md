@@ -35,3 +35,4 @@ data:
 The Secret name should be set in your override file in the `auth.existingSecret` key for each database. See the [override.yaml] for an example.
 
 [override.yaml]: ./override.yaml
+Hello World

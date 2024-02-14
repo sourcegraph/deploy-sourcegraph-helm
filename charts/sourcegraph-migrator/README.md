@@ -120,3 +120,4 @@ kubectl logs -l job=migrator -c migrator
 [job]: https://kubernetes.io/docs/concepts/workloads/controllers/job/
 [add-log]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log
 [using your own postgresql server]: https://docs.sourcegraph.com/admin/external_services/postgres#instructions
+Hello World

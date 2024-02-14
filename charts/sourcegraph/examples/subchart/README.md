@@ -8,3 +8,4 @@ Reference:
 [Sourcegraph documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#subchart)
 
 [Helm subcharts]: https://helm.sh/docs/chart_template_guide/subcharts_and_globals/
+Hello World

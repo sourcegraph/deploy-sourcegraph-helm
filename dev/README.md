@@ -5,3 +5,4 @@
 From the root of the repo
 
 helm template test ./charts/sourcegraph -f ci/override.yaml | kubectl apply -f -
+Hello World

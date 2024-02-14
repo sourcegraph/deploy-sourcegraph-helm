@@ -14,3 +14,4 @@ Your cluster will need to allow configuration of the following RBAC rules:
 ## Docker in Docker (dind)
 This chart deploys executors that deploy a [Docker in Docker](https://www.docker.com/blog/docker-can-now-run-within-docker/) sidecar with each executor pod to avoid accessing the host container runtime directly. This method requires privileged access to a container runtime daemon in order to operate correctly.  
 If you have security concerns, consider deploying via [a non-Kubernetes method](https://docs.sourcegraph.com/admin/executors).
+Hello World
