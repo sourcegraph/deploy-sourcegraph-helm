@@ -9,7 +9,7 @@ sourcegraph:
     # -- Global docker image pull policy
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
-    repository: index.docker.io/sourcegraph
+    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
@@ -291,7 +291,7 @@ embeddings:
     # -- Docker image name for the `embeddings` image
     name: "embeddings"
     # -- Docker image tag for the `embeddings` image
-    defaultTag: "5.3.0@sha256:d77a35a9349e73357ea3f23ceb3bd9001c65657e8a2b6ae55e17d407cedce25f"
+    defaultTag: "5.3.0@sha256:052cecffb7dbafaa1ab9e1e2ff325a8b04afd7c5160d4ddb74c609b677f9b0c3"
   # -- Resource requests & limits for the `worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -384,7 +384,7 @@ frontend:
       value: http://prometheus:30090
   image:
     # -- Docker image tag for the `frontend` image
-    defaultTag: 5.3.0@sha256:ec5a76c839181edd313e30adcd26c324e97646cf580915308605d377d1a5030b
+    defaultTag: 5.3.0@sha256:c1714190b9cf0e6ede5d9b1ac77c35c00926811f8fd59ca8cbb571dfe3897bfd
     # -- Docker image name for the `frontend` image
     name: "frontend"
   ingress:
@@ -442,7 +442,7 @@ migrator:
   enabled: true
   image:
     # -- Docker image tag for the `migrator` image
-    defaultTag: 5.3.0@sha256:8b0ac9c8112c9314f4b51cc73cbf325ad8a923fc30ef05c6ba1921e284ebf997
+    defaultTag: 5.3.0@sha256:2352b7afd1548b5dbd4f15ef11698e6b3a3c55c0a2e78eb5be118f42456a9b76
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
@@ -467,7 +467,7 @@ migrator:
 gitserver:
   image:
     # -- Docker image tag for the `gitserver` image
-    defaultTag: 5.3.0@sha256:d5fa43492a9b5e4a64c8b2cd5d3295f2afd1407755c3869f639c5d3f390310b7
+    defaultTag: 5.3.0@sha256:cb8eb2b92a0863ba5eb5b88d2fb5315392ea00b975822f98e948bd135581a084
     # -- Docker image name for the `gitserver` image
     name: "gitserver"
   # -- Name of existing Secret that contains SSH credentials to clone repositories.
@@ -852,7 +852,7 @@ preciseCodeIntel:
       value: "4"
   image:
     # -- Docker image tag for the `precise-code-intel-worker` image
-    defaultTag: 5.3.0@sha256:9602d646e0c55f735c7042a1b2b1962716de120b18c2321b3112dda57dbe0670
+    defaultTag: 5.3.0@sha256:88fdccdeaff9a1db08c210b677611d82ae0aad36c8d35eb02263d67eff0fa6e1
     # -- Docker image name for the `precise-code-intel-worker` image
     name: "precise-code-intel-worker"
   # -- Security context for the `precise-code-intel-worker` container,
@@ -891,7 +891,7 @@ prometheus:
   existingConfig: "" # Name of an existing configmap
   image:
     # -- Docker image tag for the `prometheus` image
-    defaultTag: 5.3.0@sha256:465095a2a58dcfd112b3f6d63737193fdf813c1a49054bd418188252756107e7
+    defaultTag: 5.3.0@sha256:61d6ad26b02c949c2f24c02ffd601ce016dbc2f42ab5006af814f55ce5897a14
     # -- Docker image name for the `prometheus` image
     name: "prometheus"
   # -- Security context for the `prometheus` container,
@@ -1054,7 +1054,7 @@ redisStore:
 repoUpdater:
   image:
     # -- Docker image tag for the `repo-updater` image
-    defaultTag: 5.3.0@sha256:5e3aef99f7c8281089a2aae38fb44cafebbddd1abd28771bc1b88c48282f6651
+    defaultTag: 5.3.0@sha256:b7689a2add8b4e987010d5f815fa29fb9cf1e249f7d80166ef8415625d60f334
     # -- Docker image name for the `repo-updater` image
     name: "repo-updater"
   # -- Security context for the `repo-updater` container,
@@ -1087,7 +1087,7 @@ repoUpdater:
 searcher:
   image:
     # -- Docker image tag for the `searcher` image
-    defaultTag: 5.3.0@sha256:9f3789bb3ba6c8ed9b40e6fd7ad76b69f8397ad25e040e720b23b7e6b0d41a88
+    defaultTag: 5.3.0@sha256:6c0eb554181b4546f9dd0c7e797b5c9fcc682dd005d2dd0b5054ac8105d04850
     # -- Docker image name for the `searcher` image
     name: "searcher"
   # -- Security context for the `searcher` container,
@@ -1148,7 +1148,7 @@ storageClass:
 symbols:
   image:
     # -- Docker image tag for the `symbols` image
-    defaultTag: 5.3.0@sha256:07c7c5ea96c38c7b2c276411373a2dd69171a00e3e44447886bec5a8ca7d52eb
+    defaultTag: 5.3.0@sha256:bdbc55f268e39f4df1e315fb2c0507ad5669d279fad2957da5482e8138deda7e
     # -- Docker image name for the `symbols` image
     name: "symbols"
   # -- Security context for the `symbols` container,
@@ -1282,7 +1282,7 @@ jaeger:
 worker:
   image:
     # -- Docker image tag for the `worker` image
-    defaultTag: 5.3.0@sha256:5c8f5ebe0671475cde82703cb3a59bcb295177fcce92d26fc6084a69f82d4dd3
+    defaultTag: 5.3.0@sha256:376f988e24f0608fb7571d4a56a5faeb94a2b5248bd3d2a18a9e2a3c71ade797
     # -- Docker image name for the `worker` image
     name: "worker"
   # -- Security context for the `worker` container,
