@@ -1,0 +1,320 @@
+---
+meta:
+  productName: "deploy-sourcegraph-helm"
+  owners:
+    - "@sourcegraph/release"
+  repository: "github.com/sourcegraph/deploy-sourcegraph-helm"
+inputs:
+  releaseId: server
+requirements:
+  - name: "comby exists"
+    cmd: "which comby"
+    fixInstructions: "install comby"
+  - name: "GitHub cli exists"
+    cmd: "which gh"
+    fixInstructions: "install GitHub cli"
+  - name: "sg-rfc795 exists"
+    cmd: "which sg-rfc795"
+    fixInstructions: "install sg"
+  - name: "DOCKER_USERNAME exported"
+    env: "DOCKER_USERNAME"
+  - name: "DOCKER_PASSWORD exported"
+    env: "DOCKER_PASSWORD"
+internal:
+  create:
+    steps:
+      patch:
+          - name: sg ops:sourcegraph
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
+          - name: sg ops:dind
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
+          - name: sg ops:k8s
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
+          - name: sg ops:migrator
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
+          - name: "chart:version"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "chart:appVersion"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "helm:docs"
+            cmd: ./scripts/helm-docs.sh
+          - name: "git:branch"
+            cmd: |
+              branch="wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release_patch: {{version}}' -m '{{config}}'
+              git push origin ${branch}
+          - name: "gh"
+            cmd: |
+              gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
+      minor:
+          - name: sg ops:sourcegraph
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+
+              echo "updating sourcegraph images"
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
+          - name: sg ops:dind
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
+          - name: sg ops:k8s
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
+          - name: sg ops:migrator
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
+          - name: "chart:version"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "chart:appVersion"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "helm:docs"
+            cmd: ./scripts/helm-docs.sh
+          - name: "git:branch"
+            cmd: |
+              branch="wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release_minor: {{version}}' -m '{{config}}'
+              git push origin ${branch}
+          - name: "gh"
+            cmd: |
+              gh pr create -f -t "PRETEND RELEASE WIP: release_minor: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
+      major:
+          - name: sg ops:sourcegraph
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
+          - name: sg ops:dind
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
+          - name: sg ops:k8s
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
+          - name: sg ops:migrator
+            cmd: |
+              set -e
+              registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+              sg-rfc795 ops update-images \
+              -t {{tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
+          - name: "chart:version"
+            cmd: |
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "chart:appVersion"
+            cmd: |
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+              comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+          - name: "helm:docs"
+            cmd: ./scripts/helm-docs.sh
+          - name: "git:branch"
+            cmd: |
+              branch="wip_{{version}}"
+              git switch -c "${branch}"
+              git commit -am 'release_major: {{version}}' -m '{{config}}'
+              git push origin ${branch}
+          - name: "gh"
+            cmd: |
+              gh pr create -f -t "PRETEND RELEASE WIP: release_major: build {{version}}" --body "Test plan: automated release PR, CI will perform additional checks"
+  finalize:
+    steps:
+      - name: "git:finalize"
+        cmd: |
+          set -e
+          branch="wip-release-{{version}}"
+          git switch -c "${branch}"
+          echo "pushing branch ${branch}"
+          git push origin "${branch}"
+          git checkout -
+
+test:
+  steps:
+    - name: "foo"
+      cmd: |
+        echo "Test"
+
+promoteToPublic:
+  create:
+    steps:
+      - name: sg ops:sourcegraph
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
+          -t {{tag}} \
+          -k helm \
+          --registry "${registry}" \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph/
+      - name: sg ops:dind
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
+          -t {{tag}} \
+          -k helm \
+          --registry "${registry}" \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph-executor/dind/
+      - name: sg ops:k8s
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
+          -t {{tag}} \
+          -k helm \
+          --registry "${registry}" \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph-executor/k8s/
+      - name: sg ops:migrator
+        cmd: |
+          set -e
+          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          sg-rfc795 ops update-images \
+          -t {{tag}} \
+          -k helm \
+          --registry "${registry}" \
+          --docker-username $DOCKER_USERNAME \
+          --docker-password $DOCKER_PASSWORD \
+          charts/sourcegraph-migrator/
+      - name: "update helm docs"
+        cmd: ./scripts/helm-docs.sh
+      - name: "git:branch"
+        cmd: |
+          branch="promote-release_{{version}}"
+          git switch -c "${branch}"
+          git commit -am "promote_release: {{version}}" -m '{{config}}'
+          git push origin "${branch}"
+      - name: "gh"
+        cmd: |
+          set -e
+          remote_branch="wip-release-{{version}}"
+          # we need to fetch from origin just in case this remote_branch doesn't exist locally, so that the PR can find the base
+          git fetch origin "${remote_branch}"
+          gh pr create -f -t "PRETEND PROMOTE RELEASE - release: build {{version}}" --base "${remote_branch}" --body "Test plan: automated release PR, CI will perform additional checks"
+  finalize:
+    steps:
+      - name: git:tag
+        cmd: |
+          set -e
+          branch="wip-release-{{version}}"
+          git fetch origin
+          git checkout "${branch}"
+          git tag wip-{{version}}
+          git push origin ${branch} --tags

@@ -1,4 +1,3 @@
-{{- if .Values.executor.enabled -}}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -12,4 +11,3 @@ spec:
   resources:
     requests:
       storage: {{ .Values.executor.storageSize }}
-{{- end}}
