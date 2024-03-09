@@ -10,10 +10,13 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Updated redis liveness/readiness probes [#419](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/419)
 
+## 5.3.2
+
+- Sourcegraph 5.3.2 is now available
+
 ## 5.3.1
 
 - Sourcegraph 5.3.1 is now available
-
 
 ## 5.3.0
 
@@ -50,11 +53,9 @@ Use `**BREAKING**:` to denote a breaking change
 - Sourcegraph 5.2.1 is now available
 - The GitHub Proxy service has been removed and is no longer required. Remove all `githubProxy` fields from config, if set.
 
-
 ## 5.2.0
 
 - Sourcegraph 5.2.0 is now available
-
 
 ## 5.1.9
 
@@ -130,7 +131,6 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Sourcegraph 4.5.0 is now available
 
-
 - Deploy Sourcegraph Executors now deployable via helm [#236](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/236).
 - Searcher and Symbols now use StatefulSets and PVCs to avoid large `ephermeralStorage` requests [#242](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/242)
 - The default `hostPort`s for OpenTelemetry agent pods deployed by the DaemonSet can now be overridden by setting `openTelemetry.agent.hostPorts` for one or more of `otlpGrpc`, `otlpHttp`, and `zpages`. This allows multiple instances of Sourcegraph to be deployed on a single cluster [#245](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/245).
@@ -141,11 +141,13 @@ Use `**BREAKING**:` to denote a breaking change
 ## 4.4.2
 
 Sourcegraph 4.4.2 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-4-2)
 
 ## 4.4.1
 
 Sourcegraph 4.4.1 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-4-1)
 
 ## 4.4.0
@@ -155,16 +157,18 @@ Sourcegraph 4.4.1 is now available!
 ## 4.3.1
 
 Sourcegraph 4.3.1 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-3-1)
 
 ## 4.3.0
 
 Sourcegraph 4.3.0 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-3-0)
 
 ## 4.2.1
 
-* `minio` has been replaced with `blobstore`. If you use Sourcegraph's built-in object storage (instead of an external S3/GCP bucket), then please see the update notes here: https://docs.sourcegraph.com/admin/how-to/blobstore_update_notes
+- `minio` has been replaced with `blobstore`. If you use Sourcegraph's built-in object storage (instead of an external S3/GCP bucket), then please see the update notes here: https://docs.sourcegraph.com/admin/how-to/blobstore_update_notes
 
 ## 4.2.0
 
@@ -172,7 +176,8 @@ Sourcegraph 4.3.0 is now available!
 
 - Added a node-exporter daemonset, which collects crucial machine-level metrics that help Sourcegraph scale your deployment. See [#194](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/194) for more information
 
-  - 🚨 **WARNING**: Similarly to cadvisor,  `node-exporter`:
+  - 🚨 **WARNING**: Similarly to cadvisor, `node-exporter`:
+
     - runs as a daemonset
     - needs to mount various read-only directories from the host machine (`/`, `/proc`, and `/sys`)
     - ideally shares the machine's PID namespaces
@@ -182,32 +187,38 @@ Sourcegraph 4.3.0 is now available!
 ## 4.1.3
 
 Sourcegraph 4.1.3 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-1-3)
 
 ## 4.1.2
 
 Sourcegraph 4.1.2 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-1-2)
 
 ## 4.1.1
 
 Sourcegraph 4.1.1 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-1-1)
 
 ## 4.1.0
 
 Sourcegraph 4.1.0 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-1-0)
 - Added `allowedTopologies` support to storageclass [#188](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/188). This is useful to restrict provisioning of PV in specific zones or regions. In some cloud providers (e.g. GCP), this can be used to provision regional disks with only one worker node present.
 
 ## 4.0.1
 
 Sourcegraph 4.0.1 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-0-1)
 
 ## 4.0.0
 
 Sourcegraph 4.0.0 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#4-0-0)
 - (lint) Don't emit `annotations` key on k8s objects if the value is empty [#163](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/163)
 - **BREAKING**: Switched to OpenTelemetry for trace data collection [#167](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/167)
@@ -220,55 +231,57 @@ Sourcegraph 4.0.0 is now available!
 ## 3.43.2
 
 Sourcegraph 3.43.2 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-43-2)
 
 ## 3.43.1
 
 Sourcegraph 3.43.1 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-43-1)
 
 ## 3.43.0
 
 Sourcegraph 3.43.0 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-43-0)
 
 ## 3.42.2
 
 Sourcegraph 3.42.2 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-2)
 
 ## 3.42.1
 
 Sourcegraph 3.42.1 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-1)
 
 ## 3.42.0
 
 Sourcegraph 3.42.0 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-0)
 - [Update](https://docs.sourcegraph.com/admin/updates)
 - [Release post](https://about.sourcegraph.com/blog/release/3.42)
-
 
 ## 3.42.1
 
 Sourcegraph 3.42.1 is now available!
-- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-1)
 
+- [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-1)
 
 ## 3.42.0
 
 Sourcegraph 3.42.0 is now available!
+
 - [Changelog](https://sourcegraph.com/github.com/sourcegraph/sourcegraph/-/blob/CHANGELOG.md#3-42-0)
 - [Update](https://docs.sourcegraph.com/admin/updates)
 - [Release post](https://about.sourcegraph.com/blog/release/3.42)
 
-
 - Add new example `envoy` to enable HTTP trailers using Envoy Filter [#148](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/148)
 - Add support to configure service account annotations [#151](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/151)
-
-
-
 
 ## 3.41.0
 
