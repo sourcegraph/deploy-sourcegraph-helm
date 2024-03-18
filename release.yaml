@@ -13,8 +13,8 @@ requirements:
   - name: "GitHub cli exists"
     cmd: "which gh"
     fixInstructions: "install GitHub cli"
-  - name: "sg-rfc795 exists"
-    cmd: "which sg-rfc795"
+  - name: "sg exists"
+    cmd: "which sg"
     fixInstructions: "install sg"
   - name: "DOCKER_USERNAME exported"
     env: "DOCKER_USERNAME"
@@ -28,7 +28,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -39,7 +39,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -50,7 +50,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -61,7 +61,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -98,7 +98,7 @@ internal:
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
               echo "updating sourcegraph images"
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -109,7 +109,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -120,7 +120,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -131,7 +131,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -166,7 +166,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -177,7 +177,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -188,7 +188,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -199,7 +199,7 @@ internal:
             cmd: |
               set -e
               registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-              sg-rfc795 ops update-images \
+              sg ops update-images \
               -t {{tag}} \
               -k helm \
               --registry "${registry}" \
@@ -253,7 +253,7 @@ promoteToPublic:
         cmd: |
           set -e
           registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
-          sg-rfc795 ops update-images \
+          sg ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
@@ -264,7 +264,7 @@ promoteToPublic:
         cmd: |
           set -e
           registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
-          sg-rfc795 ops update-images \
+          sg ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
@@ -275,7 +275,7 @@ promoteToPublic:
         cmd: |
           set -e
           registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
-          sg-rfc795 ops update-images \
+          sg ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
@@ -286,7 +286,7 @@ promoteToPublic:
         cmd: |
           set -e
           registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
-          sg-rfc795 ops update-images \
+          sg ops update-images \
           -t {{tag}} \
           -k helm \
           --registry "${registry}" \
