@@ -1,0 +1,136 @@
+{{- if .Values.qdrant.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.qdrant.name }}
+  annotations:
+    description: Backend for vector search operations.
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.qdrant.labels }}
+      {{- toYaml .Values.qdrant.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: qdrant
+spec:
+  minReadySeconds: 10
+  replicas: 1
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.qdrant.name }}
+  serviceName: qdrant
+  updateStrategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: qdrant
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.qdrant.podAnnotations }}
+      {{- toYaml .Values.qdrant.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.qdrant.podLabels }}
+      {{- toYaml .Values.qdrant.podLabels | nindent 8 }}
+      {{- end }}
+        app: {{ .Values.qdrant.name }}
+        app.kubernetes.io/component: qdrant
+        deploy: sourcegraph
+    spec:
+      containers:
+      - name: {{ .Values.qdrant.name }}
+        image: {{ include "sourcegraph.image" (list . "qdrant") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.qdrant.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        ports:
+          - containerPort: 6333
+            name: http
+            protocol: TCP
+          - containerPort: 6334
+            name: grpc
+            protocol: TCP
+        # TODO: use gRPC liveness/readiness probe once this PR lands: https://github.com/qdrant/qdrant/pull/2409
+        readinessProbe:
+          failureThreshold: 30
+          httpGet:
+            scheme: HTTP
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        livenessProbe:
+          failureThreshold: 30
+          httpGet:
+            scheme: HTTP
+            port: http
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        volumeMounts:
+          - name: qdrant-data
+            mountPath: /data
+          - name: config
+            mountPath: /etc/qdrant
+          {{- if .Values.qdrant.extraVolumeMounts }}
+          {{- toYaml .Values.qdrant.extraVolumeMounts | nindent 8 }}
+          {{- end }}
+        {{- if not .Values.sourcegraph.localDevMode}}
+        resources:
+          {{- toYaml .Values.qdrant.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.qdrant.containerSecurityContext | nindent 10 }}
+      {{- if .Values.blobstore.extraContainers }}
+        {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.qdrant.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "qdrant" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "qdrant" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "qdrant" ) | trim | nindent 6 }}
+      {{- if .Values.qdrant.serviceAccount.create }}
+      serviceAccountName: {{ .Values.qdrant.serviceAccount.name }}
+      {{- end}}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+        {{- if .Values.qdrant.extraVolumes }}
+        {{- toYaml .Values.qdrant.extraVolumes | nindent 6 }}
+        {{- end }}
+        - name: qdrant-data
+          persistentVolumeClaim:
+            claimName: qdrant-data
+        - name: config
+          configMap:
+            name: qdrant
+            items:
+              - key: config.yaml
+                path: config.yaml
+  volumeClaimTemplates:
+  - metadata:
+      name: qdrant-data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.qdrant.storageSize }}
+      storageClassName: {{ .Values.storageClass.name }}
+{{- end }}

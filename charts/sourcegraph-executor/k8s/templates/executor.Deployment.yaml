@@ -107,4 +107,3 @@ spec:
         - name: "sg-{{include "executor.name" . }}"
           persistentVolumeClaim:
             claimName: "sg-{{include "executor.name" . }}"
-{{- end }}
