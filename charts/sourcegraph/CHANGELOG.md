@@ -6,9 +6,10 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 
-## Unreleased
+## 5.3.3
 
 - Updated redis liveness/readiness probes [#419](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/419)
+- Sourcegraph 5.3.3 is now available
 
 ## 5.3.2
 
