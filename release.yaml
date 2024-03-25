@@ -307,7 +307,7 @@ promoteToPublic:
       - name: "git"
         cmd: |
           set -eu
-          branch="internal/release-{{version}}
+          branch="internal/release-{{version}}"
           echo "Checking out origin/${branch}"
           git fetch origin "${branch}"
           git switch "${branch}"
