@@ -389,16 +389,16 @@ promoteToPublic:
           # Branches
           internal_branch="internal/release-{{version}}"
           promote_branch="promote/release-{{version}}"
-          release_branch="release-{{version}}"
+          release_branch="qa-release-{{version}}"
 
           # Create the final branch holding the tagged commit
           git checkout "${promote_branch}"
           git switch -c "${release_branch}"
-          git tag {{version}}
+          git tag qa-{{version}}
           git push origin ${release_branch} --tags
 
           # Web URL to the tag
-          tag_url="https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/{{version}}"
+          tag_url="https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/qa-{{version}}"
 
           # Annotate PRs
           cat << EOF | gh pr comment "$internal_branch" --body-file -
