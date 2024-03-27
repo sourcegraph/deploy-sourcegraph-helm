@@ -26,39 +26,47 @@ steps:
       - "[[ -z $(git status -s) ]]"
     agents: { queue: standard }
 
-  - label: "Release: test"
-    if: "build.branch =~ /^wip_/"
+  - label: "(internal) Release: test"
+    if: build.branch =~ /^internal\/release-.*/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |
       wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
       chmod +x ./comby-1.8.1-x86_64-linux
-      mv comby-1.8.1-x86_64-linux comby
+      mv comby-1.8.1-x86_64-linux /usr/local/bin/comby
 
-      export PATH=$PATH:$(pwd)
+      sg release run test --workdir=. --config-from-commit
+
+  - label: "(promote) Release: test"
+    if: build.branch =~ /^promote\/release-.*/
+    plugins:
+      - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
+    command: |
+      wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
+      chmod +x ./comby-1.8.1-x86_64-linux
+      mv comby-1.8.1-x86_64-linux /usr/local/bin/comby
+
       sg release run test --workdir=. --config-from-commit
 
   - wait
 
-  - label: "Release: finalize"
-    if: "build.branch =~ /^wip_/"
+  - label: "(internal) Release: finalize"
+    if: build.branch =~ /^internal\/release-.*/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |
       wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
       chmod +x ./comby-1.8.1-x86_64-linux
-      mv comby-1.8.1-x86_64-linux comby
+      mv comby-1.8.1-x86_64-linux /usr/local/bin/comby
 
-      export PATH=$PATH:$(pwd)
       sg release run internal finalize --workdir=. --config-from-commit
-  - label: "Promote to public: finalize"
-    if: build.message =~ /^promote_release/ && build.branch =~ /^wip-release/
+  - label: "(promote) Release: finalize"
+    if: build.branch =~ /^promote\/release-.*/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |
       wget https://github.com/comby-tools/comby/releases/download/1.8.1/comby-1.8.1-x86_64-linux
       chmod +x ./comby-1.8.1-x86_64-linux
-      mv comby-1.8.1-x86_64-linux comby
+      mv comby-1.8.1-x86_64-linux /usr/local/bin/comby
 
-      export PATH=$PATH:$(pwd)
       sg release run promote-to-public finalize --workdir=. --config-from-commit
