@@ -17,6 +17,7 @@ spec:
   selector:
     matchLabels:
       app: grafana
+  replicas: 1
   serviceName: grafana
   updateStrategy:
      type: RollingUpdate
