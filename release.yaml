@@ -317,7 +317,7 @@ promoteToPublic:
       - name: sg ops:sourcegraph
         cmd: |
           set -eu
-          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          registry=index.docker.io/sourcegraph
           sg ops update-images \
           -t {{inputs.server.tag}} \
           -k helm \
@@ -328,7 +328,7 @@ promoteToPublic:
       - name: sg ops:dind
         cmd: |
           set -eu
-          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          registry=index.docker.io/sourcegraph
           sg ops update-images \
           -t {{inputs.server.tag}} \
           -k helm \
@@ -339,7 +339,7 @@ promoteToPublic:
       - name: sg ops:k8s
         cmd: |
           set -eu
-          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          registry=index.docker.io/sourcegraph
           sg ops update-images \
           -t {{inputs.server.tag}} \
           -k helm \
@@ -350,7 +350,7 @@ promoteToPublic:
       - name: sg ops:migrator
         cmd: |
           set -eu
-          registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-public
+          registry=index.docker.io/sourcegraph
           sg ops update-images \
           -t {{inputs.server.tag}} \
           -k helm \
