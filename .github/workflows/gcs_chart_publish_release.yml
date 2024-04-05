@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - release/**
+      - release-**
     paths:
       - .github/workflows/gcs_chart_publish_release.yml
       - 'charts/**'
