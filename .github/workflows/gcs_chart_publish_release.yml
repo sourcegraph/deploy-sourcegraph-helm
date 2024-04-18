@@ -8,6 +8,13 @@ on:
     paths:
       - .github/workflows/gcs_chart_publish_release.yml
       - 'charts/**'
+  workflow_dispatch:
+    inputs:
+      ref:
+        type: string
+        description: |
+          BREAK GLASS ONLY. The branch to forcefully trigger a new release from
+        required: false
 
 env:
   HELM_VERSION: v3.4.0
@@ -21,9 +28,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
+        if: ${{ inputs.ref == '' }}
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
+
+      - name: Checkout (break glass)
+        if: ${{ inputs.ref == '' }}
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.ref }}
 
       - name: Install Helm
         uses: azure/setup-helm@v1
