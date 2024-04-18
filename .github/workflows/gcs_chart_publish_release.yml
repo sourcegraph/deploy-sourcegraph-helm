@@ -34,7 +34,7 @@ jobs:
           fetch-depth: 0
 
       - name: Checkout (break glass)
-        if: ${{ inputs.ref == '' }}
+        if: ${{ inputs.ref != '' }}
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
