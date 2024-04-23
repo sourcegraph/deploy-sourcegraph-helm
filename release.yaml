@@ -321,7 +321,7 @@ internal:
           body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}" -d '{
               "name": "helm",
               "version": "{{version}}",
-              "git_sha": "${COMMIT_SHA}"
+              # "git_sha": "${COMMIT_SHA}"
             }')
           exit_code=$?
 
@@ -473,3 +473,20 @@ promoteToPublic:
           cat << EOF | buildkite-agent annotate --style info
           Promoted release is **publicly available** through a git tag at [\`{{version}}\`](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/{{version}}).
           EOF
+
+      - name: 'Promote on release registry'
+        cmd: |
+          echo "Promoting deploy-sourcegraph-helm {{version}} release on release registry"
+            body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}/promote" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}")
+            exit_code=$?
+
+            if [ $exit_code != 0 ]; then
+              echo "❌ Failed to promote release on release registry, got:"
+              echo "--- raw body ---"
+              echo $body
+              echo "--- raw body ---"
+              exit $exit_code
+            else
+              echo "Build created, see:"
+              echo $body | jq .web_url
+            fi
