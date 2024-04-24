@@ -13,6 +13,9 @@ requirements:
   - name: "GitHub CLI "
     cmd: "which gh"
     fixInstructions: "install GitHub cli"
+  - name: "GH auth status"
+    cmd: "gh auth status"
+    fixInstructions: "gh auth login"
   - name: "Docker username"
     env: "DOCKER_USERNAME"
   - name: "Docker password"
@@ -21,9 +24,6 @@ internal:
   create:
     steps:
       patch:
-          - name: "gh:auth"
-            cmd: |
-              gh auth status
           - name: sg ops:sourcegraph
             cmd: |
               set -eu
@@ -110,9 +110,6 @@ internal:
                   --body "Test plan: automated release PR, CI will perform additional checks"
                 echo "🚢 Please check the associated CI build to ensure the process completed".
       minor:
-          - name: "gh:auth"
-            cmd: |
-              gh auth status
           - name: sg ops:sourcegraph
             cmd: |
               set -eu
@@ -200,9 +197,6 @@ internal:
                   --body "Test plan: automated release PR, CI will perform additional checks"
                 echo "🚢 Please check the associated CI build to ensure the process completed".
       major:
-          - name: "gh:auth"
-            cmd: |
-              gh auth status
           - name: sg ops:sourcegraph
             cmd: |
               set -eu
@@ -316,9 +310,6 @@ test:
 promoteToPublic:
   create:
     steps:
-      - name: "gh:auth"
-        cmd: |
-          gh auth status
       - name: "git"
         cmd: |
           set -eu
