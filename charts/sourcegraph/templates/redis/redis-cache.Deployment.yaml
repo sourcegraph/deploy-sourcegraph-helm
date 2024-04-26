@@ -67,6 +67,9 @@ spec:
             - -c
             - |
               #!/bin/bash
+              if [ -f /etc/redis/redis.conf ]; then
+                REDISCLI_AUTH=$(grep --no-filename --no-heading --no-line-number "requirepass" /etc/redis/redis.conf | \tr -s ' '| cut -d ' ' -f 3)
+              fi
               response=$(
                 redis-cli ping
               )
