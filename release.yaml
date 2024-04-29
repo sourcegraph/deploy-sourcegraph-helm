@@ -27,12 +27,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
 
         - name: sg ops:dind
           cmd: |
@@ -40,12 +40,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/dind/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
 
         - name: sg ops:k8s
           cmd: |
@@ -53,12 +53,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/k8s/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
 
         - name: sg ops:migrator
           cmd: |
@@ -66,12 +66,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-migrator/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
 
         - name: "chart:version"
           cmd: |
@@ -125,12 +125,12 @@ internal:
 
             echo "updating sourcegraph images"
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
 
         - name: sg ops:dind
           cmd: |
@@ -138,12 +138,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/dind/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
 
         - name: sg ops:k8s
           cmd: |
@@ -151,12 +151,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/k8s/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
 
         - name: sg ops:migrator
           cmd: |
@@ -164,12 +164,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-migrator/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
 
         - name: "chart:version"
           cmd: |
@@ -223,12 +223,12 @@ internal:
 
             echo "updating sourcegraph images"
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph/
 
         - name: sg ops:dind
           cmd: |
@@ -236,12 +236,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/dind/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/dind/
 
         - name: sg ops:k8s
           cmd: |
@@ -249,12 +249,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/k8s/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-executor/k8s/
 
         - name: sg ops:migrator
           cmd: |
@@ -262,12 +262,12 @@ internal:
             registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
 
             sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-migrator/
+              -t {{inputs.server.tag}} \
+              -k helm \
+              --registry "${registry}" \
+              --docker-username $DOCKER_USERNAME \
+              --docker-password $DOCKER_PASSWORD \
+              charts/sourcegraph-migrator/
 
         - name: "chart:version"
           cmd: |
@@ -318,10 +318,11 @@ internal:
       - name: 'Register on release registry'
         cmd: |
           echo "Registering internal sourcegraph/sourcegraph {{version}} release on release registry"
+          COMMIT_SHA=$(git rev-parse HEAD)
           body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}" -d '{
               "name": "helm",
               "version": "{{version}}",
-              # "git_sha": "${COMMIT_SHA}"
+              "git_sha": "${COMMIT_SHA}"
             }')
           exit_code=$?
 
@@ -372,45 +373,45 @@ promoteToPublic:
           set -eu
           registry=index.docker.io/sourcegraph
           sg ops update-images \
-          -t {{inputs.server.tag}} \
-          -k helm \
-          --registry "${registry}" \
-          --docker-username $DOCKER_USERNAME \
-          --docker-password $DOCKER_PASSWORD \
-          charts/sourcegraph/
+            -t {{inputs.server.tag}} \
+            -k helm \
+            --registry "${registry}" \
+            --docker-username $DOCKER_USERNAME \
+            --docker-password $DOCKER_PASSWORD \
+            charts/sourcegraph/
       - name: sg ops:dind
         cmd: |
           set -eu
           registry=index.docker.io/sourcegraph
           sg ops update-images \
-          -t {{inputs.server.tag}} \
-          -k helm \
-          --registry "${registry}" \
-          --docker-username $DOCKER_USERNAME \
-          --docker-password $DOCKER_PASSWORD \
-          charts/sourcegraph-executor/dind/
+            -t {{inputs.server.tag}} \
+            -k helm \
+            --registry "${registry}" \
+            --docker-username $DOCKER_USERNAME \
+            --docker-password $DOCKER_PASSWORD \
+            charts/sourcegraph-executor/dind/
       - name: sg ops:k8s
         cmd: |
           set -eu
           registry=index.docker.io/sourcegraph
           sg ops update-images \
-          -t {{inputs.server.tag}} \
-          -k helm \
-          --registry "${registry}" \
-          --docker-username $DOCKER_USERNAME \
-          --docker-password $DOCKER_PASSWORD \
-          charts/sourcegraph-executor/k8s/
+            -t {{inputs.server.tag}} \
+            -k helm \
+            --registry "${registry}" \
+            --docker-username $DOCKER_USERNAME \
+            --docker-password $DOCKER_PASSWORD \
+            charts/sourcegraph-executor/k8s/
       - name: sg ops:migrator
         cmd: |
           set -eu
           registry=index.docker.io/sourcegraph
           sg ops update-images \
-          -t {{inputs.server.tag}} \
-          -k helm \
-          --registry "${registry}" \
-          --docker-username $DOCKER_USERNAME \
-          --docker-password $DOCKER_PASSWORD \
-          charts/sourcegraph-migrator/
+            -t {{inputs.server.tag}} \
+            -k helm \
+            --registry "${registry}" \
+            --docker-username $DOCKER_USERNAME \
+            --docker-password $DOCKER_PASSWORD \
+            charts/sourcegraph-migrator/
       - name: "update helm docs"
         cmd: ./scripts/helm-docs.sh
       - name: "git:branch"
