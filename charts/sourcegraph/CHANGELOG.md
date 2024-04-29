@@ -6,6 +6,10 @@ Use `**BREAKING**:` to denote a breaking change
 
 <!-- START CHANGELOG -->
 
+## Unreleased
+
+- Updated redis readiness check to fix NOAUTH on password'd redis servers #458
+
 ## 5.3.3
 
 - Updated redis liveness/readiness probes [#419](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/419)
