@@ -256,24 +256,6 @@ In addition to the documented values, all services also support the following va
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
-| qdrant.config | object | `{"debug":true,"log_level":"INFO"}` | Resource requests & limits for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| qdrant.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| qdrant.enabled | bool | `false` | Enable `qdrant` |
-| qdrant.env | object | `{}` | Environment variables for the `qdrant` container |
-| qdrant.extraVolumeMounts | object | `{}` |  |
-| qdrant.extraVolumes | object | `{}` |  |
-| qdrant.image.defaultTag | string | `"5.3.2@sha256:c8628523bb6acf57b0633ab3ca3bc7a07ee21d6ecac1fb370b1bed3d73420269"` | Docker image tag for the `qdrant` image |
-| qdrant.image.name | string | `"qdrant"` | Docker image name for the `qdrant` image |
-| qdrant.name | string | `"qdrant"` | Name of the `qdrant` service |
-| qdrant.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `qdrant` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| qdrant.resources.limits.cpu | string | `"2"` |  |
-| qdrant.resources.limits.memory | string | `"8G"` |  |
-| qdrant.resources.requests.cpu | string | `"500m"` |  |
-| qdrant.resources.requests.memory | string | `"2G"` |  |
-| qdrant.serviceAccount.annotations | object | `{}` |  |
-| qdrant.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
-| qdrant.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| qdrant.storageSize | string | `"100Gi"` | PVC Storage Request for `qdrant` data volume |
 | redisCache.connection.endpoint | string | `"redis-cache:6379"` | Endpoint to use for redis-cache. Supports either host:port or IANA specification |
 | redisCache.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisCache.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-cache` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |

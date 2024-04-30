@@ -322,54 +322,6 @@ embeddings:
   extraVolumeMounts: {}
   extraVolumes: {}
 
-qdrant:
-  # -- Enable `qdrant`
-  enabled: false
-  # -- Name of the `qdrant` service
-  name: qdrant
-  image:
-    # -- Docker image name for the `qdrant` image
-    name: "qdrant"
-    # -- Docker image tag for the `qdrant` image
-    defaultTag: "5.3.2@sha256:c8628523bb6acf57b0633ab3ca3bc7a07ee21d6ecac1fb370b1bed3d73420269"
-  # -- Resource requests & limits for the `qdrant` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  config:
-    debug: true
-    log_level: INFO
-  resources:
-    limits:
-      cpu: "2"
-      memory: 8G
-    requests:
-      cpu: "500m"
-      memory: 2G
-  # -- Environment variables for the `qdrant` container
-  env: {}
-  # -- Security context for the `qdrant` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-  # -- Security context for the `qdrant` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  podSecurityContext:
-    runAsUser: 100
-    runAsGroup: 101
-    fsGroup: 101
-    fsGroupChangePolicy: "OnRootMismatch"
-  serviceAccount:
-    # -- Enable creation of ServiceAccount for `embeddings`
-    create: false
-    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
-    name: ""
-    annotations: {}
-  extraVolumeMounts: {}
-  extraVolumes: {}
-  # -- PVC Storage Request for `qdrant` data volume
-  storageSize: 100Gi
-
 frontend:
   # -- Environment variables for the `frontend` container
   # @default -- the chart will add some default environment values
