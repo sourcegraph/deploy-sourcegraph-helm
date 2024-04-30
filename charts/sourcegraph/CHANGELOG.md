@@ -9,6 +9,7 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Updated redis readiness check to fix NOAUTH on password'd redis servers #458
+- Removed qdrant from deployment #459
 
 ## 5.3.3
 
