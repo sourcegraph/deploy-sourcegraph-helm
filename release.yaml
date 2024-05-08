@@ -7,6 +7,9 @@ meta:
 inputs:
   - releaseId: server
 requirements:
+    # We use wget here, because curl --fail-with-body was introduced in a version ulterior to what we can have on the CI agents.
+  - name: "wget"
+    cmd: "wget --help"
   - name: "comby"
     cmd: "which comby"
     fixInstructions: "install comby"
@@ -320,13 +323,13 @@ internal:
     steps:
       - name: 'Register on release registry'
         cmd: |
-          echo "Registering internal sourcegraph/sourcegraph {{version}} release on release registry"
+          echo "Registering internal deploy-sourcegraph-helm {{version}} release on release registry"
           COMMIT_SHA=$(git rev-parse HEAD)
-          body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}" -d '{
+          body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '{
               "name": "helm",
               "version": "{{version}}",
-              "git_sha": "${COMMIT_SHA}"
-            }')
+              "git_sha": "'${COMMIT_SHA}'"
+            }' "https://releaseregistry.sourcegraph.com/v1/releases")
           exit_code=$?
 
           if [ $exit_code != 0 ]; then
@@ -364,6 +367,25 @@ test:
 promoteToPublic:
   create:
     steps:
+      # - name: 'validate promotion criteria'
+      #   cmd: |
+      #     echo "validating promotion criteria"
+      #     body=$(wget --content-on-error -O- --header="Content-Type: application/json" "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}")
+      #     exit_code=$?
+
+      #     if [ $exit_code != 0 ]; then
+      #       echo "❌ Failed to fetch release on release registry, got:"
+      #       echo "--- raw body ---"
+      #       echo $body
+      #       echo "--- raw body ---"
+      #       exit $exit_code
+      #     fi
+
+      #     is_development=$(echo "$body" | jq -r '.is_development')
+      #     if [ "$is_development" = "true" ]; then
+      #       echo "cannot promote a development release"
+      #       exit 1
+      #     fi
       - name: "git"
         cmd: |
           set -eu
@@ -481,16 +503,16 @@ promoteToPublic:
       - name: 'Promote on release registry'
         cmd: |
           echo "Promoting deploy-sourcegraph-helm {{version}} release on release registry"
-            body=$(curl -s --fail-with-body -X POST "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}/promote" -H "Content-Type: application/json" -H "Authorization: ${RELEASE_REGISTRY_TOKEN}")
-            exit_code=$?
+          body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '' "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}/promote")
+          exit_code=$?
 
-            if [ $exit_code != 0 ]; then
-              echo "❌ Failed to promote release on release registry, got:"
-              echo "--- raw body ---"
-              echo $body
-              echo "--- raw body ---"
-              exit $exit_code
-            else
-              echo "Build created, see:"
-              echo $body | jq .web_url
-            fi
+          if [ $exit_code != 0 ]; then
+            echo "❌ Failed to promote release on release registry, got:"
+            echo "--- raw body ---"
+            echo $body
+            echo "--- raw body ---"
+            exit $exit_code
+          else
+            echo "Build created, see:"
+            echo $body | jq .web_url
+          fi
