@@ -370,7 +370,7 @@ promoteToPublic:
       - name: 'validate promotion criteria'
         cmd: |
           echo "validating promotion criteria"
-          body=$(wget --content-on-error -O- --header="Content-Type: application/json" "https://releaseregistry.sourcegraph.com/v1/releases/sourcegraph/{{version}}")
+          body=$(wget --content-on-error -O- --header="Content-Type: application/json" "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}")
           exit_code=$?
 
           if [ $exit_code != 0 ]; then
@@ -503,7 +503,7 @@ promoteToPublic:
       - name: 'Promote on release registry'
         cmd: |
           echo "Promoting deploy-sourcegraph-helm {{version}} release on release registry"
-          body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '' "https://releaseregistry.sourcegraph.com/v1/releases/sourcegraph/{{version}}/promote")
+          body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '' "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}/promote")
           exit_code=$?
 
           if [ $exit_code != 0 ]; then
