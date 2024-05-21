@@ -94,6 +94,8 @@ spec:
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
+        - mountPath: /etc/redis/
+          name: redis-store-conf
         {{- if .Values.redisStore.extraVolumeMounts }}
         {{- toYaml .Values.redisStore.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -132,6 +134,9 @@ spec:
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-store
+      - configMap:
+          name: redis-store-conf
+        name: redis-store-conf
       {{- if .Values.redisStore.extraVolumes }}
       {{- toYaml .Values.redisStore.extraVolumes | nindent 6 }}
       {{- end }}
