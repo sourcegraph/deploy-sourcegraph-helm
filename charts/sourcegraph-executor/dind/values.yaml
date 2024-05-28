@@ -8,7 +8,7 @@ sourcegraph:
     # -- Global docker image pull policy
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
-    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+    repository: index.docker.io/sourcegraph
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
@@ -55,7 +55,7 @@ storageClass:
 executor:
   enabled: true
   image:
-    defaultTag: 5.4.3500@sha256:855287c547c6cc6e1fd404b290acef995301f687e991b44021eb977fa0480cd3
+    defaultTag: 5.4.3500@sha256:95dcd532d600627cc653219d0655212dd05d353def27be4b43137a1d67ee010c
     name: "executor"
   replicaCount: 1
   env:
