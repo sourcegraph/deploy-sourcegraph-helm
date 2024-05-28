@@ -10,6 +10,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Updated redis readiness check to fix NOAUTH on password'd redis servers #458, #471
 - Removed qdrant from deployment #459
+- Add missing "matchLabels" to frontend PDB selector #355
 
 ## 5.3.3
 
