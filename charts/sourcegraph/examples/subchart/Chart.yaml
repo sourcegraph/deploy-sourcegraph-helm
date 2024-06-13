@@ -2,10 +2,10 @@ apiVersion: v2
 name: sourcegraph-subchart
 description: Customer-owned chart that inherits from Sourcegraph
 type: application
-version: "5.3.2"
+version: "5.4.0"
 
 dependencies:
 - name: sourcegraph
   alias: sg # Optional, allows a custom name to be used
-  version: "5.3.2"
+  version: "5.4.0"
   repository: "https://sourcegraph.github.io/deploy-sourcegraph-helm"
