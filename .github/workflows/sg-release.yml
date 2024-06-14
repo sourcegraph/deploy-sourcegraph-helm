@@ -1,10 +1,7 @@
 name: sg-release
 
 on: 
-  workflow_dispatch
-
-env:
-
+  [push, workflow_dispatch]
 
 jobs:
   sg-release:
