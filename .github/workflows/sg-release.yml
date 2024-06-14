@@ -14,8 +14,6 @@ jobs:
         run: curl -L --proto '=https' --tlsv1.2 -sSLf -o sg https://github.com/sourcegraph/sg/releases/download/2024-06-11-15-14-add4baa4/sg_linux_amd64_static
 
           chmod +x sg
-      - name: Update apt
-        run: sudo apt update && sudo apt upgrade -y
       - name: Install dependencies
         run: sudo apt-get install libpcre3-dev libev4  -y
       - name: Install Comby
