@@ -15,7 +15,7 @@ jobs:
 
           chmod +x sg
       - name: Update apt
-        run: sudo apt update && apt upgrade -y
+        run: sudo apt update && sudo apt upgrade -y
       - name: Install dependencies
         run: sudo apt-get install libpcre3-dev libev4  -y
       - name: Install Comby
