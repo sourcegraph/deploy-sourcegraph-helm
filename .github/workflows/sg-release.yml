@@ -15,13 +15,13 @@ jobs:
 
           chmod +x sg
       - name: Update apt
-        run: apt update && apt upgrade -y
+        run: sudo apt update && apt upgrade -y
       - name: Install dependencies
-        run: apt-get install libpcre3-dev libev4  -y
+        run: sudo apt-get install libpcre3-dev libev4  -y
       - name: Install Comby
         run: bash <(curl -sL get-comby.netlify.app)
       - name: Install gh
-        run: apt install gh
+        run: sudo apt install gh
       - name: Run sg    
         run: ./sg release create --version=auto --inputs=server=auto --pretend
         env:
