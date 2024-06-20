@@ -1,7 +1,7 @@
 name: sg-setup
 
 jobs:
-  sg-internal-setup:
+  sg-setup:
     name: Setup release process
     runs-on: ubuntu-latest
     steps:
