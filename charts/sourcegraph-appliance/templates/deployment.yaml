@@ -34,16 +34,21 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}/appliance:candidate"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: SRC_LOG_LEVEL
+              value: debug
+            - name: SRC_PROF_HTTP
+              value: localhost:6060
+            - name: APPLIANCE_GRPC_ADDR
+              value: localhost:9000
+            - name: APPLIANCE_HTTP_ADDR
+              value: localhost:8080
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
-          livenessProbe:
-            {{- toYaml .Values.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           {{- with .Values.volumeMounts }}
