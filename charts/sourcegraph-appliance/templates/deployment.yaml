@@ -45,6 +45,8 @@ spec:
               value: localhost:9000
             - name: APPLIANCE_HTTP_ADDR
               value: localhost:8080
+            - name: APPLIANCE_VERSION
+              value: 5.4.5099
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
