@@ -9,7 +9,14 @@ image:
   image: appliance
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: {{ .Chart.AppVersion }}
+  tag: "{{ .Chart.AppVersion }}"
+  # Version and Tag (above) are subtley different
+  # Tag is the docker container tag
+  # Version is the internal version number as understood by appliance
+  # When building production images, the version is set by `ld`
+  # But for dev version we would need to specify it, since 0.0.0+dev is the default when built locally
+  # version: 5.4.7765
+  # log_level: debug
 
 imagePullSecrets: []
 nameOverride: ""

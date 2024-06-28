@@ -5,9 +5,7 @@ metadata:
   labels:
     {{- include "sourcegraph-appliance.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     matchLabels:
       {{- include "sourcegraph-appliance.selectorLabels" . | nindent 6 }}
@@ -38,9 +36,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: SRC_LOG_LEVEL
-              value: debug
+              value: {{ default "info" .Values.image.log_level }}
             - name: APPLIANCE_VERSION
-              value: 5.4.5099
+              value: "{{ .Values.image.version | default .Chart.AppVersion }}"
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
