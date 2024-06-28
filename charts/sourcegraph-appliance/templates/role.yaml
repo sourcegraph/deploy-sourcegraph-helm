@@ -10,6 +10,8 @@ rules:
   - apiGroups:
       - ""
       - "apps"
+      - "rbac.authorization.k8s.io"
+      - "networking.k8s.io"
     resources:
       - apps
       - pods
@@ -20,9 +22,17 @@ rules:
       - statefulsets
       - persistentvolumeclaims
       - daemonsets
+      - roles
+      - rolebindings
+      - events
+      - endpoints
+      - ingresses
       - secrets
     verbs:
       - get
       - list
       - watch
       - create
+      - delete
+      - patch
+      - update
