@@ -39,12 +39,6 @@ spec:
           env:
             - name: SRC_LOG_LEVEL
               value: debug
-            - name: SRC_PROF_HTTP
-              value: localhost:6060
-            - name: APPLIANCE_GRPC_ADDR
-              value: localhost:9000
-            - name: APPLIANCE_HTTP_ADDR
-              value: localhost:8080
             - name: APPLIANCE_VERSION
               value: 5.4.5099
           ports:
