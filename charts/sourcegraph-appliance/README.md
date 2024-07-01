@@ -3,7 +3,7 @@
   README.md is automatically generated from README.md.gotmpl
 -->
 
-# Sourcegraph Helm Chart
+# Sourcegraph Appliance Helm Chart
 
 Visit the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm) for guidance on using this chart.
 
@@ -28,15 +28,11 @@ In addition to the documented values, all services also support the following va
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| autoscaling.enabled | bool | `false` |  |
-| autoscaling.maxReplicas | int | `100` |  |
-| autoscaling.minReplicas | int | `1` |  |
-| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | fullnameOverride | string | `""` |  |
 | image.image | string | `"appliance"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"localhost:5001"` |  |
-| image.tag | string | `"candidate"` |  |
+| image.repository | string | `"index.docker.io/sourcegraph"` |  |
+| image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
