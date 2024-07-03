@@ -2,25 +2,25 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
+  name: sourcegraph-appliance
   namespace: {{ .Values.namespace }}
-  {{- if .Values.frontend.ingress.annotations}}
+  {{- if .Values.ingress.annotations }}
   annotations:
-    {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
   {{- end }}
   labels:
-    app: sourcegraph-frontend
+    app: sourcegraph-appliance
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-    {{- if .Values.frontend.ingress.labels}}
-      {{- toYaml .Values.frontend.ingress.labels | nindent 4 }}
+    {{- if .Values.ingress.labels}}
+      {{- toYaml .Values.ingress.labels | nindent 4 }}
     {{- end }}
-  name: {{ .Values.frontend.name }}
 spec:
-  {{- if and .Values.frontend.ingress.host .Values.frontend.ingress.tlsSecret }}
+  {{- if and .Values.ingress.host .Values.ingress.tlsSecret }}
   tls:
   - hosts:
-    - {{ .Values.frontend.ingress.host }}
-    secretName: {{ .Values.frontend.ingress.tlsSecret }}
+    - {{ .Values.ingress.host }}
+    secretName: {{ .Values.ingress.tlsSecret }}
   {{- end }}
   rules:
   - http:
@@ -32,10 +32,10 @@ spec:
             name: sourcegraph-frontend
             port:
               number: 30080
-  {{- if .Values.frontend.ingress.host}}
-    host: {{ .Values.frontend.ingress.host }}
+  {{- if .Values.ingress.host}}
+    host: {{ .Values.ingress.host }}
   {{- end }}
-  {{- if .Values.frontend.ingress.ingressClassName}}
-  ingressClassName: {{ .Values.frontend.ingress.ingressClassName }}
+  {{- if .Values.ingress.ingressClassName}}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
   {{- end }}
 {{- end }}
