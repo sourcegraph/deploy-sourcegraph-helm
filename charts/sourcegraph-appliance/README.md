@@ -28,19 +28,19 @@ In addition to the documented values, all services also support the following va
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| api.image | string | `"operator-api"` |  |
+| api.replicaCount | int | `1` |  |
+| appliance.image | string | `"appliance"` |  |
+| appliance.replicaCount | int | `1` |  |
 | fullnameOverride | string | `""` |  |
-| image.image | string | `"appliance"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"index.docker.io/sourcegraph"` |  |
-| image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
+| global.repository | string | `"index.docker.io/sourcegraph"` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
-| ingress.className | string | `""` |  |
-| ingress.enabled | bool | `false` |  |
-| ingress.hosts[0].host | string | `"chart-example.local"` |  |
-| ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
-| ingress.tls | list | `[]` |  |
+| ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
+| ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
+| ingress.enabled | bool | `true` | Enable ingress for the Sourcegraph server |
+| ingress.host | string | `""` | External hostname for the Sourcegraph server ingress (SSL) |
+| ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null` |
+| ingress.tlsSecret | string | `""` | Secret containing SSL cert |
 | livenessProbe.httpGet.path | string | `"/"` |  |
 | livenessProbe.httpGet.port | string | `"http"` |  |
 | nameOverride | string | `""` |  |
@@ -49,9 +49,9 @@ In addition to the documented values, all services also support the following va
 | podAnnotations | object | `{}` |  |
 | podLabels | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| pullPolicy | string | `"IfNotPresent"` |  |
 | readinessProbe.httpGet.path | string | `"/"` |  |
 | readinessProbe.httpGet.port | string | `"http"` |  |
-| replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | service.enabled | bool | `false` |  |
@@ -61,6 +61,9 @@ In addition to the documented values, all services also support the following va
 | serviceAccount.automount | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
+| tag | string | `"{{ .Chart.AppVersion }}"` |  |
 | tolerations | list | `[]` |  |
 | volumeMounts | list | `[]` |  |
 | volumes | list | `[]` |  |
+| webui.image | string | `"operator-ui"` |  |
+| webui.replicaCount | int | `1` |  |
