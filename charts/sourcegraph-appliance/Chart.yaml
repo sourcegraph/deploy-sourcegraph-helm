@@ -22,3 +22,7 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "5.4.7765"
+dependencies:
+  - name: sourcegraph-appliance-selfupdater
+    version: 1.0.517974
+    repository: file://./charts/sourcegraph-appliance-selfupdater

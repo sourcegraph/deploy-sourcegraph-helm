@@ -1,0 +1,9 @@
+namespace: sourcegraph
+
+global:
+  repository: <registry-path-goes-here.updated-by-bootstrap-chart>
+
+appliance:
+  distrib: https://helm.sourcegraph.com/release
+
+image: selfupdater

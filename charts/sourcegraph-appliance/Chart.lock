@@ -1,0 +1,6 @@
+dependencies:
+- name: sourcegraph-appliance-selfupdater
+  repository: file://../sourcegraph-appliance-selfupdater
+  version: 1.0.517974
+digest: sha256:ece9e27574c7b18885054b275c203b87230c8dd2095674e96f542ca47c71269c
+generated: "2024-07-02T15:44:12.226183-07:00"
