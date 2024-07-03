@@ -1,17 +1,25 @@
-{{- if .Values.service.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "sourcegraph-appliance.fullname" . }}
+  {{- if .Values.frontend.serviceAnnotations }}
+  annotations:
+    {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
+  {{- end }}
   labels:
-    {{- include "sourcegraph-appliance.labels" . | nindent 4 }}
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+    {{- if .Values.frontend.serviceLabels }}
+      {{- toYaml .Values.frontend.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: sourcegraph-frontend-internal
 spec:
-  type: {{ .Values.service.type }}
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+  - name: http-internal
+    port: 80
+    targetPort: http-internal
   selector:
-    {{- include "sourcegraph-appliance.selectorLabels" . | nindent 4 }}
-{{- end}}
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    app: sourcegraph-frontend
+  type: {{ .Values.frontend.internalServiceType | default "ClusterIP" }}
