@@ -53,7 +53,7 @@ spec:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "jaeger") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args: {{- default (list "--memory.max-traces=20000", "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json", "--collector.otlp.enabled") .Values.jaeger.args | toYaml | nindent 8 }}
+        args: {{- default (list "--memory.max-traces=20000" "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json" "--collector.otlp.enabled") .Values.jaeger.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.jaeger.env}}
         - name: {{ $name }}
