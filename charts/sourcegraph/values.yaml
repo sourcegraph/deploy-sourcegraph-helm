@@ -1193,6 +1193,8 @@ jaeger:
     name: "jaeger-all-in-one"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "jaeger"
+  # -- Default args passed to the `jaeger` binary
+  args: [ "--memory.max-traces=20000", "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json", "--collector.otlp.enabled" ]
   # -- Security context for the `jaeger` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
