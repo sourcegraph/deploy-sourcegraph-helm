@@ -14,7 +14,7 @@ metadata:
     {{- if .Values.service.serviceLabels }}
       {{- toYaml .Values.service.serviceLabels | nindent 4 }}
     {{- end }}
-  name: sourcegraph-appliance
+  name: sourcegraph-frontend
 spec:
   ports:
   - name: http
