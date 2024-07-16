@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "sourcegraph-appliance.fullname" . }}
-  namespace: {{ .Values.namespace }}
   labels:
     {{- include "sourcegraph-appliance.labels" . | nindent 4 }}
 spec:
