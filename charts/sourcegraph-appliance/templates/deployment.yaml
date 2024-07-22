@@ -43,6 +43,8 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
+            - name: APPLIANCE_DEPLOYMENT_NAME
+              value: {{ include "sourcegraph-appliance.fullname" . }}
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
