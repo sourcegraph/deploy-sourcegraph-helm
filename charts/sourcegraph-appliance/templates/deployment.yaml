@@ -4,6 +4,8 @@ metadata:
   name: {{ include "sourcegraph-appliance.fullname" . }}
   labels:
     {{- include "sourcegraph-appliance.labels" . | nindent 4 }}
+  annotations:
+    appliance.sourcegraph.com/helmValues: {{ toJson .Values | quote }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
