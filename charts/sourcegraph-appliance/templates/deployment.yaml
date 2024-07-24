@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "sourcegraph-appliance.fullname" . }}
+  name: {{ include "sourcegraph-appliance.name" . }}
   labels:
     {{- include "sourcegraph-appliance.labels" . | nindent 4 }}
 spec:
@@ -20,6 +20,7 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      app: sourcegraph-appliance
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
