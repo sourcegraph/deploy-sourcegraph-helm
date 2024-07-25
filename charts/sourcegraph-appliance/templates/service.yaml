@@ -21,6 +21,5 @@ spec:
     port: 30080
     targetPort: http
   selector:
-    {{- include "sourcegraph-appliance.selectorLabels" . | nindent 4 }}
     app: sourcegraph-appliance
   type: {{ .Values.service.serviceType | default "ClusterIP" }}
