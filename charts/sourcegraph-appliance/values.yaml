@@ -110,3 +110,12 @@ nodeSelector: {}
 tolerations: []
 
 affinity: {}
+
+frontend:
+  image:
+    image: appliance-frontend
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "{{ .Chart.AppVersion }}"
+
+selfUpdate:
+  enabled: true
