@@ -48,6 +48,10 @@ spec:
             - name: APPLIANCE_DEPLOYMENT_NAME
               value: {{ include "sourcegraph-appliance.name" . }},sourcegraph-appliance-frontend
             {{- end }}
+            {{- if .Values.noResourceRestrictions }}
+            - name: APPLIANCE_NO_RESOURCE_RESTRICTIONS
+              value: "true"
+            {{- end }}
           ports:
             - name: http
               containerPort: 8888
