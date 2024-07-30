@@ -1,0 +1,122 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Handles syntactic code intelligence indexing
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.syntacticCodeIntel.labels }}
+      {{- toYaml .Values.syntacticCodeIntel.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: syntactic-code-intel
+  name: {{ .Values.syntacticCodeIntel.name }}
+spec:
+  minReadySeconds: 10
+  replicas: {{ .Values.syntacticCodeIntel.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: syntactic-code-intel-worker
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: syntactic-code-intel-worker
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.syntacticCodeIntel.podAnnotations }}
+      {{- toYaml .Values.syntacticCodeIntel.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.syntacticCodeIntel.podLabels }}
+      {{- toYaml .Values.syntacticCodeIntel.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: syntactic-code-intel-worker
+    spec:
+      containers:
+      - name: syntactic-code-intel-worker
+        env:
+        {{- range $name, $item := .Values.syntacticCodeIntel.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- if .Values.blobstore.enabled }}
+        - name: SYNTACTIC_CODE_INTEL_UPLOAD_BACKEND
+          value: blobstore
+        - name: SYNTACTIC_CODE_INTEL_UPLOAD_AWS_ENDPOINT
+          value: http://blobstore:9000
+        {{- end }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
+        image: {{ include "sourcegraph.image" (list . "syntacticCodeIntel") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.syntacticCodeIntel.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: debug
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: debug
+            scheme: HTTP
+          periodSeconds: 5
+          timeoutSeconds: 5
+        ports:
+        - containerPort: 3188
+          name: http
+        - containerPort: 6060
+          name: debug
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.syntacticCodeIntel.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.syntacticCodeIntel.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        - mountPath: /tmp
+          name: tmpdir
+        {{- if .Values.syntacticCodeIntel.extraVolumeMounts }}
+        {{- toYaml .Values.syntacticCodeIntel.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.syntacticCodeIntel.extraContainers }}
+        {{- toYaml .Values.syntacticCodeIntel.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.syntacticCodeIntel.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "syntacticCodeIntel") | trim | nindent 6 }}
+      volumes:
+      - emptyDir: {}
+        name: tmpdir
+      {{- if .Values.syntacticCodeIntel.extraVolumes }}
+      {{- toYaml .Values.syntacticCodeIntel.extraVolumes | nindent 6 }}
+      {{- end }}
