@@ -1,14 +1,18 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "sourcegraph-appliance.name" . }}
+  name: {{ include "sourcegraph-appliance.name" . }}-frontend
   labels:
     {{- include "sourcegraph-appliance.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "sourcegraph-appliance.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph-appliance.labels" . | nindent 6 }}
+      {{- with .Values.podLabels }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      app: sourcegraph-appliance-frontend
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -20,7 +24,7 @@ spec:
         {{- with .Values.podLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        app: sourcegraph-appliance
+        app: sourcegraph-appliance-frontend
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -33,24 +37,14 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}/{{ .Values.image.image}}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}/{{ .Values.frontend.image.image }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
-            - name: SRC_LOG_LEVEL
-              value: {{ default "info" .Values.image.log_level }}
-            - name: APPLIANCE_VERSION
-              value: "{{ .Values.image.version | default .Chart.AppVersion }}"
-            - name: APPLIANCE_NAMESPACE
-              valueFrom:
-                fieldRef:
-                  fieldPath: metadata.namespace
-            {{- if .Values.selfUpdate.enabled }}
-            - name: APPLIANCE_DEPLOYMENT_NAME
-              value: {{ include "sourcegraph-appliance.name" . }},sourcegraph-appliance-frontend
-            {{- end }}
+            - name: API_ENDPOINT
+              value: http://sourcegraph-appliance-backend:8080
           ports:
             - name: http
-              containerPort: 8888
+              containerPort: 80
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

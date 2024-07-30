@@ -29,6 +29,8 @@ In addition to the documented values, all services also support the following va
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| frontend.image.image | string | `"appliance-frontend"` |  |
+| frontend.image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
 | fullnameOverride | string | `""` |  |
 | image.image | string | `"appliance"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -54,6 +56,7 @@ In addition to the documented values, all services also support the following va
 | replicaCount | int | `1` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
+| selfUpdate.enabled | bool | `true` |  |
 | service.enabled | bool | `false` |  |
 | service.port | int | `8080` |  |
 | service.type | string | `"NodePort"` |  |
