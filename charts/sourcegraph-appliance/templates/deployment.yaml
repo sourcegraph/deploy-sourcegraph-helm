@@ -48,6 +48,8 @@ spec:
             - name: APPLIANCE_DEPLOYMENT_NAME
               value: {{ include "sourcegraph-appliance.name" . }},sourcegraph-appliance-frontend
             {{- end }}
+            - name: APPLIANCE_DEFAULT_IMAGE_REPOSITORY
+              value: {{ .Values.image.repository | quote }}
             {{- if .Values.noResourceRestrictions }}
             - name: APPLIANCE_NO_RESOURCE_RESTRICTIONS
               value: "true"
