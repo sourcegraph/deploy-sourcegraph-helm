@@ -55,12 +55,13 @@ spec:
         livenessProbe:
           initialDelaySeconds: 60
           periodSeconds: 30
-          failureThreshold: 2
+          failureThreshold: 5
           timeoutSeconds: 5
           tcpSocket:
             port: redis
         readinessProbe:
           initialDelaySeconds: 10
+          failureThreshold: 5
           timeoutSeconds: 5
           exec:
             command:
