@@ -119,3 +119,7 @@ frontend:
 
 selfUpdate:
   enabled: true
+
+# Set to true to remove all resource requests and limits from the deployed SG.
+# Only recommended for development use.
+noResourceRestrictions: false
