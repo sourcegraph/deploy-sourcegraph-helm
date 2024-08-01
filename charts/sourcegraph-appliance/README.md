@@ -30,12 +30,12 @@ In addition to the documented values, all services also support the following va
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | frontend.image.image | string | `"appliance-frontend"` |  |
-| frontend.image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
+| frontend.image.tag | string | `"5.5.3738"` |  |
 | fullnameOverride | string | `""` |  |
 | image.image | string | `"appliance"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"index.docker.io/sourcegraph"` |  |
-| image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
+| image.tag | string | `"5.5.3738"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
