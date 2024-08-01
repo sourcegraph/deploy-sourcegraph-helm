@@ -8,7 +8,7 @@ image:
   image: appliance
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "{{ .Chart.AppVersion }}"
+  tag: &version "5.5.3738"
   # Version and Tag (above) are subtley different
   # Tag is the docker container tag
   # Version is the internal version number as understood by appliance
@@ -115,7 +115,7 @@ frontend:
   image:
     image: appliance-frontend
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "{{ .Chart.AppVersion }}"
+    tag: *version
 
 selfUpdate:
   enabled: true
