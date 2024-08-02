@@ -797,6 +797,46 @@ postgresExporter:
       cpu: 10m
       memory: 50Mi
 
+syntacticCodeIntel:
+  # -- Environment variables for the `precise-code-intel-worker` container
+  env:
+    NUM_WORKERS:
+      value: "1"
+  image:
+    # -- Docker image tag for the `precise-code-intel-worker` image
+    defaultTag: 5.3.2@sha256:6142093097f5757afe772cffd131c1be54bb77335232011254733f51ffb2d6c6
+    # -- Docker image name for the `precise-code-intel-worker` image
+    name: "syntactic-code-intel-worker"
+  # -- Security context for the `precise-code-intel-worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  # -- Name used by resources. Does not affect service names or PVCs.
+  name: "syntactic-code-intel-worker"
+  # -- Security context for the `precise-code-intel-worker` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Number of `precise-code-intel-worker` pod
+  replicaCount: 2
+  # -- Resource requests & limits for the `precise-code-intel-worker` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `precise-code-intel-worker`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
+
+
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container
   env:
