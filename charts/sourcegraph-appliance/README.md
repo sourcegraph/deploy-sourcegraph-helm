@@ -6,7 +6,17 @@
 # Sourcegraph Appliance Helm Chart
 
 Install this chart through Helm:
-`helm upgrade --install ./charts/sourcegraph-appliance/ --namespace sourcegraph-appliance`
+
+    kubectl create namespace $NAMESPACE
+    kubectl --namespace $NAMESPACE create secret generic appliance-password \
+      --from-literal password=$MY_PASSWORD
+
+    helm repo add sourcegraph https://helm.sourcegraph.com/release
+    helm --namespace $NAMESPACE install appliance sourcegraph/sourcegraph-appliance
+
+To run from source (from this repo):
+
+    helm upgrade --install ./charts/sourcegraph-appliance/ --namespace sourcegraph-appliance
 
 ## Configuration Options
 
@@ -30,12 +40,12 @@ In addition to the documented values, all services also support the following va
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | frontend.image.image | string | `"appliance-frontend"` |  |
-| frontend.image.tag | string | `"5.5.3738"` |  |
+| frontend.image.tag | string | `"5.5.3956"` |  |
 | fullnameOverride | string | `""` |  |
 | image.image | string | `"appliance"` |  |
 | image.pullPolicy | string | `"IfNotPresent"` |  |
 | image.repository | string | `"index.docker.io/sourcegraph"` |  |
-| image.tag | string | `"5.5.3738"` |  |
+| image.tag | string | `"5.5.3956"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
