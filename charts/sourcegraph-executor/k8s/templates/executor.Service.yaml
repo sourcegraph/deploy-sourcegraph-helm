@@ -1,9 +1,13 @@
 apiVersion: v1
 kind: Service
 metadata:
+  {{- if or .Values.executor.serviceMetricsEnabled .Values.executor.serviceAnnotations }}
   annotations:
+  {{- end }}
+    {{- if .Values.executor.serviceMetricsEnabled }}
     prometheus.io/port: "6060"
     sourcegraph.prometheus/scrape: "true"
+    {{- end }}
     {{- if .Values.executor.serviceAnnotations }}
     {{- toYaml .Values.executor.serviceAnnotations | nindent 4 }}
     {{- end }}
