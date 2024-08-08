@@ -85,7 +85,7 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 3188
+        - containerPort: 3288
           name: http
         - containerPort: 6060
           name: debug
