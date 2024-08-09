@@ -18,7 +18,7 @@ metadata:
 spec:
   ports:
   - name: http
-    port: 3288
+    port: 3188
     targetPort: http
   - name: debug
     port: 6060
