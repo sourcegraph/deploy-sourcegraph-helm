@@ -1,3 +1,4 @@
+{{- if .Values.syntacticCodeIntel.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -122,3 +123,4 @@ spec:
       {{- if .Values.syntacticCodeIntel.extraVolumes }}
       {{- toYaml .Values.syntacticCodeIntel.extraVolumes | nindent 6 }}
       {{- end }}
+{{- end }}

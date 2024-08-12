@@ -1,3 +1,4 @@
+{{- if .Values.syntacticCodeIntel.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
@@ -27,3 +28,4 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: syntactic-code-intel-worker
   type: {{ .Values.syntacticCodeIntel.serviceType | default "ClusterIP" }}
+{{- end }}
