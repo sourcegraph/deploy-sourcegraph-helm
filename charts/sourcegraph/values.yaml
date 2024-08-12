@@ -798,6 +798,7 @@ postgresExporter:
       memory: 50Mi
 
 syntacticCodeIntel:
+  enabled: false
   properties:
     # -- port to whick worker API will bind
     workerPort: 3188
