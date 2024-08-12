@@ -798,10 +798,9 @@ postgresExporter:
       memory: 50Mi
 
 syntacticCodeIntel:
-  # -- Environment variables for the `syntactic-code-intel-worker` container
-  env:
-    NUM_WORKERS:
-      value: "1"
+  properties:
+    # -- port to whick worker API will bind
+    workerPort: 3188
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
     defaultTag: 5.3.2@sha256:ce2181fe845e359e5a1d603dd7d7d4f17bfd73d382a9a5e52149e19c0cc2fdfe
