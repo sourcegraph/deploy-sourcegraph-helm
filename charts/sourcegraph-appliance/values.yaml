@@ -92,19 +92,6 @@ readinessProbe:
     path: /
     port: http
 
-# Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
-
 nodeSelector: {}
 
 tolerations: []
@@ -123,3 +110,6 @@ selfUpdate:
 # Set to true to remove all resource requests and limits from the deployed SG.
 # Only recommended for development use.
 noResourceRestrictions: false
+
+airgap:
+  enabled: false
