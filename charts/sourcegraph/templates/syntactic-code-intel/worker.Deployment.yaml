@@ -62,8 +62,8 @@ spec:
           value: blobstore
         - name: SYNTACTIC_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
-        - name: SYNTACTIC_CODE_INTEL_WORKER_PORT
-          value: "{{ .Values.syntacticCodeIntel.properties.workerPort }}"
+        - name: SYNTACTIC_CODE_INTEL_WORKER_ADDR
+          value: ":{{ .Values.syntacticCodeIntel.properties.workerPort }}"
         {{- end }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "syntacticCodeIntel") }}
