@@ -1,0 +1,31 @@
+{{- if .Values.syntacticCodeIntel.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.syntacticCodeIntel.serviceAnnotations }}
+    {{- toYaml .Values.syntacticCodeIntel.serviceAnnotations | nindent 4 }}
+    {{- end }}
+  labels:
+    app: syntactic-code-intel-worker
+    deploy: sourcegraph
+    app.kubernetes.io/component: syntactic-code-intel
+    {{- if .Values.syntacticCodeIntel.serviceLabels }}
+      {{- toYaml .Values.syntacticCodeIntel.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: syntactic-code-intel-worker
+spec:
+  ports:
+  - name: http
+    port: {{ .Values.syntacticCodeIntel.properties.workerPort }}
+    targetPort: http
+  - name: debug
+    port: 6060
+    targetPort: debug
+  selector:
+    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    app: syntactic-code-intel-worker
+  type: {{ .Values.syntacticCodeIntel.serviceType | default "ClusterIP" }}
+{{- end }}
