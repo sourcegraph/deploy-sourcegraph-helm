@@ -29,6 +29,7 @@ In addition to the documented values, all services also support the following va
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
+| airgap.enabled | bool | `false` |  |
 | frontend.image.image | string | `"appliance-frontend"` |  |
 | frontend.image.tag | string | `"5.5.3738"` |  |
 | fullnameOverride | string | `""` |  |
@@ -66,5 +67,3 @@ In addition to the documented values, all services also support the following va
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `"sourcegraph-appliance"` |  |
 | tolerations | list | `[]` |  |
-| volumeMounts | list | `[]` |  |
-| volumes | list | `[]` |  |

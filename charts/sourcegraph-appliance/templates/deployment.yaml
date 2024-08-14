@@ -52,19 +52,29 @@ spec:
             - name: APPLIANCE_NO_RESOURCE_RESTRICTIONS
               value: "true"
             {{- end }}
+            {{- if .Values.airgap.enabled }}
+            - name: APPLIANCE_PINNED_RELEASES_FILE
+              value: /etc/releases/releases.json
+            {{- end }}
           ports:
             - name: http
               containerPort: 8888
               protocol: TCP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          {{- with .Values.volumeMounts }}
+          {{- if .Values.airgap.enabled }}
           volumeMounts:
-            {{- toYaml . | nindent 12 }}
+            - name: releases
+              mountPath: /etc/releases
           {{- end }}
-      {{- with .Values.volumes }}
+      {{- if .Values.airgap.enabled }}
       volumes:
-        {{- toYaml . | nindent 8 }}
+        - name: releases
+          configMap:
+            name: pinned-releases
+            items:
+              - key: releases.json
+                path: releases.json
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
