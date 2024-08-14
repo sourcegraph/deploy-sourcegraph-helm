@@ -8,9 +8,81 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 5.6.185
+
+- Sourcegraph 5.6.185 is now available
+
+## 5.6.0
+
+- Sourcegraph 5.6.0 is now available
+
+## 5.5.3956
+
+- Sourcegraph 5.5.3956 is now available
+
+## 5.5.3738
+
+- Sourcegraph 5.5.3738 is now available
+
+## 5.5.2463
+
+- Sourcegraph 5.5.2463 is now available
+
+## 5.5.1337
+
+- Sourcegraph 5.5.1337 is now available
+
+## 5.5.1220
+
+- Sourcegraph 5.5.1220 is now available
+
+## 5.5.160
+
+- Sourcegraph 5.5.160 is now available
+
+## 5.5.0
+
+- Sourcegraph 5.5.0 is now available
+
+## 5.4.7765
+
+- Sourcegraph 5.4.7765 is now available
+
 - Updated redis readiness check to fix NOAUTH on password'd redis servers #458, #471
 - Removed qdrant from deployment #459
 - Add `.Values.postgresExporter.containerSecurityContext` to `codeintel-db` and `codensights-db`
+
+## 5.4.5099
+
+- Sourcegraph 5.4.5099 is now available
+
+## 5.4.3643
+
+- Sourcegraph 5.4.3643 is now available
+
+## 5.4.3500
+
+- Sourcegraph 5.4.3500 is now available
+
+## 5.4.2198
+
+- Sourcegraph 5.4.2198 is now available
+
+## 5.4.0
+
+- Sourcegraph 5.4.0 is now available
+
+## 5.3.12303
+
+- Sourcegraph 5.3.12303 is now available
+
+## 5.3.11625
+
+- Sourcegraph 5.3.11625 is now available
+
+## 5.3.9104
+
+- Sourcegraph 5.3.9014 is now available
 
 ## 5.3.3
 
