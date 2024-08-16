@@ -22,7 +22,7 @@ spec:
         {{- end }}
         app: sourcegraph-appliance
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -33,13 +33,13 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}/{{ .Values.image.image}}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.sourcegraph.image.repository }}/{{ .Values.backend.image.name}}:{{ .Values.backend.image.defaultTag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
             - name: SRC_LOG_LEVEL
-              value: {{ default "info" .Values.image.log_level }}
+              value: {{ default "info" .Values.sourcegraph.image.log_level }}
             - name: APPLIANCE_VERSION
-              value: "{{ .Values.image.version | default .Chart.AppVersion }}"
+              value: "{{ .Values.sourcegraph.image.version | default .Chart.AppVersion }}"
             - name: APPLIANCE_NAMESPACE
               valueFrom:
                 fieldRef:
