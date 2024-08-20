@@ -30,13 +30,11 @@ In addition to the documented values, all services also support the following va
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | airgap.enabled | bool | `false` |  |
-| frontend.image.image | string | `"appliance-frontend"` |  |
-| frontend.image.tag | string | `"5.5.3738"` |  |
+| backend.image.defaultTag | string | `"5.6.0@sha256:ace022ecd58fdbca9a51b4100afacd19ecf2afca5dbe62ccb087c66639fb130f"` |  |
+| backend.image.name | string | `"appliance"` |  |
+| frontend.image.defaultTag | string | `"5.6.0@sha256:812c91b6551bab5894fa2cd9c35ff636652d00c7272841d67310d440543cafbe"` |  |
+| frontend.image.name | string | `"appliance-frontend"` |  |
 | fullnameOverride | string | `""` |  |
-| image.image | string | `"appliance"` |  |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"index.docker.io/sourcegraph"` |  |
-| image.tag | string | `"5.5.3738"` |  |
 | imagePullSecrets | list | `[]` |  |
 | ingress.annotations | object | `{}` |  |
 | ingress.className | string | `""` |  |
@@ -66,4 +64,6 @@ In addition to the documented values, all services also support the following va
 | serviceAccount.automount | bool | `true` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `"sourcegraph-appliance"` |  |
+| sourcegraph.image.pullPolicy | string | `"IfNotPresent"` |  |
+| sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` |  |
 | tolerations | list | `[]` |  |

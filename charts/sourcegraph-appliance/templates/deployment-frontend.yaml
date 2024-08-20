@@ -26,7 +26,7 @@ spec:
         {{- end }}
         app: sourcegraph-appliance-frontend
     spec:
-      {{- with .Values.imagePullSecrets }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -37,8 +37,8 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}/{{ .Values.frontend.image.image }}:{{ .Values.frontend.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: "{{ .Values.sourcegraph.image.repository }}/{{ .Values.frontend.image.name }}:{{ .Values.frontend.image.defaultTag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
             - name: API_ENDPOINT
               value: http://sourcegraph-appliance-backend:8080
