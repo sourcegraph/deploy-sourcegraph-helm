@@ -1,1 +1,7 @@
 target/*
+
+# MacOS system files
+.DS_Store
+
+# Jetbrains
+.idea/
