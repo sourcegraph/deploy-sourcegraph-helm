@@ -37,7 +37,7 @@ In addition to the documented values, all services also support the following va
 | image.repository | string | `"index.docker.io/sourcegraph"` |  |
 | image.tag | string | `"{{ .Chart.AppVersion }}"` |  |
 | imagePullSecrets | list | `[]` |  |
-| ingress.annotations | object | `{}` |  |
+| ingress.annotations."kubernetes.io/ingress.class" | string | `"alb"` |  |
 | ingress.className | string | `""` |  |
 | ingress.enabled | bool | `false` |  |
 | ingress.hosts[0].host | string | `"chart-example.local"` |  |
