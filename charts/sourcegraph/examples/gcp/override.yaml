@@ -69,6 +69,11 @@ preciseCodeIntel:
     SRC_LOG_FORMAT: 
       value: json_gcp
 
+syntacticCodeIntel:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
 repoUpdater:
   env:
     SRC_LOG_FORMAT: 

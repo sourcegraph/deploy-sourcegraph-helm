@@ -800,7 +800,7 @@ postgresExporter:
 syntacticCodeIntel:
   enabled: false
   properties:
-    # -- port to whick worker API will bind
+    # -- port to which worker API will bind
     workerPort: 3188
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
