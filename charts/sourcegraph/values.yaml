@@ -645,6 +645,10 @@ openTelemetry:
       create: false
       # -- Name of the ServiceAccount to be created or an existing ServiceAccount
       name: ""
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsUser: 100
+      runAsGroup: 101
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
@@ -667,6 +671,10 @@ openTelemetry:
       create: false
       # -- Name of the ServiceAccount to be created or an existing ServiceAccount
       name: ""
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      runAsUser: 100
+      runAsGroup: 101
 
 nodeExporter:
   # -- Enable `node-exporter`
