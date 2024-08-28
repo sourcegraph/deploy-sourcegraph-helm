@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Updated OpenTelemetry collector and agent images to run as non-root users [#543](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/543)
+
 ## 5.6.185
 
 - Sourcegraph 5.6.185 is now available
