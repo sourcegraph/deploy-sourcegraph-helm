@@ -157,7 +157,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearchIndexer.image.defaultTag | string | `"5.6.185@sha256:d9882354fa07f5168ae981cd80776c9b13048502bc63a3ea217a7abdff49149a"` | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
-| jaeger.args | list | `["--memory.max-traces=20000","--sampling.strategies-file=/etc/jaeger/sampling_strategies.json","--collector.otlp.enabled"]` | Default args passed to the `jaeger` binary |
+| jaeger.args | list | `["--memory.max-traces=20000","--sampling.strategies-file=/etc/jaeger/sampling_strategies.json","--collector.otlp.enabled","--collector.otlp.grpc.host-port=:4320","--collector.otlp.http.host-port=:4321"]` | Default args passed to the `jaeger` binary |
 | jaeger.collector.name | string | `""` | Name of jaeger `collector` service |
 | jaeger.collector.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `collector` service |
 | jaeger.collector.serviceLabels | object | `{}` | Add extra labels to jaeger `collector` service |
