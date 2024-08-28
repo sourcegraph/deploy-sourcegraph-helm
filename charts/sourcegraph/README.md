@@ -194,6 +194,9 @@ In addition to the documented values, all services also support the following va
 | nodeExporter.resources | object | `{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":".2","memory":"100Mi"}}` | Resource requests & limits for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nodeExporter.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `node-exporter` |
 | nodeExporter.serviceAccount.name | string | `"node-exporter"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| openTelemetry.agent.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| openTelemetry.agent.containerSecurityContext.runAsGroup | int | `101` |  |
+| openTelemetry.agent.containerSecurityContext.runAsUser | int | `100` |  |
 | openTelemetry.agent.hostPorts | object | `{"otlpGrpc":4317,"otlpHttp":4318,"zpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
 | openTelemetry.agent.resources.limits.cpu | string | `"500m"` |  |
@@ -206,6 +209,9 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to. Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
 | openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
+| openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
+| openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
 | openTelemetry.gateway.resources | object | `{"limits":{"cpu":"3","memory":"3Gi"},"requests":{"cpu":"1","memory":"1Gi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.gateway.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-collector` |
