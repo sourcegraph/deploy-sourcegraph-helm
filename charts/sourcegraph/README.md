@@ -90,19 +90,6 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
-| embeddings.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| embeddings.enabled | bool | `false` | Enable `embeddings` |
-| embeddings.env | object | `{}` | Environment variables for the `embeddings` container |
-| embeddings.extraVolumeMounts | object | `{}` |  |
-| embeddings.extraVolumes | object | `{}` |  |
-| embeddings.image.defaultTag | string | `"5.6.185@sha256:39b1607ba71da47cfe85f55026b7435654de324477bed5da112b39ab2ac1314b"` | Docker image tag for the `embeddings` image |
-| embeddings.image.name | string | `"embeddings"` | Docker image name for the `embeddings` image |
-| embeddings.name | string | `"embeddings"` | Name of the `embeddings` service |
-| embeddings.podSecurityContext | object | `{}` | Security context for the `embeddings` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| embeddings.resources | object | `{"limits":{"cpu":"8","memory":"64G"},"requests":{"cpu":"4","memory":"32G"}}` | Resource requests & limits for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| embeddings.serviceAccount.annotations | object | `{}` |  |
-| embeddings.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `embeddings` |
-| embeddings.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
