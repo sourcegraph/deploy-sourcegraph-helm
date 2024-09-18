@@ -56,6 +56,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
         ports:
         - containerPort: 3370
           name: http
