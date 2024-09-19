@@ -20,4 +20,3 @@ spec:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: {{ include "executor.name" . }}
   type: {{ .Values.executor.serviceType | default "ClusterIP" }}
-
