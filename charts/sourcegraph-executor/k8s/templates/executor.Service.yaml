@@ -2,8 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/port: "6060"
-    sourcegraph.prometheus/scrape: "true"
     {{- if .Values.executor.serviceAnnotations }}
     {{- toYaml .Values.executor.serviceAnnotations | nindent 4 }}
     {{- end }}
@@ -21,4 +19,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: {{ include "executor.name" . }}
-  type: {{ .Values.executor.serviceType | default "ClusterIP" }}
+  type: {{ .Values.executor.serviceType | default "ClusterIP" }}  type: {{ .Values.executor.serviceType | default "ClusterIP" }}
