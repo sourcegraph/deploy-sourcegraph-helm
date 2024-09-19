@@ -5,7 +5,7 @@ replicaCount: 1
 
 sourcegraph:
   image:
-    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+    repository: index.docker.io/sourcegraph
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
   # Version and Tag (above) are subtley different
@@ -20,7 +20,7 @@ sourcegraph:
 backend:
   image:
     name: appliance
-    defaultTag: "5.7.2474@sha256:99cf6106ba47638fa7025f2617b6934a8bdc343171dac18865d4b566e65794aa"
+    defaultTag: "5.7.2474@sha256:12d5be024316bdecb0069d654b84e16194f8094ac3925e15fb7a729b3f580ea7"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -107,7 +107,7 @@ frontend:
   image:
     name: appliance-frontend
     # Overrides the image tag whose default is the chart appVersion.
-    defaultTag: "5.7.2474@sha256:aa32f5756e698121c3dc480728aa273d5e9d18111ee17aebe9c9876187ee45e5"
+    defaultTag: "5.7.2474@sha256:2d99136ebf9db9f7ee5b78e48f6c6746e3a1dc19bbd5034fc78c60499cff33fb"
 
 selfUpdate:
   enabled: true
