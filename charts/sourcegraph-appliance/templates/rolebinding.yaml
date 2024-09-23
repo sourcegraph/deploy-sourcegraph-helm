@@ -8,7 +8,7 @@ metadata:
     app.kubernetes.io/component: sourcegraph-appliance
 subjects:
   - kind: ServiceAccount
-    name: {{ include "sourcegraph-appliance.serviceAccountName" . }}
+    name: {{ .Values.serviceAccount.name }} 
 roleRef:
   kind: Role
   name: sg-appliance-role

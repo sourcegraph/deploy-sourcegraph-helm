@@ -2,8 +2,6 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    prometheus.io/port: "6060"
-    sourcegraph.prometheus/scrape: "true"
     {{- if .Values.service.serviceAnnotations }}
     {{- toYaml .Values.service.serviceAnnotations | nindent 4 }}
     {{- end }}
@@ -14,12 +12,12 @@ metadata:
     {{- if .Values.service.serviceLabels }}
       {{- toYaml .Values.service.serviceLabels | nindent 4 }}
     {{- end }}
-  name: sourcegraph-frontend
+  name: sourcegraph-appliance-backend
 spec:
   ports:
   - name: http
-    port: 30080
+    port: 8080
     targetPort: http
   selector:
-    app: sourcegraph-appliance-frontend
+    app: sourcegraph-appliance
   type: {{ .Values.service.serviceType | default "ClusterIP" }}

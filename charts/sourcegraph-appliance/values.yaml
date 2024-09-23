@@ -1,15 +1,13 @@
 # Default values for sourcegraph-appliance.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-
 replicaCount: 1
 
-image:
-  repository: index.docker.io/sourcegraph
-  image: appliance
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: "{{ .Chart.AppVersion }}"
+sourcegraph:
+  image:
+    repository: index.docker.io/sourcegraph
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
   # Version and Tag (above) are subtley different
   # Tag is the docker container tag
   # Version is the internal version number as understood by appliance
@@ -17,6 +15,12 @@ image:
   # But for dev version we would need to specify it, since 0.0.0+dev is the default when built locally
   # version: 5.4.7765
   # log_level: debug
+
+
+backend:
+  image:
+    name: appliance
+    defaultTag: "5.7.2474@sha256:12d5be024316bdecb0069d654b84e16194f8094ac3925e15fb7a729b3f580ea7"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -31,15 +35,17 @@ serviceAccount:
   annotations: {}
   # The name of the service account to use.
   # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  name: "sourcegraph-appliance"
 
 podAnnotations: {}
 podLabels: {}
 
-podSecurityContext: {}
+podSecurityContext:
+  {}
   # fsGroup: 2000
 
-securityContext: {}
+securityContext:
+  {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -53,9 +59,10 @@ service:
   port: 8080
 
 ingress:
-  enabled: false
+  enabled: true
   className: ""
-  annotations: {}
+  annotations:
+    {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
   hosts:
@@ -68,7 +75,8 @@ ingress:
   #    hosts:
   #      - chart-example.local
 
-resources: {}
+resources:
+  {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
   # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -89,21 +97,24 @@ readinessProbe:
     path: /
     port: http
 
-# Additional volumes on the output Deployment definition.
-volumes: []
-# - name: foo
-#   secret:
-#     secretName: mysecret
-#     optional: false
-
-# Additional volumeMounts on the output Deployment definition.
-volumeMounts: []
-# - name: foo
-#   mountPath: "/etc/foo"
-#   readOnly: true
-
 nodeSelector: {}
 
 tolerations: []
 
 affinity: {}
+
+frontend:
+  image:
+    name: appliance-frontend
+    # Overrides the image tag whose default is the chart appVersion.
+    defaultTag: "5.7.2474@sha256:2d99136ebf9db9f7ee5b78e48f6c6746e3a1dc19bbd5034fc78c60499cff33fb"
+
+selfUpdate:
+  enabled: true
+
+# Set to true to remove all resource requests and limits from the deployed SG.
+# Only recommended for development use.
+noResourceRestrictions: false
+
+airgap:
+  enabled: false
