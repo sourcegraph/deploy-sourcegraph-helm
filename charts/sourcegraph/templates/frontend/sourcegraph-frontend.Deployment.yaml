@@ -84,13 +84,13 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
+        {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
+        {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
         {{- range $name, $item := .Values.frontend.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
-        {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
-        {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         {{- if .Values.blobstore.enabled }}
