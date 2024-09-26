@@ -1,5 +1,4 @@
 grafana:
-
   env:
     PGHOST:
       value: pgsql
@@ -13,12 +12,10 @@ grafana:
       value: password
     PGSSLMODE:
       value: disable
-
   extraVolumeMounts:
   - name: grafana-pgsql-volume-mount
     mountPath: /sg_config_grafana/provisioning/datasources/datasources-pgsql.yml
     subPath: datasources-pgsql.yml
-
   extraVolumes:
   - name: grafana-pgsql-volume
     configMap:
