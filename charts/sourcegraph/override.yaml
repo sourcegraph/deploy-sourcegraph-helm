@@ -1,0 +1,17 @@
+grafana:
+
+  env:
+    {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG_") | nindent 8 }}
+    - PG_SSL_MODE:
+      value: 'disabled'
+
+  extraVolumeMounts:
+  - name: grafana-pgsql-volume-mount
+    mountPath: /sg_config_grafana/provisioning/datasources/datasources-pgsql.yml
+    subPath: datasources-pgsql.yml
+
+  extraVolumes:
+  - name: grafana-pgsql-volume
+    configMap:
+      defaultMode: 0777
+      name: grafana-pgsql-configmap

@@ -1,0 +1,22 @@
+apiVersion: v1
+data:
+  datasources-pgsql.yml: |
+    apiVersion: 1
+
+    datasources:
+      - name: $PG_DATABASE
+        type: postgres
+        url: $PG_HOST:$PG_PORT
+        user: $PG_USER
+        database: $PG_DATABASE
+        secureJsonData:
+          password: $PG_PASSWORD
+        jsonData:
+          sslmode: $PG_SSL_MODE
+
+kind: ConfigMap
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: grafana
+  name: grafana-pgsql-configmap
