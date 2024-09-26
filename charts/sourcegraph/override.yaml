@@ -7,9 +7,9 @@ grafana:
       value: 5432
     PG_DATABASE:
       value: sg
-    PG_GRAFANA_USER:
+    PG_USER:
       value: sg
-    PG_GRAFANA_PASSWORD:
+    PG_PASSWORD:
       value: password
     PG_SSL_MODE:
       value: disable
