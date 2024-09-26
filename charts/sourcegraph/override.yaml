@@ -1,8 +1,18 @@
 grafana:
 
   env:
-  - PG_SSL_MODE:
-      value: 'disabled'
+    PG_HOST:
+      value: pgsql
+    PG_PORT:
+      value: 5432
+    PG_DATABASE:
+      value: sg
+    PG_GRAFANA_USER:
+      value: sg
+    PG_GRAFANA_PASSWORD:
+      value: password
+    PG_SSL_MODE:
+      value: disable
 
   extraVolumeMounts:
   - name: grafana-pgsql-volume-mount
