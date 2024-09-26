@@ -1,7 +1,6 @@
 grafana:
 
   env:
-  {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG_") | nindent 8 }}
   - name: PG_SSL_MODE
     value: 'disabled'
 
