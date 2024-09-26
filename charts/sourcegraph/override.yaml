@@ -2,7 +2,7 @@ grafana:
 
   env:
   {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG_") | nindent 8 }}
-  - PG_SSL_MODE:
+  - name: PG_SSL_MODE
     value: 'disabled'
 
   extraVolumeMounts:
