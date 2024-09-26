@@ -4,7 +4,7 @@ grafana:
     PGHOST:
       value: pgsql
     PGPORT:
-      value: 5432
+      value: '5432'
     PGDATABASE:
       value: sg
     PGUSER:
