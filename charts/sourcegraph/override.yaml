@@ -1,17 +1,17 @@
 grafana:
 
   env:
-    PG_HOST:
+    PGHOST:
       value: pgsql
-    PG_PORT:
+    PGPORT:
       value: 5432
-    PG_DATABASE:
+    PGDATABASE:
       value: sg
-    PG_USER:
+    PGUSER:
       value: sg
-    PG_PASSWORD:
+    PGPASSWORD:
       value: password
-    PG_SSL_MODE:
+    PGSSLMODE:
       value: disable
 
   extraVolumeMounts:

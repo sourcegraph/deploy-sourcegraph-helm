@@ -4,15 +4,15 @@ data:
     apiVersion: 1
 
     datasources:
-      - name: $PG_DATABASE
+      - name: $PGDATABASE
         type: postgres
-        url: $PG_HOST:$PG_PORT
-        user: $PG_USER
-        database: $PG_DATABASE
+        url: $PGHOST:$PGPORT
+        user: $PGUSER
+        database: $PGDATABASE
         secureJsonData:
-          password: $PG_PASSWORD
+          password: $PGPASSWORD
         jsonData:
-          sslmode: $PG_SSL_MODE
+          sslmode: $PGSSLMODE
 
 kind: ConfigMap
 metadata:
