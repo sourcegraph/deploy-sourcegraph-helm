@@ -22,5 +22,5 @@ grafana:
       name: grafana-datasources-pgsql-configmap
       defaultMode: 0777
       items:
-       - key: datasources-pgsql.yml
-         path: datasources-pgsql.yml
+      - key: datasources-pgsql.yml
+        path: datasources-pgsql.yml
