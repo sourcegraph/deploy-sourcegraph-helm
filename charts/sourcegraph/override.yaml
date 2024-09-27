@@ -13,11 +13,11 @@ grafana:
     PGSSLMODE:
       value: disable
   extraVolumeMounts:
-  - name: grafana-pgsql-volume-mount
+  - name: grafana-datasources-pgsql
     mountPath: /sg_config_grafana/provisioning/datasources/datasources-pgsql.yml
     subPath: datasources-pgsql.yml
   extraVolumes:
-  - name: grafana-pgsql-volume
+  - name: grafana-datasources-pgsql
     configMap:
       defaultMode: 0777
-      name: grafana-pgsql-configmap
+      name: grafana-datasources-pgsql
