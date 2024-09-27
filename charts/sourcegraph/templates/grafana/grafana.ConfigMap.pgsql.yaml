@@ -8,8 +8,6 @@ metadata:
 data:
   grafana-datasources-pgsql.yml: |
     apiVersion: 1
-    deleteDatasources:
-    - name: pgsql
     datasources:
     - name: pgsql
       type: postgres
