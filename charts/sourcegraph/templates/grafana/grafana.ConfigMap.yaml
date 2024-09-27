@@ -11,7 +11,6 @@ data:
       type: prometheus
       access: proxy
       url: http://prometheus:30090
-      isDefault: true
       editable: false
     - name: Jaeger
       type: Jaeger
