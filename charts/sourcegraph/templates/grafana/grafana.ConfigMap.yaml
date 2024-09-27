@@ -3,7 +3,9 @@ apiVersion: v1
 data:
   datasources.yml: |
     apiVersion: 1
-
+    deleteDatasources:
+      - name: Prometheus
+      - name: Jaeger
     datasources:
     - name: Prometheus
       type: prometheus
