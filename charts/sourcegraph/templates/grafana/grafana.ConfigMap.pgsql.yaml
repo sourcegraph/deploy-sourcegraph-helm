@@ -6,14 +6,15 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
 data:
-  apiVersion: 1
-  datasources:
-    - name: pgsql
-      type: postgres
-      url: $PGHOST:$PGPORT
-      user: $PGUSER
-      database: $PGDATABASE
-      secureJsonData:
-        password: $PGPASSWORD
-      jsonData:
-        sslmode: $PGSSLMODE
+  grafana-datasources-pgsql.yml: |
+    apiVersion: 1
+    datasources:
+      - name: pgsql
+        type: postgres
+        url: $PGHOST:$PGPORT
+        user: $PGUSER
+        database: $PGDATABASE
+        secureJsonData:
+          password: $PGPASSWORD
+        jsonData:
+          sslmode: $PGSSLMODE
