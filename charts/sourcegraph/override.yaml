@@ -17,6 +17,9 @@ grafana:
     configMap:
       defaultMode: 0777
       name: grafana-datasources-pgsql
+      items:
+        - key: grafana-datasources-pgsql.yml
+          path: grafana-datasources-pgsql.yml
   extraVolumeMounts:
   - name: grafana-datasources-pgsql
     mountPath: /sg_config_grafana/provisioning/datasources/grafana-datasources-pgsql.yml
