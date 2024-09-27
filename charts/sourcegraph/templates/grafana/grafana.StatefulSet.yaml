@@ -62,7 +62,8 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/grafana
           name: grafana-data
-        - mountPath: /sg_config_grafana/provisioning/datasources
+        - mountPath: /sg_config_grafana/provisioning/datasources/datasources.yml
+          subPath: datasources.yml
           name: config
         # Grafana is relied upon to send alerts to site admins when something is wrong with
         # Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough

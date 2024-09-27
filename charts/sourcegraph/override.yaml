@@ -12,13 +12,12 @@ grafana:
       value: password
     PGSSLMODE:
       value: disable
-  existingConfig: grafana-datasources-pgsql
-  # extraVolumeMounts:
-  # - name: grafana-datasources-pgsql
-  #   mountPath: /sg_config_grafana/provisioning/datasources/grafana-datasources-pgsql.yml
-  #   subPath: grafana-datasources-pgsql.yml
-  # extraVolumes:
-  # - name: grafana-datasources-pgsql
-  #   configMap:
-  #     defaultMode: 0777
-  #     name: grafana-datasources-pgsql
+  extraVolumes:
+  - name: grafana-datasources-pgsql
+    configMap:
+      defaultMode: 0777
+      name: grafana-datasources-pgsql
+  extraVolumeMounts:
+  - name: grafana-datasources-pgsql
+    mountPath: /sg_config_grafana/provisioning/datasources/grafana-datasources-pgsql.yml
+    subPath: grafana-datasources-pgsql.yml
