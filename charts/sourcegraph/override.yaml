@@ -15,7 +15,7 @@ grafana:
   extraVolumeMounts:
   - name: grafana-datasources-pgsql
     mountPath: /sg_config_grafana/provisioning/datasources/grafana-datasources-pgsql.yml
-    subPath: grafana-datasources-pgsql.yml
+#    subPath: grafana-datasources-pgsql.yml
   extraVolumes:
   - name: grafana-datasources-pgsql
     configMap:
