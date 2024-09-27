@@ -22,4 +22,4 @@ grafana:
       name: grafana-datasources-pgsql
       items:
       - key: grafana-datasources-pgsql.yml
-#        path: grafana-datasources-pgsql.yml
+        path: grafana-datasources-pgsql.yml
