@@ -19,4 +19,4 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
-  name: grafana-datasources-pgsql
+  name: grafana-datasources-pgsql-configmap
