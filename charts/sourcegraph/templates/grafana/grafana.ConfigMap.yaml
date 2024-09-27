@@ -12,7 +12,6 @@ data:
         editable: false
       - name: Jaeger
         type: Jaeger
-        isDefault: false
         access: proxy
         url: http://{{ default "jaeger-query" .Values.jaeger.query.name }}:16686/-/debug/jaeger
 kind: ConfigMap

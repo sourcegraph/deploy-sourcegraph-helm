@@ -14,7 +14,6 @@ data:
         url: $PGHOST:$PGPORT
         user: $PGUSER
         database: $PGDATABASE
-        isDefault: false
         secureJsonData:
           password: $PGPASSWORD
         jsonData:
