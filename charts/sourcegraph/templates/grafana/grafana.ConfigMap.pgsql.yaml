@@ -6,7 +6,7 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
 data:
-  datasources.yml: |
+  grafana-datasources-pgsql.yml: |
     apiVersion: 1
     datasources:
       - name: pgsql
