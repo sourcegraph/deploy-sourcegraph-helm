@@ -96,7 +96,7 @@ spec:
           defaultMode: 0777
           name: {{ default .Values.grafana.name .Values.grafana.existingConfig }}
       {{- if .Values.grafana.extraVolumes }}
-      {{- toYaml .Values.grafana.extraVolumes | nindent 6 }}
+      {{- toYaml .Values.grafana.extraVolumes | nindent 4 }}
       {{- end }}
   volumeClaimTemplates:
   - metadata:
