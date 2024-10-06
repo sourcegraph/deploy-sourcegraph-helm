@@ -17,9 +17,9 @@ metadata:
   name: repo-updater
 spec:
   ports:
-  - name: http
+  - name: grpc
     port: 3182
-    targetPort: http
+    targetPort: grpc
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: repo-updater
