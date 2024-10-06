@@ -1084,6 +1084,10 @@ searcher:
   # -- Size of the PVC for searcher pods to store cache data
   storageSize: 26Gi
 
+sgTestConnection:
+  # Run a connection test after instance startup, for CI/CD testing
+  enabled: false
+
 storageClass:
   # -- Enable creation of storageClass.
   # Disable if you have your own existing storage class
