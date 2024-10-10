@@ -1,0 +1,90 @@
+should not render initContainers when it is not set:
+  1: |
+    null
+should render initContainers when it is set:
+  1: |
+    affinity: null
+    containers:
+    - env:
+      - name: OTEL_AGENT_HOST
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://$(OTEL_AGENT_HOST):4317
+      - name: OPENTELEMETRY_DISABLED
+        value: "false"
+      image: index.docker.io/sourcegraph/indexed-searcher:4.4.2@sha256:013190418308b94521e072972ae2342c41f99144205f58d61f5dfeda29ac0f58
+      imagePullPolicy: IfNotPresent
+      name: zoekt-webserver
+      ports:
+      - containerPort: 6070
+        name: http
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /healthz
+          port: http
+          scheme: HTTP
+        periodSeconds: 5
+        timeoutSeconds: 5
+      resources:
+        limits:
+          cpu: "2"
+          memory: 4G
+        requests:
+          cpu: 500m
+          memory: 2G
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsGroup: 101
+        runAsUser: 100
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /data
+        name: data
+    - env:
+      - name: OTEL_AGENT_HOST
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
+      - name: OTEL_EXPORTER_OTLP_ENDPOINT
+        value: http://$(OTEL_AGENT_HOST):4317
+      - name: OPENTELEMETRY_DISABLED
+        value: "false"
+      image: index.docker.io/sourcegraph/search-indexer:4.4.2@sha256:7716a32597300f7dfb7e974465a3bd3c62fae3aa485b48d9aa9f79ea3348f87f
+      imagePullPolicy: IfNotPresent
+      name: zoekt-indexserver
+      ports:
+      - containerPort: 6072
+        name: index-http
+      resources:
+        limits:
+          cpu: "8"
+          memory: 8G
+        requests:
+          cpu: "4"
+          memory: 4G
+      securityContext:
+        allowPrivilegeEscalation: false
+        readOnlyRootFilesystem: true
+        runAsGroup: 101
+        runAsUser: 100
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /data
+        name: data
+    initContainers:
+    - command:
+      - echo
+      - hello
+      image: alpine
+      name: init
+    nodeSelector: null
+    securityContext:
+      fsGroup: 101
+      fsGroupChangePolicy: OnRootMismatch
+    tolerations: null
+    volumes:
+    - name: data
