@@ -15,6 +15,15 @@ data:
         type: Jaeger
         access: proxy
         url: http://{{ default "jaeger-query" .Values.jaeger.query.name }}:16686/-/debug/jaeger
+      - name: pgsql
+        type: postgres
+        url: $PGHOST:$PGPORT
+        user: $PGGRAFANAUSER
+        database: $PGDATABASE
+        secureJsonData:
+          password: $PGGRAFANAPASSWORD
+        jsonData:
+          sslmode: $PGSSLMODE
 kind: ConfigMap
 metadata:
   labels:
