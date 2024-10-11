@@ -3,6 +3,9 @@
 - [ ] Follow the [manual testing process](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/TEST.md)
 - [ ] Update [changelog](https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/CHANGELOG.md)
 - [ ] Update [Kubernetes update doc](https://docs.sourcegraph.com/admin/updates/kubernetes)
+- [ ] Ensure that any resource configuration changes are reflected in the
+      Appliance. Make changes to the relevant service in
+      https://github.com/sourcegraph/sourcegraph/tree/main/internal/appliance/reconciler.
 
 ### Test plan
 
