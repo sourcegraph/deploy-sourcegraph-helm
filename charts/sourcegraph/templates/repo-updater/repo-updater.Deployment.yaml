@@ -65,7 +65,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
         - containerPort: 3182
-          name: http
+          name: grpc
         - containerPort: 6060
           name: debug
         readinessProbe:
