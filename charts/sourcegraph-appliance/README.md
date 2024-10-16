@@ -30,9 +30,9 @@ In addition to the documented values, all services also support the following va
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | airgap.enabled | bool | `false` |  |
-| backend.image.defaultTag | string | `"5.7.2474@sha256:12d5be024316bdecb0069d654b84e16194f8094ac3925e15fb7a729b3f580ea7"` |  |
+| backend.image.defaultTag | string | `"5.8.1579@sha256:7bf3b184ff88b37884bfbd9fb4bfab4890d8eeb60986586f65801839bf28388c"` |  |
 | backend.image.name | string | `"appliance"` |  |
-| frontend.image.defaultTag | string | `"5.7.2474@sha256:2d99136ebf9db9f7ee5b78e48f6c6746e3a1dc19bbd5034fc78c60499cff33fb"` |  |
+| frontend.image.defaultTag | string | `"5.8.1579@sha256:bd2fa045025fb9a6dc905ff195871b67c3bc75b61c8847baca590af01ec350e0"` |  |
 | frontend.image.name | string | `"appliance-frontend"` |  |
 | fullnameOverride | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
@@ -65,5 +65,5 @@ In addition to the documented values, all services also support the following va
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `"sourcegraph-appliance"` |  |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` |  |
-| sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` |  |
+| sourcegraph.image.repository | string | `"us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal"` |  |
 | tolerations | list | `[]` |  |
