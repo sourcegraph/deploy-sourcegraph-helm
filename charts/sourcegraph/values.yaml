@@ -1086,7 +1086,8 @@ searcher:
 
 sgTestConnection:
   # Run a connection test after instance startup, for CI/CD testing
-  enabled: false
+  # Setting to true to not change default behaviour
+  enabled: true
 
 storageClass:
   # -- Enable creation of storageClass.
