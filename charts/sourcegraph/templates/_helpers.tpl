@@ -217,7 +217,6 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: sslmode
       name: {{ $secretName }}
-      optional: true
 {{- end }}
 {{- end }}
 
