@@ -424,6 +424,25 @@ gitserver:
 grafana:
   # -- Enable `grafana` dashboard (recommended)
   enabled: true
+  # -- Sourcegraph Internal - Enable grafana to query pgsql database
+  # -- NOTE: Create a separate user in the pgsql database with read-only perms on the minimum set of tables
+  auth:
+    # -- Name of existing secret to for Grafana to use to connect to the pgsql database
+    # The secret must contain the keys `user`, `password`, `database`, `host` and `port`.
+    # `auth.user`, `auth.password`, etc. are ignored if this is enabled
+    existingSecret: ""
+    # -- Sets postgres database name
+    database: ""
+    # -- Sets postgres host
+    host: ""
+    # -- Sets postgres username
+    user: ""
+    # -- Sets postgres password
+    password: ""
+    # -- Sets postgres port
+    port: ""
+    # -- Sets postgres sslmode
+    sslmode: ""
   # -- Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key.
   existingConfig: "" # Name of an existing configmap
   image:
