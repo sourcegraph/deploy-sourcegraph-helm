@@ -52,8 +52,8 @@ spec:
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
-        {{- range $name, $item := .Values.grafana.env}}
         {{- include "sourcegraph.databaseAuth" (list . "grafana" "GRAFANA_PGSQL_") | nindent 8 }}
+        {{- range $name, $item := .Values.grafana.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
