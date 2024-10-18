@@ -211,6 +211,12 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: user
       name: {{ $secretName }}
+- name: {{ printf "%sSSLMODE" $prefix }}
+  valueFrom:
+    secretKeyRef:
+      key: sslmode
+      name: {{ $secretName }}
+      optional: true
 {{- end }}
 
 {{- define "sourcegraph.dataSource" -}}
