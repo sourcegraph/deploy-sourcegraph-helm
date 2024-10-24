@@ -119,6 +119,14 @@ In addition to the documented values, all services also support the following va
 | gitserver.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.sshSecret | string | `""` | Name of existing Secret that contains SSH credentials to clone repositories. It usually contains keys, such as `id_rsa` (private key) and `known_hosts`. Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories) |
 | gitserver.storageSize | string | `"200Gi"` | PVC Storage Request for `gitserver` data volume |
+| grafana.auth | object | `{"database":"","existingSecret":"","host":"","password":"","port":"","sslmode":"","user":""}` | NOTE: Create a separate user in the pgsql database with read-only perms on the minimum set of tables |
+| grafana.auth.database | string | `""` | Sets postgres database name |
+| grafana.auth.existingSecret | string | `""` | Name of existing secret to for Grafana to use to connect to the pgsql database The secret must contain the keys `user`, `password`, `database`, `host` and `port`. `auth.user`, `auth.password`, etc. are ignored if this is enabled |
+| grafana.auth.host | string | `""` | Sets postgres host |
+| grafana.auth.password | string | `""` | Sets postgres password |
+| grafana.auth.port | string | `""` | Sets postgres port |
+| grafana.auth.sslmode | string | `""` | Sets postgres sslmode |
+| grafana.auth.user | string | `""` | Sets postgres username |
 | grafana.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | grafana.enabled | bool | `true` | Enable `grafana` dashboard (recommended) |
 | grafana.existingConfig | string | `""` | Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key. |
