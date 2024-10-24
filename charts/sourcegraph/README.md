@@ -5,7 +5,7 @@
 
 # Sourcegraph Helm Chart
 
-Visit the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm) for guidance on using this chart.
+Visit the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes) for guidance on using this chart.
 
 ## Configuration Options
 
