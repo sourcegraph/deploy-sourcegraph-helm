@@ -10,7 +10,7 @@ metadata:
 spec:
   containers:
     - name: wget
-      image: busybox
+      image: {{ include "sourcegraph.image" (list . "sgTestConnection") }}
       command: ['wget']
       args: ['sourcegraph-frontend:30080/']
   restartPolicy: Never

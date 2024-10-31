@@ -1088,6 +1088,11 @@ sgTestConnection:
   # Run a connection test after instance startup, for CI/CD testing
   # Setting to true to not change default behaviour
   enabled: true
+  image:
+    # -- Docker image tag for the sg-test-connection pod
+    defaultTag: ''
+    # -- Docker image name for the sg-test-connection pod
+    name: "busybox"
 
 storageClass:
   # -- Enable creation of storageClass.
