@@ -4,7 +4,7 @@ Thank you for installing {{ .Chart.Name }}.
 
 Your release is named {{ .Release.Name }}.
 
-To learn more about supported configuration, check out https://docs.sourcegraph.com/admin/install/kubernetes/helm.
+To learn more about supported configuration, check out https://sourcegraph.com/docs/admin/deploy/kubernetes#configuration.
 
 {{- "\n" }}
 
