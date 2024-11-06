@@ -61,7 +61,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password The name of the secret must match `executor.name`, i.e., the name of the helm release used to deploy the helm chart. The k8s Secret must contain the key `EXECUTOR_FRONTEND_PASSWORD` matching the site config `executors.accessToken` value. `executor.frontendPassword` is ignored if this is enabled. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if `executor.frontendExistingSecret`` is not configured. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
-| executor.image.defaultTag | string | `"5.8.1579@sha256:b76a8e107958b8c2f20be09d36b434c4631e52c8d1fedfbac2ed6a98147a45e3"` |  |
+| executor.image.defaultTag | string | `"5.9.347@sha256:f393592d65e5058fb265e281ca8acb8e9f2bddc8d91b48d28d78490515505797"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
 | executor.kubeconfigPath | string | `""` | The path to the kubeconfig file. If not specified, the in-cluster config is used. |
 | executor.kubernetesJob.deadline | string | `"1200"` | The number of seconds after which a Kubernetes job will be terminated. |
