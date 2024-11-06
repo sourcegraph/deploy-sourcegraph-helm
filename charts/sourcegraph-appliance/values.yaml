@@ -20,7 +20,7 @@ sourcegraph:
 backend:
   image:
     name: appliance
-    defaultTag: "5.7.2474@sha256:12d5be024316bdecb0069d654b84e16194f8094ac3925e15fb7a729b3f580ea7"
+    defaultTag: "5.9.347@sha256:e2508f9772418cf852607da224877af9d1e56e05eabee1314c53b4017645d4c5"
 
 imagePullSecrets: []
 nameOverride: ""
@@ -107,7 +107,7 @@ frontend:
   image:
     name: appliance-frontend
     # Overrides the image tag whose default is the chart appVersion.
-    defaultTag: "5.7.2474@sha256:2d99136ebf9db9f7ee5b78e48f6c6746e3a1dc19bbd5034fc78c60499cff33fb"
+    defaultTag: "5.9.347@sha256:1041328834c1ebec797373983d10566fd067c0850403bc5b6bd0f31e881b6334"
 
 selfUpdate:
   enabled: true
