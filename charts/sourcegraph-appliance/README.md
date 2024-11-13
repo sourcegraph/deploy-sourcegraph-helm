@@ -30,9 +30,9 @@ In addition to the documented values, all services also support the following va
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | airgap.enabled | bool | `false` |  |
-| backend.image.defaultTag | string | `"5.9.347@sha256:e2508f9772418cf852607da224877af9d1e56e05eabee1314c53b4017645d4c5"` |  |
+| backend.image.defaultTag | string | `"5.9.1590@sha256:07596aed59b0d9c85a0a57fecb3692e6d49b7c5d0ef3860888ae3e395da8d332"` |  |
 | backend.image.name | string | `"appliance"` |  |
-| frontend.image.defaultTag | string | `"5.9.347@sha256:1041328834c1ebec797373983d10566fd067c0850403bc5b6bd0f31e881b6334"` |  |
+| frontend.image.defaultTag | string | `"5.9.1590@sha256:0a8bdedf3daf1899a8e509e85262c4cd4c79aa3803ac28dc270391137b5c2862"` |  |
 | frontend.image.name | string | `"appliance-frontend"` |  |
 | fullnameOverride | string | `""` |  |
 | imagePullSecrets | list | `[]` |  |
