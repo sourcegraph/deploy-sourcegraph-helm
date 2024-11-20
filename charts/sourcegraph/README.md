@@ -355,6 +355,7 @@ In addition to the documented values, all services also support the following va
 | syntectServer.resources | object | `{"limits":{"cpu":"4","memory":"6G"},"requests":{"cpu":"250m","memory":"2G"}}` | Resource requests & limits for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntectServer.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntect-server` |
 | syntectServer.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| worker.blocklist | list | `[]` | List of jobs to block globally If replicas are configured, use this values to block jobs instead of manually setting WORKER_JOB_BLOCKLIST |
 | worker.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | worker.env | object | `{}` | Environment variables for the `worker` container |
 | worker.image.defaultTag | string | `"5.9.1590@sha256:b258021d297a7a562982a5606507d4e4ddb27ebe010f3fdbbda20ab7f0a9f4fc"` | Docker image tag for the `worker` image |

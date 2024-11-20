@@ -33,6 +33,9 @@ tests:
   template: worker/worker.Deployment.yaml
   set:
     worker:
+      blocklist:
+      - rogue-job-1
+      - rogue-job-2
       replicas:
       - jobs: ["job1", "job2"]
       - jobs: ["job3", "job4"]
@@ -47,7 +50,7 @@ tests:
       path: spec.template.spec.containers[0].env
       content:
         name: WORKER_JOB_BLOCKLIST
-        value: job1,job2,job3,job4
+        value: job1,job2,job3,job4,rogue-job-1,rogue-job-2
   - isEmpty:
       path: spec.selector.matchLabels.worker-replica
 - it: should have the correct worker-0 deployment
@@ -61,6 +64,9 @@ tests:
         requests:
           cpu: 500m
           memory: 2G
+      blocklist:
+      - rogue-job-1
+      - rogue-job-2
       replicas:
       - jobs: ["job1", "job2"]
       - jobs: ["job3", "job4"]
@@ -98,6 +104,9 @@ tests:
   template: worker/worker.Deployment.yaml
   set:
     worker:
+      blocklist:
+      - rogue-job-1
+      - rogue-job-2
       replicas:
       - jobs: ["job1", "job2"]
       - jobs: ["job3", "job4"]
