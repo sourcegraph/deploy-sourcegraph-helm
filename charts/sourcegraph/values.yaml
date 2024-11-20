@@ -1282,6 +1282,19 @@ worker:
   podSecurityContext: {}
   # -- Number of `worker` pod
   replicaCount: 1
+  # -- Scale worker horizontally by configuring additional replicas dedicated to specific jobs.
+  # for each replica, configure the dedicated jobs to run on this replica.
+  # learn more from https://sourcegraph.com/docs/admin/workers#3-split-jobs-and-scale-independently
+  replicas: []
+    # - jobs: []
+    #   resources:
+    #     limits:
+    #       cpu: "2"
+    #       memory: 4G
+    #     requests:
+    #       cpu: 500m
+    #       memory: 2G
+      
   # -- Resource requests & limits for the `worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:

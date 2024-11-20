@@ -1,0 +1,140 @@
+suite: worker
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render only the worker deployment when replicas are not set
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      replicas: []
+  asserts:
+  - hasDocuments:
+      count: 1
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_ALLOWLIST
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_BLOCKLIST
+- it: should render multiple worker deployment with replicas set
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      replicas:
+      - jobs: ["job1", "job2"]
+      - jobs: ["job3", "job4"]
+  asserts:
+  - hasDocuments:
+      count: 3
+- it: should have the correct env var in primary worker deployment
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      replicas:
+      - jobs: ["job1", "job2"]
+      - jobs: ["job3", "job4"]
+  documentIndex: 0
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_ALLOWLIST
+        value: all
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_BLOCKLIST
+        value: job1,job2,job3,job4
+  - isEmpty:
+      path: spec.selector.matchLabels.worker-replica
+- it: should have the correct worker-0 deployment
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      resources:
+        limits:
+          cpu: "2"
+          memory: 4G
+        requests:
+          cpu: 500m
+          memory: 2G
+      replicas:
+      - jobs: ["job1", "job2"]
+      - jobs: ["job3", "job4"]
+  documentIndex: 1
+  asserts:
+  - containsDocument:
+      kind: Deployment
+      apiVersion: apps/v1
+      name: worker-0
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_ALLOWLIST
+        value: job1,job2
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_BLOCKLIST
+  - equal:
+      path: spec.selector.matchLabels.worker-replica
+      value: worker-0
+  - equal:
+      path: spec.template.metadata.labels.worker-replica
+      value: worker-0
+  - equal:
+      path: spec.template.spec.containers[0].resources
+      value:
+        limits:
+          cpu: "2"
+          memory: 4G
+        requests:
+          cpu: 500m
+          memory: 2G
+- it: should have the correct worker-1 deployment
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      replicas:
+      - jobs: ["job1", "job2"]
+      - jobs: ["job3", "job4"]
+        resources:
+          limits:
+            cpu: 2000m
+            memory: 4Gi
+          requests:
+            cpu: 2000m
+            memory: 4Gi
+  documentIndex: 2
+  asserts:
+  - containsDocument:
+      kind: Deployment
+      apiVersion: apps/v1
+      name: worker-1
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_ALLOWLIST
+        value: job3,job4
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: WORKER_JOB_BLOCKLIST
+  - equal:
+      path: spec.selector.matchLabels.worker-replica
+      value: worker-1
+  - equal:
+      path: spec.template.metadata.labels.worker-replica
+      value: worker-1
+  - equal:
+      path: spec.template.spec.containers[0].resources
+      value:
+        limits:
+          cpu: 2000m
+          memory: 4Gi
+        requests:
+          cpu: 2000m
+          memory: 4Gi
