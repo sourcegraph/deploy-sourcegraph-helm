@@ -105,3 +105,21 @@ tests:
   - equal:
       path: spec.template.spec.priorityClassName
       value: symbols-class
+- it: set priority class on redisCache
+  template: redis/redis-cache.Deployment.yaml
+  set:
+    redisCache:
+      priorityClassName: redis-cache-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: redis-cache-class
+- it: set priority class on redisStore
+  template: redis/redis-store.Deployment.yaml
+  set:
+    redisStore:
+      priorityClassName: redis-store-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: redis-store-class
