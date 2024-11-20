@@ -1282,6 +1282,9 @@ worker:
   podSecurityContext: {}
   # -- Number of `worker` pod
   replicaCount: 1
+  # -- List of jobs to block globally
+  # If replicas are configured, use this values to block jobs instead of manually setting WORKER_JOB_BLOCKLIST
+  blocklist: []
   # -- Scale worker horizontally by configuring additional replicas dedicated to specific jobs.
   # for each replica, configure the dedicated jobs to run on this replica.
   # learn more from https://sourcegraph.com/docs/admin/workers#3-split-jobs-and-scale-independently

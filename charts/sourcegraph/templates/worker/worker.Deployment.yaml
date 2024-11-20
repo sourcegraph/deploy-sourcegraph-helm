@@ -1,7 +1,13 @@
+{{- $globalBlocklist := "" }}
+{{- if .Values.worker.blocklist }}
+{{- $globalBlocklist = join "," (.Values.worker.blocklist | uniq | sortAlpha) }}
+{{- end }}
+
 {{- if not .Values.worker.replicas }}
-  {{- include "sourcegraph.worker" (list . "" "" "" .Values.worker.resources ) | nindent 0 }}
+  {{- include "sourcegraph.worker" (list . "" "" $globalBlocklist .Values.worker.resources ) | nindent 0 }}
 {{- else }}
   {{- $dedicatedJobs := list }}
+  {{- $dedicatedJobs = $dedicatedJobs | concat .Values.worker.blocklist }}
   {{- range .Values.worker.replicas }}
     {{- $dedicatedJobs = $dedicatedJobs | concat .jobs }}
   {{- end }}
