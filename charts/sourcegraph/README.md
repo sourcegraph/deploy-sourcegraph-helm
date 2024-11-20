@@ -362,6 +362,7 @@ In addition to the documented values, all services also support the following va
 | worker.name | string | `"worker"` | Name used by resources. Does not affect service names or PVCs. |
 | worker.podSecurityContext | object | `{}` | Security context for the `worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | worker.replicaCount | int | `1` | Number of `worker` pod |
+| worker.replicas | list | `[]` | Scale worker horizontally by configuring additional replicas dedicated to specific jobs. for each replica, configure the dedicated jobs to run on this replica. learn more from https://sourcegraph.com/docs/admin/workers#3-split-jobs-and-scale-independently |
 | worker.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | worker.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `worker` |
 | worker.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
