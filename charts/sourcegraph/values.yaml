@@ -174,9 +174,9 @@ codeInsightsDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeinsights-db` image
-    defaultTag: 5.9.1590@sha256:4e75b2c463ce1ef3bfeec4bb71a16693df02005e66b9e697859ce61064e08f42
+    defaultTag: insiders
     # -- Docker image name for the `codeinsights-db` image
-    name: "codeinsights-db"
+    name: "postgresql-16-codeinsights"
   # -- Security context for the `codeinsights-db` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -245,9 +245,9 @@ codeIntelDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeintel-db` image
-    defaultTag: 5.9.1590@sha256:3d5dd36e3af6b643903f507422be19ed1cb1f5f71c4541572d4a8a252e81aeb8
+    defaultTag: insiders
     # -- Docker image name for the `codeintel-db` image
-    name: "codeintel-db"
+    name: "postgresql-16"
   # -- Security context for the `codeintel-db` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -729,9 +729,9 @@ pgsql:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `pgsql` image
-    defaultTag: 5.9.1590@sha256:3d5dd36e3af6b643903f507422be19ed1cb1f5f71c4541572d4a8a252e81aeb8
+    defaultTag: insiders
     # -- Docker image name for the `pgsql` image
-    name: "postgres-12-alpine"
+    name: "postgresql-16"
   # -- Security context for the `pgsql` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
