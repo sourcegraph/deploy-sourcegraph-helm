@@ -8,8 +8,11 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+## 5.10.0
+
 - Updated OpenTelemetry collector and agent images to run as non-root users [#543](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/543)
 - redis cache and redis store deployments support priority class
+- Update Postgres images to Postgres 16. These images will update existing Postgres 12 databases to Postgres 16. Please see our [technical changelog](https://sourcegraph.com/docs/technical-changelog) for more details.
 
 ## 5.6.185
 
