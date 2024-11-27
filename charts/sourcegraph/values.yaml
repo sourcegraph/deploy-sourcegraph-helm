@@ -174,7 +174,7 @@ codeInsightsDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeinsights-db` image
-    defaultTag: insiders
+    defaultTag: 5.10.0@sha256:fc3bc82f68abe635bb164af6b5d00ca3017a9b862ac0c930be2e8766a12ad810
     # -- Docker image name for the `codeinsights-db` image
     name: "postgresql-16-codeinsights"
   # -- Security context for the `codeinsights-db` container,
@@ -245,7 +245,7 @@ codeIntelDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeintel-db` image
-    defaultTag: insiders
+    defaultTag: 5.10.0@sha256:3605d1f49c24518ecbbae57db89aaaea46664db1235e5eb7b83ca229cc471358
     # -- Docker image name for the `codeintel-db` image
     name: "postgresql-16"
   # -- Security context for the `codeintel-db` container,
@@ -729,7 +729,7 @@ pgsql:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `pgsql` image
-    defaultTag: insiders
+    defaultTag: 5.10.0@sha256:3605d1f49c24518ecbbae57db89aaaea46664db1235e5eb7b83ca229cc471358
     # -- Docker image name for the `pgsql` image
     name: "postgresql-16"
   # -- Security context for the `pgsql` container,
