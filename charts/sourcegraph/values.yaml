@@ -174,7 +174,7 @@ codeInsightsDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeinsights-db` image
-    defaultTag: 5.10.1164
+    defaultTag: 5.10.1164@sha256:e0f2818ce95cfb1e236feedfdcc2061f97d3d8333b74d8a5b0f1d9430d31ede6
     # -- Docker image name for the `codeinsights-db` image
     name: "postgresql-16-codeinsights"
   # -- Security context for the `codeinsights-db` container,
@@ -245,7 +245,7 @@ codeIntelDB:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `codeintel-db` image
-    defaultTag: 5.10.1164
+    defaultTag: 5.10.1164@sha256:3a921369f241fec32659e7e31c31e0d1433d5887894a69e94de6ca3d257f650f
     # -- Docker image name for the `codeintel-db` image
     name: "postgresql-16"
   # -- Security context for the `codeintel-db` container,
@@ -729,7 +729,7 @@ pgsql:
   additionalConfig: ""
   image:
     # -- Docker image tag for the `pgsql` image
-    defaultTag: 5.10.1164
+    defaultTag: 5.10.1164@sha256:3a921369f241fec32659e7e31c31e0d1433d5887894a69e94de6ca3d257f650f
     # -- Docker image name for the `pgsql` image
     name: "postgresql-16"
   # -- Security context for the `pgsql` container,
@@ -822,7 +822,6 @@ syntacticCodeIntel:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
-
 
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container
@@ -1221,7 +1220,14 @@ jaeger:
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "jaeger"
   # -- Default args passed to the `jaeger` binary
-  args: [ "--memory.max-traces=20000", "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json", "--collector.otlp.enabled", "--collector.otlp.grpc.host-port=:4320", "--collector.otlp.http.host-port=:4321" ]
+  args:
+    [
+      "--memory.max-traces=20000",
+      "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json",
+      "--collector.otlp.enabled",
+      "--collector.otlp.grpc.host-port=:4320",
+      "--collector.otlp.http.host-port=:4321",
+    ]
   # -- Security context for the `jaeger` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -1288,7 +1294,8 @@ worker:
   # -- Scale worker horizontally by configuring additional replicas dedicated to specific jobs.
   # for each replica, configure the dedicated jobs to run on this replica.
   # learn more from https://sourcegraph.com/docs/admin/workers#3-split-jobs-and-scale-independently
-  replicas: []
+  replicas:
+    []
     # - jobs: []
     #   resources:
     #     limits:
@@ -1297,7 +1304,7 @@ worker:
     #     requests:
     #       cpu: 500m
     #       memory: 2G
-      
+
   # -- Resource requests & limits for the `worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
