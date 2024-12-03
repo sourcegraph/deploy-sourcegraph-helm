@@ -1,122 +1,28 @@
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-    description: Manages background processes.
-  labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.worker.labels }}
-      {{- toYaml .Values.worker.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: worker
-  name: {{ .Values.worker.name }}
-spec:
-  minReadySeconds: 10
-  replicas: {{ .Values.worker.replicaCount }}
-  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
-  selector:
-    matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: worker
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        kubectl.kubernetes.io/default-container: worker
-      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.worker.podAnnotations }}
-      {{- toYaml .Values.worker.podAnnotations | nindent 8 }}
-      {{- end }}
-      labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.worker.podLabels }}
-      {{- toYaml .Values.worker.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: worker
-    spec:
-      containers:
-      - name: worker
-        env:
-        {{- include "sourcegraph.redisConnection" .| nindent 8 }}
-        {{- range $name, $item := .Values.worker.env}}
-        - name: {{ $name }}
-          {{- $item | toYaml | nindent 10 }}
-        {{- end }}
-        {{- if .Values.blobstore.enabled }}
-        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
-          value: blobstore
-        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
-          value: http://blobstore:9000
-        {{- end }}
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
-        image: {{ include "sourcegraph.image" (list . "worker" ) }}
-        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        {{- with .Values.worker.args }}
-        args:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
-        terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: debug
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
-        ports:
-        - containerPort: 3189
-          name: http
-        - containerPort: 6060
-          name: debug
-        - containerPort: 6996
-          name: prom
-        {{- if not .Values.sourcegraph.localDevMode }}
-        resources:
-          {{- toYaml .Values.worker.resources | nindent 10 }}
-        {{- end }}
-        securityContext:
-          {{- toYaml .Values.worker.containerSecurityContext | nindent 10 }}
-        volumeMounts:
-        {{- if .Values.worker.extraVolumeMounts }}
-        {{- toYaml .Values.worker.extraVolumeMounts | nindent 8 }}
-        {{- end }}
-      {{- if .Values.worker.extraContainers }}
-        {{- toYaml .Values.worker.extraContainers | nindent 6 }}
-      {{- end }}
-      securityContext:
-        {{- toYaml .Values.worker.podSecurityContext | nindent 8 }}
-      {{- include "sourcegraph.nodeSelector" (list . "worker" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "worker" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "worker" ) | trim | nindent 6 }}
-      {{- with .Values.sourcegraph.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "worker") | trim | nindent 6 }}
-      volumes:
-      {{- if .Values.worker.extraVolumes }}
-      {{- toYaml .Values.worker.extraVolumes | nindent 6 }}
-      {{- end }}
+{{- $globalBlocklist := "" }}
+{{- if .Values.worker.blocklist }}
+{{- $globalBlocklist = join "," (.Values.worker.blocklist | uniq | sortAlpha) }}
+{{- end }}
+
+{{- if not .Values.worker.replicas }}
+  {{- include "sourcegraph.worker" (list . "" "" $globalBlocklist .Values.worker.resources ) | nindent 0 }}
+{{- else }}
+  {{- $dedicatedJobs := list }}
+  {{- $dedicatedJobs = $dedicatedJobs | concat .Values.worker.blocklist }}
+  {{- range .Values.worker.replicas }}
+    {{- $dedicatedJobs = $dedicatedJobs | concat .jobs }}
+  {{- end }}
+  {{- $primaryBlocklist := join "," ($dedicatedJobs | uniq | sortAlpha) }}
+---
+  {{-  include "sourcegraph.worker" (list . "" "all" $primaryBlocklist $.Values.worker.resources) | nindent 0 }}
+
+  {{- range $idx, $item := .Values.worker.replicas }}
+---
+    {{- $replicaName := printf "%d" $idx }}
+    {{- $allowlist := join "," ($item.jobs | uniq | sortAlpha) }}
+    {{- $resources := $.Values.worker.resources -}}
+    {{- if $item.resources -}}
+    {{- $resources = $item.resources -}}
+    {{- end -}}
+    {{- include "sourcegraph.worker" (list $ $replicaName $allowlist "" $resources) | nindent 0 }}
+  {{- end }}
+{{- end }}
