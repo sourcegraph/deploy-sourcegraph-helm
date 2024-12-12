@@ -5,7 +5,7 @@ icon: https://sourcegraph.com/favicon.ico
 type: application
 
 # Chart version, separate from Sourcegraph
-version: "5.9.1590"
+version: "5.10.2832"
 
 # Version of Sourcegraph release
-appVersion: "5.9.1590"
+appVersion: "5.10.2832"
