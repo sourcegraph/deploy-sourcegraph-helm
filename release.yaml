@@ -548,7 +548,7 @@ promoteToPublic:
           set -eu
           branch="promote/release-{{version}}-update-main"
           echo "Checking out origin/main"
-          git fetch origin "${branch}"
+          git fetch origin main
           echo "Creating branch origin/${branch}"
           git switch -c "${branch}"
 
