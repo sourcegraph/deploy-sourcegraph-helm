@@ -1225,7 +1225,7 @@ jaeger:
       "--memory.max-traces=20000",
       "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json",
       "--collector.otlp.enabled",
-      "--collector.otlp.grpc.host-port=:4320",
+      "--collector.otlp.grpc.host-port=:4317",
       "--collector.otlp.http.host-port=:4321",
     ]
   # -- Security context for the `jaeger` container,
