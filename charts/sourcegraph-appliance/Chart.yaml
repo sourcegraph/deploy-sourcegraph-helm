@@ -4,7 +4,7 @@ description: The Sourcegraph Appliance
 type: application
 
 # Chart version, separate from Sourcegraph
-version: "5.9.1590"
+version: "5.10.3940"
 
 # Version of Sourcegraph release
-appVersion: "5.9.1590"
+appVersion: "5.10.3940"
