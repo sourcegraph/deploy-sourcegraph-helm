@@ -5,7 +5,7 @@ replicaCount: 1
 
 sourcegraph:
   image:
-    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+    repository: index.docker.io/sourcegraph
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
   # Version and Tag (above) are subtley different
