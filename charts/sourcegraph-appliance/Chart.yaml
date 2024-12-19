@@ -1,7 +1,6 @@
 apiVersion: v2
-name: sourcegraph-migrator
-description: Chart for running Sourcegraph migrator
-icon: https://sourcegraph.com/favicon.ico
+name: sourcegraph-appliance
+description: The Sourcegraph Appliance
 type: application
 
 # Chart version, separate from Sourcegraph
