@@ -8,7 +8,7 @@ sourcegraph:
     # -- Global docker image pull policy
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
-    repository: us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+    repository: index.docker.io/sourcegraph
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
@@ -57,7 +57,7 @@ executor:
   configureRbac: true
   replicas: 1
   image:
-    defaultTag: 5.11.3601@sha256:b60431fb519d81a3fc329690804fb364e2a815a9f227af42f3e9b5393677ec2a
+    defaultTag: 5.11.3601@sha256:f2aaa1dab005e1cf24ccf4222aa44a7b2d16e6dd31c2347822b0a16dbee8ef91
     name: "executor-kubernetes"
   # -- The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace). 
   # This will avoid unnecessary network charges as traffic will stay within the local network.
