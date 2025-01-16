@@ -6,12 +6,12 @@ tests:
     set:
       sourcegraph.localDevMode: true
     asserts:
-      - isEmpty:
-          path: spec.template.spec.containers[0].resources
+      - notExists:
+          path: "spec.template.spec.containers[0].resources"
 
   - it: should have a resource block when localDevMode=false
     set:
       sourcegraph.localDevMode: false
     asserts:
-      - isNotEmpty:
-          path: spec.template.spec.containers[0].resources
+      - exists:
+          path: "spec.template.spec.containers[0].resources"

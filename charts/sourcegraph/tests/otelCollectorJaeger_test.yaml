@@ -65,7 +65,7 @@ tests:
           count: 1 # ConfigMap is rendered
         template: otel-collector/otel-collector.ConfigMap.yaml
       - matchRegex:
-          path: data.[config.yaml]
+          path: data["config.yaml"]
           pattern: "endpoint: otlp.service.com:443" # check if element of config is substituted correctly
         template: otel-collector/otel-collector.ConfigMap.yaml
   - it: should fail if a configuration is provided and jaeger is enabled

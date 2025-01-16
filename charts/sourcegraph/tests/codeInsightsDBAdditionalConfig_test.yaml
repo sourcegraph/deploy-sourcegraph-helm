@@ -15,7 +15,7 @@ tests:
         max_connections = 3000000000000000000
   asserts:
   - matchRegex:
-      path: data.postgresql\.conf
+      path: data["postgresql.conf"]
       pattern: max_connections = 3000000000000000000
 - it: should fail to render when both codeInsightsDB.additionalConfig and codeInsightsDB.existingConfig are defined
   set:
