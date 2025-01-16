@@ -164,6 +164,8 @@ codeInsightsDB:
     password: "password"
     # -- Sets codeinsights-db port
     port: "5432"
+    # -- Sets codeinsights-db SSL mode
+    sslmode: "disable"  # set to "require" to enable SSL
   # -- Environment variables for the `codeinsights-db` container
   env: {}
   # -- Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key.
@@ -237,6 +239,8 @@ codeIntelDB:
     password: "password"
     # -- Sets codeintel-db port
     port: "5432"
+    # -- Sets codeintel-db SSL mode
+    sslmode: "disable"  # set to "require" to enable SSL
   # -- Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key
   existingConfig: ""
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
@@ -721,8 +725,10 @@ pgsql:
     password: "password"
     # -- Sets postgres port
     port: "5432"
+    # -- Sets postgres SSL mode
+    sslmode: "disable"  # set to "require" to enable SSL
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
-  existingConfig: "" # Name of an existing configmap
+  existingConfig: ""  # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
   # Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)

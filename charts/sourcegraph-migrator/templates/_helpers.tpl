@@ -91,4 +91,9 @@ useGlobalTagAsDefault configuration
     secretKeyRef:
       key: user
       name: {{ $secretName }}
+- name: {{ printf "%sSSLMODE" $prefix }}
+  valueFrom:
+    secretKeyRef:
+      key: sslmode
+      name: {{ $secretName }}
 {{- end }}
