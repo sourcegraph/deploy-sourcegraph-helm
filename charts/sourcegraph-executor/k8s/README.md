@@ -77,8 +77,8 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.kubernetesJob.resources.limits.memory | string | `"12Gi"` | The maximum memory for a job. |
 | executor.kubernetesJob.resources.requests.cpu | string | `""` | The requested CPU for a job. |
 | executor.kubernetesJob.resources.requests.memory | string | `"1Gi"` | The requested memory for a job. |
-| executor.kubernetesJob.runAsGroup | int | `-1` | The group ID to run Kubernetes jobs as. |
-| executor.kubernetesJob.runAsUser | int | `-1` | The user ID to run Kubernetes jobs as. |
+| executor.kubernetesJob.runAsGroup | int | `nil` | The group ID to run Kubernetes jobs as. |
+| executor.kubernetesJob.runAsUser | int | `nil` | The user ID to run Kubernetes jobs as. |
 | executor.log.format | string | `"condensed"` |  |
 | executor.log.level | string | `"warn"` | Possible values are `dbug`, `info`, `warn`, `eror`, `crit`. |
 | executor.log.trace | string | `"false"` |  |

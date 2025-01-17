@@ -94,12 +94,10 @@ executor:
   kubernetesJob:
     # -- The number of seconds after which a Kubernetes job will be terminated.
     deadline: "1200"
-    # -- The user ID to run Kubernetes jobs as.
-    # -- Set only if used. The `sourcegraph` UID is 100.
-    # runAsUser: 100
-    # -- The group ID to run Kubernetes jobs as.
-    # -- Set only if used. The `sourcegraph` GID is 101.
-    # runAsGroup: 101
+    # -- (int) The user ID to run Kubernetes jobs as.
+    runAsUser: 
+    # -- (int) The group ID to run Kubernetes jobs as.
+    runAsGroup: 
     # -- The group ID which is set on the job PVC file system. 
     fsGroup: "1000"
     resources:
