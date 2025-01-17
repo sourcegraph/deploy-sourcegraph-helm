@@ -1,15 +1,15 @@
 should update checksum when codeinsights-db secret is modified:
   1: |
-    b60668796ecf6c0c43c250feeb4f61583494b50c518d145753612c0f3e10d2d1
+    29f56ffb20b2f033b6f54a3b8e4f049734a9330390bc4e4b162a792e073b9447
 should update checksum when codeintel-db secret is modified:
   1: |
-    393b4697f158c0151c67f84d2caf81894565f9928a68fe4cea86de62c2784c3c
+    839b4e7703dfa58ea8513e436a017af6183d7e5c3d8560a8d580bef8299242fb
 should update checksum when pgsql secret is modified:
   1: |
-    9edce55c26da40c6a2f12025db322495f2f2a50183f234d7476d486134434aa2
+    54b0ee5944d429d618699fa4e18a406fb817668d9111bb43b46eac363415e5b2
 should update checksum when redis-cache secret is modified:
   1: |
-    cffe7781e068ed7f9b5cff231361a3973a2a3378a28cf047a9a5ad77c832732c
+    97d7112d6b8b0d3e6251d9062aaba1a7205fda567b701d70eecc4540878228c0
 should update checksum when redis-store secret is modified:
   1: |
-    cffe7781e068ed7f9b5cff231361a3973a2a3378a28cf047a9a5ad77c832732c
+    97d7112d6b8b0d3e6251d9062aaba1a7205fda567b701d70eecc4540878228c0
