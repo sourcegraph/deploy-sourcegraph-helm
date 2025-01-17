@@ -94,10 +94,12 @@ executor:
   kubernetesJob:
     # -- The number of seconds after which a Kubernetes job will be terminated.
     deadline: "1200"
-    # -- The user ID to run Kubernetes jobs as.
-    runAsUser: -1
-    # -- The group ID to run Kubernetes jobs as.
-    runAsGroup: -1
+    # -- (int) The user ID to run Kubernetes jobs as.
+    # @default -- `nil`; accepts [0, 2147483647]
+    runAsUser: 
+    # -- (int) The group ID to run Kubernetes jobs as.
+    # @default -- `nil`; accepts [0, 2147483647]
+    runAsGroup: 
     # -- The group ID which is set on the job PVC file system. 
     fsGroup: "1000"
     resources:
