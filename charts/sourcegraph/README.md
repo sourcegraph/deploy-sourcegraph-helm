@@ -56,6 +56,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.auth.host | string | `"codeinsights-db"` | Sets codeinsights-db host |
 | codeInsightsDB.auth.password | string | `"password"` | Sets codeinsights-db password |
 | codeInsightsDB.auth.port | string | `"5432"` | Sets codeinsights-db port |
+| codeInsightsDB.auth.sslmode | string | `"disable"` | Sets codeinsights-db SSL mode |
 | codeInsightsDB.auth.user | string | `"postgres"` | Sets codeinsights-db username |
 | codeInsightsDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.enabled | bool | `true` | Enable `codeinsights-db` PostgreSQL server |
@@ -77,6 +78,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.auth.host | string | `"codeintel-db"` | Sets codeintel-db host |
 | codeIntelDB.auth.password | string | `"password"` | Sets codeintel-db password |
 | codeIntelDB.auth.port | string | `"5432"` | Sets codeintel-db port |
+| codeIntelDB.auth.sslmode | string | `"disable"` | Sets codeintel-db SSL mode |
 | codeIntelDB.auth.user | string | `"sg"` | Sets codeintel-db username |
 | codeIntelDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeIntelDB.enabled | bool | `true` | Enable `codeintel-db` PostgreSQL server |
@@ -219,6 +221,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.auth.host | string | `"pgsql"` | Sets postgres host |
 | pgsql.auth.password | string | `"password"` | Sets postgres password |
 | pgsql.auth.port | string | `"5432"` | Sets postgres port |
+| pgsql.auth.sslmode | string | `"disable"` | Sets postgres SSL mode |
 | pgsql.auth.user | string | `"sg"` | Sets postgres username |
 | pgsql.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | pgsql.enabled | bool | `true` | Enable `pgsql` PostgreSQL server |
