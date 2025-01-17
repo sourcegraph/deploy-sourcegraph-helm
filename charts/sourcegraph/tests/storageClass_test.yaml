@@ -18,8 +18,8 @@ tests:
       create: true
       type: null
   asserts:
-  - isNull:
-      path: parameters
+  - notExists:
+      path: parameters.type
 - it: should have 'allowedTopologies` when storageClass.allowedTopologies is set
   set:
     storageClass:

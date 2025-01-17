@@ -10,7 +10,7 @@ tests:
         existingSecret: "my-secret"
   asserts:
     - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+          path: spec.template.metadata.annotations["checksum/auth"]
 - it: should update checksum when codeintel-db secret is modified
   set:
     codeIntelDB:
@@ -18,7 +18,7 @@ tests:
         newkey: "blank"
   asserts:
     - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+          path: spec.template.metadata.annotations["checksum/auth"]
 - it: should update checksum when codeinsights-db secret is modified
   set:
     codeInsightsDB:
@@ -27,7 +27,7 @@ tests:
         database: "anotherdb"
   asserts:
     - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+          path: spec.template.metadata.annotations["checksum/auth"]
 - it: should update checksum when redis-store secret is modified
   set:
     redisStore:
@@ -35,7 +35,7 @@ tests:
         endpoint: "external-redis:6379"
   asserts:
     - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+          path: spec.template.metadata.annotations["checksum/auth"]
 - it: should update checksum when redis-cache secret is modified
   set:
     redisCache:
@@ -43,4 +43,4 @@ tests:
         endpoint: "external-redis:6379"
   asserts:
     - matchSnapshot:
-          path: spec.template.metadata.annotations.[checksum/auth]
+          path: spec.template.metadata.annotations["checksum/auth"]
