@@ -9,10 +9,10 @@ tests:
     frontend:
       image:
         defaultTag: test
-  matchRegexRaw:
-    path: "spec.template.spec.containers[0].image"
-    pattern: |
-      "[\w-]+\.\w+\.\w+\/.+\/.+:test"
+  asserts:
+    - matchRegex:
+        path: "spec.template.spec.containers[0].image"
+        pattern: ^[\w-]+\.\w+\.\w+\/.+\/.+:test$
 - it: should add defaultTagPrefix
   template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
@@ -20,7 +20,7 @@ tests:
       image:
         defaultTag: test
         defaultTagPrefix: "prefix-"
-  matchRegexRaw:
-    path: "spec.template.spec.containers[0].image"
-    pattern: |
-      "[\w-]+\.\w+\.\w+\/.+\/.+:prefix-test"
+  asserts:
+    - matchRegex:
+        path: "spec.template.spec.containers[0].image"
+        pattern: ^[\w-]+\.\w+\.\w+\/.+\/.+:prefix-test$

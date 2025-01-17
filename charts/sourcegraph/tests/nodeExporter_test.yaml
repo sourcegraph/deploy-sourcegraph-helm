@@ -102,7 +102,7 @@ tests:
           create: false
           name: "test-service-account-name"
     asserts:
-      - isEmpty:
+      - notExists:
           path: spec.template.spec.serviceAccountName
         template: node-exporter/node-exporter.DaemonSet.yaml
   
