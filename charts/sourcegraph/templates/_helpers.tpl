@@ -216,13 +216,6 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: sslmode
       name: {{ $secretName }}
-{{- if eq $service "grafana" }}
-- name: {{ printf "%sSSLMODE" $prefix }}
-  valueFrom:
-    secretKeyRef:
-      key: sslmode
-      name: {{ $secretName }}
-{{- end }}
 {{- end }}
 
 {{- define "sourcegraph.dataSource" -}}
