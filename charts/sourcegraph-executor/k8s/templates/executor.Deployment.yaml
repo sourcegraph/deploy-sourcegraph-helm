@@ -45,6 +45,8 @@ spec:
     spec:
       securityContext:
         fsGroup: {{ .Values.executor.kubernetesJob.fsGroup }}
+        runAsUser: {{ .Values.executor.securityContext.runAsUser }}
+        runAsGroup: {{ .Values.executor.securityContext.runAsGroup }}
       serviceAccountName: sg-executor
       containers:
         - name: executor

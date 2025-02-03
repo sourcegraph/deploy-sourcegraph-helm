@@ -90,6 +90,12 @@ executor:
   namespace: "default"
   # -- The path to the kubeconfig file. If not specified, the in-cluster config is used.
   kubeconfigPath: ""
+  # -- The containerSecurityContext for the executor image
+  containerSecurityContext:
+    # @default -- `100`; accepts [0, 2147483647]
+    runAsUser: 100
+    # @default -- `101`; accepts [0, 2147483647]
+    runAsGroup: 101
   
   kubernetesJob:
     # -- The number of seconds after which a Kubernetes job will be terminated.
