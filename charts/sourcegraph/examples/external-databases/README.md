@@ -30,6 +30,7 @@ data:
   password: ""
   port: ""
   user: ""
+  pgsslmode: "require" # optional, enable if using SSL
 ```
 
 The Secret name should be set in your override file in the `auth.existingSecret` key for each database. See the [override.yaml] for an example.

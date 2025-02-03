@@ -7,7 +7,7 @@ meta:
 inputs:
   - releaseId: server
 requirements:
-    # We use wget here, because curl --fail-with-body was introduced in a version ulterior to what we can have on the CI agents.
+  # We use wget here, because curl --fail-with-body was introduced in a version ulterior to what we can have on the CI agents.
   - name: "wget"
     cmd: "wget --help"
   - name: "comby"
@@ -79,19 +79,6 @@ internal:
               --docker-password $DOCKER_PASSWORD \
               charts/sourcegraph-migrator/
 
-        - name: sg ops:appliance
-          cmd: |
-            set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-
-            sg ops update-images \
-              -t {{inputs.server.tag}} \
-              -k helm \
-              --registry "${registry}" \
-              --docker-username $DOCKER_USERNAME \
-              --docker-password $DOCKER_PASSWORD \
-              charts/sourcegraph-appliance/
-
         - name: "chart:version"
           cmd: |
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -99,19 +86,17 @@ internal:
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
-          
+
         - name: "chart:appVersion"
           cmd: |
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
-        
+
         - name: "helm:docs"
           cmd: ./scripts/helm-docs.sh
-          
+
         - name: "git:branch"
           cmd: |
             set -eu
@@ -192,19 +177,6 @@ internal:
               --docker-password $DOCKER_PASSWORD \
               charts/sourcegraph-migrator/
 
-        - name: sg ops:appliance
-          cmd: |
-            set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
-
-            sg ops update-images \
-              -t {{inputs.server.tag}} \
-              -k helm \
-              --registry "${registry}" \
-              --docker-username $DOCKER_USERNAME \
-              --docker-password $DOCKER_PASSWORD \
-              charts/sourcegraph-appliance/
-
         - name: "chart:version"
           cmd: |
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -212,16 +184,14 @@ internal:
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
-          
+
         - name: "chart:appVersion"
           cmd: |
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
-          
+
         - name: "helm:docs"
           cmd: ./scripts/helm-docs.sh
 
@@ -235,7 +205,7 @@ internal:
         - name: "git:commit"
           cmd: |
             git commit -am 'release_minor: {{version}}' -m '{{config}}'
-          
+
         - name: "git:push"
           cmd: |
             branch="internal/release-{{version}}"
@@ -312,16 +282,14 @@ internal:
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
             comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
-         
+
         - name: "chart:appVersion"
           cmd: |
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
             comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
-          
+
         - name: "helm:docs"
           cmd: ./scripts/helm-docs.sh
 
@@ -350,10 +318,10 @@ internal:
               --title "(internal) release_major: build {{version}}" \
               --body "Test plan: automated release PR, CI will perform additional checks"
             echo "🚢 Please check the associated CI build to ensure the process completed".
-  
+
   finalize:
     steps:
-      - name: 'Register on release registry'
+      - name: "Register on release registry"
         cmd: |
           echo "Registering internal deploy-sourcegraph-helm {{version}} release on release registry"
           COMMIT_SHA=$(git rev-parse HEAD)
@@ -469,17 +437,6 @@ promoteToPublic:
             --docker-username $DOCKER_USERNAME \
             --docker-password $DOCKER_PASSWORD \
             charts/sourcegraph-migrator/
-      - name: sg ops:appliance
-        cmd: |
-          set -eu
-          registry=index.docker.io/sourcegraph
-          sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-appliance/
       - name: "update helm docs"
         cmd: ./scripts/helm-docs.sh
       - name: "git:branch"
@@ -543,7 +500,7 @@ promoteToPublic:
           Promoted release is **publicly available** through a git tag at [\`{{version}}\`](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/{{version}}).
           EOF
 
-      - name: 'Promote on release registry'
+      - name: "Promote on release registry"
         cmd: |
           echo "Promoting deploy-sourcegraph-helm {{version}} release on release registry"
           body=$(wget --content-on-error -O- --header="Content-Type: application/json" --header="Authorization: ${RELEASE_REGISTRY_TOKEN}" --post-data '' "https://releaseregistry.sourcegraph.com/v1/releases/helm/{{version}}/promote")

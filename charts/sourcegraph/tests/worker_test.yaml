@@ -51,7 +51,7 @@ tests:
       content:
         name: WORKER_JOB_BLOCKLIST
         value: job1,job2,job3,job4,rogue-job-1,rogue-job-2
-  - isEmpty:
+  - notExists:
       path: spec.selector.matchLabels.worker-replica
 - it: should have the correct worker-0 deployment
   template: worker/worker.Deployment.yaml
