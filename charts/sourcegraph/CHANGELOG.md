@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Fix Pod Disruption Budget for sourcegraph-frontend
+
 ## 5.10.0
 
 - Updated OpenTelemetry collector and agent images to run as non-root users [#543](https://github.com/sourcegraph/deploy-sourcegraph-helm/pull/543)
