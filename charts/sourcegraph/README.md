@@ -308,6 +308,7 @@ In addition to the documented values, all services also support the following va
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.containerSecurityContext | object | `{}` | Global container security context settings that can be overridden per service Used to set security parameters like runAsUser, privileged mode, etc. |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
@@ -319,7 +320,10 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.podSecurityContext | object | `{}` | Global pod security context settings that can be overridden per service Controls pod-level security attributes like fsGroup and runAsUser |
+| sourcegraph.privileged | object | `{}` | Global privileged mode settings that can be overridden per service Determines if pods/containers can run with elevated privileges |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
+| sourcegraph.serviceAccount | object | `{"create":false}` | Global service account creation settings that can be overridden per service Controls whether service accounts should be automatically created |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | list | `[]` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
