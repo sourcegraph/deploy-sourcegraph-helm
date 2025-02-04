@@ -6,6 +6,7 @@ metadata:
 spec:
   {{- toYaml .Values.frontend.podDisruptionBudget | nindent 2 }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: sourcegraph-frontend
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: sourcegraph-frontend
 {{- end }}
