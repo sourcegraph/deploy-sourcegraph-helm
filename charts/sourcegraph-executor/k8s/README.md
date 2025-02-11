@@ -89,6 +89,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or queueNames is required.** |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
 | executor.replicas | int | `1` |  |
+| executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | The containerSecurityContext for the executor image |
 | executor.storageSize | string | `"10Gi"` | The storage size of the PVC attached to the executor deployment. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
