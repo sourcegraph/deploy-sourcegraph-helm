@@ -323,12 +323,16 @@ frontend:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540002
+    runAsGroup: 1000540002
     readOnlyRootFilesystem: true
   # -- Security context for the `frontend` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Enable creation of Role and RoleBinding (RBAC). Uses [view](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) ClusterRole if set to false
   privileged: true
   # -- Number of `frontend` pod
@@ -376,9 +380,14 @@ migrator:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540003
+    runAsGroup: 1000540003
     readOnlyRootFilesystem: true
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
 
 gitserver:
   image:
@@ -389,13 +398,13 @@ gitserver:
   # -- Name of existing Secret that contains SSH credentials to clone repositories.
   # It usually contains keys, such as `id_rsa` (private key) and `known_hosts`.
   # Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories)
-  sshSecret: ""
+  sshSecret: "gitserversshsecret"
   # -- Security context for the `gitserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540004
+    runAsGroup: 1000540004
     readOnlyRootFilesystem: true
   # -- Number of `gitserver` pod
   replicaCount: 1
@@ -413,10 +422,12 @@ gitserver:
   # -- Security context for the `gitserver` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    runAsUser: 100
-    runAsGroup: 101
-    fsGroup: 101
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    runAsUser: 1000540004
+    runAsGroup: 1000540004
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount for `gitserver`
     create: false
@@ -458,8 +469,8 @@ grafana:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 472
-    runAsGroup: 472
+    runAsUser: 1000540005
+    runAsGroup: 1000540005
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "grafana"
@@ -475,6 +486,8 @@ grafana:
   # -- Security context for the `grafana` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
+    supplementalGroups:
+      - 0
     runAsUser: 472
     runAsGroup: 472
     fsGroup: 472
@@ -497,8 +510,8 @@ indexedSearch:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540006
+    runAsGroup: 1000540006
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "indexed-search"
@@ -516,8 +529,10 @@ indexedSearch:
   # -- Security context for the `indexed-search` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    fsGroup: 101
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount for `indexed-search`
     create: false
@@ -538,9 +553,14 @@ indexedSearchIndexer:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540006
+    runAsGroup: 1000540006
     readOnlyRootFilesystem: true
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Resource requests & limits for the `zoekt-indexserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
@@ -565,8 +585,8 @@ blobstore:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540008
+    runAsGroup: 1000540008
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "blobstore"
   # -- Resource requests & limits for the `blobstore` container,
@@ -581,10 +601,12 @@ blobstore:
   # -- Security context for the `blobstore` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    runAsUser: 100
-    runAsGroup: 101
-    fsGroup: 101
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    runAsUser: 1000540008
+    runAsGroup: 1000540008
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount for `blobstore`
     create: false
@@ -622,7 +644,7 @@ openTelemetry:
         exporters: {}
         # -- Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls".
         # Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md)
-        exportersTlsSecretName: ""
+        exportersTlsSecretName: "foobarbaz"
     serviceAccount:
       # -- Enable creation of ServiceAccount for `otel-collector`
       create: false
@@ -630,8 +652,13 @@ openTelemetry:
       name: ""
     containerSecurityContext:
       allowPrivilegeEscalation: false
-      runAsUser: 100
-      runAsGroup: 101
+      runAsUser: 1000540009
+      runAsGroup: 1000540009
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
@@ -656,8 +683,13 @@ openTelemetry:
       name: ""
     containerSecurityContext:
       allowPrivilegeEscalation: false
-      runAsUser: 100
-      runAsGroup: 101
+      runAsUser: 1000540009
+      runAsGroup: 1000540009
+    podSecurityContext:
+      supplementalGroups:
+        - 0
+      fsGroup: 0
+      fsGroupChangePolicy: "Always"
 
 nodeExporter:
   # -- Enable `node-exporter`
@@ -696,16 +728,19 @@ nodeExporter:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 65534
-    runAsGroup: 65534
+    runAsUser: 1000540010
+    runAsGroup: 1000540010
     readOnlyRootFilesystem: true
   # -- Security context for the `node-exporter` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    fsGroup: 65534
-    runAsGroup: 65534
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
+    runAsGroup: 1000540010
     runAsNonRoot: true
-    runAsUser: 65534
+    runAsUser: 1000540010
 
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
@@ -804,14 +839,18 @@ syntacticCodeIntel:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540011
+    runAsGroup: 1000540011
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "syntactic-code-intel-worker"
   # -- Security context for the `syntactic-code-intel-worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Number of `syntactic-code-intel-worker` pod
   replicaCount: 2
   # -- Resource requests & limits for the `syntactic-code-intel-worker` container,
@@ -843,14 +882,18 @@ preciseCodeIntel:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540012
+    runAsGroup: 1000540012
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "precise-code-intel-worker"
   # -- Security context for the `precise-code-intel-worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Number of `precise-code-intel-worker` pod
   replicaCount: 2
   # -- Resource requests & limits for the `precise-code-intel-worker` container,
@@ -882,8 +925,8 @@ prometheus:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 100
+    runAsUser: 1000540013
+    runAsGroup: 1000540013
     # Read-only filesystem not supported for the prometheus container,
     # see [sourcegraph/issues/34012](https://github.com/sourcegraph/sourcegraph/issues/34012) for more information
     readOnlyRootFilesystem: false
@@ -910,8 +953,10 @@ prometheus:
   # -- Security context for the `prometheus` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    fsGroup: 100
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount
     create: true
@@ -939,8 +984,8 @@ redisCache:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 999
-    runAsGroup: 1000
+    runAsUser: 1000540014
+    runAsGroup: 1000540014
     readOnlyRootFilesystem: true
   # -- Resource requests & limits for the `redis-cache` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -956,8 +1001,10 @@ redisCache:
   # -- Security context for the `redis-cache` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    fsGroup: 1000
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount for `redis-cache`
     create: false
@@ -976,9 +1023,14 @@ redisExporter:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 999
-    runAsGroup: 1000
+    runAsUser: 1000540015
+    runAsGroup: 1000540015
     readOnlyRootFilesystem: true
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Resource requests & limits for the `redis-exporter` sidecar container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1008,8 +1060,8 @@ redisStore:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 999
-    runAsGroup: 1000
+    runAsUser: 1000540016
+    runAsGroup: 1000540016
     readOnlyRootFilesystem: true
   # -- Resource requests & limits for the `redis-store` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -1025,8 +1077,10 @@ redisStore:
   # -- Security context for the `redis-store` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    fsGroup: 1000
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   serviceAccount:
     # -- Enable creation of ServiceAccount for `redis-store`
     create: false
@@ -1045,14 +1099,18 @@ repoUpdater:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540017
+    runAsGroup: 1000540017
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "repo-updater"
   # -- Security context for the `repo-updater` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Resource requests & limits for the `repo-updater` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1078,17 +1136,21 @@ searcher:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540018
+    runAsGroup: 1000540018
     readOnlyRootFilesystem: true
   # -- Security context for the `searcher` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    runAsUser: 100
-    fsGroup: 101
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    runAsUser: 1000540018
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "searcher"
+  # command: ["/bin/sh"]
+  # args: []
   # -- Number of `searcher` pod
   replicaCount: 1
   # -- Resource requests & limits for the `searcher` container,
@@ -1139,15 +1201,17 @@ symbols:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540019
+    runAsGroup: 1000540019
     readOnlyRootFilesystem: true
   # -- Security context for the `symbols` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext:
-    runAsUser: 100
-    fsGroup: 101
-    fsGroupChangePolicy: "OnRootMismatch"
+    supplementalGroups:
+      - 0
+    runAsUser: 1000540019
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "symbols"
   # -- Number of `symbols` pod
@@ -1179,14 +1243,18 @@ syntectServer:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540020
+    runAsGroup: 1000540020
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "syntect-server"
   # -- Security context for the `syntect-server` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Number of `syntect-server` pod
   replicaCount: 1
   # -- Resource requests & limits for the `syntect-server` container,
@@ -1238,12 +1306,16 @@ jaeger:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540021
+    runAsGroup: 1000540021
     readOnlyRootFilesystem: true
   # -- Security context for the `jaeger` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   query:
     # -- Name of jaeger `query` service
     name: ""
@@ -1282,8 +1354,8 @@ worker:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
+    runAsUser: 1000540022
+    runAsGroup: 1000540022
     readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "worker"
@@ -1291,7 +1363,11 @@ worker:
   env: {}
   # -- Security context for the `worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
+  podSecurityContext:
+    supplementalGroups:
+      - 0
+    fsGroup: 0
+    fsGroupChangePolicy: "Always"
   # -- Number of `worker` pod
   replicaCount: 1
   # -- List of jobs to block globally
