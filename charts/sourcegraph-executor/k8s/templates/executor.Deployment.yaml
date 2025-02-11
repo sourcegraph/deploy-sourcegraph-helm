@@ -44,7 +44,7 @@ spec:
         {{- include "executor.labels" . | nindent 8 }}
     spec:
       securityContext:
-        fsGroup: {{ .Values.executor.kubernetesJob.fsGroup }}
+        fsGroup: {{ .Values.executor.securityContext.fsGroup }}
         runAsUser: {{ .Values.executor.securityContext.runAsUser }}
         runAsGroup: {{ .Values.executor.securityContext.runAsGroup }}
       serviceAccountName: sg-executor
@@ -52,6 +52,8 @@ spec:
         - name: executor
           image: {{ include "sourcegraph.image" (list . "executor") }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          securityContext:
+            privileged: {{ .Values.executor.securityContext.privileged }}
           ports:
             - containerPort: 6060
               name: debug
