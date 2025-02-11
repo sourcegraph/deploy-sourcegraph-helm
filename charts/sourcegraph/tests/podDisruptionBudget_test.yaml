@@ -13,3 +13,6 @@ tests:
   - equal:
       path: spec.minAvailable
       value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: sourcegraph-frontend
