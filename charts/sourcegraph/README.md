@@ -28,12 +28,12 @@ In addition to the documented values, all services also support the following va
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | alpine.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| alpine.image.defaultTag | string | `"6.1.2889@sha256:03f4342b207142adf886fec10a09bed9e13b5c02680f2dc60f4eeb8a8e9195a2"` | Docker image tag for the `alpine` image |
+| alpine.image.defaultTag | string | `"6.1.2889@sha256:1098432c2c1f36e291313bc610f290097bf065fc9d82882baf8dbd32c2bd14e4"` | Docker image tag for the `alpine` image |
 | alpine.image.name | string | `"alpine-3.14"` | Docker image name for the `alpine` image |
 | alpine.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | blobstore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `blobstore` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | blobstore.enabled | bool | `true` | Enable `blobstore` (S3 compatible storage) |
-| blobstore.image.defaultTag | string | `"6.1.2889@sha256:3fc5222e72111357c3cfb851be5aa379f0b9b1a0e4e93cb1594f4125a4cf65ed"` | Docker image tag for the `blobstore` image |
+| blobstore.image.defaultTag | string | `"6.1.2889@sha256:8f49a897d7f7ad4655df9cd79959620ddb73406adccccd567c4846aa24ec4a01"` | Docker image tag for the `blobstore` image |
 | blobstore.image.name | string | `"blobstore"` | Docker image name for the `blobstore` image |
 | blobstore.name | string | `"blobstore"` | Name used by resources. Does not affect service names or PVCs. |
 | blobstore.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `blobstore` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -43,7 +43,7 @@ In addition to the documented values, all services also support the following va
 | blobstore.storageSize | string | `"100Gi"` | PVC Storage Request for `blobstore` data volume |
 | cadvisor.containerSecurityContext | object | `{"privileged":true}` | Security context for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | cadvisor.enabled | bool | `true` | Enable `cadvisor` |
-| cadvisor.image.defaultTag | string | `"6.1.2889@sha256:d6c2803b8f4dab82c30f4d7f07448f7adffe977a6e143ae11ab7530afd8b1076"` | Docker image tag for the `cadvisor` image |
+| cadvisor.image.defaultTag | string | `"6.1.2889@sha256:c13394cf2de03154dd48e78129bf3d4cc31854ab98dedafd3901b413d54b4822"` | Docker image tag for the `cadvisor` image |
 | cadvisor.image.name | string | `"cadvisor"` | Docker image name for the `cadvisor` image |
 | cadvisor.name | string | `"cadvisor"` | Name used by resources. Does not affect service names or PVCs. |
 | cadvisor.podSecurityPolicy.enabled | bool | `false` | Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `cadvisor` pods |
@@ -62,7 +62,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.enabled | bool | `true` | Enable `codeinsights-db` PostgreSQL server |
 | codeInsightsDB.env | object | `{}` | Environment variables for the `codeinsights-db` container |
 | codeInsightsDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key. |
-| codeInsightsDB.image.defaultTag | string | `"6.1.2889@sha256:522eb90f640d3ed60c29895dd1e4cdac9dc9b5b80895ba5f5a636ee7e2854496"` | Docker image tag for the `codeinsights-db` image |
+| codeInsightsDB.image.defaultTag | string | `"6.1.2889@sha256:7d84febae82181e096f79e26f6459e86fa66a40ccbe30ff0f37cb118707e4e2a"` | Docker image tag for the `codeinsights-db` image |
 | codeInsightsDB.image.name | string | `"postgresql-16-codeinsights"` | Docker image name for the `codeinsights-db` image |
 | codeInsightsDB.init.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.name | string | `"codeinsights-db"` | Name used by resources. Does not affect service names or PVCs. |
@@ -83,7 +83,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeIntelDB.enabled | bool | `true` | Enable `codeintel-db` PostgreSQL server |
 | codeIntelDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key |
-| codeIntelDB.image.defaultTag | string | `"6.1.2889@sha256:44d10196f25968e82258fc7fc509a494eb924eddbb0a9b6a879f5218711ad5d9"` | Docker image tag for the `codeintel-db` image |
+| codeIntelDB.image.defaultTag | string | `"6.1.2889@sha256:8cb7b0f54c7ab464f8e3b26918a70bebcb060219dd0b91084209563238ec1dd5"` | Docker image tag for the `codeintel-db` image |
 | codeIntelDB.image.name | string | `"postgresql-16"` | Docker image name for the `codeintel-db` image |
 | codeIntelDB.name | string | `"codeintel-db"` | Name used by resources. Does not affect service names or PVCs. |
 | codeIntelDB.podSecurityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":999}` | Security context for the `codeintel-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -95,7 +95,7 @@ In addition to the documented values, all services also support the following va
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
-| frontend.image.defaultTag | string | `"6.1.2889@sha256:402a7982f96ee0f28b66c81f1127314bbee3b332d09fae8a4868b1ffe62528c8"` | Docker image tag for the `frontend` image |
+| frontend.image.defaultTag | string | `"6.1.2889@sha256:43dad562a65d08842659abdd06cf3c92d3745cc9e18c3762e458b78028a86e1e"` | Docker image tag for the `frontend` image |
 | frontend.image.name | string | `"frontend"` | Docker image name for the `frontend` image |
 | frontend.ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
 | frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
@@ -111,7 +111,7 @@ In addition to the documented values, all services also support the following va
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| gitserver.image.defaultTag | string | `"6.1.2889@sha256:73f337992fb2dde6599996e3764627a8c39ce3be0e601333e70f2fe3acb5fa4c"` | Docker image tag for the `gitserver` image |
+| gitserver.image.defaultTag | string | `"6.1.2889@sha256:282142b7886f58b0ea7251575c92d5c837ff8649d5831c9c52745ebed6f3af4f"` | Docker image tag for the `gitserver` image |
 | gitserver.image.name | string | `"gitserver"` | Docker image name for the `gitserver` image |
 | gitserver.name | string | `"gitserver"` | Name used by resources. Does not affect service names or PVCs. |
 | gitserver.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -132,7 +132,7 @@ In addition to the documented values, all services also support the following va
 | grafana.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | grafana.enabled | bool | `true` | Enable `grafana` dashboard (recommended) |
 | grafana.existingConfig | string | `""` | Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key. |
-| grafana.image.defaultTag | string | `"6.1.2889@sha256:e3245472104310d29d664a182957be374c39d0fb32b42353ba5e1373bc77070a"` | Docker image tag for the `grafana` image |
+| grafana.image.defaultTag | string | `"6.1.2889@sha256:fcf1195d4ca852527bb20b4e68756b59186f2315489539753a98cc1191e8edec"` | Docker image tag for the `grafana` image |
 | grafana.image.name | string | `"grafana"` | Docker image name for the `grafana` image |
 | grafana.name | string | `"grafana"` | Name used by resources. Does not affect service names or PVCs. |
 | grafana.podSecurityContext | object | `{"fsGroup":472,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -141,7 +141,7 @@ In addition to the documented values, all services also support the following va
 | grafana.serviceAccount.name | string | `"grafana"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| indexedSearch.image.defaultTag | string | `"6.1.2889@sha256:57334bdbd8941d25c3a4b6e417f3a88093de7941dee16c750fc99c9c2a46eaf6"` | Docker image tag for the `zoekt-webserver` image |
+| indexedSearch.image.defaultTag | string | `"6.1.2889@sha256:9bb181a003811fb0193c4fa594ded800f2f155752829f1c4f97a7bfa37dbe69e"` | Docker image tag for the `zoekt-webserver` image |
 | indexedSearch.image.name | string | `"indexed-searcher"` | Docker image name for the `zoekt-webserver` image |
 | indexedSearch.name | string | `"indexed-search"` | Name used by resources. Does not affect service names or PVCs. |
 | indexedSearch.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `indexed-search` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -151,7 +151,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multipled by the number of gitserver shards. |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| indexedSearchIndexer.image.defaultTag | string | `"6.1.2889@sha256:fad61260fdba3b445783f413b29e515eeec68fdc038f8c33d7a998c2d1de45f3"` | Docker image tag for the `zoekt-indexserver` image |
+| indexedSearchIndexer.image.defaultTag | string | `"6.1.2889@sha256:8a79ecf88f4f22ff72c8a50f33a2d43506c44deddf6ef2e43d8101af9ccd97c0"` | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
 | jaeger.args | list | `["--memory.max-traces=20000","--sampling.strategies-file=/etc/jaeger/sampling_strategies.json","--collector.otlp.enabled","--collector.otlp.grpc.host-port=:4320","--collector.otlp.http.host-port=:4321"]` | Default args passed to the `jaeger` binary |
@@ -161,7 +161,7 @@ In addition to the documented values, all services also support the following va
 | jaeger.collector.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `collector` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
 | jaeger.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | jaeger.enabled | bool | `false` | Enable `jaeger` |
-| jaeger.image.defaultTag | string | `"6.1.2889@sha256:e0f8e8aa67f6a664944e58c2b728ef737e1daa72bd9c4866113153fe19b73b11"` | Docker image tag for the `jaeger` image |
+| jaeger.image.defaultTag | string | `"6.1.2889@sha256:d35f0bf61a5be6fe73714bb06e489a68024a77ea7d0a9f346c42633d66c8b1d3"` | Docker image tag for the `jaeger` image |
 | jaeger.image.name | string | `"jaeger-all-in-one"` | Docker image name for the `jaeger` image |
 | jaeger.name | string | `"jaeger"` | Name used by resources. Does not affect service names or PVCs. |
 | jaeger.podSecurityContext | object | `{}` | Security context for the `jaeger` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -176,14 +176,14 @@ In addition to the documented values, all services also support the following va
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | migrator.enabled | bool | `true` | Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in `frontend` deployment to perform database migration |
 | migrator.env | object | `{}` | Environment variables for the `migrator` container |
-| migrator.image.defaultTag | string | `"6.1.2889@sha256:f7dc3b1006fa8a031d3c4ee224d21576f930e2522f57bf5bb15094da62211361"` | Docker image tag for the `migrator` image |
+| migrator.image.defaultTag | string | `"6.1.2889@sha256:67b5b187f006bb789898cd1ab02fd82f860fe1511524a416ba63ee71ebd603c6"` | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
 | migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nodeExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":65534,"runAsUser":65534}` | Security context for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | nodeExporter.enabled | bool | `true` | Enable `node-exporter` |
 | nodeExporter.extraArgs | list | `[]` |  |
 | nodeExporter.hostPID | bool | `true` |  |
-| nodeExporter.image.defaultTag | string | `"6.1.2889@sha256:85bf1c16153df908f509d64d8911e7476b98a1acce8c457d1ed80b86c28da837"` | Docker image tag for the `node-exporter` image |
+| nodeExporter.image.defaultTag | string | `"6.1.2889@sha256:e496aa37a1053cd59f0025c232fd58261ae08d934269870a343061c7a9596bfd"` | Docker image tag for the `node-exporter` image |
 | nodeExporter.image.name | string | `"node-exporter"` | Docker image name for the `node-exporter` image |
 | nodeExporter.name | string | `"node-exporter"` | Name used by resources. Does not affect service names or PVCs. |
 | nodeExporter.podSecurityContext | object | `{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534}` | Security context for the `node-exporter` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -213,7 +213,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.resources | object | `{"limits":{"cpu":"3","memory":"3Gi"},"requests":{"cpu":"1","memory":"1Gi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.gateway.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-collector` |
 | openTelemetry.gateway.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| openTelemetry.image.defaultTag | string | `"6.1.2889@sha256:5e4f8fb6a023b6c317045a9db90eb491541f27dabd702d67217b20a60d999046"` | Docker image tag for the `otel-collector` image |
+| openTelemetry.image.defaultTag | string | `"6.1.2889@sha256:c05e84380dd81d74ff952f73d132710dc4a162fa26c0a0709fba58dcb2829958"` | Docker image tag for the `otel-collector` image |
 | openTelemetry.image.name | string | `"opentelemetry-collector"` | Docker image name for the `otel-collector` image |
 | pgsql.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
 | pgsql.auth.database | string | `"sg"` | Sets postgres database name |
@@ -226,7 +226,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | pgsql.enabled | bool | `true` | Enable `pgsql` PostgreSQL server |
 | pgsql.existingConfig | string | `""` | Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key |
-| pgsql.image.defaultTag | string | `"6.1.2889@sha256:44d10196f25968e82258fc7fc509a494eb924eddbb0a9b6a879f5218711ad5d9"` | Docker image tag for the `pgsql` image |
+| pgsql.image.defaultTag | string | `"6.1.2889@sha256:8cb7b0f54c7ab464f8e3b26918a70bebcb060219dd0b91084209563238ec1dd5"` | Docker image tag for the `pgsql` image |
 | pgsql.image.name | string | `"postgresql-16"` | Docker image name for the `pgsql` image |
 | pgsql.name | string | `"pgsql"` | Name used by resources. Does not affect service names or PVCs. |
 | pgsql.podSecurityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -235,12 +235,12 @@ In addition to the documented values, all services also support the following va
 | pgsql.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `pgsql` |
 | pgsql.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | pgsql.storageSize | string | `"200Gi"` | PVC Storage Request for `pgsql` data volume |
-| postgresExporter.image.defaultTag | string | `"6.1.2889@sha256:b76b6b6ff7703cb8d77c8de089a3ee669a9a0eea41a786d3c8382c66e246fdbe"` | Docker image tag for the `pgsql-exporter` image |
+| postgresExporter.image.defaultTag | string | `"6.1.2889@sha256:a2fedb3d4aa845375d3c60f37e2813d095c6718c2afa96c2bcc8c17dc8b73991"` | Docker image tag for the `pgsql-exporter` image |
 | postgresExporter.image.name | string | `"postgres_exporter"` | Docker image name for the `pgsql-exporter` image |
 | postgresExporter.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `pgsql-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | preciseCodeIntel.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `precise-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | preciseCodeIntel.env | object | `{"NUM_WORKERS":{"value":"4"}}` | Environment variables for the `precise-code-intel-worker` container |
-| preciseCodeIntel.image.defaultTag | string | `"6.1.2889@sha256:29e9e3d6777269f16412452b6cec80a56fc7fb537a8155e89b4226b1b2b6536b"` | Docker image tag for the `precise-code-intel-worker` image |
+| preciseCodeIntel.image.defaultTag | string | `"6.1.2889@sha256:2a8ec49e080ff19e6f05f92c39cfc67ac50b8e2ff5aba4dcbd7451bba1e8d539"` | Docker image tag for the `precise-code-intel-worker` image |
 | preciseCodeIntel.image.name | string | `"precise-code-intel-worker"` | Docker image name for the `precise-code-intel-worker` image |
 | preciseCodeIntel.name | string | `"precise-code-intel-worker"` | Name used by resources. Does not affect service names or PVCs. |
 | preciseCodeIntel.podSecurityContext | object | `{}` | Security context for the `precise-code-intel-worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -252,7 +252,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":false,"runAsGroup":100,"runAsUser":100}` | Security context for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | prometheus.enabled | bool | `true` | Enable `prometheus` (recommended) |
 | prometheus.existingConfig | string | `""` | Name of existing ConfigMap for `pgsql`. It must contain a `prometheus.yml` key |
-| prometheus.image.defaultTag | string | `"6.1.2889@sha256:fbdedfaf3e60634965f568976a02c46b494beec2766516fde0affc8b88a8ad47"` | Docker image tag for the `prometheus` image |
+| prometheus.image.defaultTag | string | `"6.1.2889@sha256:75fa45933ecb03f7aca1d54ec5ebc05d11ff300494a2ca8fbaefa25c83f0326f"` | Docker image tag for the `prometheus` image |
 | prometheus.image.name | string | `"prometheus"` | Docker image name for the `prometheus` image |
 | prometheus.name | string | `"prometheus"` | Name used by resources. Does not affect service names or PVCs. |
 | prometheus.podSecurityContext | object | `{"fsGroup":100,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `prometheus` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -265,7 +265,7 @@ In addition to the documented values, all services also support the following va
 | redisCache.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisCache.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-cache` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | redisCache.enabled | bool | `true` | Enable `redis-cache` Redis server |
-| redisCache.image.defaultTag | string | `"6.1.2889@sha256:797fd5e4d69c246c3779ad8553611ba11e93d0951748bc4e201d6b9b0f04d485"` | Docker image tag for the `redis-cache` image |
+| redisCache.image.defaultTag | string | `"6.1.2889@sha256:204c164bc59119cde8b8d19a640897e8ffe008e040b730bed2188f28fca0d31c"` | Docker image tag for the `redis-cache` image |
 | redisCache.image.name | string | `"redis-cache"` | Docker image name for the `redis-cache` image |
 | redisCache.name | string | `"redis-cache"` | Name used by resources. Does not affect service names or PVCs. |
 | redisCache.podSecurityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `redis-cache` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -274,14 +274,14 @@ In addition to the documented values, all services also support the following va
 | redisCache.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | redisCache.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-cache` data volume |
 | redisExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| redisExporter.image.defaultTag | string | `"6.1.2889@sha256:64089b3ed54e0fa56157d6fe29e83f24c375cfe265fd10d357a4a6f1d431cbd9"` | Docker image tag for the `redis-exporter` image |
+| redisExporter.image.defaultTag | string | `"6.1.2889@sha256:a015f57ccb3f216af6d2996261749a9ebc18a30c251c3e4c996778705b22cc2f"` | Docker image tag for the `redis-exporter` image |
 | redisExporter.image.name | string | `"redis_exporter"` | Docker image name for the `redis-exporter` image |
 | redisExporter.resources | object | `{"limits":{"cpu":"10m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"100Mi"}}` | Resource requests & limits for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | redisStore.connection.endpoint | string | `"redis-store:6379"` | Endpoint to use for redis-store. Supports either host:port or IANA specification |
 | redisStore.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisStore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-store` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | redisStore.enabled | bool | `true` | Enable `redis-store` Redis server |
-| redisStore.image.defaultTag | string | `"6.1.2889@sha256:5a3a8332434caaf10cb873b0ed50bc0ee9627af63e84f45abe0228909de94f48"` | Docker image tag for the `redis-store` image |
+| redisStore.image.defaultTag | string | `"6.1.2889@sha256:4f4dfb3074e586b7eb8ab2ba631285aeb5e018452219e2f1a2f235c85b8de4bc"` | Docker image tag for the `redis-store` image |
 | redisStore.image.name | string | `"redis-store"` | Docker image name for the `redis-store` image |
 | redisStore.name | string | `"redis-store"` | Name used by resources. Does not affect service names or PVCs. |
 | redisStore.podSecurityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `redis-store` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -290,7 +290,7 @@ In addition to the documented values, all services also support the following va
 | redisStore.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | redisStore.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-store` data volume |
 | repoUpdater.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `repo-updater` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| repoUpdater.image.defaultTag | string | `"6.1.2889@sha256:1644d18f4f594e9bb97cb5d5365e7b6c20a78b280895315e13703ea848effc62"` | Docker image tag for the `repo-updater` image |
+| repoUpdater.image.defaultTag | string | `"6.1.2889@sha256:95e8a28bd2d13270a5d0ab80eae5e8aac44913bd421fb92cf45d5550c4874fbc"` | Docker image tag for the `repo-updater` image |
 | repoUpdater.image.name | string | `"repo-updater"` | Docker image name for the `repo-updater` image |
 | repoUpdater.name | string | `"repo-updater"` | Name used by resources. Does not affect service names or PVCs. |
 | repoUpdater.podSecurityContext | object | `{}` | Security context for the `repo-updater` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -298,7 +298,7 @@ In addition to the documented values, all services also support the following va
 | repoUpdater.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `repo-updater` |
 | repoUpdater.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | searcher.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| searcher.image.defaultTag | string | `"6.1.2889@sha256:18d1b4298666938097e1061afcd1f842e84351cdde9c79b2da0b0d7cf72b2021"` | Docker image tag for the `searcher` image |
+| searcher.image.defaultTag | string | `"6.1.2889@sha256:66f633e4e666d65684915087009bdbdb8a46dad6eccb4c307a6de141e0225be6"` | Docker image tag for the `searcher` image |
 | searcher.image.name | string | `"searcher"` | Docker image name for the `searcher` image |
 | searcher.name | string | `"searcher"` | Name used by resources. Does not affect service names or PVCs. |
 | searcher.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":100}` | Security context for the `searcher` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -310,7 +310,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
-| sourcegraph.image.repository | string | `"us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal"` | Global docker image registry or prefix |
+| sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add extra labels to all resources |
@@ -329,7 +329,7 @@ In addition to the documented values, all services also support the following va
 | storageClass.provisioner | string | `"kubernetes.io/gce-pd"` | Name of the storageClass provisioner, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner) and consult your cloud provider persistent storage documentation |
 | storageClass.type | string | `"pd-ssd"` | Value of `type` key in storageClass `parameters`, consult your cloud provider persistent storage documentation |
 | symbols.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `symbols` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| symbols.image.defaultTag | string | `"6.1.2889@sha256:888ee3dfbe022e0b98c6868bccb51de78d4d769ce111fb1209019bcf66638b5d"` | Docker image tag for the `symbols` image |
+| symbols.image.defaultTag | string | `"6.1.2889@sha256:0ffea2e2d7641decf87587a2c0fbcedb172d876f71a10da4cd3e72b566ce12b4"` | Docker image tag for the `symbols` image |
 | symbols.image.name | string | `"symbols"` | Docker image name for the `symbols` image |
 | symbols.name | string | `"symbols"` | Name used by resources. Does not affect service names or PVCs. |
 | symbols.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":100}` | Security context for the `symbols` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -340,7 +340,7 @@ In addition to the documented values, all services also support the following va
 | symbols.storageSize | string | `"12Gi"` | Size of the PVC for symbols pods to store cache data |
 | syntacticCodeIntel.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | syntacticCodeIntel.enabled | bool | `false` |  |
-| syntacticCodeIntel.image.defaultTag | string | `"6.1.2889@sha256:49bb092ddc8f27074d99158bfc4c8ce3534958ef0d254919bafe35d88a3321b0"` | Docker image tag for the `syntactic-code-intel-worker` image |
+| syntacticCodeIntel.image.defaultTag | string | `"6.1.2889@sha256:966a4d6f2cbf81ca064086bb4541cad0d941b5673251b8bca0336a390d29a87c"` | Docker image tag for the `syntactic-code-intel-worker` image |
 | syntacticCodeIntel.image.name | string | `"syntactic-code-intel-worker"` | Docker image name for the `syntactic-code-intel-worker` image |
 | syntacticCodeIntel.name | string | `"syntactic-code-intel-worker"` | Name used by resources. Does not affect service names or PVCs. |
 | syntacticCodeIntel.podSecurityContext | object | `{}` | Security context for the `syntactic-code-intel-worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -350,7 +350,7 @@ In addition to the documented values, all services also support the following va
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |
 | syntacticCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | syntectServer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| syntectServer.image.defaultTag | string | `"6.1.2889@sha256:db83411e2f3dfd75fc830cf4f9fc0ef97cc5d9ed6c1910614363a2fc1e99622c"` | Docker image tag for the `syntect-server` image |
+| syntectServer.image.defaultTag | string | `"6.1.2889@sha256:eea296267ca84c8d06eb9c1e44fd5f4c4fbb3f0490193517cc3764d558a773c6"` | Docker image tag for the `syntect-server` image |
 | syntectServer.image.name | string | `"syntax-highlighter"` | Docker image name for the `syntect-server` image |
 | syntectServer.name | string | `"syntect-server"` | Name used by resources. Does not affect service names or PVCs. |
 | syntectServer.podSecurityContext | object | `{}` | Security context for the `syntect-server` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
@@ -361,7 +361,7 @@ In addition to the documented values, all services also support the following va
 | worker.blocklist | list | `[]` | List of jobs to block globally If replicas are configured, use this values to block jobs instead of manually setting WORKER_JOB_BLOCKLIST |
 | worker.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | worker.env | object | `{}` | Environment variables for the `worker` container |
-| worker.image.defaultTag | string | `"6.1.2889@sha256:86013b6bc116ed063faa38212b506ca55298af1adedcd9fe11856eb8de61d2c3"` | Docker image tag for the `worker` image |
+| worker.image.defaultTag | string | `"6.1.2889@sha256:1ef615670e315edda8511ab1e06ffd27b98129bc962bf06aca455c7731baf482"` | Docker image tag for the `worker` image |
 | worker.image.name | string | `"worker"` | Docker image name for the `worker` image |
 | worker.name | string | `"worker"` | Name used by resources. Does not affect service names or PVCs. |
 | worker.podSecurityContext | object | `{}` | Security context for the `worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
