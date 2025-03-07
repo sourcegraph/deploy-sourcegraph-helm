@@ -9,6 +9,7 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Fix Pod Disruption Budget for sourcegraph-frontend
+- Added a startup probe to the gitserver statefulset to give it time to run the on-disk migration from repo names to repo IDs
 
 ## 5.10.0
 
