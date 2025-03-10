@@ -23,11 +23,13 @@ jobs:
         run: pip install checkov
         
       - name: Write skip checks config
-        run: echo "${{ vars.CHECKOV_SKIP_CHECKS }}" > checkov-skip.yml
+        run: |
+            echo "${{ vars.CHECKOV_SKIP_CHECKS }}" > .checkov.yaml
+            ls
 
       - name: Run Checkov scan
         run: |
-          checkov -d . --output cli --output sarif --output-file-path console,results.sarif
+          checkov -d . --output cli --output sarif --output-file-path console,results.sarif --s
         continue-on-error: true
 
       - name: Upload SARIF file
