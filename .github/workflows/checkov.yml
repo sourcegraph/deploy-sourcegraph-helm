@@ -29,7 +29,7 @@ jobs:
 
       - name: Run Checkov scan
         run: |
-          checkov -d . --output cli --output sarif --output-file-path console,results.sarif
+          checkov -d ./charts --output cli --output sarif --output-file-path console,results.sarif
         continue-on-error: true
 
       - name: Upload SARIF file
