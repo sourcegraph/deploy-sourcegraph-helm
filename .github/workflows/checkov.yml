@@ -25,7 +25,6 @@ jobs:
       - name: Write skip checks config
         run: |
             echo "${{ vars.CHECKOV_SKIP_CHECKS }}" > .checkov.yaml
-            ls -a
 
       - name: Run Checkov scan
         run: |
