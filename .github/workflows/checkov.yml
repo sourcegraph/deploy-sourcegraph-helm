@@ -1,0 +1,37 @@
+name: Checkov Scan
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  checkov-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Checkov
+        run: pip install checkov
+        
+      - name: Write skip checks config
+        run: |
+            echo "${{ vars.CHECKOV_SKIP_CHECKS }}" > .checkov.yaml
+
+      - name: Run Checkov scan
+        run: |
+          checkov -d ./charts --output cli --output sarif --output-file-path console,results.sarif
+        continue-on-error: true
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
