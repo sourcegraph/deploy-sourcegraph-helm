@@ -992,6 +992,9 @@ redisExporter:
 redisStore:
   # -- Enable `redis-store` Redis server
   enabled: true
+  # -- io-threads configuration for redis-store (disabled by default)
+  # When enabled, CPU resources should be set to io-threads+1
+  ioThreads: null
   connection:
     # -- Name of existing secret to use for Redis endpoint
     # The secret must contain the key `endpoint` and should follow IANA specification

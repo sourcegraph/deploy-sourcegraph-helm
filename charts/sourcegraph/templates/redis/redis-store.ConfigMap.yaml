@@ -1,0 +1,26 @@
+{{- if .Values.redisStore.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-store
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+data:
+  redis.conf: |
+    # allow access from all instances
+    protected-mode no
+    # limit memory usage, return error when hitting limit
+    maxmemory 6gb
+    maxmemory-policy noeviction
+    # live commit log to disk, additionally snapshot every 5 minutes
+    dir /redis-data/
+    appendonly yes
+    aof-use-rdb-preamble yes
+    save 300 1
+    {{- if .Values.redisStore.ioThreads }}
+    # io threads configuration - when enabled, CPU resources should be set to io-threads+1
+    io-threads {{ .Values.redisStore.ioThreads }}
+    {{- end }}
+{{- end }}
