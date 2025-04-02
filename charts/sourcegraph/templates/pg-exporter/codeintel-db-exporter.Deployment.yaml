@@ -1,4 +1,4 @@
-{{- if and .Values.postgresExporter.standalone (not .Values.codeintel-db.enabled) -}}
+{{- if and .Values.postgresExporter.standalone (not .Values.codeIntelDB.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:

@@ -1,4 +1,4 @@
-{{- if and .Values.postgresExporter.standalone (not .Values.codeinsights-db.enabled) -}}
+{{- if and .Values.postgresExporter.standalone (not .Values.codeInsightsDB.enabled) -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
