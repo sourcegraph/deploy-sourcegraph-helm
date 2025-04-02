@@ -73,19 +73,6 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
-        # volumeMounts:
-        # - name: config
-        #   mountPath: /config
-        # {{- if .Values.postgresExporter.extraVolumeMounts }}
-        # {{- toYaml .Values.postgresExporter.extraVolumeMounts | nindent 8 }}
-        # {{- end }}
-      # volumes:
-      # - name: config
-      #   configMap:
-      #     name: {{ .Values.postgresExporter.configMap | default "postgres-exporter-config" }}
-      # {{- if .Values.postgresExporter.extraVolumes }}
-      # {{- toYaml .Values.postgresExporter.extraVolumes | nindent 6 }}
-      # {{- end }}
       securityContext:
         {{- toYaml .Values.postgresExporter.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "postgresExporter" ) | trim | nindent 6 }}
