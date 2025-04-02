@@ -775,6 +775,8 @@ pgsql:
   storageSize: 200Gi
 
 postgresExporter:
+  # deploy the postgres exporter service as a standalone deployment
+  standalone: false
   image:
     # -- Docker image tag for the `pgsql-exporter` image
     defaultTag: 6.0.0@sha256:685a18f482e4a71a54e15814ffd6b8cd62844f6af056a81f7ec0ba5cf23fce27

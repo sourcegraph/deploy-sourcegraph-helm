@@ -1,0 +1,99 @@
+{{- if and .Values.postgresExporter.standalone (not .Values.pgsql.enabled) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Postgres exporter for external PostgreSQL pgsql database.
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: postgres-exporter
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.postgresExporter.labels }}
+      {{- toYaml .Values.postgresExporter.labels | nindent 4 }}
+    {{- end }}
+  name: pgsql-exporter
+spec:
+  replicas: 1
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: postgres-exporter
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9187"
+        kubectl.kubernetes.io/default-container: postgresExporter
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.postgresExporter.podAnnotations }}
+      {{- toYaml .Values.postgresExporter.podAnnotations | nindent 8 }}
+      {{- end }}
+    labels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.postgresExporter.podLabels }}
+      {{- toYaml .Values.postgresExporter.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: postgres-exporter
+    spec:
+      containers:
+      - name: postgres-exporter
+        image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        env:
+        {{- if .Values.postgresExporter.existingSecret }}
+        - name: DATA_SOURCE_NAME
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.postgresExporter.existingSecret }}
+              key: {{ .Values.postgresExporter.existingSecretKey | default "pgsql-connectionString" }}
+        {{- else }}
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "POSTGRES_") | nindent 8 }}
+        - name: DATA_SOURCE_NAME
+          value: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:$POSTGRES_PORT/$POSTGRES_DATABASE?sslmode=$POSTGRES_SSLMODE"
+        {{- end }}
+        {{- range $name, $item := .Values.postgresExporter.env}}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/queries.yaml
+        ports:
+        - name: http
+          containerPort: 9187
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        # volumeMounts:
+        # - name: config
+        #   mountPath: /config
+        # {{- if .Values.postgresExporter.extraVolumeMounts }}
+        # {{- toYaml .Values.postgresExporter.extraVolumeMounts | nindent 8 }}
+        # {{- end }}
+      # volumes:
+      # - name: config
+      #   configMap:
+      #     name: {{ .Values.postgresExporter.configMap | default "postgres-exporter-config" }}
+      # {{- if .Values.postgresExporter.extraVolumes }}
+      # {{- toYaml .Values.postgresExporter.extraVolumes | nindent 6 }}
+      # {{- end }}
+      securityContext:
+        {{- toYaml .Values.postgresExporter.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "postgresExporter" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "postgresExporter" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.tolerations" (list . "postgresExporter" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "postgresExporter" ) | trim | nindent 6 }}
+{{- end }}
