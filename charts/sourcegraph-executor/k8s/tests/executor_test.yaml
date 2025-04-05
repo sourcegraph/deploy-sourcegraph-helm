@@ -46,3 +46,12 @@ tests:
     templates:
       - executor.Deployment.yaml
       - executor.Service.yaml
+  - it: fails if neither queueName and queueNames are set
+    set:
+      executor:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "You must set either executor.queueName or executor.queueNames"
+    templates:
+      - executor.Deployment.yaml
