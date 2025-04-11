@@ -16,14 +16,15 @@ data:
         access: proxy
         url: http://{{ default "jaeger-query" .Values.jaeger.query.name }}:16686/-/debug/jaeger
       - name: pgsql
+        database: $GRAFANA_PGSQL_DATABASE
+        editable: true
+        jsonData:
+          sslmode: $GRAFANA_PGSQL_SSLMODE
+        secureJsonData:
+          password: $GRAFANA_PGSQL_PASSWORD
         type: postgres
         url: $GRAFANA_PGSQL_HOST:$GRAFANA_PGSQL_PORT
         user: $GRAFANA_PGSQL_USER
-        database: $GRAFANA_PGSQL_DATABASE
-        secureJsonData:
-          password: $GRAFANA_PGSQL_PASSWORD
-        jsonData:
-          sslmode: $GRAFANA_PGSQL_SSLMODE
 kind: ConfigMap
 metadata:
   labels:
