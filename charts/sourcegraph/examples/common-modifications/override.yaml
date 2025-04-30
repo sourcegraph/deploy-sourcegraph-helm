@@ -171,15 +171,6 @@ redisStore:
       memory: 7Gi
   storageSize: 100Gi
 
-repoUpdater:
-  resources:
-    limits:
-      cpu: "1"
-      memory: 2Gi
-    requests:
-      cpu: "1"
-      memory: 500Mi
-
 searcher:
   replicaCount: 2
   resources:

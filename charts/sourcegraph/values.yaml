@@ -1035,39 +1035,6 @@ redisStore:
   # -- PVC Storage Request for `redis-store` data volume
   storageSize: 100Gi
 
-repoUpdater:
-  image:
-    # -- Docker image tag for the `repo-updater` image
-    defaultTag: 6.0.0@sha256:238702dde17eaa41f9dc5b5f379c08a9e57940587128ceda6008d7f06e72cccc
-    # -- Docker image name for the `repo-updater` image
-    name: "repo-updater"
-  # -- Security context for the `repo-updater` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
-    allowPrivilegeEscalation: false
-    runAsUser: 100
-    runAsGroup: 101
-    readOnlyRootFilesystem: true
-  # -- Name used by resources. Does not affect service names or PVCs.
-  name: "repo-updater"
-  # -- Security context for the `repo-updater` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext: {}
-  # -- Resource requests & limits for the `repo-updater` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
-  resources:
-    limits:
-      cpu: "1"
-      memory: 2Gi
-    requests:
-      cpu: "1"
-      memory: 500Mi
-  serviceAccount:
-    # -- Enable creation of ServiceAccount for `repo-updater`
-    create: false
-    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
-    name: ""
-
 searcher:
   image:
     # -- Docker image tag for the `searcher` image

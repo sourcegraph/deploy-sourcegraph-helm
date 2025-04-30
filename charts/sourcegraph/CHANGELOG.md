@@ -10,6 +10,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Fix Pod Disruption Budget for sourcegraph-frontend
 - Added a startup probe to the gitserver statefulset to give it time to run the on-disk migration from repo names to repo IDs
+- The repo-updater service is no longer needed and has been removed from the chart.
 
 ## 5.10.0
 
