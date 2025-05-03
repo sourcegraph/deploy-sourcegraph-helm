@@ -100,9 +100,9 @@ tolerations:
 
 
 {{- define "executor.name" -}}
-{{- if .Values.executor.env.EXECUTOR_QUEUE_NAME.value -}}
+{{- if not (empty .Values.executor.env.EXECUTOR_QUEUE_NAME.value) -}}
 executor-{{.Values.executor.env.EXECUTOR_QUEUE_NAME.value}}
-{{- else if .Values.executor.env.EXECUTOR_QUEUE_NAMES.value -}}
+{{- else if not (empty .Values.executor.env.EXECUTOR_QUEUE_NAMES.value) -}}
 executor-{{replace "," "-" .Values.executor.env.EXECUTOR_QUEUE_NAMES.value }}
 {{- end }}
 {{- end }}
