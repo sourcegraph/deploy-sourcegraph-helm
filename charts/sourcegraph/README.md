@@ -298,7 +298,7 @@ In addition to the documented values, all services also support the following va
 | searcher.resources | object | `{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
+| searcher.storageSize | string | `"52Gi"` | Size of the PVC for searcher pods to store cache data |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
