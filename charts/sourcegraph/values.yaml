@@ -1073,7 +1073,7 @@ searcher:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
   # -- Size of the PVC for searcher pods to store cache data
-  storageSize: 26Gi
+  storageSize: 52Gi
 
 storageClass:
   # -- Enable creation of storageClass.
