@@ -74,6 +74,11 @@ searcher:
     SRC_LOG_FORMAT: 
       value: json_gcp
 
+symbols:
+  env:
+    SRC_LOG_FORMAT: 
+      value: json_gcp
+
 syntectServer:
   env:
     SRC_LOG_FORMAT: 

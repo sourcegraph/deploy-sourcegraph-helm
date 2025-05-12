@@ -96,6 +96,15 @@ tests:
   - equal:
       path: spec.template.spec.priorityClassName
       value: searcher-class
+- it: set priority class on symbols
+  template: symbols/symbols.StatefulSet.yaml
+  set:
+    symbols:
+      priorityClassName: symbols-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: symbols-class
 - it: set priority class on redisCache
   template: redis/redis-cache.Deployment.yaml
   set:
