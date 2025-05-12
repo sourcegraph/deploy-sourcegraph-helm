@@ -64,3 +64,14 @@ searcher:
     requests:
       cpu: 500m
       memory: 1G
+
+symbols:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 4G
+      ephemeral-storage: "10G"
+    requests:
+      cpu: "1"
+      memory: 1G
+      ephemeral-storage: "10G"

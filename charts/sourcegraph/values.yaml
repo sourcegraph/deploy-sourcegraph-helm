@@ -1073,7 +1073,7 @@ searcher:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
   # -- Size of the PVC for searcher pods to store cache data
-  storageSize: 52Gi
+  storageSize: 26Gi
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -1095,6 +1095,46 @@ storageClass:
   # -- Persistent volumes topology configuration,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: []
+
+symbols:
+  image:
+    # -- Docker image tag for the `symbols` image
+    defaultTag: 6.0.0@sha256:7f91048d1966add54b199755c77a5c3ca84b7f57bb5d2ffb65113da7f100b051
+    # -- Docker image name for the `symbols` image
+    name: "symbols"
+  # -- Security context for the `symbols` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  # -- Security context for the `symbols` pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext:
+    runAsUser: 100
+    fsGroup: 101
+    fsGroupChangePolicy: "OnRootMismatch"
+  # -- Name used by resources. Does not affect service names or PVCs.
+  name: "symbols"
+  # -- Number of `symbols` pod
+  replicaCount: 1
+  # -- Resource requests & limits for the `symbols` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: "2"
+      memory: 2G
+    requests:
+      cpu: 500m
+      memory: 500M
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `symbols`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
+  # -- Size of the PVC for symbols pods to store cache data
+  storageSize: 12Gi
 
 syntectServer:
   image:
