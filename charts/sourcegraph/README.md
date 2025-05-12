@@ -298,7 +298,7 @@ In addition to the documented values, all services also support the following va
 | searcher.resources | object | `{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
+| searcher.storageSize | string | `"52Gi"` | Size of the PVC for searcher pods to store cache data |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
@@ -320,16 +320,6 @@ In addition to the documented values, all services also support the following va
 | storageClass.parameters | object | `{}` | Extra parameters of storageClass, consult your cloud provider persistent storage documentation |
 | storageClass.provisioner | string | `"kubernetes.io/gce-pd"` | Name of the storageClass provisioner, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner) and consult your cloud provider persistent storage documentation |
 | storageClass.type | string | `"pd-ssd"` | Value of `type` key in storageClass `parameters`, consult your cloud provider persistent storage documentation |
-| symbols.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `symbols` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| symbols.image.defaultTag | string | `"6.0.0@sha256:7f91048d1966add54b199755c77a5c3ca84b7f57bb5d2ffb65113da7f100b051"` | Docker image tag for the `symbols` image |
-| symbols.image.name | string | `"symbols"` | Docker image name for the `symbols` image |
-| symbols.name | string | `"symbols"` | Name used by resources. Does not affect service names or PVCs. |
-| symbols.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":100}` | Security context for the `symbols` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| symbols.replicaCount | int | `1` | Number of `symbols` pod |
-| symbols.resources | object | `{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `symbols` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| symbols.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `symbols` |
-| symbols.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| symbols.storageSize | string | `"12Gi"` | Size of the PVC for symbols pods to store cache data |
 | syntacticCodeIntel.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | syntacticCodeIntel.enabled | bool | `false` |  |
 | syntacticCodeIntel.image.defaultTag | string | `"6.0.0@sha256:50bdeb38b196f0fc21404969016bf8263f78144292e905867e93480f66c8251c"` | Docker image tag for the `syntactic-code-intel-worker` image |
