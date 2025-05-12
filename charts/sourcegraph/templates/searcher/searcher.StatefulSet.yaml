@@ -62,7 +62,7 @@ spec:
           {{- else }}
           # This value is ~45% of the default value for
           # storageSize in the VolumeClaimTemplate below
-          value: "23400"  
+          value: "11700"
           {{- end }}
         - name: SYMBOLS_CACHE_SIZE_MB
           # Set the cache size to ~45% of the PVC size
@@ -71,7 +71,7 @@ spec:
           {{- else }}
           # This value is ~45% of the default value for
           # storageSize in the VolumeClaimTemplate below
-          value: "23400"  
+          value: "11700"
           {{- end }}
         - name: POD_NAME
           valueFrom:
