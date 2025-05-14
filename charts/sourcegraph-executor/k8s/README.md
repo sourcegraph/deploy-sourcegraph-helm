@@ -89,6 +89,10 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or queueNames is required.** |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
 | executor.replicas | int | `1` |  |
+| executor.resources.limits.cpu | string | `"1"` |  |
+| executor.resources.limits.memory | string | `"1Gi"` |  |
+| executor.resources.requests.cpu | string | `"500m"` |  |
+| executor.resources.requests.memory | string | `"200Mi"` |  |
 | executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | The containerSecurityContext for the executor image |
 | executor.storageSize | string | `"10Gi"` | The storage size of the PVC attached to the executor deployment. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
@@ -99,6 +103,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
+| sourcegraph.localDevMode | bool | `false` | When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources. |
 | sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
 | sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
