@@ -72,6 +72,6 @@ jobs:
             if gsutil ls gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}/$i 2>/dev/null; then
               echo "Chart already published"
             else
-              helm gcs push --public --publicUrl https://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }} $i sg
+              helm gcs push --force --public --publicUrl https://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }} $i sg
             fi;
           done
