@@ -93,19 +93,6 @@ searcher:
                 app: searcher
           weight: 100
 
-symbols:
-  replicaCount: 3
-  affinity:
-    podAntiAffinity:
-      preferredDuringSchedulingIgnoredDuringExecution:
-        - podAffinityTerm:
-            topologyKey: kubernetes.io/hostname
-            labelSelector:
-              matchLabels:
-                <<: *commonSelectorLabels
-                app: symbols
-          weight: 100
-
 worker:
   replicaCount: 3
   affinity:

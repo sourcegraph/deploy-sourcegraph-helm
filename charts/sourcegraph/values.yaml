@@ -1169,6 +1169,7 @@ symbols:
   # -- Size of the PVC for symbols pods to store cache data
   storageSize: 12Gi
 
+
 syntectServer:
   image:
     # -- Docker image tag for the `syntect-server` image

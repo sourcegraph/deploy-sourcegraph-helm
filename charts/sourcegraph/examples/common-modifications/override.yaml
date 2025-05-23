@@ -171,15 +171,6 @@ redisStore:
       memory: 7Gi
   storageSize: 100Gi
 
-repoUpdater:
-  resources:
-    limits:
-      cpu: "1"
-      memory: 2Gi
-    requests:
-      cpu: "1"
-      memory: 500Mi
-
 searcher:
   replicaCount: 2
   resources:
@@ -190,19 +181,6 @@ searcher:
     requests:
       cpu: 500m
       ephemeral-storage: 25G
-      memory: 500M
-
-
-symbols:
-  replicaCount: 1
-  resources:
-    limits:
-      cpu: "2"
-      ephemeral-storage: 12G
-      memory: 2G
-    requests:
-      cpu: 500m
-      ephemeral-storage: 10G
       memory: 500M
 
 syntectServer:

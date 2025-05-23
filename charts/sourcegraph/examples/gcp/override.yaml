@@ -69,17 +69,7 @@ preciseCodeIntel:
     SRC_LOG_FORMAT: 
       value: json_gcp
 
-repoUpdater:
-  env:
-    SRC_LOG_FORMAT: 
-      value: json_gcp
-
 searcher:
-  env:
-    SRC_LOG_FORMAT: 
-      value: json_gcp
-
-symbols:
   env:
     SRC_LOG_FORMAT: 
       value: json_gcp
