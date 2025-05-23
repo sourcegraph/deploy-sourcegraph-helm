@@ -146,6 +146,25 @@ tolerations:
 {{- end }}
 
 {{/*
+OpenTelemetry tolerations - supports separate tolerations for agent and gateway
+*/}}
+{{- define "sourcegraph.openTelemetry.tolerations" -}}
+{{- $top := index . 0 }}
+{{- $component := index . 1 }}
+{{- $globalTolerations := (index $top.Values "sourcegraph" "tolerations") }}
+{{- $openTelemetryTolerations := (index $top.Values "openTelemetry" "tolerations") }}
+{{- $componentTolerations := (index $top.Values "openTelemetry" $component "tolerations") }}
+tolerations:
+{{- if $componentTolerations }}
+{{- $componentTolerations | toYaml | trim | nindent 2 }}
+{{- else if $openTelemetryTolerations }}
+{{- $openTelemetryTolerations | toYaml | trim | nindent 2 }}
+{{- else if $globalTolerations }}
+{{- $globalTolerations | toYaml | trim | nindent 2 }}
+{{- end }}
+{{- end }}
+
+{{/*
 Jaeger common labels
 */}}
 {{- define "sourcegraph.jaeger.labels" -}}

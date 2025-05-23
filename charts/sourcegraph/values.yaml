@@ -632,6 +632,8 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Tolerations for the `otel-collector` pods
+    tolerations: []
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
@@ -658,6 +660,8 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Tolerations for the `otel-agent` pods
+    tolerations: []
 
 nodeExporter:
   # -- Enable `node-exporter`
