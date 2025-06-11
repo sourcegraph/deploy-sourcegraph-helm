@@ -61,7 +61,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password The name of the secret must match `executor.name`, i.e., the name of the helm release used to deploy the helm chart. The k8s Secret must contain the key `EXECUTOR_FRONTEND_PASSWORD` matching the site config `executors.accessToken` value. `executor.frontendPassword` is ignored if this is enabled. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if `executor.frontendExistingSecret`` is not configured. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
-| executor.image.defaultTag | string | `"6.4.2622@sha256:0afa9458855f9fc3083d171db6d2e6f73c96af0fbab4993254dbb2eb2d8a7cd2"` |  |
+| executor.image.defaultTag | string | `"6.4.2622@sha256:f7678df503b22799c5bd2f7bde1a6ba0a8f1c113545b9db6a9b12d084b312b6a"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
 | executor.kubeconfigPath | string | `""` | The path to the kubeconfig file. If not specified, the in-cluster config is used. |
 | executor.kubernetesJob.deadline | string | `"1200"` | The number of seconds after which a Kubernetes job will be terminated. |
@@ -99,7 +99,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
-| sourcegraph.image.repository | string | `"us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal"` | Global docker image registry or prefix |
+| sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
