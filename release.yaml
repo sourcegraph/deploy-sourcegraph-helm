@@ -618,11 +618,11 @@ promoteToPublic:
       - name: "github:pr"
         cmd: |
           set -eu
-          internal_branch="promote/release-{{version}}-update-main"
+          # Create PR to merge release updates into main branch
           gh pr create \
             --fill \
             --draft \
-            --base "$internal_branch" \
+            --base main \
             --title "Update main: build {{version}}" \
             --body "Test plan: automated release PR, CI will perform additional checks"
           echo "🚢 Please check the associated CI build to ensure the process completed".
