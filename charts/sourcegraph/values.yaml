@@ -326,6 +326,8 @@ frontend:
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC
+  createRoleBinding: true
   # -- Security context for the `frontend` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
