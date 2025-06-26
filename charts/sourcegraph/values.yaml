@@ -1266,3 +1266,7 @@ extraResources: []
 #   preemptionPolicy: Never
 #   description: "gitserver priority class"
 priorityClasses: []
+
+# -- Enable the busybox connection test after deployment
+sgTestConnection:
+  enabled: true
