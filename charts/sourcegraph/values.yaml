@@ -38,6 +38,19 @@ sourcegraph:
   revisionHistoryLimit: 10
   # -- Add extra labels to all services
   serviceLabels: {}
+  # -- Global container security context settings that can be overridden per service
+  # Used to set security parameters like runAsUser, privileged mode, etc.
+  containerSecurityContext: {}
+  # -- Global pod security context settings that can be overridden per service
+  # Controls pod-level security attributes like fsGroup and runAsUser
+  podSecurityContext: {}
+  # -- Global privileged mode settings that can be overridden per service
+  # Determines if pods/containers can run with elevated privileges
+  privileged: {}
+  # -- Global service account creation settings that can be overridden per service
+  # Controls whether service accounts should be automatically created
+  serviceAccount:
+    create: false
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
