@@ -1,3 +1,7 @@
+{{- if .Values.executor.enabled -}}
+{{- if and (empty .Values.executor.queueName) (empty .Values.executor.queueNames) }}
+{{- fail "You must set either executor.queueName or executor.queueNames" }}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
