@@ -94,6 +94,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| frontend.createRoleBinding | bool | `true` | Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
 | frontend.image.defaultTag | string | `"6.0.0@sha256:d4f21178096da5fdb3804099ae9de2e050b06e859a327aa79452b1ea2f3ede0a"` | Docker image tag for the `frontend` image |
 | frontend.image.name | string | `"frontend"` | Docker image name for the `frontend` image |
