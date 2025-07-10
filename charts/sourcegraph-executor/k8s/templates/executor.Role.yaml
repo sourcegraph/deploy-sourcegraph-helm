@@ -29,7 +29,10 @@ rules:
       - ""
     resources:
       - secrets
+      - persistentvolumeclaims
     verbs:
+      - get
+      - list
       - create
       - delete
 {{- end }}
