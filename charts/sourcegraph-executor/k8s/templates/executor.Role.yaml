@@ -10,16 +10,28 @@ metadata:
     app.kubernetes.io/component: executor
 rules:
   - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - create
+      - delete
+  - apiGroups:
       - ""
     resources:
       - pods
       - pods/log
-      - secrets
-      - persistentvolumeclaims
     verbs:
       - get
       - list
       - watch
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - persistentvolumeclaims
+    verbs:
+      - get
       - create
       - delete
 {{- end }}
