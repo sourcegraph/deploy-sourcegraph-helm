@@ -30,7 +30,7 @@ internal:
         - name: sg ops:sourcegraph
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -43,7 +43,7 @@ internal:
         - name: sg ops:dind
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -56,7 +56,7 @@ internal:
         - name: sg ops:k8s
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -69,7 +69,7 @@ internal:
         - name: sg ops:migrator
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -102,7 +102,7 @@ internal:
         - name: sg ops:sourcegraph
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             echo "updating sourcegraph images"
             sg ops update-images \
@@ -116,7 +116,7 @@ internal:
         - name: sg ops:dind
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -129,7 +129,7 @@ internal:
         - name: sg ops:k8s
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -142,7 +142,7 @@ internal:
         - name: sg ops:migrator
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -174,7 +174,7 @@ internal:
         - name: sg ops:sourcegraph
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             echo "updating sourcegraph images"
             sg ops update-images \
@@ -188,7 +188,7 @@ internal:
         - name: sg ops:dind
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -201,7 +201,7 @@ internal:
         - name: sg ops:k8s
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
@@ -214,7 +214,7 @@ internal:
         - name: sg ops:migrator
           cmd: |
             set -eu
-            registry=us-central1-docker.pkg.dev/sourcegraph-ci/rfc795-internal
+            registry=us-docker.pkg.dev/sourcegraph-images/internal
 
             sg ops update-images \
               -t {{inputs.server.tag}} \
