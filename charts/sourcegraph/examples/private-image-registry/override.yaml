@@ -25,3 +25,9 @@ alpine:
   image:
     name: alpine # Use a custom name instead of the Sourcegraph name - i.e. alpine-3.12
     tag: 3.12 # Use a custom tag instead of the default - i.e. 3.35.1
+
+# Allow Executors to reuse the same registry credentials to pull the needed images for Batch Changes and Auto-indexing
+executor:
+  extraEnv:
+   - name: KUBERNETES_IMAGE_PULL_SECRETS
+     value: regcred

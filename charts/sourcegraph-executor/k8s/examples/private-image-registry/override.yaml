@@ -1,0 +1,15 @@
+## Override file demonstrating the use of a private docker image registry and custom image names
+
+sourcegraph:
+  image:
+    repository: custom-repo.ecr.us-east-1.amazonaws.com/sourcegraph
+
+  # Registry credentials: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry
+  imagePullSecrets:
+  - name: regcred # Pre-existing secret that contains the credentials needed to pull from the image registry
+
+# Allow Executors to reuse the same registry credentials to pull the needed images for Batch Changes and Auto-indexing
+executor:
+  extraEnv:
+   - name: KUBERNETES_IMAGE_PULL_SECRETS
+     value: regcred
