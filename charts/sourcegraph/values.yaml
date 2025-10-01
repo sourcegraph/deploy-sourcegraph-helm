@@ -895,6 +895,7 @@ prometheus:
   name: "prometheus"
   # -- Enable RBAC for `prometheus`
   privileged: true
+  createRoleBinding: true
   # -- Resource requests & limits for the `prometheus` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   # Prometheus is relied upon to monitor services for sending alerts to site admins when
@@ -1260,7 +1261,7 @@ worker:
 # -- Additional resources to include in the rendered manifest. Templates are supported.
 extraResources: []
 
-# -- Additional priorityClasses minimise re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class.
+# -- Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class.
 # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass)
 # Sample class definition:
 # - name: gitserver-class
