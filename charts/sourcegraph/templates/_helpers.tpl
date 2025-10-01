@@ -249,6 +249,7 @@ app.kubernetes.io/name: jaeger
 {{- end }}
 
 {{- define "sourcegraph.redisConnection" -}}
+{{- if .Values.sourcegraph.createKubernetesSecrets -}}
 - name: REDIS_CACHE_ENDPOINT
   valueFrom:
     secretKeyRef:
@@ -259,7 +260,13 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: endpoint
       name: {{ default .Values.redisStore.name .Values.redisStore.connection.existingSecret }}
-{{- end }}
+{{- else -}}
+- name: REDIS_CACHE_ENDPOINT
+  value: {{ .Values.sourcegraph.redisCacheEndpoint }}
+- name: REDIS_STORE_ENDPOINT
+  value: {{ .Values.sourcegraph.redisStoreEndpoint }}
+{{- end -}}
+{{- end -}}
 
 {{- define "sourcegraph.authChecksum" -}}
 {{- $checksum := list .Values.codeInsightsDB.auth -}}
