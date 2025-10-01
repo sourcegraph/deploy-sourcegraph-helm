@@ -45,7 +45,7 @@ For top-level services, pass in the top-level values:
 {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
 
 frontend:
-  serivceAccount:
+  serviceAccount:
     create: false
 
 For nested services, pass in the nested values:
@@ -249,7 +249,12 @@ app.kubernetes.io/name: jaeger
 {{- end }}
 
 {{- define "sourcegraph.redisConnection" -}}
-{{- if .Values.sourcegraph.createKubernetesSecrets -}}
+{{- if .Values.sourcegraph.disableKubernetesSecrets -}}
+- name: REDIS_CACHE_ENDPOINT
+  value: {{ .Values.sourcegraph.redisCacheEndpoint }}
+- name: REDIS_STORE_ENDPOINT
+  value: {{ .Values.sourcegraph.redisStoreEndpoint }}
+{{- else -}}
 - name: REDIS_CACHE_ENDPOINT
   valueFrom:
     secretKeyRef:
@@ -260,11 +265,6 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: endpoint
       name: {{ default .Values.redisStore.name .Values.redisStore.connection.existingSecret }}
-{{- else -}}
-- name: REDIS_CACHE_ENDPOINT
-  value: {{ .Values.sourcegraph.redisCacheEndpoint }}
-- name: REDIS_STORE_ENDPOINT
-  value: {{ .Values.sourcegraph.redisStoreEndpoint }}
 {{- end -}}
 {{- end -}}
 

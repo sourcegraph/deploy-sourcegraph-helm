@@ -54,7 +54,7 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
         env:
-        {{- if not .Values.migrator.databaseAuthOverrideEnvVars }}
+        {{- if and (not .Values.migrator.databaseAuthOverrideEnvVars) (not .Values.sourcegraph.disableKubernetesSecrets) }}
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
@@ -80,9 +80,11 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
+        {{- if not .Values.sourcegraph.disableKubernetesSecrets }}
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeInsightsDB" "CODEINSIGHTS_PG") | nindent 8 }}
+        {{- end }}
         {{- range $name, $item := .Values.frontend.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
