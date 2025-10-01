@@ -52,6 +52,9 @@ spec:
       - name: migrator
         image: {{ include "sourcegraph.image" (list . "migrator") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- if .Values.migrator.command }}
+        command: {{ .Values.migrator.command }}
+        {{- end }}
         args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
         env:
         {{- if and (not .Values.migrator.databaseAuthOverrideEnvVars) (not .Values.sourcegraph.disableKubernetesSecrets) }}
@@ -78,6 +81,9 @@ spec:
       - name: frontend
         image: {{ include "sourcegraph.image" (list . "frontend") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- if .Values.frontend.command }}
+        command: {{ .Values.frontend.command }}
+        {{- end }}
         args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
         {{- if not .Values.sourcegraph.disableKubernetesSecrets }}
