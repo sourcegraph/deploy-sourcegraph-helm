@@ -302,6 +302,7 @@ In addition to the documented values, all services also support the following va
 | searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.disableKubernetesSecrets | bool | `false` | Disable the creation of Kubernetes secrets objects |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
