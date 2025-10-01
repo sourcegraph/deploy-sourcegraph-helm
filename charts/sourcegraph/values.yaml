@@ -38,6 +38,8 @@ sourcegraph:
   revisionHistoryLimit: 10
   # -- Add extra labels to all services
   serviceLabels: {}
+  # -- Create Kubernetes secrets objects
+  createKubernetesSecrets: true
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
