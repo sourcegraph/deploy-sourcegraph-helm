@@ -249,8 +249,9 @@ In addition to the documented values, all services also support the following va
 | preciseCodeIntel.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `precise-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | preciseCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `precise-code-intel-worker` |
 | preciseCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| priorityClasses | list | `[]` | Additional priorityClasses minimise re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) Sample class definition: - name: gitserver-class   value: 100   preemptionPolicy: Never   description: "gitserver priority class" |
+| priorityClasses | list | `[]` | Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) Sample class definition: - name: gitserver-class   value: 100   preemptionPolicy: Never   description: "gitserver priority class" |
 | prometheus.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":false,"runAsGroup":100,"runAsUser":100}` | Security context for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| prometheus.createRoleBinding | bool | `true` | Disable the creation of a RoleBinding object, for customers who block all RBAC resource creation |
 | prometheus.enabled | bool | `true` | Enable `prometheus` (recommended) |
 | prometheus.existingConfig | string | `""` | Name of existing ConfigMap for `pgsql`. It must contain a `prometheus.yml` key |
 | prometheus.image.defaultTag | string | `"6.0.0@sha256:86a315720fd9813d9ef9746d92e637bc20cd9ebd90da78d8cc6906062252891f"` | Docker image tag for the `prometheus` image |
@@ -302,6 +303,7 @@ In addition to the documented values, all services also support the following va
 | searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.disableKubernetesSecrets | bool | `false` | Disable the creation of Kubernetes secrets objects |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
@@ -313,6 +315,8 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.redisCacheEndpoint | string | `""` | Set the value of the REDIS_CACHE_ENDPOINT environment variable on the needed containers, when Kubernetes secrets are disabled |
+| sourcegraph.redisStoreEndpoint | string | `""` | Set the value of the REDIS_STORE_ENDPOINT environment variable on the needed containers, when Kubernetes secrets are disabled |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
