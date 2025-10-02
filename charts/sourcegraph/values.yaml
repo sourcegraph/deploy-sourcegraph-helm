@@ -895,6 +895,7 @@ prometheus:
   name: "prometheus"
   # -- Enable RBAC for `prometheus`
   privileged: true
+  # -- Disable the creation of a RoleBinding object, for customers who block all RBAC resource creation
   createRoleBinding: true
   # -- Resource requests & limits for the `prometheus` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
