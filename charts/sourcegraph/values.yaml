@@ -40,6 +40,10 @@ sourcegraph:
   serviceLabels: {}
   # -- Disable the creation of Kubernetes secrets objects
   disableKubernetesSecrets: false
+  # -- Set the value of the REDIS_CACHE_ENDPOINT environment variable on the needed containers, when Kubernetes secrets are disabled
+  redisCacheEndpoint: ""
+  # -- Set the value of the REDIS_STORE_ENDPOINT environment variable on the needed containers, when Kubernetes secrets are disabled
+  redisStoreEndpoint: ""
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
