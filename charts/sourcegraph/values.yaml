@@ -40,12 +40,6 @@ sourcegraph:
   serviceLabels: {}
   # -- Disable the creation of Kubernetes secrets objects
   disableKubernetesSecrets: false
-  # -- If disabling Kubernetes secrets, and using our bundled Redis containers where this endpoint string does not contain a secret, then set this to "redis-cache:6379". If disabling Kubernetes secrets, and using an external Redis service where this endpoint string contains a secret, then set this to "", and inject the REDIS_CACHE_ENDPOINT environment variable on the needed pods (frontend, gitserver, searcher, and worker)
-  redisCacheEndpoint: ""
-  # redisCacheEndpoint: redis-cache:6379
-  # -- If disabling Kubernetes secrets, and using our bundled Redis containers where this endpoint string does not contain a secret, then set this to "redis-store:6379". If disabling Kubernetes secrets, and using an external Redis service where this endpoint string contains a secret, then set this to "", and inject the REDIS_STORE_ENDPOINT environment variable on the needed pods (frontend, gitserver, searcher, and worker)
-  redisStoreEndpoint: ""
-  # redisStoreEndpoint: redis-store:6379
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name

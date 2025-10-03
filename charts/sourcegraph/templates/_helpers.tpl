@@ -251,9 +251,9 @@ app.kubernetes.io/name: jaeger
 {{- define "sourcegraph.redisConnection" -}}
 {{- if .Values.sourcegraph.disableKubernetesSecrets -}}
 - name: REDIS_CACHE_ENDPOINT
-  value: {{ .Values.sourcegraph.redisCacheEndpoint }}
+  value: {{ .Values.redisCache.connection.endpoint }}
 - name: REDIS_STORE_ENDPOINT
-  value: {{ .Values.sourcegraph.redisStoreEndpoint }}
+  value: {{ .Values.redisStore.connection.endpoint }}
 {{- else -}}
 - name: REDIS_CACHE_ENDPOINT
   valueFrom:
