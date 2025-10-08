@@ -1,4 +1,4 @@
-{{- if and .Values.prometheus.enabled .Values.prometheus.privileged -}}
+{{- if and .Values.prometheus.enabled .Values.prometheus.privileged .Values.prometheus.createRoleBinding -}}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
