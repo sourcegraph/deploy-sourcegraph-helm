@@ -122,7 +122,7 @@ spec:
         - containerPort: 3080
           name: http
         - containerPort: 3090
-          name: http-internal
+          name: grpc-internal
         - containerPort: 6060
           name: debug
         {{- if not .Values.sourcegraph.localDevMode }}
