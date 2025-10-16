@@ -85,8 +85,8 @@ spec:
                 exit 1
               fi
         ports:
-        - containerPort: 6379
-          name: redis
+        - name: redis
+          containerPort: 6379
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.redisStore.resources | nindent 10 }}
@@ -109,8 +109,8 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         ports:
-        - containerPort: 9121
-          name: redisexp
+        - name: http-metrics
+          containerPort: 9121
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.redisExporter.resources | nindent 10 }}

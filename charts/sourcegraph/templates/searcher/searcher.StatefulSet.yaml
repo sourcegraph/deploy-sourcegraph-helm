@@ -84,15 +84,15 @@ spec:
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
-        - containerPort: 3181
-          name: http
-        - containerPort: 6060
-          name: debug
+        - name: grpc
+          containerPort: 3181
+        - name: http-debug
+          containerPort: 6060
         readinessProbe:
           failureThreshold: 3
           httpGet:
             path: /healthz
-            port: http
+            port: grpc
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
