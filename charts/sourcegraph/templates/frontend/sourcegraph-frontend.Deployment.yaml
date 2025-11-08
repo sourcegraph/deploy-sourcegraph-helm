@@ -107,24 +107,24 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: debug
+            port: http-debug
             scheme: HTTP
           initialDelaySeconds: 300
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /ready
-            port: debug
+            port: http-debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 3080
-          name: http
-        - containerPort: 3090
-          name: grpc-internal
-        - containerPort: 6060
-          name: debug
+        - name: grpc-internal
+          containerPort: 3090
+        - name: http
+          containerPort: 3080
+        - name: http-debug
+          containerPort: 6060
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 }}

@@ -70,8 +70,10 @@ spec:
             port: grpc
           timeoutSeconds: 5
         ports:
-        - containerPort: 3178
-          name: grpc
+        - name: grpc
+          containerPort: 3178
+        - name: http-debug
+          containerPort: 6060
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.gitserver.resources | nindent 10 }}

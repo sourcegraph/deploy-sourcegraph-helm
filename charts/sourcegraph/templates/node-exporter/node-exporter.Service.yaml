@@ -4,9 +4,9 @@ kind: Service
 metadata:
   annotations:
     description: Prometheus exporter for hardware and OS metrics.
-    url: https://github.com/prometheus/node_exporter
     prometheus.io/port: "9100"
     sourcegraph.prometheus/scrape: "true"
+    url: https://github.com/prometheus/node_exporter
     {{- if .Values.nodeExporter.serviceAnnotations }}
     {{- toYaml .Values.nodeExporter.serviceAnnotations | nindent 4 }}
     {{- end }}

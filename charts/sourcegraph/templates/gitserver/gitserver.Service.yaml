@@ -23,7 +23,10 @@ spec:
   ports:
   - name: grpc
     port: 3178
-    targetPort: 3178
+    targetPort: grpc
+  - name: http-debug
+    port: 6060
+    targetPort: http-debug
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: gitserver
