@@ -195,7 +195,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.agent.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.agent.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.agent.containerSecurityContext.runAsUser | int | `100` |  |
-| openTelemetry.agent.hostPorts | object | `{"otlpGrpc":4317,"otlpHttp":4318,"zpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| openTelemetry.agent.hostPorts | object | `{"grpcOtlp":4317,"httpOtlp":4318,"httpZpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
 | openTelemetry.agent.resources.limits.cpu | string | `"500m"` |  |
 | openTelemetry.agent.resources.limits.memory | string | `"500Mi"` |  |

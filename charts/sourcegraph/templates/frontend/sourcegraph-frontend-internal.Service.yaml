@@ -15,9 +15,9 @@ metadata:
   name: sourcegraph-frontend-internal
 spec:
   ports:
-  - name: http-internal
+  - name: grpc-internal
     port: 80
-    targetPort: http-internal
+    targetPort: grpc-internal
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: sourcegraph-frontend

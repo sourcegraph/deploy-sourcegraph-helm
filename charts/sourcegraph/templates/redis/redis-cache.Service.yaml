@@ -18,6 +18,9 @@ metadata:
   name: redis-cache
 spec:
   ports:
+  - name: http-metrics
+    port: 9121
+    targetPort: http-metrics
   - name: redis
     port: 6379
     targetPort: redis

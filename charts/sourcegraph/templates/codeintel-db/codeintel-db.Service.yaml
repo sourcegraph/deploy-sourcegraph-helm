@@ -18,6 +18,9 @@ metadata:
   name: codeintel-db
 spec:
   ports:
+  - name: http-metrics
+    port: 9187
+    targetPort: http-metrics
   - name: pgsql
     port: 5432
     targetPort: pgsql

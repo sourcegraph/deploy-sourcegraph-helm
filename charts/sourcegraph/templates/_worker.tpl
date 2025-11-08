@@ -1,7 +1,7 @@
 {{- define "sourcegraph.worker" -}}
 {{- $top := index . 0 }}
 {{- $suffix := index . 1 -}}
-{{- $allowlist := index . 2 -}} 
+{{- $allowlist := index . 2 -}}
 {{- $blocklist := index . 3 -}}
 {{- $resources := index . 4 -}}
 
@@ -100,24 +100,24 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: debug
+            port: http-debug
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /ready
-            port: debug
+            port: http-debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 3189
-          name: http
-        - containerPort: 6060
-          name: debug
-        - containerPort: 6996
-          name: prom
+        - name: http
+          containerPort: 3189
+        - name: http-debug
+          containerPort: 6060
+        - name: http-debug-exec
+          containerPort: 6996
         {{- if not $top.Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml $resources | nindent 10 }}

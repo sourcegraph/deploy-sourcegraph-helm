@@ -4,11 +4,11 @@ kind: Service
 metadata:
   name: otel-collector
   annotations:
+    prometheus.io/port: "8888"
+    sourcegraph.prometheus/scrape: "true"
     {{- if .Values.openTelemetry.gateway.serviceAnnotations }}
     {{- toYaml .Values.openTelemetry.gateway.serviceAnnotations | nindent 4 }}
     {{- end }}
-    sourcegraph.prometheus/scrape: "true"
-    prometheus.io/port: "8888"
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- if .Values.openTelemetry.gateway.serviceLabels }}
@@ -18,16 +18,17 @@ metadata:
     app.kubernetes.io/component: otel-collector
 spec:
   ports:
-    - name: otlp-grpc
+    - name: grpc-otlp
       port: 4317
       protocol: TCP
-      targetPort: 4317
-    - name: otlp-http
+      targetPort: grpc-otlp
+    - name: http-metrics
+      port: 8888
+      targetPort: http-metrics
+    - name: http-otlp
       port: 4318
       protocol: TCP
-      targetPort: 4318
-    - name: metrics # Default endpoint for querying metrics.
-      port: 8888
+      targetPort: http-otlp
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: otel-collector

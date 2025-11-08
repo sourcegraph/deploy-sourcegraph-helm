@@ -61,13 +61,13 @@ spec:
           value: "false"
         {{- end }}
         ports:
-        - containerPort: 6070
-          name: http
+        - name: grpc
+          containerPort: 6070
         readinessProbe:
           failureThreshold: 3
           httpGet:
             path: /healthz
-            port: http
+            port: grpc
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
@@ -98,8 +98,8 @@ spec:
           value: "false"
         {{- end }}
         ports:
-        - containerPort: 6072
-          name: index-http
+        - name: grpc-indexer
+          containerPort: 6072
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}

@@ -4,8 +4,8 @@ metadata:
   annotations:
     description: Headless service that provides a stable network identity for the
       indexed-search stateful set.
-    sourcegraph.prometheus/scrape: "true"
     prometheus.io/port: "6072"
+    sourcegraph.prometheus/scrape: "true"
     {{- if .Values.indexedSearch.serviceAnnotations }}
     {{- toYaml .Values.indexedSearch.serviceAnnotations | nindent 4 }}
     {{- end }}
@@ -20,8 +20,9 @@ metadata:
 spec:
   clusterIP: None
   ports:
-    - port: 6072
-      targetPort: 6072
+  - name: grpc-indexer
+    port: 6072
+    targetPort: grpc-indexer
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: indexed-search

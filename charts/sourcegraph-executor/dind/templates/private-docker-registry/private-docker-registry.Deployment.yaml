@@ -47,19 +47,19 @@ spec:
             - name: REGISTRY_PROXY_REMOTEURL
               value: http://registry-1.docker.io
           ports:
-            - containerPort: 5000
-              name: registry
+            - name: http
+              containerPort: 5000
           livenessProbe:
             httpGet:
               path: /
-              port: registry
+              port: http
               scheme: HTTP
             initialDelaySeconds: 5
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /
-              port: registry
+              port: http
               scheme: HTTP
             periodSeconds: 5
             timeoutSeconds: 5

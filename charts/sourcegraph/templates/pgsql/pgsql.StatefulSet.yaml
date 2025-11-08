@@ -90,8 +90,8 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         ports:
-        - containerPort: 5432
-          name: pgsql
+        - name: pgsql
+          containerPort: 5432
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.pgsql.resources | nindent 10 }}
@@ -113,7 +113,8 @@ spec:
       {{- if .Values.pgsql.extraContainers }}
         {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
       {{- end }}
-      - env:
+      - name: pgsql-exporter
+        env:
         {{- include "sourcegraph.dataSource" (list . "pgsql" ) | nindent 8 }}
         {{- range $name, $item := .Values.pgsql.postgresExporter.env}}
         - name: {{ $name }}
@@ -122,14 +123,16 @@ spec:
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/queries.yaml
         image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: pgsql-exporter
+        ports:
+        - name: http-metrics
+          containerPort: 9187
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        terminationMessagePolicy: FallbackToLogsOnError
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}

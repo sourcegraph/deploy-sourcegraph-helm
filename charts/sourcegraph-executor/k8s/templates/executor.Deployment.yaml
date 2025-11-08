@@ -55,8 +55,8 @@ spec:
           securityContext:
             privileged: {{ .Values.executor.securityContext.privileged }}
           ports:
-            - containerPort: 6060
-              name: debug
+            - name: http-debug
+              containerPort: 6060
           envFrom:
             - configMapRef:
                 name: {{ include "executor.name" . }}

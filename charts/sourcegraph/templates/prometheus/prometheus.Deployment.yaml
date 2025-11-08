@@ -60,13 +60,13 @@ spec:
         readinessProbe:
           httpGet:
             path: /-/ready
-            port: 9090
+            port: http
           timeoutSeconds: 3
           failureThreshold: 120
           periodSeconds: 5
         ports:
-        - containerPort: 9090
-          name: http
+        - name: http
+          containerPort: 9090
         volumeMounts:
         - mountPath: /prometheus
           name: data

@@ -17,18 +17,14 @@ metadata:
   name: {{ default "jaeger-collector" .Values.jaeger.collector.name }}
 spec:
   ports:
-  - name: jaeger-collector-tchannel
-    port: 14267
-    protocol: TCP
-    targetPort: 14267
-  - name: jaeger-collector-http
+  - name: http-collector
     port: 4321
     protocol: TCP
-    targetPort: 4321
-  - name: jaeger-collector-grpc
+    targetPort: http-collector
+  - name: grpc-collector
     port: 4320
     protocol: TCP
-    targetPort: 4320
+    targetPort: grpc-collector
   selector:
     {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/instance: {{ .Release.Name }}

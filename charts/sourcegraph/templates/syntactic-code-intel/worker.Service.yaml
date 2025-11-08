@@ -21,9 +21,9 @@ spec:
   - name: http
     port: {{ .Values.syntacticCodeIntel.properties.workerPort }}
     targetPort: http
-  - name: debug
+  - name: http-debug
     port: 6060
-    targetPort: debug
+    targetPort: http-debug
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: syntactic-code-intel-worker

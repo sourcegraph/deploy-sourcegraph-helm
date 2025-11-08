@@ -17,9 +17,9 @@ metadata:
   name: worker-executors
 spec:
   ports:
-  - name: prom
+  - name: http-debug-exec
     port: 6996
-    targetPort: prom
+    targetPort: http-debug-exec
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: worker

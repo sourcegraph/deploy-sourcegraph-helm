@@ -55,19 +55,19 @@ spec:
         args: {{- default (list "") .Values.blobstore.args | toYaml | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
-        - containerPort: 9000
-          name: blobstore
+        - name: http
+          containerPort: 9000
         livenessProbe:
           httpGet:
             path: /
-            port: blobstore
+            port: http
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /
-            port: blobstore
+            port: http
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5

@@ -17,10 +17,10 @@ metadata:
   name: {{ default "jaeger-query" .Values.jaeger.query.name }}
 spec:
   ports:
-  - name: query-http
+  - name: http
     port: 16686
     protocol: TCP
-    targetPort: 16686
+    targetPort: http
   selector:
     {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/instance: {{ .Release.Name }}

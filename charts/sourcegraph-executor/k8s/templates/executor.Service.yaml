@@ -13,9 +13,9 @@ metadata:
   name: {{ include "executor.name" . }}
 spec:
   ports:
-  - name: debug
+  - name: http-debug
     port: 6060
-    targetPort: debug
+    targetPort: http-debug
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: {{ include "executor.name" . }}

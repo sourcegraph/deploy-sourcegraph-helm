@@ -51,20 +51,20 @@ spec:
           livenessProbe:
             httpGet:
               path: /healthz
-              port: debug
+              port: http-debug
               scheme: HTTP
             initialDelaySeconds: 60
             timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /ready
-              port: debug
+              port: http-debug
               scheme: HTTP
             periodSeconds: 5
             timeoutSeconds: 5
           ports:
-            - containerPort: 6060
-              name: debug
+            - name: http-debug
+              containerPort: 6060
           terminationMessagePolicy: FallbackToLogsOnError
           env:
             {{- range $name, $item := .Values.executor.env }}

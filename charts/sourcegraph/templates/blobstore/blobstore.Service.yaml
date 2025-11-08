@@ -16,9 +16,9 @@ metadata:
   name: blobstore
 spec:
   ports:
-  - name: blobstore
+  - name: http
     port: 9000
-    targetPort: blobstore
+    targetPort: http
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: blobstore

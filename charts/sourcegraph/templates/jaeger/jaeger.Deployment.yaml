@@ -27,9 +27,9 @@ spec:
   template:
     metadata:
       annotations:
-        prometheus.io/scrape: "true"
-        prometheus.io/port: "16686"
         kubectl.kubernetes.io/default-container: jaeger
+        prometheus.io/port: "16686"
+        sourcegraph.prometheus/scrape: "true"
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -68,13 +68,16 @@ spec:
           protocol: UDP
         - containerPort: 5778
           protocol: TCP
-        - containerPort: 16686
-          protocol: TCP
         - containerPort: 14250
           protocol: TCP
-        - containerPort: 4320
+        - name: grpc-collector
+          containerPort: 4320
           protocol: TCP
-        - containerPort: 4321
+        - name: http-collector
+          containerPort: 4321
+          protocol: TCP
+        - name: http
+          containerPort: 16686
           protocol: TCP
         readinessProbe:
           httpGet:

@@ -9,19 +9,19 @@ tests:
           content:
             containerPort: 55679
             hostPort: 55679
-            name: zpages
+            name: http-zpages
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
             containerPort: 4317
             hostPort: 4317
-            name: otlp-grpc
+            name: grpc-otlp
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
             containerPort: 4318
             hostPort: 4318
-            name: otlp-http
+            name: http-otlp
   - it: should render the agent endpoint with the default gRPC host port
     template: searcher/searcher.StatefulSet.yaml
     asserts:
@@ -36,37 +36,37 @@ tests:
       openTelemetry:
         agent:
           hostPorts:
-            otlpGrpc: 4319
-            otlpHttp: 4320
-            zpages: 55680
+            grpcOtlp: 4319
+            httpOtlp: 4320
+            httpZpages: 55680
     asserts:
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
             containerPort: 55679
             hostPort: 55680
-            name: zpages
+            name: http-zpages
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
             containerPort: 4317
             hostPort: 4319
-            name: otlp-grpc
+            name: grpc-otlp
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
             containerPort: 4318
             hostPort: 4320
-            name: otlp-http
+            name: http-otlp
   - it: should render the agent endpoint with the custom gRPC host port
     template: searcher/searcher.StatefulSet.yaml
     set:
       openTelemetry:
         agent:
           hostPorts:
-            otlpGrpc: 4319
-            otlpHttp: 4320
-            zpages: 55680
+            grpcOtlp: 4319
+            httpOtlp: 4320
+            httpZpages: 55680
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
