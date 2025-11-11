@@ -90,8 +90,8 @@ spec:
           failureThreshold: 360
           periodSeconds: 10
         ports:
-        - containerPort: 5432
-          name: pgsql
+        - name: pgsql
+          containerPort: 5432
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
@@ -111,7 +111,8 @@ spec:
       {{- if .Values.codeIntelDB.extraContainers }}
         {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
       {{- end }}
-      - env:
+      - name: pgsql-exporter
+        env:
         {{- include "sourcegraph.dataSource" (list . "codeIntelDB" ) | nindent 8 }}
         {{- range $name, $item := .Values.codeIntelDB.postgresExporter.env}}
         - name: {{ $name }}
@@ -120,14 +121,16 @@ spec:
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_intel_queries.yaml
         image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: pgsql-exporter
+        ports:
+        - name: http-metrics
+          containerPort: 9187
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        terminationMessagePolicy: FallbackToLogsOnError
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}

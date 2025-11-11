@@ -83,15 +83,15 @@ spec:
         readinessProbe:
           httpGet:
             path: /ready
-            port: debug
+            port: http-debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: {{ .Values.syntacticCodeIntel.properties.workerPort }}
-          name: http
-        - containerPort: 6060
-          name: debug
+        - name: http
+          containerPort: {{ .Values.syntacticCodeIntel.properties.workerPort }}
+        - name: http-debug
+          containerPort: 6060
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.syntacticCodeIntel.resources | nindent 10 }}

@@ -60,8 +60,8 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         ports:
-        - containerPort: 3370
-          name: http
+        - name: http
+          containerPort: 3370
         volumeMounts:
         - mountPath: /var/lib/grafana
           name: grafana-data

@@ -67,8 +67,10 @@ spec:
           initialDelaySeconds: 5
           timeoutSeconds: 5
         ports:
-        - containerPort: 9238
-          name: http
+        - name: http
+          containerPort: 9238
+        - name: http-debug
+          containerPort: 6060
         readinessProbe:
           tcpSocket:
             port: http

@@ -22,9 +22,9 @@ spec:
     metadata:
       annotations:
         description: Collects and exports container metrics.
+        kubectl.kubernetes.io/default-container: cadvisor
         prometheus.io/port: "48080"
         sourcegraph.prometheus/scrape: "true"
-        kubectl.kubernetes.io/default-container: cadvisor
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

@@ -79,8 +79,8 @@ spec:
           value: "/conf"
         terminationMessagePolicy: FallbackToLogsOnError
         ports:
-        - containerPort: 5432
-          name: codeinsights-db
+        - name: codeinsights-db
+          containerPort: 5432
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
@@ -97,7 +97,8 @@ spec:
         {{- if .Values.codeInsightsDB.extraVolumeMounts }}
         {{- toYaml .Values.codeInsightsDB.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      - env:
+      - name: pgsql-exporter
+        env:
         {{- include "sourcegraph.dataSource" (list . "codeInsightsDB" ) | nindent 8 }}
         {{- range $name, $item := .Values.codeInsightsDB.postgresExporter.env}}
         - name: {{ $name }}
@@ -106,14 +107,16 @@ spec:
         - name: PG_EXPORTER_EXTEND_QUERY_PATH
           value: /config/code_insights_queries.yaml
         image: {{ include "sourcegraph.image" (list . "postgresExporter") }}
-        terminationMessagePolicy: FallbackToLogsOnError
-        name: pgsql-exporter
+        ports:
+        - name: http-metrics
+          containerPort: 9187
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        terminationMessagePolicy: FallbackToLogsOnError
       {{- if .Values.codeInsightsDB.extraContainers }}
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
       {{- end }}
