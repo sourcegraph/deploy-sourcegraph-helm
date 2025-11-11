@@ -85,7 +85,8 @@ sourcegraph:
 #   # Toggle deployment of applications on/off. Applies to databases and third-party applications
 #   enabled: true
 
-alpine: # Used in init containers
+alpine:
+  # Used in init containers
   image:
     # -- Docker image tag for the `alpine` image
     defaultTag: 6.0.0@sha256:c4705ccf969e262ee3916719ecc7c0fb5e606dd954278ac07ac1d052e4e490df
@@ -167,7 +168,7 @@ codeInsightsDB:
     # -- Sets codeinsights-db port
     port: "5432"
     # -- Sets codeinsights-db SSL mode
-    sslmode: "disable"  # set to "require" to enable SSL
+    sslmode: "disable" # set to "require" to enable SSL
   # -- Environment variables for the `codeinsights-db` container
   env: {}
   # -- Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key.
@@ -242,7 +243,7 @@ codeIntelDB:
     # -- Sets codeintel-db port
     port: "5432"
     # -- Sets codeintel-db SSL mode
-    sslmode: "disable"  # set to "require" to enable SSL
+    sslmode: "disable" # set to "require" to enable SSL
   # -- Name of existing ConfigMap for `codeintel-db`. It must contain a `postgresql.conf` key
   existingConfig: ""
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
@@ -643,9 +644,9 @@ openTelemetry:
     # -- Resource requests & limits for the `otel-agent` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     hostPorts:
-      otlpGrpc: 4317
-      otlpHttp: 4318
-      zpages: 55679
+      grpcOtlp: 4317
+      httpOtlp: 4318
+      httpZpages: 55679
     resources:
       limits:
         cpu: "500m"
@@ -730,9 +731,9 @@ pgsql:
     # -- Sets postgres port
     port: "5432"
     # -- Sets postgres SSL mode
-    sslmode: "disable"  # set to "require" to enable SSL
+    sslmode: "disable" # set to "require" to enable SSL
   # -- Name of existing ConfigMap for `pgsql`. It must contain a `postgresql.conf` key
-  existingConfig: ""  # Name of an existing configmap
+  existingConfig: "" # Name of an existing configmap
   # -- Additional PostgreSQL configuration. This will override or extend our default configuration.
   # Notes: This is expecting a multiline string.
   # Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html)
