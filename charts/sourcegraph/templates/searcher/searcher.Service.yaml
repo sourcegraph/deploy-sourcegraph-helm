@@ -18,12 +18,12 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - name: http
+  - name: grpc
     port: 3181
-    targetPort: http
-  - name: debug
+    targetPort: grpc
+  - name: http-debug
     port: 6060
-    targetPort: debug
+    targetPort: http-debug
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: searcher
