@@ -1,16 +1,23 @@
+storageClass:
+  create: true
+  provisioner: ebs.csi.aws.com
+  reclaimPolicy: Retain
+  type: gp3
+  volumeBindingMode: WaitForFirstConsumer
+
 frontend:
   ingress:
     enabled: true
     annotations:
-      kubernetes.io/ingress.class: alb # aws load balancer controller ingressClass name
-      # additional aws alb ingress controller supported annotations
+      kubernetes.io/ingress.class: null # Unset deprecated annotation
+      # Additional AWS ALB ingress controller annotations
       # ...
-    # replace with your actual domain
-    host: sourcegraph.company.com
+    host: sourcegraph.company.com # Replace with your actual hostname
+    ingressClassName: alb
 
-storageClass:
-  create: true
-  type: gp3 # This configures SSDs (recommended).
-  provisioner: ebs.csi.aws.com
-  volumeBindingMode: WaitForFirstConsumer
-  reclaimPolicy: Retain
+  # Uncomment if using AWS RDS with IAM authentication
+  # env:
+  #   PG_CONNECTION_UPDATER:
+  #     value: EC2_ROLE_CREDENTIALS
+  #   AWS_STS_REGIONAL_ENDPOINTS:
+  #     value: regional
