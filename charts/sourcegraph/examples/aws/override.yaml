@@ -14,3 +14,18 @@ frontend:
       # ...
     host: sourcegraph.company.com # Replace with your actual hostname
     ingressClassName: alb
+  env:
+    # If using databases in AWS RDS, with IAM authentication
+    PG_CONNECTION_UPDATER:
+      value: EC2_ROLE_CREDENTIALS
+    # If using databases in AWS RDS, with IAM authentication, with regional endpoints
+    AWS_STS_REGIONAL_ENDPOINTS:
+      value: regional
+
+migrator:
+    # If using databases in AWS RDS, with IAM authentication
+    PG_CONNECTION_UPDATER:
+      value: EC2_ROLE_CREDENTIALS
+    # If using databases in AWS RDS, with IAM authentication, with regional endpoints
+    AWS_STS_REGIONAL_ENDPOINTS:
+      value: regional
