@@ -1,5 +1,5 @@
-# Config for the agent pods running as a DaemonSet, which forward data to the gateway pod
 {{ if .Values.openTelemetry.enabled -}}
+# Config for the agent pods running as a DaemonSet, which forward data to the gateway pod
 apiVersion: v1
 kind: ConfigMap
 metadata:

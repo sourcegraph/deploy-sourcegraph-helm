@@ -99,10 +99,10 @@ spec:
       - name: data
         persistentVolumeClaim:
           claimName: prometheus
-      - configMap:
+      - name: config
+        configMap:
           defaultMode: 0777
           name: {{ default .Values.prometheus.name .Values.prometheus.existingConfig }}
-        name: config
       {{- if .Values.prometheus.extraVolumes }}
       {{- toYaml .Values.prometheus.extraVolumes | nindent 6 }}
       {{- end }}

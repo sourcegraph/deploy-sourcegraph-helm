@@ -19,7 +19,7 @@ roleRef:
   name: view
 {{- end }}
 subjects:
-- kind: ServiceAccount
-  name: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
+- name: {{ include "sourcegraph.serviceAccountName" (list . "frontend") }}
+  kind: ServiceAccount
   namespace: {{ .Release.Namespace }}
 {{- end }}
