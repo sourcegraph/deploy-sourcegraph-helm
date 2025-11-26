@@ -54,6 +54,24 @@ sourcegraph:
 
 Make sure you test both enabled and disabled toggles. For example, if you added a new values to conditional render some templates, turn it on and off in the `override.yaml` to make sure they both work. You can also include your `override.yaml` in the `Test plan` during PR review to help others understand your testing strategy.
 
+### Update the image tag
+
+You have two options to target specificy Sourcegraph version. Add the below to your `override.yaml`:
+
+```yaml
+sourcegraph: 
+  image:
+    defaultTag: "6.10.0"
+    useGlobalTagAsDefault: true
+```
+
+Alternatively, you can use `sg` to update the image tags directly in the default `values.yaml`, **DO NOT COMMIT** the changes:
+
+```sh
+cd charts/sourcegraph
+sg ops update-images -kind helm -pin-tag 6.10.0 -cr-username=$DOCKER_HUB_USERNAME -cr-password=$DOCKER_HUB_PERSONAL_ACCESS_TOKEN .
+```
+
 ### Inspect the entire rendered template
 
 It's a good idea to inspect the rendered manifest to catch things that look off.
