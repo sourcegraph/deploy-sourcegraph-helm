@@ -794,6 +794,11 @@ postgresExporter:
     requests:
       cpu: 10m
       memory: 50Mi
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 999
+    runAsGroup: 999
+    readOnlyRootFilesystem: true
 
 syntacticCodeIntel:
   enabled: false
