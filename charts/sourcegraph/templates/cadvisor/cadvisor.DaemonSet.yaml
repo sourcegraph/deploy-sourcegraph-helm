@@ -94,11 +94,11 @@ spec:
         - name: http
           containerPort: 48080
           protocol: TCP
-      automountServiceAccountToken: false
-      terminationGracePeriodSeconds: 30
       {{- if .Values.cadvisor.extraContainers }}
         {{- toYaml .Values.cadvisor.extraContainers | nindent 6 }}
       {{- end }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
       securityContext:
         {{- toYaml .Values.cadvisor.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "cadvisor" ) | trim | nindent 6 }}

@@ -81,10 +81,10 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.prometheus.containerSecurityContext | nindent 10 }}
-      terminationGracePeriodSeconds: 120
       {{- if .Values.prometheus.extraContainers }}
         {{- toYaml .Values.prometheus.extraContainers | nindent 6 }}
       {{- end }}
+      terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.prometheus.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "prometheus" ) | trim | nindent 6 }}
