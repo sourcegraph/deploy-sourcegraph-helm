@@ -1,16 +1,180 @@
-frontend:
-  ingress:
-    enabled: true
-    annotations:
-      kubernetes.io/ingress.class: alb # aws load balancer controller ingressClass name
-      # additional aws alb ingress controller supported annotations
-      # ...
-    # replace with your actual domain
-    host: sourcegraph.company.com
+# Example Helm override file for deploying on AWS EKS
+
+# Using:
+# ALB Ingress Controller EKS add-on
+# RDS databases, with IAM authentication
+# Customer-manged encryption key for EBS storage volumes for persistent volumes
+# Not EKS Auto Mode, but with comments for changes required for Auto Mode
+# Kubernetes-native Executors, in the same namespace
+
+################################################################################
+# Sourcegraph-wide configuration
+################################################################################
 
 storageClass:
   create: true
-  type: gp3 # This configures SSDs (recommended).
-  provisioner: ebs.csi.aws.com
-  volumeBindingMode: WaitForFirstConsumer
+  provisioner: ebs.csi.aws.com # If using the EBS CSI EKS add-on
+  # provisioner: ebs.csi.eks.amazonaws.com # If using an AWS EKS "Auto mode" cluster, need use its storage provisioner
   reclaimPolicy: Retain
+  type: gp3
+  volumeBindingMode: WaitForFirstConsumer
+  parameters:
+    # If using CMK encryption for EBS volumes for persistent storage
+    encrypted: "true"
+    kmsKeyId: arn:aws:kms:region:account-id:key/key-id # Full ARN of the key
+
+################################################################################
+# Databases
+# Using external DBs, on RDS, with IAM auth
+################################################################################
+
+codeInsightsDB:
+  enabled: false
+  auth:
+    database: "sg"
+    host: codeinsights.rds.amazon.com
+    password: "" # Empty password for IAM auth
+    port: "5432"
+    sslmode: require
+    user: "sg"
+
+codeIntelDB:
+  enabled: false
+  auth:
+    database: "sg"
+    host: codeintel.rds.amazon.com
+    password: "" # Empty password for IAM auth
+    port: "5432"
+    sslmode: require
+    user: "sg"
+
+pgsql:
+  enabled: false
+  auth:
+    database: "sg"
+    host: pgsql.rds.amazon.com
+    password: "" # Empty password for IAM auth
+    port: "5432"
+    sslmode: require
+    user: "sg"
+
+################################################################################
+# Frontend / ingress
+################################################################################
+
+frontend:
+
+  ingress:
+    enabled: true
+    annotations:
+      # Unset deprecated annotation to hide warning
+      kubernetes.io/ingress.class: null
+
+      # AWS ALB ingress controller annotations
+      alb.ingress.kubernetes.io/healthcheck-path: /healthz
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+      alb.ingress.kubernetes.io/ssl-redirect: '443'
+
+    # Replace with your actual hostname, for TLS cert lookup, and ALB Ingress Controller, and ExternalDNS
+    host: sourcegraph.example.com
+    ingressClassName: alb
+
+  env:
+    # If using databases in AWS RDS, with IAM authentication
+    PG_CONNECTION_UPDATER:
+      value: EC2_ROLE_CREDENTIALS
+    # If using databases in AWS RDS, with IAM authentication, and regional endpoints
+    AWS_STS_REGIONAL_ENDPOINTS:
+      value: regional
+
+################################################################################
+# Migrator
+################################################################################
+
+migrator:
+
+  # Need to duplicate these environment variables on migrator, however, other pods will pull them from frontend
+  env:
+    # If using databases in AWS RDS, with IAM authentication
+    PG_CONNECTION_UPDATER:
+      value: EC2_ROLE_CREDENTIALS
+    # If using databases in AWS RDS, with IAM authentication, and regional endpoints
+    AWS_STS_REGIONAL_ENDPOINTS:
+      value: regional
+
+  ### Use the args list to operate migrator commands, if needed
+  ### Available commands can be found at
+  ### https://sourcegraph.com/docs/admin/updates/migrator/migrator-operations#commands
+
+  ### Manually mark migrations as completed
+  # After installing the Postgres extensions on fresh, new RDS databases via Terraform / other means
+  # Run these one at a time, then run again with them all commented out for a normal startup
+  # args:
+  #   - add-log
+  #   - --db=frontend
+  #   - --version=1680296731
+
+  # args:
+  #   - add-log
+  #   - --db=codeintel
+  #   - --version=1679010276
+
+  # args:
+  #   - add-log
+  #   - --db=codeinsights
+  #   - --version=1675347548
+
+  ### Drift check
+  # args:
+  # - drift
+  # - -version=v6.8.0
+
+  ### Multi-version upgrades
+  ### https://sourcegraph.com/docs/admin/deploy/kubernetes#multi-version-upgrades
+  # args:
+  # - upgrade
+  # - -from=v6.8.0
+  # - -to=v6.10.3349
+
+################################################################################
+# Executors
+# If deploying Kubernetes native executors in the same namespace,
+# you can use the same override.yaml file for both Helm charts
+################################################################################
+
+executor:
+  frontendUrl: "http://sourcegraph-frontend:30080" # Use cluster-local DNS name, to avoid paying extra for network traffic
+  frontendPassword: "long_random_password_which_matches_in_site_config"
+  queueNames: [ "batches", "codeintel" ]
+
+################################################################################
+# Extra resources
+################################################################################
+
+# extraResources:
+
+# If using an AWS EKS "Auto mode" cluster, need to create the IngressClass, and IngressClassParams
+# https://docs.aws.amazon.com/eks/latest/userguide/auto-elb-example.html
+# https://docs.aws.amazon.com/eks/latest/userguide/auto-configure-alb.html
+
+# - apiVersion: eks.amazonaws.com/v1
+#   kind: IngressClassParams
+#   metadata:
+#     name: alb
+#   spec:
+#     scheme: internet-facing
+#     # certificateARNs: # ALB seems to be smart enough, and have the needed perms, to find the correct cert based on matching host
+
+# - apiVersion: networking.k8s.io/v1
+#   kind: IngressClass
+#   metadata:
+#     annotations:
+#       ingressclass.kubernetes.io/is-default-class: "true"
+#     name: alb
+#   spec:
+#     # Use the EKS Auto Mode ALB controller
+#     controller: eks.amazonaws.com/alb
+#     parameters:
+#       apiGroup: eks.amazonaws.com
+#       kind: IngressClassParams
+#       name: alb
