@@ -96,7 +96,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "syntectServer") | trim | nindent 6 }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list . "syntectServer") | trim }}
+      {{ . }}
+      {{- end }}
       volumes:
       {{- if .Values.syntectServer.extraVolumes }}
       {{- toYaml .Values.syntectServer.extraVolumes | nindent 6 }}

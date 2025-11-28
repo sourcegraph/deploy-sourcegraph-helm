@@ -140,7 +140,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list $top "worker") | trim | nindent 6 }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list $top "worker") | trim }}
+      {{ . }}
+      {{- end }}
       volumes:
       {{- if $top.Values.worker.extraVolumes }}
       {{- toYaml $top.Values.worker.extraVolumes | nindent 6 }}

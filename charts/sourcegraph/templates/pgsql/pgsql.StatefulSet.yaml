@@ -143,7 +143,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "pgsql") | trim | nindent 6 }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list . "pgsql") | trim }}
+      {{ . }}
+      {{- end }}
       volumes:
       - name: disk
         persistentVolumeClaim:

@@ -124,7 +124,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "indexedSearch") | trim | nindent 6 }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list . "indexedSearch") | trim }}
+      {{ . }}
+      {{- end }}
       volumes:
       - name: data
       {{- if .Values.indexedSearch.extraVolumes }}

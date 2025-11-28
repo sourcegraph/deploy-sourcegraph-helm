@@ -129,7 +129,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "redisStore") | trim | nindent 6 }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list . "redisStore") | trim }}
+      {{ . }}
+      {{- end }}
       {{- if .Values.redisStore.priorityClassName }}
       priorityClassName: {{ .Values.redisStore.priorityClassName }}
       {{- end }}

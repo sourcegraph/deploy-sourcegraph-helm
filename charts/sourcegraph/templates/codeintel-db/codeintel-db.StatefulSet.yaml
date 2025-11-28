@@ -141,7 +141,9 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "codeIntelDB") | trim | nindent 6 }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list . "codeIntelDB") | trim }}
+      {{ . }}
+      {{- end }}
       volumes:
       - name: disk
         persistentVolumeClaim:
