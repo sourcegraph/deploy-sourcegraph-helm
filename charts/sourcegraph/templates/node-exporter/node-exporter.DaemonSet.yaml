@@ -58,9 +58,9 @@ spec:
           - --collector.filesystem.ignored-mount-points=^/(dev|proc|sys|var/lib/docker/.+|var/lib/kubelet/pods/.+)($|/)
           - --collector.netclass.ignored-devices=^(veth.*)$
           - --collector.netdev.device-exclude=^(veth.*)$
-{{- if .Values.nodeExporter.extraArgs }}
-{{ toYaml .Values.nodeExporter.extraArgs | indent 10 }}
-{{- end }}
+          {{- if .Values.nodeExporter.extraArgs }}
+          {{ toYaml .Values.nodeExporter.extraArgs }}
+          {{- end }}
         env:
         {{- range $name, $item := .Values.nodeExporter.env}}
         - name: {{ $name }}
@@ -111,11 +111,11 @@ spec:
           successThreshold: 1
           timeoutSeconds: 1
         terminationMessagePolicy: FallbackToLogsOnError
-      automountServiceAccountToken: false
-      terminationGracePeriodSeconds: 30
       {{- if .Values.nodeExporter.extraContainers }}
         {{- toYaml .Values.nodeExporter.extraContainers | nindent 6 }}
       {{- end }}
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 30
       securityContext:
         {{- toYaml .Values.nodeExporter.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "nodeExporter" ) | trim | nindent 6 }}

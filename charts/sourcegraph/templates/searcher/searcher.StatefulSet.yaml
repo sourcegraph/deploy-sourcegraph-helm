@@ -124,10 +124,10 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "searcher") | trim | nindent 6 }}
       volumes:
-      - emptyDir: {}
-        name: cache
-      - emptyDir: {}
-        name: tmpdir
+      - name: cache
+        emptyDir: {}
+      - name: tmpdir
+        emptyDir: {}
       {{- if .Values.searcher.extraVolumes }}
       {{- toYaml .Values.searcher.extraVolumes | nindent 6 }}
       {{- end }}

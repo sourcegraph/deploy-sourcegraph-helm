@@ -2,11 +2,11 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: "sg-test-connection"
-  labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
   annotations:
     "helm.sh/hook": test
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+  name: "sg-test-connection"
 spec:
   containers:
     - name: wget
