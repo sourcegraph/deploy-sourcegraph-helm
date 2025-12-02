@@ -3,7 +3,7 @@
 
 set -euf -o pipefail
 
-helmdocsv=1.7.0
+helmdocsv=1.14.2
 bindir=$( cd "${0%/*}" && pwd ) # Change to script dir and set bin dir to this
 targetbin=$( cd "$bindir"/.. && pwd )/target/bin
 helmdocsbin=$targetbin/helm-docs-$helmdocsv
@@ -11,16 +11,16 @@ os=""
 arch=""
 
 if [ ! -f "$helmdocsbin" ]; then
-    case $(uname | tr '[:upper:]' '[:lower:]') in
-        darwin*)
-            os=darwin
+    case $(uname) in
+        Darwin)
+            os=Darwin
             arch=x86_64
             ;;
-        linux*)
-            os=linux
+        Linux)
+            os=Linux
             case $(uname -m) in
                 x86_64) arch=x86_64 ;;
-                amd64) arch=amd64 ;;
+                amd64) arch=x86_64 ;;
                 arm)
                     tmp=$(dpkg --print-architecture)
                     if echo "$tmp" | grep -q arm64; then
@@ -31,10 +31,11 @@ if [ ! -f "$helmdocsbin" ]; then
                         arch=armv6
                     fi
                 ;;
+                aarch64) arch=arm64 ;;
             esac
             ;;
-        msys*)
-            os=windows
+        MINGW*)
+            os=Windows
             arch=x86_64
             ;;
     esac
