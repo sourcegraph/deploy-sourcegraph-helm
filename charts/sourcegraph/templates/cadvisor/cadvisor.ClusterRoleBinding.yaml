@@ -13,7 +13,7 @@ roleRef:
   kind: ClusterRole
   name: {{ .Values.cadvisor.name }}
 subjects:
-- kind: ServiceAccount
-  name: {{ include "sourcegraph.serviceAccountName" (list . "cadvisor") }}
+- name: {{ include "sourcegraph.serviceAccountName" (list . "cadvisor") }}
+  kind: ServiceAccount
   namespace: {{ .Release.Namespace }}
 {{- end }}
