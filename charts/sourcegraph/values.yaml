@@ -33,6 +33,8 @@ sourcegraph:
   podAnnotations: {}
   # -- Add extra labels to attach to all pods
   podLabels: {}
+  # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
+  priorityClassName: ""
   # -- Global deployment clean up policy,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
   revisionHistoryLimit: 10

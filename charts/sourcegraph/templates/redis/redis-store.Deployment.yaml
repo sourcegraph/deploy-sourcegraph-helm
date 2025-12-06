@@ -130,8 +130,8 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "redisStore") | trim | nindent 6 }}
-      {{- if .Values.redisStore.priorityClassName }}
-      priorityClassName: {{ .Values.redisStore.priorityClassName }}
+      {{- if or .Values.redisStore.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.redisStore.priorityClassName .Values.sourcegraph.priorityClassName }}
       {{- end }}
       volumes:
       - name: redis-data

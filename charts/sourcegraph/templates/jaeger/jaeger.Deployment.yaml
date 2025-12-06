@@ -97,6 +97,9 @@ spec:
       {{- if .Values.jaeger.extraContainers }}
         {{- toYaml .Values.jaeger.extraContainers | nindent 6 }}
       {{- end }}
+      {{- if or .Values.jaeger.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.jaeger.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.jaeger.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "jaeger" ) | trim | nindent 6 }}

@@ -118,8 +118,8 @@ spec:
       {{- if .Values.gitserver.extraVolumes }}
       {{- toYaml .Values.gitserver.extraVolumes | nindent 6 }}
       {{- end }}
-      {{- if .Values.gitserver.priorityClassName }}
-      priorityClassName: {{ .Values.gitserver.priorityClassName }}
+      {{- if or .Values.gitserver.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.gitserver.priorityClassName .Values.sourcegraph.priorityClassName }}
       {{- end }}
   updateStrategy:
     type: RollingUpdate

@@ -95,6 +95,9 @@ spec:
           containerPort: 48080
           protocol: TCP
       automountServiceAccountToken: false
+      {{- if or .Values.cadvisor.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.cadvisor.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 30
       {{- if .Values.cadvisor.extraContainers }}
         {{- toYaml .Values.cadvisor.extraContainers | nindent 6 }}

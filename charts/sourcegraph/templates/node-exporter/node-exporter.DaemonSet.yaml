@@ -112,6 +112,9 @@ spec:
           timeoutSeconds: 1
         terminationMessagePolicy: FallbackToLogsOnError
       automountServiceAccountToken: false
+      {{- if or .Values.nodeExporter.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.nodeExporter.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 30
       {{- if .Values.nodeExporter.extraContainers }}
         {{- toYaml .Values.nodeExporter.extraContainers | nindent 6 }}

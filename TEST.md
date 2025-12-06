@@ -23,7 +23,7 @@ helm plugin install https://github.com/helm-unittest/helm-unittest
 Once the plugin is installed, you can run the unit tests using the following:
 
 ```bash
-helm unittest --helm3 ./charts/sourcegraph/.
+helm unittest ./charts/sourcegraph/.
 ```
 
 We currently do not have testing best practices or require unit tests for new changes, so add test cases at your best judgement if possible.
@@ -59,7 +59,7 @@ Make sure you test both enabled and disabled toggles. For example, if you added 
 You have two options to target specificy Sourcegraph version. Add the below to your `override.yaml`:
 
 ```yaml
-sourcegraph: 
+sourcegraph:
   image:
     defaultTag: "6.10.0"
     useGlobalTagAsDefault: true

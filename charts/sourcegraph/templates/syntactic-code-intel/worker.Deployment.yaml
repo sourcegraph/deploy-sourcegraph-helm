@@ -107,6 +107,9 @@ spec:
       {{- if .Values.syntacticCodeIntel.extraContainers }}
         {{- toYaml .Values.syntacticCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
+      {{- if or .Values.syntacticCodeIntel.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.syntacticCodeIntel.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.syntacticCodeIntel.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}

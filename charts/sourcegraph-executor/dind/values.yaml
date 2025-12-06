@@ -30,6 +30,8 @@ sourcegraph:
   podAnnotations: {}
   # -- Add extra labels to attach to all pods
   podLabels: {}
+  # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
+  priorityClassName: ""
 
 
 storageClass:

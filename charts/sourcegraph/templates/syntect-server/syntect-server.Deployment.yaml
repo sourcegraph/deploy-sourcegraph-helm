@@ -87,6 +87,9 @@ spec:
       {{- if .Values.syntectServer.extraContainers }}
         {{- toYaml .Values.syntectServer.extraContainers | nindent 6 }}
       {{- end }}
+      {{- if or .Values.syntectServer.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.syntectServer.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.syntectServer.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "syntectServer" ) | trim | nindent 6 }}

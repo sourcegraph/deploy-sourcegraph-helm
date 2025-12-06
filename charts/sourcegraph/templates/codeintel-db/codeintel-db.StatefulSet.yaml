@@ -131,6 +131,9 @@ spec:
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
         terminationMessagePolicy: FallbackToLogsOnError
+      {{- if or .Values.codeIntelDB.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.codeIntelDB.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}

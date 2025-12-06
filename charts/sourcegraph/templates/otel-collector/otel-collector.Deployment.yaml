@@ -102,6 +102,9 @@ spec:
           - name: otel-collector-tls
             mountPath: /tls
           {{- end }}
+      {{- if or .Values.openTelemetry.gateway.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.openTelemetry.gateway.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 120
       {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
