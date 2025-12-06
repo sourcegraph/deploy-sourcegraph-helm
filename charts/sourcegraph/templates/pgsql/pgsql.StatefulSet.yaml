@@ -133,6 +133,9 @@ spec:
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
         terminationMessagePolicy: FallbackToLogsOnError
+      {{- if or .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}

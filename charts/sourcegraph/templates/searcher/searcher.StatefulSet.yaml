@@ -131,8 +131,8 @@ spec:
       {{- if .Values.searcher.extraVolumes }}
       {{- toYaml .Values.searcher.extraVolumes | nindent 6 }}
       {{- end }}
-      {{- if .Values.searcher.priorityClassName }}
-      priorityClassName: {{ .Values.searcher.priorityClassName }}
+      {{- if or .Values.searcher.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.searcher.priorityClassName .Values.sourcegraph.priorityClassName }}
       {{- end }}
   volumeClaimTemplates:
   - metadata:
