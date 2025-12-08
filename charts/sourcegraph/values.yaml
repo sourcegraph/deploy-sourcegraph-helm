@@ -119,9 +119,6 @@ cadvisor:
     name: "cadvisor"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "cadvisor"
-  podSecurityPolicy:
-    # -- Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `cadvisor` pods
-    enabled: false
   # -- Resource requests & limits for the `cadvisor` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -674,9 +671,6 @@ nodeExporter:
     name: "node-exporter"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "node-exporter"
-  podSecurityPolicy:
-    # -- Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `node-exporter` pods
-    enabled: false
   # -- Resource requests & limits for the `node-exporter` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
