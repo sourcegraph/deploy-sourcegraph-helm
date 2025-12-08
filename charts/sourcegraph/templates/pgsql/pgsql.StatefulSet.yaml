@@ -133,6 +133,9 @@ spec:
       {{- if .Values.pgsql.extraContainers }}
         {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
       {{- end }}
+      {{- if or .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}

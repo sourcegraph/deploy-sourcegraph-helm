@@ -115,6 +115,9 @@ spec:
         {{- toYaml .Values.nodeExporter.extraContainers | nindent 6 }}
       {{- end }}
       automountServiceAccountToken: false
+      {{- if or .Values.nodeExporter.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.nodeExporter.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 30
       securityContext:
         {{- toYaml .Values.nodeExporter.podSecurityContext | nindent 8 }}

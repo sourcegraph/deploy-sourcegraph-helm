@@ -98,6 +98,9 @@ spec:
         {{- toYaml .Values.cadvisor.extraContainers | nindent 6 }}
       {{- end }}
       automountServiceAccountToken: false
+      {{- if or .Values.cadvisor.priorityClassName .Values.sourcegraph.priorityClassName }}
+      priorityClassName: {{ coalesce .Values.cadvisor.priorityClassName .Values.sourcegraph.priorityClassName }}
+      {{- end }}
       terminationGracePeriodSeconds: 30
       securityContext:
         {{- toYaml .Values.cadvisor.podSecurityContext | nindent 8 }}
