@@ -1,6 +1,6 @@
 suite: cadvisorPrivileged
 templates:
-  - NOTES.txt
+  - other-resources/NOTES.txt
   - cadvisor/cadvisor.DaemonSet.yaml
 tests:
   - it: should not have the warning text when cadvisor.containerSecurityContext.privileged=true
@@ -11,7 +11,7 @@ tests:
     asserts:
       - notMatchRegexRaw:
           pattern: You have set 'cadvisor.containerSecurityContext.privileged' to 'false'
-        template: NOTES.txt
+        template: other-resources/NOTES.txt
   - it: should have the warning text when prometheus.privileged=false
     set:
       cadvisor:
@@ -20,7 +20,7 @@ tests:
     asserts:
       - matchRegexRaw:
           pattern: You have set 'cadvisor.containerSecurityContext.privileged' to 'false'
-        template: NOTES.txt
+        template: other-resources/NOTES.txt
   - it: should render /dev/kmsg in volumes and volumeMounts when cadvisor.containerSecurityContext.privileged=true
     set:
       cadvisor:

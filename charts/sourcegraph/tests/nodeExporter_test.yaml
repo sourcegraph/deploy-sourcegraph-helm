@@ -1,6 +1,6 @@
 suite: nodeExporter
 templates:
-  - NOTES.txt
+  - other-resources/NOTES.txt
   - node-exporter/node-exporter.ClusterRole.yaml
   - node-exporter/node-exporter.ClusterRoleBinding.yaml
   - node-exporter/node-exporter.DaemonSet.yaml
@@ -9,7 +9,7 @@ templates:
   - node-exporter/node-exporter.ServiceAccount.yaml
 tests:
   - it: should render the DaemonSet and Service if node-exporter is enabled
-    set: 
+    set:
       nodeExporter:
         enabled: true
     asserts:
@@ -25,11 +25,11 @@ tests:
         template: node-exporter/node-exporter.Service.yaml
 
   - it: should not render any resources if node-exporter is disabled
-    set: 
+    set:
       nodeExporter:
         enabled: false
     asserts:
-      - hasDocuments: 
+      - hasDocuments:
           count: 0
     templates:
       - node-exporter/node-exporter.ClusterRole.yaml
@@ -41,25 +41,25 @@ tests:
 
   - it: should not render the PodSecurityPolicy, Service Accounts, and ClusterRoles by default
     asserts:
-      - hasDocuments: 
+      - hasDocuments:
           count: 0
         template: node-exporter/node-exporter.PodSecurityPolicy.yaml
-      - hasDocuments: 
+      - hasDocuments:
           count: 0
         template: node-exporter/node-exporter.ClusterRole.yaml
-      - hasDocuments: 
+      - hasDocuments:
             count: 0
         template: node-exporter/node-exporter.ClusterRoleBinding.yaml
-      - hasDocuments: 
+      - hasDocuments:
             count: 0
         template: node-exporter/node-exporter.ServiceAccount.yaml
 
   - it: should render the PodSecurityPolicy, ServiceAccounts, and ClusterRoles if PodSecurityPolicy + Service Accounts are enabled
-    set: 
+    set:
       nodeExporter:
         serviceAccount:
           create: true
-        podSecurityPolicy: 
+        podSecurityPolicy:
           enabled: true
     asserts:
       - containsDocument:
@@ -82,9 +82,9 @@ tests:
           apiVersion: rbac.authorization.k8s.io/v1
           name: node-exporter
         template: node-exporter/node-exporter.ClusterRoleBinding.yaml
-  
+
   - it: should add the ServiceAccount name to the DaemonSet spec if the ServiceAccount is enabled
-    set: 
+    set:
       nodeExporter:
         serviceAccount:
           create: true
@@ -94,9 +94,9 @@ tests:
           path: spec.template.spec.serviceAccountName
           value: "test-service-account-name"
         template: node-exporter/node-exporter.DaemonSet.yaml
-    
+
   - it: should add not the ServiceAccount name to the DaemonSet spec if the ServiceAccount is disabled
-    set: 
+    set:
       nodeExporter:
         serviceAccount:
           create: false
@@ -105,30 +105,30 @@ tests:
       - notExists:
           path: spec.template.spec.serviceAccountName
         template: node-exporter/node-exporter.DaemonSet.yaml
-  
+
   - it: should fail to render if the PodSecurityPolicy is enabled, but the ServiceAccount isn't
-    set: 
+    set:
       nodeExporter:
         serviceAccount:
           create: false
-        podSecurityPolicy: 
+        podSecurityPolicy:
           enabled: true
     asserts:
       - failedTemplate:
           errorMessage: "Node Exporter's service account must be enabled in order to use its pod security policy (set 'nodeExporter.ServiceAccount.create' to true)"
         template: node-exporter/node-exporter.PodSecurityPolicy.yaml
 
-  - it: should not render the podSecurityPolicy if disabled 
-    set: 
+  - it: should not render the podSecurityPolicy if disabled
+    set:
       nodeExporter:
-        podSecurityPolicy: 
+        podSecurityPolicy:
           enabled: false
     asserts:
       - hasDocuments:
           count: 0
         template: node-exporter/node-exporter.PodSecurityPolicy.yaml
-  
-  - it: should ensure that the namespace is properly propagated to the cluster role binding 
+
+  - it: should ensure that the namespace is properly propagated to the cluster role binding
     release:
       namespace: "my-test-namespace"
     set:
@@ -151,16 +151,16 @@ tests:
           create: true
         podSecurityPolicy:
           enabled: true
-    asserts:  
-      - equal: 
+    asserts:
+      - equal:
           path: spec.template.spec.hostPID
           value: true
         template: node-exporter/node-exporter.DaemonSet.yaml
-      - equal: 
+      - equal:
           path: spec.hostPID
           value: true
         template: node-exporter/node-exporter.PodSecurityPolicy.yaml
-  
+
   - it: should propagate host PID settings to both the daemonset and podSecurityPolicy
     set:
       nodeExporter:
@@ -170,12 +170,12 @@ tests:
           create: true
         podSecurityPolicy:
           enabled: true
-    asserts:  
-      - equal: 
+    asserts:
+      - equal:
           path: spec.template.spec.hostPID
           value: false
         template: node-exporter/node-exporter.DaemonSet.yaml
-      - equal: 
+      - equal:
           path: spec.hostPID
           value: false
         template: node-exporter/node-exporter.PodSecurityPolicy.yaml
@@ -184,34 +184,34 @@ tests:
     set:
       nodeExporter:
         enabled: true
-    asserts:  
+    asserts:
       - notMatchRegexRaw:
           pattern: You have set 'nodeExporter.enabled' to 'false'
-        template: NOTES.txt
-  
+        template: other-resources/NOTES.txt
+
   - it: should generate warnings if node-exporter is disabled
     set:
       nodeExporter:
         enabled: false
-    asserts:  
+    asserts:
       - matchRegexRaw:
           pattern: You have set 'nodeExporter.enabled' to 'false'
-        template: NOTES.txt
+        template: other-resources/NOTES.txt
 
   - it: should not generate warnings if hostPID is true
     set:
       nodeExporter:
         hostPID: true
-    asserts:  
+    asserts:
       - notMatchRegexRaw:
           pattern: You have set 'nodeExporter.hostPID' to 'false'
-        template: NOTES.txt
+        template: other-resources/NOTES.txt
 
-  - it: should generate warnings if hostPID is false 
+  - it: should generate warnings if hostPID is false
     set:
       nodeExporter:
         hostPID: false
-    asserts:  
+    asserts:
       - matchRegexRaw:
           pattern: You have set 'nodeExporter.hostPID' to 'false'
-        template: NOTES.txt
+        template: other-resources/NOTES.txt

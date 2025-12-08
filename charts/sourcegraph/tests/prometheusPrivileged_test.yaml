@@ -1,6 +1,6 @@
 suite: prometheusPrivileged
 templates:
-  - NOTES.txt
+  - other-resources/NOTES.txt
 tests:
   - it: should not have the warning text when prometheus.privileged=true
     set:
