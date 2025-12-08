@@ -4,20 +4,14 @@ metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.gitserver.labels }}
-      {{- toYaml .Values.gitserver.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: gitserver
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "gitserver" "kind" "statefulset") | nindent 4 }}
   name: {{ .Values.gitserver.name }}
 spec:
   replicas: {{ .Values.gitserver.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: gitserver
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "gitserver") | nindent 6 }}
   serviceName: gitserver
   template:
     metadata:
@@ -31,17 +25,8 @@ spec:
       {{- toYaml .Values.gitserver.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.gitserver.podLabels }}
-      {{- toYaml .Values.gitserver.podLabels | nindent 8 }}
-      {{- end }}
-        app: gitserver
-        group: backend
+        {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "gitserver") | nindent 8 }}
         type: gitserver
-        deploy: sourcegraph
     spec:
       containers:
       - name: gitserver

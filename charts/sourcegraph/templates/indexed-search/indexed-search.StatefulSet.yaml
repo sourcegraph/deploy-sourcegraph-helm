@@ -6,7 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: indexed-search
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "indexedSearch" "kind" "statefulset") | nindent 4 }}
     {{- if .Values.indexedSearch.labels }}
       {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
     {{- end }}
@@ -16,7 +16,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "indexedSearch") | nindent 6 }}
       app: indexed-search
   serviceName: indexed-search
   template:
@@ -31,7 +31,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "indexedSearch") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

@@ -5,7 +5,7 @@ metadata:
   annotations:
     description: Collects metrics and aggregates them into graphs.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "prometheus" "kind" "deployment") | nindent 4 }}
     {{- if .Values.prometheus.labels }}
       {{- toYaml .Values.prometheus.labels | nindent 4 }}
     {{- end }}
@@ -17,7 +17,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "prometheus") | nindent 6 }}
       app: prometheus
   replicas: 1
   strategy:
@@ -33,7 +33,7 @@ spec:
       {{- toYaml .Values.prometheus.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "prometheus") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

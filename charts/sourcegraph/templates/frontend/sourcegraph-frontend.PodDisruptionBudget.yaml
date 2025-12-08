@@ -2,11 +2,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
-  name: sourcegraph-frontend
+  name: {{ .Values.frontend.name }}
 spec:
   {{- toYaml .Values.frontend.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: sourcegraph-frontend
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "frontend" "componentLabel" "sourcegraph-frontend") | nindent 6 }}
 {{- end }}

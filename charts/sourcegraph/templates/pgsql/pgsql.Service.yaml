@@ -25,7 +25,7 @@ spec:
     port: 5432
     targetPort: pgsql
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "pgsql") | nindent 4 }}
     app: pgsql
   type: {{ .Values.pgsql.serviceType | default "ClusterIP" }}
 {{- end }}

@@ -7,9 +7,7 @@ metadata:
     {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
   {{- end }}
   labels:
-    app: sourcegraph-frontend
-    deploy: sourcegraph
-    app.kubernetes.io/component: frontend
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "frontend" "kind" "ingress" "componentLabel" "sourcegraph-frontend") | nindent 4 }}
     {{- if .Values.frontend.ingress.labels}}
       {{- toYaml .Values.frontend.ingress.labels | nindent 4 }}
     {{- end }}

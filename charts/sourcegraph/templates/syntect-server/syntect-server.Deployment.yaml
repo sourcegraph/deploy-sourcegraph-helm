@@ -4,7 +4,7 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "syntectServer" "kind" "deployment") | nindent 4 }}
     {{- if .Values.syntectServer.labels }}
       {{- toYaml .Values.syntectServer.labels | nindent 4 }}
     {{- end }}
@@ -17,7 +17,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "syntectServer") | nindent 6 }}
       app: syntect-server
   strategy:
     rollingUpdate:
@@ -35,7 +35,7 @@ spec:
       {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "syntectServer") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

@@ -24,6 +24,6 @@ spec:
     port: 6060
     targetPort: http-debug
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "preciseCodeIntel") | nindent 4 }}
     app: precise-code-intel-worker
   type: {{ .Values.preciseCodeIntel.serviceType | default "ClusterIP" }}

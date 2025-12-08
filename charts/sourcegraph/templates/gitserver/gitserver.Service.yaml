@@ -10,13 +10,8 @@ metadata:
     {{- toYaml .Values.gitserver.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: gitserver
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "gitserver" "kind" "service") | nindent 4 }}
     type: gitserver
-    app: gitserver
-    {{- if .Values.gitserver.serviceLabels }}
-      {{- toYaml .Values.gitserver.serviceLabels | nindent 4 }}
-    {{- end }}
   name: gitserver
 spec:
   clusterIP: None
@@ -28,7 +23,6 @@ spec:
     port: 6060
     targetPort: http-debug
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: gitserver
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "gitserver") | nindent 4 }}
     type: gitserver
   type: {{ .Values.gitserver.serviceType | default "ClusterIP" }}

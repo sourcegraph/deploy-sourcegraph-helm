@@ -3,10 +3,10 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   annotations:
-    description: DaemonSet to ensure all nodes run a node-exporter pod.
+    description: Collects cluster node resource and performance metrics for Prometheus alerts and Grafana dashboards
     seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "nodeExporter" "kind" "daemonset") | nindent 4 }}
     {{- if .Values.nodeExporter.labels }}
       {{- toYaml .Values.nodeExporter.labels | nindent 4 }}
     {{- end }}
@@ -17,7 +17,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "nodeExporter") | nindent 6 }}
       app: node-exporter
   template:
     metadata:
@@ -31,7 +31,7 @@ spec:
       {{- toYaml .Values.nodeExporter.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "nodeExporter") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

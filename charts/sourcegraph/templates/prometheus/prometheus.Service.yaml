@@ -20,7 +20,7 @@ spec:
     port: 30090
     targetPort: http
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "prometheus") | nindent 4 }}
     app: prometheus
   type: {{ .Values.prometheus.serviceType | default "ClusterIP" }}
 {{- end }}

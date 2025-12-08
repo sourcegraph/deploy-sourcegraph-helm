@@ -24,6 +24,6 @@ spec:
     port: 6060
     targetPort: http-debug
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "syntectServer") | nindent 4 }}
     app: syntect-server
   type: {{ .Values.syntectServer.serviceType | default "ClusterIP" }}

@@ -3,20 +3,15 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    description: Metrics/monitoring dashboards and alerts.
+    description: Dashboards for app-internal metrics
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.grafana.labels }}
-      {{- toYaml .Values.grafana.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: grafana
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "grafana" "kind" "statefulset") | nindent 4 }}
   name: {{ .Values.grafana.name }}
 spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      app: grafana
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "grafana") | nindent 6 }}
   replicas: 1
   serviceName: grafana
   updateStrategy:
@@ -25,22 +20,14 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: grafana
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.grafana.podAnnotations }}
-      {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- if .Values.sourcegraph.podAnnotations }}
+        {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.grafana.podAnnotations }}
+        {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
+        {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.grafana.podLabels }}
-      {{- toYaml .Values.grafana.podLabels | nindent 8 }}
-      {{- end }}
-        app: grafana
-        deploy: sourcegraph
+        {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "grafana") | nindent 8 }}
     spec:
       containers:
       - name: grafana

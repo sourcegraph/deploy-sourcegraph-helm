@@ -334,7 +334,13 @@ frontend:
   # -- Security context for the `frontend` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
-  # -- Enable creation of Role and RoleBinding (RBAC). Uses [view](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) ClusterRole if set to false
+  # -- RBAC for frontend
+  # privileged: true: Creates Role and RoleBinding
+  # privileged: false: Uses ClusterRole [view](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles)
+  # NOTE: The name "privileged" is misleading, either true or false results in the same privileges,
+  # just a matter of either creating and using an RBAC role, vs using a built-in role,
+  # whichever the customer's cluster policies allow
+  # NOTE: Switching between true and false requires deleting rolebinding.rbac.authorization.k8s.io/sourcegraph-frontend before redeploying
   privileged: true
   # -- Number of `frontend` pod
   replicaCount: 2
@@ -894,7 +900,11 @@ prometheus:
     readOnlyRootFilesystem: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "prometheus"
-  # -- Enable RBAC for `prometheus`
+  # -- RBAC for `prometheus`
+  # privileged: true: create ClusterRole and ClusterRoleBinding resources, to enable Prometheus to scrape metrics from the Kubernetes API
+  # NOTE: the only Kubernetes API metric shown in the Grafana dashboards is pod availability, all other pod and node metrics are scraped from cadvisor and nodeexporter daemonsets
+  # privileged: false: create a RoleBinding resource, to allow the prometheus serviceAccount to use the `view` ClusterRole's permissions, but scoped down to the Sourcegraph instance's namespace
+  # NOTE: Switching between true and false requires deleting rolebinding.rbac.authorization.k8s.io/prometheus before redeploying
   privileged: true
   # -- Disable the creation of a RoleBinding object, for customers who block all RBAC resource creation
   createRoleBinding: true

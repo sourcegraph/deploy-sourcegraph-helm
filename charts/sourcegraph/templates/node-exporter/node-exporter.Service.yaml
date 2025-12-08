@@ -20,12 +20,13 @@ metadata:
     {{- end }}
   name: node-exporter
 spec:
+  clusterIP: None
   ports:
   - name: metrics
     port: 9100
     targetPort: metrics
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "nodeExporter") | nindent 4 }}
     app: node-exporter
   type: {{ .Values.nodeExporter.serviceType | default "ClusterIP" }}
 {{- end }}

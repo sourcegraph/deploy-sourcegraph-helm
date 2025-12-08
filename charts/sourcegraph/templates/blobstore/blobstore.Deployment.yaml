@@ -3,14 +3,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: blobstore for storing LSIF uploads.
+    description: Stores temporary files
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.blobstore.labels }}
-      {{- toYaml .Values.blobstore.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: blobstore
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "blobstore" "kind" "deployment") | nindent 4 }}
   name: {{ .Values.blobstore.name }}
 spec:
   minReadySeconds: 10
@@ -18,8 +13,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: blobstore
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "blobstore") | nindent 6 }}
   strategy:
     type: Recreate
   template:
@@ -33,15 +27,7 @@ spec:
       {{- toYaml .Values.blobstore.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.blobstore.podLabels }}
-      {{- toYaml .Values.blobstore.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: blobstore
+        {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "blobstore" "kind" "deployment") | nindent 8 }}
     spec:
       containers:
       - name: blobstore

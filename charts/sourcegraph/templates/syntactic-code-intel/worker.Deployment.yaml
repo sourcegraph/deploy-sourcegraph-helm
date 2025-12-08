@@ -5,7 +5,7 @@ metadata:
   annotations:
     description: Handles syntactic code intelligence indexing
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "syntacticCodeIntel" "kind" "deployment") | nindent 4 }}
     {{- if .Values.syntacticCodeIntel.labels }}
       {{- toYaml .Values.syntacticCodeIntel.labels | nindent 4 }}
     {{- end }}
@@ -18,7 +18,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "syntacticCodeIntel") | nindent 6 }}
       app: syntactic-code-intel-worker
   strategy:
     rollingUpdate:
@@ -36,7 +36,7 @@ spec:
       {{- toYaml .Values.syntacticCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "syntacticCodeIntel") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

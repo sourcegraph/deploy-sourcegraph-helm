@@ -3,22 +3,16 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   annotations:
-    description: Code Insights Postgresql instance.
+    description: Code Insights Postgres database
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeInsightsDB.labels }}
-      {{- toYaml .Values.codeInsightsDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeinsights-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeInsightsDB" "kind" "statefulset" "componentLabel" "codeinsights-db") | nindent 4 }}
   name: {{ .Values.codeInsightsDB.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: codeinsights-db
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "codeInsightsDB" "componentLabel" "codeinsights-db") | nindent 6 }}
   serviceName: codeinsights-db
   template:
     metadata:
@@ -32,16 +26,7 @@ spec:
       {{- toYaml .Values.codeInsightsDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeInsightsDB.podLabels }}
-      {{- toYaml .Values.codeInsightsDB.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: codeinsights-db
-        group: backend
+        {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeInsightsDB" "componentLabel" "codeinsights-db") | nindent 8 }}
     spec:
       initContainers:
       - name: correct-data-dir-permissions

@@ -7,7 +7,7 @@ metadata:
     {{- toYaml .Values.storageClass.annotations | nindent 4 }}
   {{- end }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "storageClass" "kind" "storageclass") | nindent 4 }}
     deploy: sourcegraph-storage
   name:  {{ .Values.storageClass.name }}
 provisioner: {{ .Values.storageClass.provisioner }}

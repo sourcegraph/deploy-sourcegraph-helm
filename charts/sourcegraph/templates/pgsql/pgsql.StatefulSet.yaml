@@ -5,20 +5,14 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: pgsql
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.pgsql.labels }}
-      {{- toYaml .Values.pgsql.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "pgsql" "kind" "statefulset") | nindent 4 }}
   name: {{ .Values.pgsql.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: pgsql
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "pgsql") | nindent 6 }}
   serviceName: pgsql
   template:
     metadata:
@@ -32,16 +26,7 @@ spec:
       {{- toYaml .Values.pgsql.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.pgsql.podLabels }}
-      {{- toYaml .Values.pgsql.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: pgsql
-        group: backend
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "pgsql") | nindent 8 }}
     spec:
       initContainers:
       - name: correct-data-dir-permissions

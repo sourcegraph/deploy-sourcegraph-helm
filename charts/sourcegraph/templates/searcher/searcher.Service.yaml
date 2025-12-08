@@ -8,12 +8,7 @@ metadata:
     {{- toYaml .Values.searcher.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: searcher
-    deploy: sourcegraph
-    app.kubernetes.io/component: searcher
-    {{- if .Values.searcher.serviceLabels }}
-      {{- toYaml .Values.searcher.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "searcher" "kind" "service") | nindent 4 }}
   name: searcher
 spec:
   clusterIP: None
@@ -25,5 +20,4 @@ spec:
     port: 6060
     targetPort: http-debug
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: searcher
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "searcher") | nindent 4 }}

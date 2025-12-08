@@ -1,0 +1,23 @@
+{{- if .Values.cadvisor.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Collects container resource and performance metrics for Prometheus alerts and Grafana dashboards
+    prometheus.io/port: "48080"
+    sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.cadvisor.serviceAnnotations }}
+    {{- toYaml .Values.cadvisor.serviceAnnotations | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "cadvisor" "kind" "service") | nindent 4 }}
+  name: {{ .Values.cadvisor.name }}
+spec:
+  clusterIP: None
+  ports:
+  - name: http
+    port: 48080
+    targetPort: http
+  selector:
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "cadvisor") | nindent 4 }}
+{{- end }}

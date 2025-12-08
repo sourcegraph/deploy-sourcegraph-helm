@@ -5,7 +5,7 @@ metadata:
   annotations:
     "helm.sh/hook": test
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "sgTestConnection" "kind" "pod") | nindent 4 }}
   name: "sg-test-connection"
 spec:
   containers:

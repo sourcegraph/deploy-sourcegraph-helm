@@ -3,8 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    app.kubernetes.io/component: codeintel-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeIntelDB" "kind" "persistentvolumeclaim" "componentLabel" "codeintel-db") | nindent 4 }}
   name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   accessModes:

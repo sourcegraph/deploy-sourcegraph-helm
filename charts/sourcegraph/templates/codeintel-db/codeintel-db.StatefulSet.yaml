@@ -5,20 +5,14 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeIntelDB.labels }}
-      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeintel-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeIntelDB" "kind" "statefulset" "componentLabel" "codeintel-db") | nindent 4 }}
   name: {{ .Values.codeIntelDB.name }}
 spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: codeintel-db
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "codeIntelDB" "componentLabel" "codeintel-db") | nindent 6 }}
   serviceName: codeintel-db
   template:
     metadata:
@@ -32,16 +26,7 @@ spec:
       {{- toYaml .Values.codeIntelDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeIntelDB.podLabels }}
-      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: codeintel-db
-        group: backend
+        {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeIntelDB" "componentLabel" "codeintel-db") | nindent 8 }}
     spec:
       initContainers:
       - name: correct-data-dir-permissions

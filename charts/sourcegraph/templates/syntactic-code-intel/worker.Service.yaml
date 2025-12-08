@@ -25,7 +25,7 @@ spec:
     port: 6060
     targetPort: http-debug
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "syntacticCodeIntel") | nindent 4 }}
     app: syntactic-code-intel-worker
   type: {{ .Values.syntacticCodeIntel.serviceType | default "ClusterIP" }}
 {{- end }}

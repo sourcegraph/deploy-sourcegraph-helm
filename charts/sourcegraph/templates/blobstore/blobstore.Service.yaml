@@ -7,20 +7,14 @@ metadata:
     {{- toYaml .Values.blobstore.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: blobstore
-    deploy: sourcegraph
-    app.kubernetes.io/component: blobstore
-    {{- if .Values.blobstore.serviceLabels }}
-      {{- toYaml .Values.blobstore.serviceLabels | nindent 4 }}
-    {{- end }}
-  name: blobstore
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "blobstore" "kind" "service") | nindent 4 }}
+  name: {{ .Values.blobstore.name }}
 spec:
   ports:
   - name: http
     port: 9000
     targetPort: http
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: blobstore
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "blobstore") | nindent 4 }}
   type: {{ .Values.blobstore.serviceType | default "ClusterIP" }}
 {{- end }}

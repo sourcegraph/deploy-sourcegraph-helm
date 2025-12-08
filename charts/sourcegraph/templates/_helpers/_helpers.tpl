@@ -1,39 +1,3 @@
-{{/*
-Expand the name of the chart.
-*/}}
-{{- define "sourcegraph.name" -}}
-{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
-Create chart name and version as used by the chart label.
-*/}}
-{{- define "sourcegraph.chart" -}}
-{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
-{{- end }}
-
-{{/*
-Common labels
-*/}}
-{{- define "sourcegraph.labels" -}}
-helm.sh/chart: {{ include "sourcegraph.chart" . }}
-{{ include "sourcegraph.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.sourcegraph.labels }}
-{{ toYaml .Values.sourcegraph.labels }}
-{{- end }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "sourcegraph.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
 
 {{/*
 Create the name of the service account to use
@@ -149,7 +113,7 @@ tolerations:
 Jaeger common labels
 */}}
 {{- define "sourcegraph.jaeger.labels" -}}
-helm.sh/chart: {{ include "sourcegraph.chart" . }}
+helm.sh/chart: {{ include "sourcegraph.chartNameAndVersion" . }}
 {{ include "sourcegraph.jaeger.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}

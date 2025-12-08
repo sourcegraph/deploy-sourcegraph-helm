@@ -24,6 +24,6 @@ spec:
     port: 6070
     targetPort: grpc
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "indexedSearch") | nindent 4 }}
     app: indexed-search
   type: {{ .Values.indexedSearch.serviceType | default "ClusterIP" }}

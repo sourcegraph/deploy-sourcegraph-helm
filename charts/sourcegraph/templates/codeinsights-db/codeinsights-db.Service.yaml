@@ -9,12 +9,7 @@ metadata:
     {{- toYaml .Values.codeInsightsDB.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app.kubernetes.io/component: codeinsights-db
-    app: codeinsights-db
-    deploy: sourcegraph
-    {{- if .Values.codeInsightsDB.serviceLabels }}
-      {{- toYaml .Values.codeInsightsDB.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeInsightsDB" "kind" "service" "componentLabel" "codeinsights-db") | nindent 4 }}
   name: codeinsights-db
 spec:
   ports:
@@ -25,7 +20,6 @@ spec:
     port: 5432
     targetPort: codeinsights-db
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: codeinsights-db
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "codeInsightsDB" "componentLabel" "codeinsights-db") | nindent 4 }}
   type: {{ .Values.codeInsightsDB.serviceType | default "ClusterIP" }}
 {{- end }}

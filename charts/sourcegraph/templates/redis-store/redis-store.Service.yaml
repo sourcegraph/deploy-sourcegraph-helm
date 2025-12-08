@@ -25,7 +25,7 @@ spec:
     port: 6379
     targetPort: redis
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "redisStore") | nindent 4 }}
     app: redis-store
   type: {{ .Values.redisStore.serviceType | default "ClusterIP" }}
 {{- end }}

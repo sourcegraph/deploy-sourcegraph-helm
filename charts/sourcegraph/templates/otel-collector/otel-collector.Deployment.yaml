@@ -5,7 +5,7 @@ metadata:
   annotations:
     description: Receives, processes, and exports telemetry data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "openTelemetry" "kind" "deployment") | nindent 4 }}
     {{- if .Values.openTelemetry.gateway.labels }}
       {{- toYaml .Values.openTelemetry.gateway.labels | nindent 4 }}
     {{- end }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "openTelemetry") | nindent 6 }}
       app: otel-collector
   minReadySeconds: 5
   progressDeadlineSeconds: 120
@@ -31,7 +31,7 @@ spec:
       {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "openTelemetry") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

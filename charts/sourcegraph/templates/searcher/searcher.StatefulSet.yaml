@@ -4,20 +4,14 @@ metadata:
   annotations:
     description: Backend for text search operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.searcher.labels }}
-      {{- toYaml .Values.searcher.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: searcher
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "searcher" "kind" "statefulset") | nindent 4 }}
   name: {{ .Values.searcher.name }}
 spec:
   replicas: {{ .Values.searcher.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: searcher
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "searcher") | nindent 6 }}
   serviceName: searcher
   updateStrategy:
     type: RollingUpdate
@@ -33,15 +27,7 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.searcher.podLabels }}
-      {{- toYaml .Values.searcher.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: searcher
+        {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "searcher") | nindent 8 }}
     spec:
       containers:
       - name: searcher

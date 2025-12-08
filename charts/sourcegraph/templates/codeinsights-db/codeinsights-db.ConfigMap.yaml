@@ -6,10 +6,9 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   annotations:
-    description: Configuration for Code Insights
+    description: Configuration for Code Insights database
   labels:
-    app.kubernetes.io/component: codeinsights-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeInsightsDB" "kind" "configmap" "componentLabel" "codeinsights-db") | nindent 4 }}
   name: {{ .Values.codeInsightsDB.name }}-conf
 data:
   postgresql.conf: |

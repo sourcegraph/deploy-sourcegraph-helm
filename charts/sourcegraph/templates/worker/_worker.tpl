@@ -15,7 +15,7 @@ metadata:
   annotations:
     description: Manages background processes.
   labels:
-    {{- include "sourcegraph.labels" $top | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" $top "valuesKey" "worker" "kind" "deployment") | nindent 4 }}
     {{- if $top.Values.worker.labels }}
       {{- toYaml $top.Values.worker.labels | nindent 4 }}
     {{- end }}
@@ -28,7 +28,7 @@ spec:
   revisionHistoryLimit: {{ $top.Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" $top "valuesKey" "worker") | nindent 6 }}
       app: worker
       {{- if $suffix }}
       worker-replica: {{ $name | quote }}
@@ -50,7 +50,7 @@ spec:
       {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" $top "valuesKey" "worker") | nindent 8 }}
       {{- if $top.Values.sourcegraph.podLabels }}
       {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

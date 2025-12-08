@@ -5,7 +5,7 @@ metadata:
   annotations:
     description: Redis for storing semi-persistent data like user sessions.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "redisStore" "kind" "deployment") | nindent 4 }}
     {{- if .Values.redisStore.labels }}
       {{- toYaml .Values.redisStore.labels | nindent 4 }}
     {{- end }}
@@ -18,7 +18,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "redisStore") | nindent 6 }}
       app: redis-store
   strategy:
     type: Recreate
@@ -33,7 +33,7 @@ spec:
       {{- toYaml .Values.redisStore.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "redisStore") | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

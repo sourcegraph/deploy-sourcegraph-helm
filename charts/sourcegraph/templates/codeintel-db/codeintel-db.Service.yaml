@@ -9,12 +9,7 @@ metadata:
     {{- toYaml .Values.codeIntelDB.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app.kubernetes.io/component: codeintel-db
-    app: codeintel-db
-    deploy: sourcegraph
-    {{- if .Values.codeIntelDB.serviceLabels }}
-      {{- toYaml .Values.codeIntelDB.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "codeIntelDB" "kind" "service" "componentLabel" "codeintel-db") | nindent 4 }}
   name: codeintel-db
 spec:
   ports:
@@ -25,7 +20,6 @@ spec:
     port: 5432
     targetPort: pgsql
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
-    app: codeintel-db
+    {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "codeIntelDB" "componentLabel" "codeintel-db") | nindent 4 }}
   type: {{ .Values.codeIntelDB.serviceType | default "ClusterIP" }}
 {{- end }}

@@ -2,14 +2,9 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Serves the frontend of Sourcegraph via HTTP(S).
+    description: Serves the frontend of Sourcegraph via HTTP(S)
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.frontend.labels }}
-      {{- toYaml .Values.frontend.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: frontend
+    {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "frontend" "kind" "deployment" "componentLabel" "sourcegraph-frontend") | nindent 4 }}
   name: {{ .Values.frontend.name }}
 spec:
   minReadySeconds: 10
@@ -17,8 +12,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: sourcegraph-frontend
+      {{- include "sourcegraph.selectorLabels" (dict "ctx" . "valuesKey" "frontend" "componentLabel" "sourcegraph-frontend") | nindent 6 }}
   strategy:
     rollingUpdate:
       maxSurge: 2
@@ -37,15 +31,7 @@ spec:
       {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.frontend.podLabels }}
-      {{- toYaml .Values.frontend.podLabels | nindent 8 }}
-      {{- end }}
-        app: sourcegraph-frontend
-        deploy: sourcegraph
+        {{- include "sourcegraph.labels" (dict "ctx" . "valuesKey" "frontend" "kind" "deployment" "componentLabel" "sourcegraph-frontend") | nindent 8 }}
     spec:
       initContainers:
       {{- if .Values.migrator.enabled }}
@@ -65,7 +51,7 @@ spec:
         {{- range $name, $item := .Values.migrator.env }}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
-        {{- end }} 
+        {{- end }}
         {{- if not .Values.sourcegraph.localDevMode}}
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
