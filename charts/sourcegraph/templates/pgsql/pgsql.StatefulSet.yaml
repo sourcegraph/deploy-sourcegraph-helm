@@ -58,7 +58,8 @@ spec:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
         {{- end }}
       containers:
-      - image: {{ include "sourcegraph.image" (list . "pgsql") }}
+      - name: pgsql
+        image: {{ include "sourcegraph.image" (list . "pgsql") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.pgsql.args }}
         args:
@@ -80,7 +81,6 @@ spec:
               - /liveness.sh
           failureThreshold: 360
           periodSeconds: 10
-        name: pgsql
         env:
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "POSTGRES_") | nindent 8 }}
         - name: POSTGRES_DB
@@ -110,9 +110,6 @@ spec:
         {{- if .Values.pgsql.extraVolumeMounts }}
         {{- toYaml .Values.pgsql.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- if .Values.pgsql.extraContainers }}
-        {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
-      {{- end }}
       - name: pgsql-exporter
         env:
         {{- include "sourcegraph.dataSource" (list . "pgsql" ) | nindent 8 }}
@@ -133,6 +130,9 @@ spec:
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
         terminationMessagePolicy: FallbackToLogsOnError
+      {{- if .Values.pgsql.extraContainers }}
+        {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
+      {{- end }}
       {{- if or .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
       priorityClassName: {{ coalesce .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
       {{- end }}

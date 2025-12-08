@@ -121,8 +121,8 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "syntacticCodeIntel") | trim | nindent 6 }}
       volumes:
-      - emptyDir: {}
-        name: tmpdir
+      - name: tmpdir
+        emptyDir: {}
       {{- if .Values.syntacticCodeIntel.extraVolumes }}
       {{- toYaml .Values.syntacticCodeIntel.extraVolumes | nindent 6 }}
       {{- end }}
