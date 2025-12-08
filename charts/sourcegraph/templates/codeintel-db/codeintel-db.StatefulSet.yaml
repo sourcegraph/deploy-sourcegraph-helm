@@ -58,7 +58,7 @@ spec:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
         {{- end }}
       containers:
-      - name: pgsql
+      - name: pgsql # TODO: Evaluate renaming container to codeintel
         image: {{ include "sourcegraph.image" (list . "codeIntelDB") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with .Values.codeIntelDB.args }}
@@ -108,9 +108,6 @@ spec:
         {{- if .Values.codeIntelDB.extraVolumeMounts }}
         {{- toYaml .Values.codeIntelDB.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- if .Values.codeIntelDB.extraContainers }}
-        {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
-      {{- end }}
       - name: pgsql-exporter
         env:
         {{- include "sourcegraph.dataSource" (list . "codeIntelDB" ) | nindent 8 }}
@@ -131,6 +128,9 @@ spec:
         securityContext:
           {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
         terminationMessagePolicy: FallbackToLogsOnError
+      {{- if .Values.codeIntelDB.extraContainers }}
+        {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
+      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}

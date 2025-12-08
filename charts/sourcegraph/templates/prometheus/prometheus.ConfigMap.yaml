@@ -1,5 +1,11 @@
 {{- if and .Values.prometheus.enabled (not .Values.prometheus.existingConfig) -}}
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: prometheus
+  name: {{ .Values.prometheus.name }}
 data:
   prometheus.yml: |
     global:
@@ -112,7 +118,9 @@ data:
         regex: (.+)
         target_label: __metrics_path__
         replacement: /api/v1/nodes/${1}/proxy/metrics
-    {{- end }} # End of privileged config
+
+      # End of privileged config
+    {{- end }}
 
     # Scrape config for service endpoints.
     #
@@ -171,7 +179,7 @@ data:
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: instance
-      # Sourcegraph specific customization. We want to add a label to every 
+      # Sourcegraph specific customization. We want to add a label to every
       # metric that indicates the node it came from.
       - source_labels: [__meta_kubernetes_endpoint_node_name]
         action: replace
@@ -252,7 +260,7 @@ data:
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         target_label: ns
-      # Sourcegraph specific customization. We want to add a label to every 
+      # Sourcegraph specific customization. We want to add a label to every
       # metric that indicates the node it came from.
       - source_labels: [__meta_kubernetes_pod_node_name]
         action: replace
@@ -295,10 +303,4 @@ data:
           labels:
             app: alertmanager
   extra_rules.yml: ""
-kind: ConfigMap
-metadata:
-  labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
-  name: {{ .Values.prometheus.name }}
 {{- end }}

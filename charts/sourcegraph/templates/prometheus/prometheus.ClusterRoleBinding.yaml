@@ -12,7 +12,7 @@ roleRef:
   kind: ClusterRole
   name: {{ .Values.prometheus.name }}
 subjects:
-- kind: ServiceAccount
-  name: {{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}
+- name: {{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}
+  kind: ServiceAccount
   namespace: {{ .Release.Namespace }}
 {{- end }}
