@@ -2,14 +2,14 @@
 kind: StorageClass
 apiVersion: storage.k8s.io/v1
 metadata:
-  name:  {{ .Values.storageClass.name }}
-  labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    deploy: sourcegraph-storage
   {{- if .Values.storageClass.annotations}}
   annotations:
     {{- toYaml .Values.storageClass.annotations | nindent 4 }}
   {{- end }}
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    deploy: sourcegraph-storage
+  name:  {{ .Values.storageClass.name }}
 provisioner: {{ .Values.storageClass.provisioner }}
 parameters:
   {{- with .Values.storageClass.type }}
