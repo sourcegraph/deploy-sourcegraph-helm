@@ -13,7 +13,7 @@ roleRef:
   kind: ClusterRole
   name: {{ .Values.nodeExporter.name }}
 subjects:
-- kind: ServiceAccount
-  name: {{ include "sourcegraph.serviceAccountName" (list . "nodeExporter") }}
+- name: {{ include "sourcegraph.serviceAccountName" (list . "nodeExporter") }}
+  kind: ServiceAccount
   namespace: {{ .Release.Namespace }}
 {{- end }}

@@ -115,8 +115,8 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "preciseCodeIntel") | trim | nindent 6 }}
       volumes:
-      - emptyDir: {}
-        name: tmpdir
+      - name: tmpdir
+        emptyDir: {}
       {{- if .Values.preciseCodeIntel.extraVolumes }}
       {{- toYaml .Values.preciseCodeIntel.extraVolumes | nindent 6 }}
       {{- end }}
