@@ -1,6 +1,6 @@
 suite: storageClass
 templates:
-- storageclass.yaml
+- other-resources/storageclass.yaml
 tests:
 - it: should have parameters rendered when storageClass.parameters.zones=us-central1-f
   set:

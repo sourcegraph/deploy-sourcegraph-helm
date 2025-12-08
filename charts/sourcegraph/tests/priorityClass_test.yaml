@@ -4,7 +4,7 @@ release:
   namespace: sourcegraph
 tests:
 - it: should render single priority class
-  template: priorityClass.yaml
+  template: other-resources/priorityClass.yaml
   set:
     priorityClasses:
     - name: gitserver-class
@@ -25,7 +25,7 @@ tests:
       path: description
       value: "gitserver priority class"
 - it: should render two priority classes
-  template: priorityClass.yaml
+  template: other-resources/priorityClass.yaml
   set:
     priorityClasses:
     - name: gitserver-class
@@ -97,7 +97,7 @@ tests:
       path: spec.template.spec.priorityClassName
       value: searcher-class
 - it: set priority class on redisCache
-  template: redis/redis-cache.Deployment.yaml
+  template: redis-cache/redis-cache.Deployment.yaml
   set:
     redisCache:
       priorityClassName: redis-cache-class
@@ -106,7 +106,7 @@ tests:
       path: spec.template.spec.priorityClassName
       value: redis-cache-class
 - it: set priority class on redisStore
-  template: redis/redis-store.Deployment.yaml
+  template: redis-store/redis-store.Deployment.yaml
   set:
     redisStore:
       priorityClassName: redis-store-class
