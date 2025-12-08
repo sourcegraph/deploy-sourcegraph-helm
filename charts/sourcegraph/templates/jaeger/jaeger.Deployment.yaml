@@ -5,7 +5,6 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.jaeger.name }}
   labels:
     {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
     {{- if .Values.jaeger.labels }}
@@ -14,6 +13,7 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger
+  name: {{ .Values.jaeger.name }}
 spec:
   replicas: {{ .Values.jaeger.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}

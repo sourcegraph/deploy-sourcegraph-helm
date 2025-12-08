@@ -65,7 +65,7 @@ spec:
         {{- range $name, $item := .Values.migrator.env }}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
-        {{- end }}
+        {{- end }} 
         {{- if not .Values.sourcegraph.localDevMode}}
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
@@ -151,8 +151,8 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "frontend") | trim | nindent 6 }}
       volumes:
-      - emptyDir: {}
-        name: home-dir
+      - name: home-dir
+        emptyDir: {}
       {{- if .Values.frontend.extraVolumes }}
       {{- toYaml .Values.frontend.extraVolumes | nindent 6 }}
       {{- end }}
