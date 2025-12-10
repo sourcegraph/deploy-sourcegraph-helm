@@ -249,19 +249,33 @@ app.kubernetes.io/name: jaeger
 {{- end }}
 
 {{/*
-Set redisCache and redisStore endpoints
-So that customers can configure them any of these ways:
+Set redisCache and redisStore endpoints,
+so that customers can configure them any of these ways:
+
 1. Create a new Kubernetes secret, with default values (default, no override config required)
+
 2. Use an existing Kubernetes secret, by configuring .Values.redisCache.connection.existingSecret
+
 3. Do not create or use Kubernetes secrets, just pass the default values directly as environment variables into the needed pods, by configuring .Values.sourcegraph.disableKubernetesSecrets = true
-4. Do not create or use Kubernetes secrets, but pass custom values (ex. external Redis) directly as environment variables into the needed pods, by configuring .Values.sourcegraph.disableKubernetesSecrets = true, .Values.redisCache.connection.endpoint = "", .Values.redisStore.connection.endpoint = "", and defining the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods
+
+4. Do not create or use Kubernetes secrets, but provide custom values (ex. external Redis) to have this function pass them into the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods, by configuring:
+.Values.sourcegraph.disableKubernetesSecrets = true,
+.Values.redisCache.connection.endpoint = <custom value for REDIS_CACHE_ENDPOINT>,
+.Values.redisStore.connection.endpoint = <custom value for REDIS_STORE_ENDPOINT>,
+
+5. Do not create or use Kubernetes secrets, but pass custom values (ex. external Redis) directly as environment variables into the needed pods, by configuring:
+.Values.sourcegraph.disableKubernetesSecrets = true,
+.Values.redisCache.connection.endpoint = "",
+.Values.redisStore.connection.endpoint = "",
+and defining the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods
+
 */}}
 {{- define "sourcegraph.redisConnection" -}}
 {{- if .Values.sourcegraph.disableKubernetesSecrets -}}
 {{- if .Values.redisCache.connection.endpoint -}}
 - name: REDIS_CACHE_ENDPOINT
   value: {{ .Values.redisCache.connection.endpoint }}
-{{- end -}}
+{{ end -}}
 {{- if .Values.redisStore.connection.endpoint -}}
 - name: REDIS_STORE_ENDPOINT
   value: {{ .Values.redisStore.connection.endpoint }}
