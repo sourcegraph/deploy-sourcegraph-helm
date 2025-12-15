@@ -74,10 +74,8 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with include "sourcegraph.priorityClassName" (list . "privateDockerRegistry") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- with .Values.sourcegraph.tolerations }}
-      {{- if or .Values.privateDockerRegistry.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.privateDockerRegistry.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

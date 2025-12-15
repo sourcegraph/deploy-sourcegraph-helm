@@ -23,7 +23,7 @@ helm plugin install https://github.com/helm-unittest/helm-unittest
 Once the plugin is installed, you can run the unit tests using the following:
 
 ```bash
-helm unittest ./charts/sourcegraph/.
+helm unittest ./charts/sourcegraph
 ```
 
 We currently do not have testing best practices or require unit tests for new changes, so add test cases at your best judgement if possible.

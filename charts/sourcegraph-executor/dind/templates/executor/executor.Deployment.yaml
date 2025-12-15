@@ -130,10 +130,8 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with include "sourcegraph.priorityClassName" (list . "executor") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- with .Values.sourcegraph.tolerations }}
-      {{- if or .Values.executor.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.executor.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
