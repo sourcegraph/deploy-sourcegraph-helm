@@ -278,7 +278,9 @@ and defining the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on front
 {{- if .Values.redisCache.connection.endpoint -}}
 - name: REDIS_CACHE_ENDPOINT
   value: {{ .Values.redisCache.connection.endpoint }}
+{{- if .Values.redisStore.connection.endpoint }} {{/*Add whitespace only if both are defined*/}}
 {{ end -}}
+{{- end -}}
 {{- if .Values.redisStore.connection.endpoint -}}
 - name: REDIS_STORE_ENDPOINT
   value: {{ .Values.redisStore.connection.endpoint }}

@@ -66,7 +66,7 @@ spec:
       containers:
       - name: worker
         env:
-        {{- include "sourcegraph.redisConnection" $top | nindent 8 }}
+        {{- with include "sourcegraph.redisConnection" $top | trim }}{{ . | nindent 8 }}{{- end }}
         {{- if $allowlist }}
         - name: WORKER_JOB_ALLOWLIST
           value: {{ $allowlist }}

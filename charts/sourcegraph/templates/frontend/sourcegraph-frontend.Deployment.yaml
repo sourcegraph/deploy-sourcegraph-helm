@@ -65,7 +65,7 @@ spec:
         {{- range $name, $item := .Values.migrator.env }}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
-        {{- end }} 
+        {{- end }}
         {{- if not .Values.sourcegraph.localDevMode}}
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
@@ -95,7 +95,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        {{- include "sourcegraph.redisConnection" .| nindent 8 }}
+        {{- with include "sourcegraph.redisConnection" . | trim }}{{ . | nindent 8 }}{{- end }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         {{- if .Values.blobstore.enabled }}
         - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
