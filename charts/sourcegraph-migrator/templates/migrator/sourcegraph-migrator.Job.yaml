@@ -68,6 +68,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with include "sourcegraph.priorityClassName" (list . "migrator") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

@@ -108,6 +108,7 @@ spec:
         {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "preciseCodeIntel" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

@@ -92,6 +92,7 @@ spec:
         {{- toYaml .Values.blobstore.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "blobstore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "blobstore" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "blobstore") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "blobstore" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
