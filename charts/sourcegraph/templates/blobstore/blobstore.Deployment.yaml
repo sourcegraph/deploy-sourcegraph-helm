@@ -88,13 +88,11 @@ spec:
       {{- if .Values.blobstore.extraContainers }}
         {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.blobstore.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.blobstore.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       securityContext:
         {{- toYaml .Values.blobstore.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "blobstore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "blobstore" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "blobstore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "blobstore" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

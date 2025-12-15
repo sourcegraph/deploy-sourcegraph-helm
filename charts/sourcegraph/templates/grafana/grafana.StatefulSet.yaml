@@ -84,13 +84,11 @@ spec:
       {{- if .Values.grafana.extraContainers }}
         {{- toYaml .Values.grafana.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.grafana.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.grafana.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       securityContext:
         {{- toYaml .Values.grafana.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "grafana" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "grafana" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "grafana" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "grafana" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

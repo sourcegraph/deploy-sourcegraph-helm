@@ -131,14 +131,12 @@ spec:
       {{- if .Values.codeIntelDB.extraContainers }}
         {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.codeIntelDB.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.codeIntelDB.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

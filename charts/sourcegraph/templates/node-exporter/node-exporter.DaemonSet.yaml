@@ -115,14 +115,12 @@ spec:
         {{- toYaml .Values.nodeExporter.extraContainers | nindent 6 }}
       {{- end }}
       automountServiceAccountToken: false
-      {{- if or .Values.nodeExporter.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.nodeExporter.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       terminationGracePeriodSeconds: 30
       securityContext:
         {{- toYaml .Values.nodeExporter.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "nodeExporter" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "nodeExporter" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "nodeExporter" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "nodeExporter" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

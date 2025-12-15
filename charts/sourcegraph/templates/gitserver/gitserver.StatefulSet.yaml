@@ -99,6 +99,7 @@ spec:
         {{- toYaml .Values.gitserver.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "gitserver" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "gitserver" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
@@ -117,9 +118,6 @@ spec:
       {{- end }}
       {{- if .Values.gitserver.extraVolumes }}
       {{- toYaml .Values.gitserver.extraVolumes | nindent 6 }}
-      {{- end }}
-      {{- if or .Values.gitserver.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.gitserver.priorityClassName .Values.sourcegraph.priorityClassName }}
       {{- end }}
   updateStrategy:
     type: RollingUpdate

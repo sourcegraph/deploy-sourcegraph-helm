@@ -131,9 +131,7 @@ spec:
       {{- if $top.Values.worker.extraContainers }}
         {{- toYaml $top.Values.worker.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or $top.Values.worker.priorityClassName $top.Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce $top.Values.worker.priorityClassName $top.Values.sourcegraph.priorityClassName }}
-      {{- end }}
+      {{- include "sourcegraph.priorityClassName" (list . "worker" ) | trim | nindent 6 }}
       securityContext:
         {{- toYaml $top.Values.worker.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list $top "worker" ) | trim | nindent 6 }}

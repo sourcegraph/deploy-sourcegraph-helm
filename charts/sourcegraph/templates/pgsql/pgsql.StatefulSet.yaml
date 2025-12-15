@@ -133,14 +133,12 @@ spec:
       {{- if .Values.pgsql.extraContainers }}
         {{- toYaml .Values.pgsql.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.pgsql.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "pgsql" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

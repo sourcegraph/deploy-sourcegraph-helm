@@ -98,14 +98,12 @@ spec:
         {{- toYaml .Values.cadvisor.extraContainers | nindent 6 }}
       {{- end }}
       automountServiceAccountToken: false
-      {{- if or .Values.cadvisor.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.cadvisor.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       terminationGracePeriodSeconds: 30
       securityContext:
         {{- toYaml .Values.cadvisor.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "cadvisor" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

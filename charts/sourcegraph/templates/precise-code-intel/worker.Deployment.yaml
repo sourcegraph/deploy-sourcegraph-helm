@@ -104,13 +104,11 @@ spec:
       {{- if .Values.preciseCodeIntel.extraContainers }}
         {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.preciseCodeIntel.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.preciseCodeIntel.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       securityContext:
         {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

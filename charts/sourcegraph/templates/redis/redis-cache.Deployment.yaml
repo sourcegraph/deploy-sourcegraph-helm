@@ -125,15 +125,13 @@ spec:
         {{- toYaml .Values.redisCache.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "redisCache" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "redisCache" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "redisCache" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "redisCache" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "redisCache") | trim | nindent 6 }}
-      {{- if or .Values.redisCache.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.redisCache.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       volumes:
       - name: redis-data
         persistentVolumeClaim:

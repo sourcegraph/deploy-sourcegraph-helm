@@ -81,12 +81,10 @@ spec:
         volumeMounts:
           - name: config
             mountPath: /etc/otel-agent
-      {{- if or .Values.openTelemetry.agent.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.openTelemetry.agent.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       terminationGracePeriodSeconds: 120
       {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

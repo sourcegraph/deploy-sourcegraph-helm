@@ -115,13 +115,11 @@ spec:
       {{- if .Values.indexedSearch.extraContainers }}
         {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.indexedSearch.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.indexedSearch.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       securityContext:
         {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "indexedSearch" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

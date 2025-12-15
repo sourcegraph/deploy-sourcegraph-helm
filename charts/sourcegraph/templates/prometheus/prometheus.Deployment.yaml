@@ -84,14 +84,12 @@ spec:
       {{- if .Values.prometheus.extraContainers }}
         {{- toYaml .Values.prometheus.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.prometheus.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.prometheus.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.prometheus.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "prometheus" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "prometheus" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "prometheus" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "prometheus" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

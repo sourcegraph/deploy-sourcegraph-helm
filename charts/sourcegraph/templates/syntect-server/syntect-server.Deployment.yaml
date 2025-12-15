@@ -87,13 +87,11 @@ spec:
       {{- if .Values.syntectServer.extraContainers }}
         {{- toYaml .Values.syntectServer.extraContainers | nindent 6 }}
       {{- end }}
-      {{- if or .Values.syntectServer.priorityClassName .Values.sourcegraph.priorityClassName }}
-      priorityClassName: {{ coalesce .Values.syntectServer.priorityClassName .Values.sourcegraph.priorityClassName }}
-      {{- end }}
       securityContext:
         {{- toYaml .Values.syntectServer.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "syntectServer" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.priorityClassName" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- include "sourcegraph.tolerations" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
