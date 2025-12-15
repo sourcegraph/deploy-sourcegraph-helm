@@ -125,7 +125,7 @@ spec:
         {{- toYaml .Values.redisCache.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "redisCache" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "redisCache" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.priorityClassName" (list . "redisCache" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "redisCache" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "redisCache" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

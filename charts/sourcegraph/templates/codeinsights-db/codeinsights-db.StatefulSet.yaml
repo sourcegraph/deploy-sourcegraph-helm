@@ -124,7 +124,7 @@ spec:
         {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "codeInsightsDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeInsightsDB" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.priorityClassName" (list . "codeInsightsDB" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "codeInsightsDB" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "codeInsightsDB" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

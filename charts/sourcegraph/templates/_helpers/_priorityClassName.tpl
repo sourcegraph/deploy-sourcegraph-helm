@@ -13,8 +13,8 @@ and can override it for individual services, if needed, at .Values.<service>.pri
 {{- $globalPriorityClassName := (index $top.Values "sourcegraph" "priorityClassName") }}
 {{- $servicePriorityClassName := (index $top.Values $service "priorityClassName") }}
 {{- if $servicePriorityClassName }}
-priorityClassName: {{- $servicePriorityClassName | toYaml | trim }}
+priorityClassName: {{ $servicePriorityClassName | toYaml | trim }}
 {{- else if $globalPriorityClassName }}
-priorityClassName: {{- $globalPriorityClassName | toYaml | trim }}
+priorityClassName: {{ $globalPriorityClassName | toYaml | trim }}
 {{- end }}
 {{- end }}

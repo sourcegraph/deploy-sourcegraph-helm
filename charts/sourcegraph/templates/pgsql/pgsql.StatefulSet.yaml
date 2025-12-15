@@ -138,7 +138,7 @@ spec:
         {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.priorityClassName" (list . "pgsql" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "pgsql" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

@@ -89,7 +89,7 @@ spec:
         {{- toYaml .Values.prometheus.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "prometheus" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "prometheus" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.priorityClassName" (list . "prometheus" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "prometheus" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "prometheus" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

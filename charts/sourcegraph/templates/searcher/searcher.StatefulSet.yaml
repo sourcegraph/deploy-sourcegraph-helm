@@ -117,7 +117,7 @@ spec:
         {{- toYaml .Values.searcher.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "searcher" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "searcher" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.priorityClassName" (list . "searcher" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "searcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "searcher" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
