@@ -101,6 +101,7 @@ spec:
         {{- toYaml .Values.jaeger.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "jaeger" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "jaeger" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "jaeger" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "jaeger" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

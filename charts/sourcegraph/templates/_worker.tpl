@@ -135,6 +135,7 @@ spec:
         {{- toYaml $top.Values.worker.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list $top "worker" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list $top "worker" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list $top "worker") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list $top "worker" ) | trim | nindent 6 }}
       {{- with $top.Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
