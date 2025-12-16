@@ -46,7 +46,6 @@ In addition to the documented values, all services also support the following va
 | cadvisor.image.defaultTag | string | `"6.0.0@sha256:48082a2822a727e22c556ae2c3bae5f5bf4528c7b462efc3c085271ee5145be8"` | Docker image tag for the `cadvisor` image |
 | cadvisor.image.name | string | `"cadvisor"` | Docker image name for the `cadvisor` image |
 | cadvisor.name | string | `"cadvisor"` | Name used by resources. Does not affect service names or PVCs. |
-| cadvisor.podSecurityPolicy.enabled | bool | `false` | Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `cadvisor` pods |
 | cadvisor.resources | object | `{"limits":{"cpu":"300m","memory":"2000Mi"},"requests":{"cpu":"150m","memory":"200Mi"}}` | Resource requests & limits for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | cadvisor.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `cadvisor` |
 | cadvisor.serviceAccount.name | string | `"cadvisor"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -188,7 +187,6 @@ In addition to the documented values, all services also support the following va
 | nodeExporter.image.name | string | `"node-exporter"` | Docker image name for the `node-exporter` image |
 | nodeExporter.name | string | `"node-exporter"` | Name used by resources. Does not affect service names or PVCs. |
 | nodeExporter.podSecurityContext | object | `{"fsGroup":65534,"runAsGroup":65534,"runAsNonRoot":true,"runAsUser":65534}` | Security context for the `node-exporter` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| nodeExporter.podSecurityPolicy.enabled | bool | `false` | Enable [PodSecurityPolicy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) for `node-exporter` pods |
 | nodeExporter.resources | object | `{"limits":{"cpu":"1","memory":"1Gi"},"requests":{"cpu":".2","memory":"100Mi"}}` | Resource requests & limits for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | nodeExporter.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `node-exporter` |
 | nodeExporter.serviceAccount.name | string | `"node-exporter"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
