@@ -65,7 +65,7 @@ spec:
         {{- range $name, $item := .Values.migrator.env }}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
-        {{- end }} 
+        {{- end }}
         {{- if not .Values.sourcegraph.localDevMode}}
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
@@ -144,6 +144,7 @@ spec:
         {{- toYaml .Values.frontend.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "frontend" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "frontend" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "frontend" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "frontend" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

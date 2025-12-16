@@ -99,6 +99,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with include "sourcegraph.priorityClassName" (list . "executor") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- with .Values.executor.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
