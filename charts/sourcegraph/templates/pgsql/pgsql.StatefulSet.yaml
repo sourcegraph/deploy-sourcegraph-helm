@@ -136,16 +136,11 @@ spec:
       terminationGracePeriodSeconds: 120
       securityContext:
         {{- toYaml .Values.pgsql.podSecurityContext | nindent 8 }}
-      {{- include "sourcegraph.nodeSelector" (list . "pgsql" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "pgsql" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.tolerations" (list . "pgsql" ) | trim | nindent 6 }}
-      {{- with .Values.sourcegraph.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with include "sourcegraph.renderServiceAccountName" (list . "pgsql") | trim }}
-      {{ . }}
-      {{- end }}
+      {{- with include "sourcegraph.nodeSelector" (list . "pgsql") | trim }}{{ . | nindent 6 }}{{ end }}
+      {{- with include "sourcegraph.affinity" (list . "pgsql") | trim }}{{ . | nindent 6 }}{{ end }}
+      {{- with include "sourcegraph.tolerations" (list . "pgsql") | trim }}{{ . | nindent 6 }}{{ end }}
+      {{- with include "sourcegraph.imagePullSecrets" (list .) | trim }}{{ . | nindent 6 }}{{ end }}
+      {{- with include "sourcegraph.renderServiceAccountName" (list . "pgsql") | trim }}{{ . | nindent 6 }}{{ end }}
       volumes:
       - name: disk
         persistentVolumeClaim:
