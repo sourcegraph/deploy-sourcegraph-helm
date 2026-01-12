@@ -575,18 +575,6 @@ promoteToPublic:
             --docker-password $DOCKER_PASSWORD \
             charts/sourcegraph-migrator/
 
-      - name: sg ops:appliance
-        cmd: |
-          set -eu
-          registry=index.docker.io/sourcegraph
-          sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-appliance/
-
       - name: "chart:version"
         cmd: |
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
@@ -594,7 +582,6 @@ promoteToPublic:
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
           comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-          comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
 
       - name: "chart:appVersion"
         cmd: |
@@ -602,7 +589,6 @@ promoteToPublic:
           comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
           comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
           comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-          comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-appliance/Chart.yaml
 
       - name: "update helm docs"
         cmd: ./scripts/helm-docs.sh
