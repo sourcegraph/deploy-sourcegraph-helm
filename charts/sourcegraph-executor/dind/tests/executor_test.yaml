@@ -4,21 +4,43 @@ templates:
   - executor/executor.Deployment.yaml
   - executor/executor.Service.yaml
 tests:
-  - it: should render the Deployment and Service if executor is enabled
+  - it: should render the Deployment and Service if executor is enabled, single queue
     set:
       executor:
         enabled: true
+        env:
+          EXECUTOR_QUEUE_NAME:
+            value: "foo"
     asserts:
-      - containsDocument:
-          kind: Deployment
-          apiVersion: apps/v1
-          name: executor
-        template: executor/executor.Deployment.yaml
       - containsDocument:
           kind: Service
           apiVersion: v1
-          name: executor
+          name: executor-foo
         template: executor/executor.Service.yaml
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+          name: executor-foo
+        template: executor/executor.Deployment.yaml
+        
+  - it: should render the Deployment and Service if executor is enabled, multi queue
+    set:
+      executor:
+        enabled: true
+        env:
+          EXECUTOR_QUEUE_NAMES:
+            value: "foo,bar"
+    asserts:
+      - containsDocument:
+          kind: Service
+          apiVersion: v1
+          name: executor-foo-bar
+        template: executor/executor.Service.yaml
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+          name: executor-foo-bar
+        template: executor/executor.Deployment.yaml
 
   - it: should not render any resources if executor is disabled
     set:
@@ -31,3 +53,13 @@ tests:
       - executor/docker-daemon.ConfigMap.yaml
       - executor/executor.Deployment.yaml
       - executor/executor.Service.yaml
+
+  - it: fails if neither env.EXECUTOR_QUEUE_NAME.value and env.EXECUTOR_QUEUE_NAMES.value are set
+    set:
+      executor:
+        enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "You must set either executor.env.EXECUTOR_QUEUE_NAME.value or executor.env.EXECUTOR_QUEUE_NAMES.value"
+    templates:
+      - executor/executor.Deployment.yaml
