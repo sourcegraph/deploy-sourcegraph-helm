@@ -1,0 +1,46 @@
+suite: affinity
+templates:
+- searcher/searcher.StatefulSet.yaml
+- indexed-search/indexed-search.StatefulSet.yaml
+- codeinsights-db/codeinsights-db.StatefulSet.yaml
+- grafana/grafana.StatefulSet.yaml
+- codeintel-db/codeintel-db.StatefulSet.yaml
+- symbols/symbols.StatefulSet.yaml
+- pgsql/pgsql.StatefulSet.yaml
+- gitserver/gitserver.StatefulSet.yaml
+- frontend/sourcegraph-frontend.Deployment.yaml
+- redis/redis-store.Deployment.yaml
+- redis/redis-cache.Deployment.yaml
+- jaeger/jaeger.Deployment.yaml
+- blobstore/blobstore.Deployment.yaml
+- syntect-server/syntect-server.Deployment.yaml
+- precise-code-intel/worker.Deployment.yaml
+- otel-collector/otel-collector.Deployment.yaml
+- prometheus/prometheus.Deployment.yaml
+- github-proxy/github-proxy.Deployment.yaml
+- worker/worker.Deployment.yaml
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render initContainers when it is set
+  set:
+    indexedSearch:
+      initContainers:
+      - name: init
+        image: alpine
+        command: ["echo", "hello"]
+  asserts:
+  - equal:
+      path: spec.template.spec.initContainers
+      value:
+      - name: init
+        image: alpine
+        command: ["echo", "hello"]
+  - matchSnapshot:
+      path: spec.template.spec
+
+- it: should not render initContainers when it is not set
+  asserts:
+  - matchSnapshot:
+      path: spec.template.spec.initContainers
