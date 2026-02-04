@@ -78,8 +78,7 @@ spec:
         resources:
           {{- toYaml .Values.gitserver.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.gitserver.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "gitserver" 8) }}
         volumeMounts:
         - mountPath: /tmp
           name: tmpdir
@@ -95,8 +94,7 @@ spec:
       {{- if .Values.gitserver.extraContainers }}
         {{- toYaml .Values.gitserver.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.gitserver.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "gitserver" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "gitserver" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "gitserver" ) | trim }}{{ . | nindent 6 }}{{- end }}

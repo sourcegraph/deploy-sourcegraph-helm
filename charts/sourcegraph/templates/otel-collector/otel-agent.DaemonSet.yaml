@@ -58,8 +58,7 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.openTelemetry.agent.resources | nindent 10 }}
-        securityContext:
-          {{- toYaml .Values.openTelemetry.agent.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "openTelemetry" "agent" 8) }}
         readinessProbe:
           httpGet:
             path: /

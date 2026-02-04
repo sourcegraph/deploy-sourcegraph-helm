@@ -122,8 +122,7 @@ spec:
         resources:
           {{- toYaml $resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml $top.Values.worker.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list $top "worker" 8) }}
         volumeMounts:
         {{- if $top.Values.worker.extraVolumeMounts }}
         {{- toYaml $top.Values.worker.extraVolumeMounts | nindent 8 }}
@@ -131,8 +130,7 @@ spec:
       {{- if $top.Values.worker.extraContainers }}
         {{- toYaml $top.Values.worker.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml $top.Values.worker.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list $top "worker" 6) }}
       {{- include "sourcegraph.nodeSelector" (list $top "worker" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list $top "worker" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list $top "worker") | trim }}{{ . | nindent 6 }}{{- end }}
