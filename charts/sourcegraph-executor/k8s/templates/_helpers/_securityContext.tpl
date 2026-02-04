@@ -5,7 +5,10 @@ Security context helpers for container and pod security contexts.
 These helpers implement a 3-tier merge precedence:
 1. Component default (e.g., .Values.executor.defaultContainerSecurityContext)
 2. Global override (e.g., .Values.sourcegraph.containerSecurityContext)
-3. Component override (e.g., .Values.executor.securityContext for container, .Values.executor.podSecurityContext for pod)
+3. Component override (e.g., .Values.executor.containerSecurityContext for container, .Values.executor.podSecurityContext for pod)
+
+For backwards compatibility, .Values.<component>.securityContext is also supported for container
+security context and merged before containerSecurityContext (so containerSecurityContext takes precedence).
 
 Later values override earlier ones, allowing customers to:
 - Set global security context settings that apply to all components
@@ -37,8 +40,9 @@ Parameters:
 {{- end -}}
 {{- $default := $component.defaultContainerSecurityContext | default dict -}}
 {{- $global := $root.Values.sourcegraph.containerSecurityContext | default dict -}}
-{{- $override := $component.securityContext | default dict -}}
-{{- $merged := mustMergeOverwrite (deepCopy $default) $global $override -}}
+{{- $legacyOverride := $component.securityContext | default dict -}}
+{{- $override := $component.containerSecurityContext | default dict -}}
+{{- $merged := mustMergeOverwrite (deepCopy $default) $global $legacyOverride $override -}}
 {{- if $merged | keys | len | ne 0 }}
 {{ "securityContext:" | indent $indent }}
 {{ toYaml $merged | indent (int (add $indent 2)) -}}
