@@ -78,8 +78,7 @@ spec:
         resources:
           {{- toYaml .Values.syntectServer.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.syntectServer.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "syntectServer" 8) }}
         volumeMounts:
         {{- if .Values.syntectServer.extraVolumeMounts }}
         {{- toYaml .Values.syntectServer.extraVolumeMounts | nindent 8 }}
@@ -87,8 +86,7 @@ spec:
       {{- if .Values.syntectServer.extraContainers }}
         {{- toYaml .Values.syntectServer.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.syntectServer.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "syntectServer" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "syntectServer" ) | trim }}{{ . | nindent 6 }}{{- end }}

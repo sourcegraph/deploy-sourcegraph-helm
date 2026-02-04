@@ -51,8 +51,7 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
-        securityContext:
-        {{- toYaml .Values.codeInsightsDB.init.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "codeInsightsDB" "init" 8) }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
@@ -85,8 +84,7 @@ spec:
         resources:
           {{- toYaml .Values.codeInsightsDB.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.codeInsightsDB.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "codeInsightsDB" 8) }}
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
@@ -114,14 +112,12 @@ spec:
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "postgresExporter" 8) }}
         terminationMessagePolicy: FallbackToLogsOnError
       {{- if .Values.codeInsightsDB.extraContainers }}
         {{- toYaml .Values.codeInsightsDB.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.codeInsightsDB.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "codeInsightsDB" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "codeInsightsDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeInsightsDB" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "codeInsightsDB" ) | trim }}{{ . | nindent 6 }}{{- end }}

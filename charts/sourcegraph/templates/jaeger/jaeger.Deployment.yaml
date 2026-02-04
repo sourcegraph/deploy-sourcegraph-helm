@@ -88,8 +88,7 @@ spec:
         resources:
           {{- toYaml .Values.jaeger.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.jaeger.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "jaeger" 8) }}
         volumeMounts:
         {{- if .Values.jaeger.extraVolumeMounts }}
         {{- toYaml .Values.jaeger.extraVolumeMounts | nindent 8 }}
@@ -97,8 +96,7 @@ spec:
       {{- if .Values.jaeger.extraContainers }}
         {{- toYaml .Values.jaeger.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.jaeger.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "jaeger" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "jaeger" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "jaeger" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "jaeger" ) | trim }}{{ . | nindent 6 }}{{- end }}
