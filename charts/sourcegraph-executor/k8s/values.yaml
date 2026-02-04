@@ -112,9 +112,12 @@ executor:
   # -- Default container security context for the executor container
   defaultContainerSecurityContext:
     privileged: false
+  # -- (DEPRECATED) Legacy override for container security context. Use containerSecurityContext instead.
+  # Kept for backwards compatibility; containerSecurityContext takes precedence if both are set.
+  securityContext: {}
   # -- Override container security context for the executor container.
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  securityContext: {}
+  containerSecurityContext: {}
   # -- Default pod security context for the executor pod
   defaultPodSecurityContext: {}
   # -- Override pod security context for the executor pod

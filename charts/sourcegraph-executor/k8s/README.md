@@ -54,6 +54,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 |-----|------|---------|-------------|
 | executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | executor.configureRbac | bool | `true` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
+| executor.containerSecurityContext | object | `{}` | Override container security context for the executor container. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | executor.debug.keepJobs | string | `"false"` | If true, Kubernetes jobs will not be deleted after they complete. Not recommended for production use as it can hit cluster limits. |
 | executor.debug.keepWorkspaces | string | `"false"` |  |
 | executor.defaultContainerSecurityContext | object | `{"privileged":false}` | Default container security context for the executor container |
@@ -97,7 +98,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.resources.limits.memory | string | `"1Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
 | executor.resources.requests.memory | string | `"200Mi"` |  |
-| executor.securityContext | object | `{}` | Override container security context for the executor container. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| executor.securityContext | object | `{}` | (DEPRECATED) Legacy override for container security context. Use containerSecurityContext instead. Kept for backwards compatibility; containerSecurityContext takes precedence if both are set. |
 | executor.storageSize | string | `"10Gi"` | The storage size of the PVC attached to the executor deployment. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
