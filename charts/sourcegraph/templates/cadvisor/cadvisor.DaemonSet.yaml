@@ -81,7 +81,8 @@ spec:
         - name: disk
           mountPath: /dev/disk
           readOnly: true
-        {{- if or .Values.cadvisor.containerSecurityContext.privileged .Values.cadvisor.defaultContainerSecurityContext.privileged }}
+        {{- $privileged := ternary .Values.cadvisor.containerSecurityContext.privileged .Values.cadvisor.defaultContainerSecurityContext.privileged (hasKey .Values.cadvisor.containerSecurityContext "privileged") }}
+        {{- if $privileged }}
         - name: kmsg
           mountPath: /dev/kmsg
           readOnly: true
@@ -123,7 +124,8 @@ spec:
       - name: disk
         hostPath:
           path: /dev/disk
-      {{- if or .Values.cadvisor.containerSecurityContext.privileged .Values.cadvisor.defaultContainerSecurityContext.privileged }}
+      {{- $privilegedVol := ternary .Values.cadvisor.containerSecurityContext.privileged .Values.cadvisor.defaultContainerSecurityContext.privileged (hasKey .Values.cadvisor.containerSecurityContext "privileged") }}
+      {{- if $privilegedVol }}
       - name: kmsg
         hostPath:
           path: /dev/kmsg
