@@ -1,3 +1,4 @@
+{{- if .Values.executor.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -43,17 +44,13 @@ spec:
       {{- end }}
         {{- include "executor.labels" . | nindent 8 }}
     spec:
-      securityContext:
-        fsGroup: {{ .Values.executor.securityContext.fsGroup }}
-        runAsUser: {{ .Values.executor.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.executor.securityContext.runAsGroup }}
+      {{- include "sourcegraph.podSecurityContext" (list . "executor" 6) }}
       serviceAccountName: sg-executor
       containers:
         - name: executor
           image: {{ include "sourcegraph.image" (list . "executor") }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-          securityContext:
-            privileged: {{ .Values.executor.securityContext.privileged }}
+          {{- include "sourcegraph.containerSecurityContext" (list . "executor" 10) }}
           ports:
             - name: http-debug
               containerPort: 6060
@@ -112,3 +109,4 @@ spec:
         - name: "sg-{{include "executor.name" . }}"
           persistentVolumeClaim:
             claimName: "sg-{{include "executor.name" . }}"
+{{- end }}
