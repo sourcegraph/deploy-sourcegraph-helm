@@ -108,13 +108,11 @@ spec:
         resources:
           {{- toYaml .Values.searcher.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.searcher.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "searcher" 8) }}
       {{- if .Values.searcher.extraContainers }}
         {{- toYaml .Values.searcher.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.searcher.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "searcher" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "searcher" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "searcher" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "searcher" ) | trim }}{{ . | nindent 6 }}{{- end }}

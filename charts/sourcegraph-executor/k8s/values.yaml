@@ -34,6 +34,12 @@ sourcegraph:
   podLabels: { }
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Global container security context override applied to all containers.
+  # Merges with component defaults; component-specific overrides take precedence.
+  containerSecurityContext: {}
+  # -- Global pod security context override applied to all pods.
+  # Merges with component defaults; component-specific overrides take precedence.
+  podSecurityContext: {}
 
 
 storageClass:
@@ -57,6 +63,8 @@ storageClass:
   allowedTopologies: { }
 
 executor:
+  # -- Whether to deploy the executor
+  enabled: true
   # -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
   configureRbac: true
   replicas: 1
@@ -101,16 +109,19 @@ executor:
   namespace: "default"
   # -- The path to the kubeconfig file. If not specified, the in-cluster config is used.
   kubeconfigPath: ""
-  # -- The containerSecurityContext for the executor image
-  securityContext:
-    # @default -- nil; accepts [0, 2147483647]
-    runAsUser:
-    # @default -- nil; accepts [0, 2147483647]
-    runAsGroup:
-    # @default -- nil; accepts [0, 2147483647]
-    fsGroup:
-    # @default -- false; accepts [true, false]
+  # -- Default container security context for the executor container
+  defaultContainerSecurityContext:
     privileged: false
+  # -- (DEPRECATED) Legacy override for container security context. Use containerSecurityContext instead.
+  # Kept for backwards compatibility; containerSecurityContext takes precedence if both are set.
+  securityContext: {}
+  # -- Override container security context for the executor container.
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext: {}
+  # -- Default pod security context for the executor pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the executor pod
+  podSecurityContext: {}
 
   kubernetesJob:
     # -- The number of seconds after which a Kubernetes job will be terminated.

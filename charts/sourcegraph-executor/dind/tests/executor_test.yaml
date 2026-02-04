@@ -8,16 +8,19 @@ tests:
     set:
       executor:
         enabled: true
+        env:
+          EXECUTOR_QUEUE_NAME:
+            value: "test"
     asserts:
       - containsDocument:
           kind: Deployment
           apiVersion: apps/v1
-          name: executor
+          name: executor-test
         template: executor/executor.Deployment.yaml
       - containsDocument:
           kind: Service
           apiVersion: v1
-          name: executor
+          name: executor-test
         template: executor/executor.Service.yaml
 
   - it: should not render any resources if executor is disabled
