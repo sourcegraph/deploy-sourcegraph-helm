@@ -52,9 +52,14 @@ In addition to the documented values, the `executor` and `private-docker-registr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| dind.containerSecurityContext | object | `{}` | Override container security context for the dind container |
+| dind.defaultContainerSecurityContext | object | `{"privileged":true}` | Default container security context for the dind container |
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"20.10.22-dind"` |  |
+| executor.containerSecurityContext | object | `{}` | Override container security context for the executor container |
+| executor.defaultContainerSecurityContext | object | `{}` | Default container security context for the executor container |
+| executor.defaultPodSecurityContext | object | `{}` | Default pod security context for the executor pod |
 | executor.enabled | bool | `true` |  |
 | executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":""}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
 | executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":""}` | The external URL of the Sourcegraph instance. Required. |
@@ -62,6 +67,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.env.EXECUTOR_QUEUE_NAMES | object | `{"value":""}` | The comma-separated list of names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAME is required.** |
 | executor.image.defaultTag | string | `"6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508"` |  |
 | executor.image.name | string | `"executor"` |  |
+| executor.podSecurityContext | object | `{}` | Override pod security context for the executor pod |
 | executor.replicaCount | int | `1` |  |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
@@ -69,6 +75,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | privateDockerRegistry.image.tag | int | `2` |  |
 | privateDockerRegistry.storageSize | string | `"10Gi"` |  |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.containerSecurityContext | object | `{}` | Global container security context override applied to all containers. Merges with component defaults; component-specific overrides take precedence. |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
@@ -79,6 +86,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.podSecurityContext | object | `{}` | Global pod security context override applied to all pods. Merges with component defaults; component-specific overrides take precedence. |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | object | `{}` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
