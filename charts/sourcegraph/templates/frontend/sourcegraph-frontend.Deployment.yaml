@@ -70,8 +70,7 @@ spec:
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.migrator.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "migrator" 8) }}
         volumeMounts:
         {{- if .Values.migrator.extraVolumeMounts }}
         {{- toYaml .Values.migrator.extraVolumeMounts | nindent 8 }}
@@ -129,8 +128,7 @@ spec:
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.frontend.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "frontend" 8) }}
         volumeMounts:
         - mountPath: /home/sourcegraph
           name: home-dir
@@ -140,8 +138,7 @@ spec:
       {{- if .Values.frontend.extraContainers }}
         {{- toYaml .Values.frontend.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.frontend.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "frontend" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "frontend" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "frontend" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "frontend" ) | trim }}{{ . | nindent 6 }}{{- end }}

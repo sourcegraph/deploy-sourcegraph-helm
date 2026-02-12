@@ -96,8 +96,7 @@ spec:
         resources:
           {{- toYaml .Values.syntacticCodeIntel.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.syntacticCodeIntel.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "syntacticCodeIntel" 8) }}
         volumeMounts:
         - mountPath: /tmp
           name: tmpdir
@@ -107,8 +106,7 @@ spec:
       {{- if .Values.syntacticCodeIntel.extraContainers }}
         {{- toYaml .Values.syntacticCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.syntacticCodeIntel.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "syntacticCodeIntel" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "syntacticCodeIntel" ) | trim }}{{ . | nindent 6 }}{{- end }}

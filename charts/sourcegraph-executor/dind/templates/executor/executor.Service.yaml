@@ -13,7 +13,7 @@ metadata:
     {{- if .Values.executor.serviceLabels }}
     {{- toYaml .Values.executor.serviceLabels | nindent 4 }}
     {{- end }}
-  name: executor
+  name: {{ include "executor.name" . }}
 spec:
   ports:
     - name: http-debug

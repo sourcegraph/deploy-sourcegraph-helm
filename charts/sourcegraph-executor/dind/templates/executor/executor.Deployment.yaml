@@ -2,6 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: {{ include "executor.name" . }}
   annotations:
     description: Runs sourcegraph executors
     kubectl.kubernetes.io/default-container: executor
@@ -44,10 +45,12 @@ spec:
       {{- end }}
         {{- include "executor.labels" . | nindent 8 }}
     spec:
+      {{- include "sourcegraph.podSecurityContext" (list . "executor" 6) }}
       containers:
         - name: executor
           image: {{ include "sourcegraph.image" (list . "executor") }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+          {{- include "sourcegraph.containerSecurityContext" (list . "executor" 10) }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -87,8 +90,7 @@ spec:
         - name: dind
           image: "{{ .Values.dind.image.registry}}/{{ .Values.dind.image.repository}}:{{ .Values.dind.image.tag}}"
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-          securityContext:
-            privileged: true
+          {{- include "sourcegraph.containerSecurityContext" (list . "dind" 10) }}
           command:
             - 'dockerd'
             - '--tls=false'

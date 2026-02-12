@@ -49,8 +49,7 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.migrator.resources | nindent 10 }}
-        securityContext:
-          {{- toYaml .Values.migrator.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "migrator" 8) }}
         volumeMounts:
         {{- if .Values.migrator.extraVolumeMounts }}
         {{- toYaml .Values.migrator.extraVolumeMounts | nindent 8 }}
@@ -58,8 +57,7 @@ spec:
       {{- if .Values.migrator.extraContainers }}
         {{- toYaml .Values.migrator.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.migrator.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "migrator" 6) }}
       {{- with .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
