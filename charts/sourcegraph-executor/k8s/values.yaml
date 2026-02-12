@@ -61,7 +61,7 @@ executor:
   configureRbac: true
   replicas: 1
   image:
-    defaultTag: 6.0.0@sha256:6dc771a0c281a41ef676213f2f84a63d99045cf2e58d43022554a8022070ed65
+    defaultTag: 6.12.5040@sha256:16c0a913bdd1ea53ff57ccfc91f5c80db8a61b9365b1d3610113550ed6590ead
     name: "executor-kubernetes"
   resources:
     limits:
