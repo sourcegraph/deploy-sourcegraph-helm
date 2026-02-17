@@ -1,0 +1,34 @@
+{{- if .Values.frontend.gateway.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  {{- if .Values.frontend.gateway.httpRoute.annotations}}
+  annotations:
+    {{- toYaml .Values.frontend.gateway.httpRoute.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+    {{- if .Values.frontend.gateway.httpRoute.labels}}
+      {{- toYaml .Values.frontend.gateway.httpRoute.labels | nindent 4 }}
+    {{- end }}
+  name: {{ .Values.frontend.name }}
+spec:
+  parentRefs:
+  - kind: Gateway
+    name: {{ .Values.frontend.name }}
+  {{- if .Values.frontend.gateway.host }}
+  hostnames:
+  - {{ .Values.frontend.gateway.host | quote }}
+  {{- end }}
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /
+    backendRefs:
+    - kind: Service
+      name: sourcegraph-frontend
+      port: 30080
+{{- end }}

@@ -1,0 +1,50 @@
+{{- if .Values.frontend.gateway.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  {{- if .Values.frontend.gateway.annotations}}
+  annotations:
+    {{- toYaml .Values.frontend.gateway.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+    {{- if .Values.frontend.gateway.labels}}
+      {{- toYaml .Values.frontend.gateway.labels | nindent 4 }}
+    {{- end }}
+  name: {{ .Values.frontend.name }}
+spec:
+  gatewayClassName: {{ .Values.frontend.gateway.gatewayClassName }}
+  {{- if .Values.frontend.gateway.addresses }}
+  addresses:
+    {{- toYaml .Values.frontend.gateway.addresses | nindent 4 }}
+  {{- end }}
+  listeners:
+  {{- if .Values.frontend.gateway.tlsSecret }}
+  - name: https
+    protocol: HTTPS
+    port: {{ .Values.frontend.gateway.listeners.httpsPort | default 443 }}
+    {{- if .Values.frontend.gateway.host }}
+    hostname: {{ .Values.frontend.gateway.host | quote }}
+    {{- end }}
+    tls:
+      mode: Terminate
+      certificateRefs:
+      - kind: Secret
+        name: {{ .Values.frontend.gateway.tlsSecret }}
+    allowedRoutes:
+      namespaces:
+        from: Same
+  {{- else }}
+  - name: http
+    protocol: HTTP
+    port: {{ .Values.frontend.gateway.listeners.httpPort | default 80 }}
+    {{- if .Values.frontend.gateway.host }}
+    hostname: {{ .Values.frontend.gateway.host | quote }}
+    {{- end }}
+    allowedRoutes:
+      namespaces:
+        from: Same
+  {{- end }}
+{{- end }}

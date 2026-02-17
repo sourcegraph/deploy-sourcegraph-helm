@@ -324,6 +324,48 @@ frontend:
     ingressClassName: null
     # -- Secret containing SSL cert
     tlsSecret: ""
+  gateway:
+    # -- Enable Gateway API resource for the Sourcegraph server
+    enabled: false
+    # -- Annotations for the Sourcegraph server Gateway
+    annotations: {}
+    # -- Additional labels for the Sourcegraph server Gateway
+    labels: {}
+    # -- GatewayClassName for the Gateway (e.g., "istio", "gke-l7-global-external-managed")
+    gatewayClassName: ""
+    # -- External hostname for the Sourcegraph server Gateway
+    host: ""
+    # -- Secret containing TLS certificate for HTTPS listener
+    tlsSecret: ""
+    # -- Static addresses for the Gateway
+    addresses: []
+    listeners:
+      # -- Port for the HTTP listener
+      httpPort: 80
+      # -- Port for the HTTPS listener (only used when tlsSecret is set)
+      httpsPort: 443
+    httpRoute:
+      # -- Annotations for the Sourcegraph server HTTPRoute
+      annotations: {}
+      # -- Additional labels for the Sourcegraph server HTTPRoute
+      labels: {}
+    healthCheck:
+      # -- Annotations for the Sourcegraph server HealthCheckPolicy
+      annotations: {}
+      # -- Additional labels for the Sourcegraph server HealthCheckPolicy
+      labels: {}
+      # -- Health check interval in seconds
+      checkIntervalSec: 15
+      # -- Health check timeout in seconds
+      timeoutSec: 5
+      # -- Number of consecutive successes before marking healthy
+      healthyThreshold: 2
+      # -- Number of consecutive failures before marking unhealthy
+      unhealthyThreshold: 2
+      # -- Container port to health check (frontend http-debug port)
+      port: 6060
+      # -- Request path for the health check
+      requestPath: /healthz
   # -- Security context for the `frontend` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:

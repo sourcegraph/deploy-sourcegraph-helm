@@ -1,0 +1,32 @@
+{{- if .Values.frontend.gateway.enabled -}}
+apiVersion: networking.gke.io/v1
+kind: HealthCheckPolicy
+metadata:
+  {{- if .Values.frontend.gateway.healthCheck.annotations}}
+  annotations:
+    {{- toYaml .Values.frontend.gateway.healthCheck.annotations | nindent 4 }}
+  {{- end }}
+  labels:
+    app: sourcegraph-frontend
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
+    {{- if .Values.frontend.gateway.healthCheck.labels}}
+      {{- toYaml .Values.frontend.gateway.healthCheck.labels | nindent 4 }}
+    {{- end }}
+  name: {{ .Values.frontend.name }}
+spec:
+  default:
+    checkIntervalSec: {{ .Values.frontend.gateway.healthCheck.checkIntervalSec }}
+    timeoutSec: {{ .Values.frontend.gateway.healthCheck.timeoutSec }}
+    healthyThreshold: {{ .Values.frontend.gateway.healthCheck.healthyThreshold }}
+    unhealthyThreshold: {{ .Values.frontend.gateway.healthCheck.unhealthyThreshold }}
+    config:
+      type: HTTP
+      httpHealthCheck:
+        port: {{ .Values.frontend.gateway.healthCheck.port }}
+        requestPath: {{ .Values.frontend.gateway.healthCheck.requestPath }}
+  targetRef:
+    group: ""
+    kind: Service
+    name: sourcegraph-frontend
+{{- end }}

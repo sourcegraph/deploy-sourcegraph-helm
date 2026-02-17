@@ -1,0 +1,8 @@
+frontend:
+  ingress:
+    enabled: false
+  gateway:
+    enabled: true
+    gatewayClassName: gke-l7-global-external-managed
+    host: sourcegraph.example.com
+    tlsSecret: sourcegraph-tls
