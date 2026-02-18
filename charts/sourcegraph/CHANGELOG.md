@@ -12,6 +12,7 @@ Use `**BREAKING**:` to denote a breaking change
 - Added a startup probe to the gitserver statefulset to give it time to run the on-disk migration from repo names to repo IDs
 - The repo-updater service is no longer needed and has been removed from the chart.
 - The symbols service is no longer needed and has been removed from the chart. Consider merging env vars and resource overrides given to symbols into searcher before upgrading.
+- Added support for exposing the frontend service using the [Kubernetes Gateway API](https://gateway-api.sigs.k8s.io/) (`gateway.networking.k8s.io/v1`). Set `frontend.gateway.enabled: true` to create Gateway, HTTPRoute, and HealthCheckPolicy resources. See `examples/gke-gateway/override.yaml` for a GKE example.
 
 ## 5.10.0
 

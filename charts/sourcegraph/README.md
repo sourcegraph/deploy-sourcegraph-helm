@@ -96,6 +96,25 @@ In addition to the documented values, all services also support the following va
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.createRoleBinding | bool | `true` | Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
+| frontend.gateway.addresses | list | `[]` | Static addresses for the Gateway |
+| frontend.gateway.annotations | object | `{}` | Annotations for the Sourcegraph server Gateway |
+| frontend.gateway.enabled | bool | `false` | Enable Gateway API resource for the Sourcegraph server |
+| frontend.gateway.gatewayClassName | string | `""` | GatewayClassName for the Gateway (e.g., "istio", "gke-l7-global-external-managed") |
+| frontend.gateway.healthCheck.annotations | object | `{}` | Annotations for the Sourcegraph server HealthCheckPolicy |
+| frontend.gateway.healthCheck.checkIntervalSec | int | `15` | Health check interval in seconds |
+| frontend.gateway.healthCheck.healthyThreshold | int | `2` | Number of consecutive successes before marking healthy |
+| frontend.gateway.healthCheck.labels | object | `{}` | Additional labels for the Sourcegraph server HealthCheckPolicy |
+| frontend.gateway.healthCheck.port | int | `6060` | Container port to health check (frontend http-debug port) |
+| frontend.gateway.healthCheck.requestPath | string | `"/healthz"` | Request path for the health check |
+| frontend.gateway.healthCheck.timeoutSec | int | `5` | Health check timeout in seconds |
+| frontend.gateway.healthCheck.unhealthyThreshold | int | `2` | Number of consecutive failures before marking unhealthy |
+| frontend.gateway.host | string | `""` | External hostname for the Sourcegraph server Gateway |
+| frontend.gateway.httpRoute.annotations | object | `{}` | Annotations for the Sourcegraph server HTTPRoute |
+| frontend.gateway.httpRoute.labels | object | `{}` | Additional labels for the Sourcegraph server HTTPRoute |
+| frontend.gateway.labels | object | `{}` | Additional labels for the Sourcegraph server Gateway |
+| frontend.gateway.listeners.httpPort | int | `80` | Port for the HTTP listener |
+| frontend.gateway.listeners.httpsPort | int | `443` | Port for the HTTPS listener (only used when tlsSecret is set) |
+| frontend.gateway.tlsSecret | string | `""` | Secret containing TLS certificate for HTTPS listener |
 | frontend.image.defaultTag | string | `"6.0.0@sha256:d4f21178096da5fdb3804099ae9de2e050b06e859a327aa79452b1ea2f3ede0a"` | Docker image tag for the `frontend` image |
 | frontend.image.name | string | `"frontend"` | Docker image name for the `frontend` image |
 | frontend.ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
