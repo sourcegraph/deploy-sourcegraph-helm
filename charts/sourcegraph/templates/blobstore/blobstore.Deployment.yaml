@@ -75,8 +75,7 @@ spec:
         resources:
           {{- toYaml .Values.blobstore.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.blobstore.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "blobstore" 8) }}
         volumeMounts:
         - name: blobstore-data
           mountPath: /data
@@ -88,8 +87,7 @@ spec:
       {{- if .Values.blobstore.extraContainers }}
         {{- toYaml .Values.blobstore.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.blobstore.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "blobstore" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "blobstore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "blobstore" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "blobstore") | trim }}{{ . | nindent 6 }}{{- end }}

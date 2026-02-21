@@ -32,6 +32,12 @@ sourcegraph:
   podLabels: {}
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Global container security context override applied to all containers.
+  # Merges with component defaults; component-specific overrides take precedence.
+  containerSecurityContext: {}
+  # -- Global pod security context override applied to all pods.
+  # Merges with component defaults; component-specific overrides take precedence.
+  podSecurityContext: {}
 
 
 # Generic application configuration options, used by most applications below
@@ -118,13 +124,20 @@ migrator:
     requests:
       cpu: 100m
       memory: 50M
-  # -- Security context for the `migrator` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `migrator` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `migrator` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext: {}
+  # -- Default pod security context for the `migrator` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `migrator` pod
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
   # -- Override default `migrator` container args
   # Available commands can be found at
   # https://docs.sourcegraph.com/admin/how-to/manual_database_migrations

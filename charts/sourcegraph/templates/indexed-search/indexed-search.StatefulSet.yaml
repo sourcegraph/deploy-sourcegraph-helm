@@ -75,8 +75,7 @@ spec:
         resources:
           {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.indexedSearch.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "indexedSearch" 8) }}
         volumeMounts:
         - mountPath: /data
           name: data
@@ -104,8 +103,7 @@ spec:
         resources:
           {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.indexedSearchIndexer.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "indexedSearchIndexer" 8) }}
         volumeMounts:
         - mountPath: /data
           name: data
@@ -115,8 +113,7 @@ spec:
       {{- if .Values.indexedSearch.extraContainers }}
         {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "indexedSearch" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "indexedSearch" ) | trim }}{{ . | nindent 6 }}{{- end }}

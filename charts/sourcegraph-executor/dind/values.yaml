@@ -32,6 +32,12 @@ sourcegraph:
   podLabels: {}
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Global container security context override applied to all containers.
+  # Merges with component defaults; component-specific overrides take precedence.
+  containerSecurityContext: {}
+  # -- Global pod security context override applied to all pods.
+  # Merges with component defaults; component-specific overrides take precedence.
+  podSecurityContext: {}
 
 
 storageClass:
@@ -60,6 +66,14 @@ executor:
     defaultTag: 6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508
     name: "executor"
   replicaCount: 1
+  # -- Default container security context for the executor container
+  defaultContainerSecurityContext: {}
+  # -- Override container security context for the executor container
+  containerSecurityContext: {}
+  # -- Default pod security context for the executor pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the executor pod
+  podSecurityContext: {}
   env:
     # -- The external URL of the Sourcegraph instance. Required.
     EXECUTOR_FRONTEND_URL:
@@ -79,6 +93,11 @@ dind:
     registry: index.docker.io
     repository: docker
     tag: 20.10.22-dind
+  # -- Default container security context for the dind container
+  defaultContainerSecurityContext:
+    privileged: true
+  # -- Override container security context for the dind container
+  containerSecurityContext: {}
 
 privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.

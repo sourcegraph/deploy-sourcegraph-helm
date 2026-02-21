@@ -1,6 +1,5 @@
 # How to deploy this chart locally
 
-
 !! Make sure you are pointing toward a local cluster
 From the root of the repo
 
