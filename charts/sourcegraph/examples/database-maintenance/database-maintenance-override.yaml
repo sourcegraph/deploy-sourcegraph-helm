@@ -1,0 +1,86 @@
+# Override file for database maintenance
+
+################################################################################
+# Purpose
+################################################################################
+
+# Scales down all pods which would usually connect to the database
+# Leaves databases and other pods unchanged
+# Allows you to operate the Migrator commands as needed
+
+################################################################################
+# Usage
+################################################################################
+
+# 1) Append this additional override file to your usual Helm command, and run it
+
+# helm upgrade --install \
+#   sourcegraph \
+#   sourcegraph/sourcegraph \
+#   --namespace sourcegraph \
+#   --values instances/staging/override.yaml \
+#   --values examples/database-maintenance/database-maintenance-override.yaml
+
+# 2) When finished, re-run your usual Helm command without this additional override file,
+# to scale pods back to their usual replicaCount
+
+# helm upgrade --install \
+#   sourcegraph \
+#   sourcegraph/sourcegraph \
+#   --namespace sourcegraph \
+#   --values instances/staging/override.yaml
+
+################################################################################
+# Migrator
+# Operate the migrator commands using the args here
+# See available commands at
+# https://sourcegraph.com/docs/admin/updates/migrator/migrator-operations#commands
+# See details about Multi-version upgrades at
+# https://sourcegraph.com/docs/admin/deploy/kubernetes#multi-version-upgrades
+################################################################################
+
+# migrator:
+
+  ### Drift check
+  # args:
+  # - drift
+  # - --version=v6.11.1446
+
+  ### Multi-version upgrades
+  # args:
+  # - upgrade
+  # - --from=v5.1.6
+  # - --to=v6.11.1446
+
+################################################################################
+# Databases
+# Do not modify the databases in this file, unless needed
+################################################################################
+
+# codeInsightsDB:
+
+# codeIntelDB:
+
+# pgsql:
+
+################################################################################
+# Scale down all pods which would usually connect to the database
+################################################################################
+
+frontend:
+  replicaCount: 0
+
+gitserver:
+  replicaCount: 0
+
+indexedSearch:
+  replicaCount: 0
+
+preciseCodeIntel:
+  replicaCount: 0
+
+searcher:
+  replicaCount: 0
+
+worker:
+  replicaCount: 0
