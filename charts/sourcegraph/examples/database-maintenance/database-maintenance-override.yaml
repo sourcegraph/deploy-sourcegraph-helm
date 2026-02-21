@@ -1,0 +1,99 @@
+# Override file for database maintenance
+
+################################################################################
+# Purpose
+################################################################################
+
+# Scales down all pods which would usually connect to the database
+# Leaves databases and other pods unchanged
+# Allows you to operate the Migrator commands, if needed, on the migrator init container in the frontend pod
+
+################################################################################
+# Usage
+################################################################################
+
+# 1) Append this additional override file to your usual Helm command, and run it
+
+# helm upgrade --install \
+#   sourcegraph \
+#   sourcegraph/sourcegraph \
+#   --namespace $NAMESPACE \
+#   --values instances/staging/override.yaml \
+#   --values examples/database-maintenance/database-maintenance-override.yaml
+
+# 2) Get logs from the migrator init container within the frontend pod
+# Note: Be sure you're seeing the logs from the most recent replicaSet,
+# especially if you have to redeploy this a few times
+
+# kubectl -n $NAMESPACE logs -c migrator \
+#   $(kubectl -n $NAMESPACE get pods --sort-by=.metadata.creationTimestamp -o name | grep frontend | tail -1)
+
+# 3) When finished, re-run your usual Helm command without this additional override file,
+# to scale pods back to their usual replicaCount
+
+# helm upgrade --install \
+#   sourcegraph \
+#   sourcegraph/sourcegraph \
+#   --namespace $NAMESPACE \
+#   --values instances/staging/override.yaml
+
+################################################################################
+# Migrator
+# If needed, operate the migrator commands using the args here
+# See available commands at
+# https://sourcegraph.com/docs/admin/updates/migrator/migrator-operations#commands
+# See details about Multi-version upgrades at
+# https://sourcegraph.com/docs/admin/deploy/kubernetes#multi-version-upgrades
+################################################################################
+
+frontend:
+  # Need one frontend pod to run the migrator as an init container
+  # replicaCount: 1
+  # Or, leave the frontend pod and migrator disabled to let the database pods startup on their own
+  replicaCount: 0
+
+# migrator:
+
+  ### Drift check
+  # args:
+  # - drift
+  # - --version=v6.12.5040
+  # - --schema=frontend
+  # - --schema=codeinsights
+  # - --schema=codeintel
+
+  ### Multi-version upgrade
+  # args:
+  # - upgrade
+  # - --from=v5.1.6
+  # - --to=v6.12.5040
+
+################################################################################
+# Databases
+# Do not modify the databases in this file, unless needed
+################################################################################
+
+# codeInsightsDB:
+
+# codeIntelDB:
+
+# pgsql:
+
+################################################################################
+# Scale down all other pods which would usually connect to the database
+################################################################################
+
+gitserver:
+  replicaCount: 0
+
+indexedSearch:
+  replicaCount: 0
+
+preciseCodeIntel:
+  replicaCount: 0
+
+searcher:
+  replicaCount: 0
+
+worker:
+  replicaCount: 0
