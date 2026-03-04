@@ -1,0 +1,6 @@
+frontend:
+  ingress:
+    enabled: true
+    hosts:
+      - host: sourcegraph.example.com
+      - host: other.example.com

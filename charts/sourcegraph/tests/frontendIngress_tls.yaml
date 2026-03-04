@@ -1,0 +1,7 @@
+frontend:
+  ingress:
+    enabled: true
+    tls:
+      - hosts:
+          - sourcegraph.example.com
+        secretName: sourcegraph-tls
