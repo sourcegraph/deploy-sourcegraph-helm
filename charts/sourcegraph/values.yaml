@@ -322,8 +322,23 @@ frontend:
     # -- IngressClassName for the Ingress (Available in Kubernetes 1.18+)
     # If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null`
     ingressClassName: null
-    # -- Secret containing SSL cert
+    # -- Secret containing TLS cert. Cannot be set together with `tls`.
     tlsSecret: ""
+    # -- List of hosts for the ingress rules. Supersedes `host` if set.
+    # Cannot be set together with `host`.
+    # Example:
+    # hosts:
+    #   - host: sourcegraph.example.com
+    hosts: []
+    # -- Full TLS configuration for the ingress. Supersedes `tlsSecret` if set.
+    # Cannot be set together with `tlsSecret`.
+    # Omit `secretName` for controllers that manage certificates themselves (e.g. Tailscale).
+    # Example:
+    # tls:
+    #   - hosts:
+    #       - sourcegraph.example.com
+    #     secretName: sourcegraph-tls  # optional
+    tls: []
   # -- Security context for the `frontend` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
