@@ -1,4 +1,10 @@
 {{- if .Values.frontend.ingress.enabled -}}
+{{- if and .Values.frontend.ingress.hosts .Values.frontend.ingress.host -}}
+  {{- fail "frontend.ingress.hosts and frontend.ingress.host cannot both be set" -}}
+{{- end -}}
+{{- if and .Values.frontend.ingress.tls .Values.frontend.ingress.tlsSecret -}}
+  {{- fail "frontend.ingress.tls and frontend.ingress.tlsSecret cannot both be set" -}}
+{{- end -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -15,13 +21,30 @@ metadata:
     {{- end }}
   name: {{ .Values.frontend.name }}
 spec:
-  {{- if and .Values.frontend.ingress.host .Values.frontend.ingress.tlsSecret }}
+  {{- if .Values.frontend.ingress.tls }}
+  tls:
+    {{- toYaml .Values.frontend.ingress.tls | nindent 4 }}
+  {{- else if and .Values.frontend.ingress.host .Values.frontend.ingress.tlsSecret }}
   tls:
   - hosts:
     - {{ .Values.frontend.ingress.host }}
     secretName: {{ .Values.frontend.ingress.tlsSecret }}
   {{- end }}
   rules:
+  {{- if .Values.frontend.ingress.hosts }}
+  {{- range .Values.frontend.ingress.hosts }}
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sourcegraph-frontend
+            port:
+              number: 30080
+    host: {{ .host }}
+  {{- end }}
+  {{- else }}
   - http:
       paths:
       - path: /
@@ -33,6 +56,7 @@ spec:
               number: 30080
   {{- if .Values.frontend.ingress.host}}
     host: {{ .Values.frontend.ingress.host }}
+  {{- end }}
   {{- end }}
   {{- if .Values.frontend.ingress.ingressClassName}}
   ingressClassName: {{ .Values.frontend.ingress.ingressClassName }}
