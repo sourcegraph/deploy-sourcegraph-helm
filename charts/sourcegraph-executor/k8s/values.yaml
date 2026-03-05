@@ -177,3 +177,19 @@ executor:
 
   # -- For local deployments the host is 'host.docker.internal' and this needs to be true
   dockerAddHostGateway: "false"
+
+  networkPolicy:
+    # -- Enable network policies to deny egress to private, multicast, and metadata server networks.
+    enabled: false
+    # -- List of private network CIDR blocks to deny egress to.
+    # Each entry supports an optional `except` list of CIDRs to exclude from the deny rule.
+    privateNetworks:
+      - cidr: 10.0.0.0/8
+      - cidr: 172.16.0.0/12
+      - cidr: 192.168.0.0/16
+    # -- List of multicast network CIDR blocks to deny egress to.
+    multicastNetworks:
+      - cidr: 224.0.0.0/4
+    # -- List of metadata server IPs to explicitly deny egress to.
+    metadataServers:
+      - "169.254.169.254"
