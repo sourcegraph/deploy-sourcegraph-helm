@@ -101,15 +101,15 @@ executor:
   namespace: "default"
   # -- The path to the kubeconfig file. If not specified, the in-cluster config is used.
   kubeconfigPath: ""
-  # -- The containerSecurityContext for the executor image
+  # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
   securityContext:
-    # @default -- nil; accepts [0, 2147483647]
+    # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
     runAsUser:
-    # @default -- nil; accepts [0, 2147483647]
+    # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
     runAsGroup:
-    # @default -- nil; accepts [0, 2147483647]
+    # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
     fsGroup:
-    # @default -- false; accepts [true, false]
+    # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
     privileged: false
 
   kubernetesJob:
@@ -177,3 +177,11 @@ executor:
 
   # -- For local deployments the host is 'host.docker.internal' and this needs to be true
   dockerAddHostGateway: "false"
+
+  # -- Security context for the container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    privileged: false
+  # -- Security context for the pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
