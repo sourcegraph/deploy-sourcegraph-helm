@@ -54,6 +54,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 |-----|------|---------|-------------|
 | executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | executor.configureRbac | bool | `true` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
+| executor.containerSecurityContext | object | `{"privileged":false}` | Security context for the container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | executor.debug.keepJobs | string | `"false"` | If true, Kubernetes jobs will not be deleted after they complete. Not recommended for production use as it can hit cluster limits. |
 | executor.debug.keepWorkspaces | string | `"false"` |  |
 | executor.dockerAddHostGateway | string | `"false"` | For local deployments the host is 'host.docker.internal' and this needs to be true |
@@ -90,6 +91,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.networkPolicy.multicastNetworks | list | `[{"cidr":"224.0.0.0/4"}]` | List of multicast network CIDR blocks to deny egress to. |
 | executor.networkPolicy.privateNetworks | list | `[{"cidr":"10.0.0.0/8"},{"cidr":"172.16.0.0/12"},{"cidr":"192.168.0.0/16"}]` | List of private network CIDR blocks to deny egress to. Each entry supports an optional `except` list of CIDRs to exclude from the deny rule. |
 | executor.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| executor.podSecurityContext | object | `{}` | Security context for the pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or queueNames is required.** |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
 | executor.replicas | int | `1` |  |
@@ -97,7 +99,11 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.resources.limits.memory | string | `"1Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
 | executor.resources.requests.memory | string | `"200Mi"` |  |
-| executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | The containerSecurityContext for the executor image |
+| executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.fsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.privileged | bool | `false` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.runAsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.runAsUser | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.storageSize | string | `"10Gi"` | The storage size of the PVC attached to the executor deployment. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |

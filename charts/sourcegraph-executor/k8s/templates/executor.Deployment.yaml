@@ -44,16 +44,26 @@ spec:
         {{- include "executor.labels" . | nindent 8 }}
     spec:
       securityContext:
-        fsGroup: {{ .Values.executor.securityContext.fsGroup }}
-        runAsUser: {{ .Values.executor.securityContext.runAsUser }}
-        runAsGroup: {{ .Values.executor.securityContext.runAsGroup }}
+        {{- if .Values.executor.podSecurityContext }}
+        {{- toYaml .Values.executor.podSecurityContext | nindent 8 }}
+        {{- else }}
+        {{- with .Values.executor.securityContext.fsGroup }}
+        fsGroup: {{ . }}
+        {{- end }}
+        {{- with .Values.executor.securityContext.runAsUser }}
+        runAsUser: {{ . }}
+        {{- end }}
+        {{- with .Values.executor.securityContext.runAsGroup }}
+        runAsGroup: {{ . }}
+        {{- end }}
+        {{- end }}
       serviceAccountName: sg-executor
       containers:
         - name: executor
           image: {{ include "sourcegraph.image" (list . "executor") }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           securityContext:
-            privileged: {{ .Values.executor.securityContext.privileged }}
+            {{- toYaml .Values.executor.containerSecurityContext | nindent 12 }}
           ports:
             - name: http-debug
               containerPort: 6060
