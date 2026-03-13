@@ -8,10 +8,7 @@ tests:
   - it: should render the Deployment, Service, ConfigMap, PVC if executor is enabled
     set:
       executor:
-        enabled: true
         queueName: "test"
-      rbac:
-        enabled: true
     asserts:
       - containsDocument:
           kind: Deployment
@@ -34,15 +31,103 @@ tests:
           name: sg-executor-test
         template: executor.PersistentVolumeClaim.yaml                
 
-  - it: should not render any resources if executor is disabled
+  - it: should render default containerSecurityContext with privileged false
+    template: executor.Deployment.yaml
     set:
       executor:
-        enabled: false
-      rbac:
-        enabled: false
+        queueName: "test"
     asserts:
-      - hasDocuments:
-          count: 0
-    templates:
-      - executor.Deployment.yaml
-      - executor.Service.yaml
+      - equal:
+          path: spec.template.spec.containers[0].securityContext.privileged
+          value: false
+
+  - it: should render custom containerSecurityContext
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        containerSecurityContext:
+          privileged: true
+          runAsUser: 1000
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].securityContext
+          value:
+            privileged: true
+            runAsUser: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+
+  - it: should render podSecurityContext when set
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        podSecurityContext:
+          fsGroup: 2000
+          runAsUser: 1000
+          runAsGroup: 3000
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            fsGroup: 2000
+            runAsUser: 1000
+            runAsGroup: 3000
+
+  - it: should fall back to legacy securityContext fields when podSecurityContext is empty
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        podSecurityContext: {}
+        securityContext:
+          fsGroup: 1001
+          runAsUser: 1001
+          runAsGroup: 1001
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            fsGroup: 1001
+            runAsUser: 1001
+            runAsGroup: 1001
+
+  - it: should not render legacy securityContext fields when podSecurityContext is set
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        podSecurityContext:
+          fsGroup: 2000
+        securityContext:
+          fsGroup: 1001
+          runAsUser: 1001
+          runAsGroup: 1001
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 2000
+      - isNull:
+          path: spec.template.spec.securityContext.runAsUser
+      - isNull:
+          path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should omit pod securityContext fields not set in legacy securityContext
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        podSecurityContext: {}
+        securityContext:
+          fsGroup: 500
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 500
+      - isNull:
+          path: spec.template.spec.securityContext.runAsUser
+      - isNull:
+          path: spec.template.spec.securityContext.runAsGroup
