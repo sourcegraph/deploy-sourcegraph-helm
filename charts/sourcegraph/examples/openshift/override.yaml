@@ -253,6 +253,7 @@ grafana:
   <<: *securityContext
 
 # Required for in-app performance metrics and alerts
+# TODO: Sort out readOnlyRootFilesystem: true
 prometheus:
   <<: *securityContext
   privileged: false
