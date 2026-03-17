@@ -70,7 +70,7 @@ x-serviceAccount: &serviceAccount
 # however, Sourcegraph's images do have UIDs / GIDs baked in,
 # but these UIDs / GIDs can be overridden with specified values
 # Set GID and UID in one place, to be reused as needed
-x-gid: &gid 1000
+x-gid: &gid 1001
 x-uid: &uid 1000
 
 # Build reusable chunks, to apply to each service below
@@ -284,7 +284,6 @@ extraResources:
     kind: Route
     metadata:
       name: sourcegraph-route
-      namespace: sourcegraph
       annotations:
         haproxy.router.openshift.io/balance: roundrobin
         haproxy.router.openshift.io/disable_cookies: 'true'
@@ -370,8 +369,12 @@ executor:
 
   podSecurityContext:
     fsGroup: *executor-gid
+    fsGroupChangePolicy: "OnRootMismatch"
     runAsGroup: *executor-gid
+    runAsNonRoot: true
     runAsUser: *executor-uid
+    seccompProfile:
+      type: RuntimeDefault
 
   queueNames:
     - batches
