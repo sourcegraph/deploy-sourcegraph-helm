@@ -53,36 +53,31 @@ spec:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "jaeger") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        args: {{- default (list "--memory.max-traces=20000" "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json" "--collector.otlp.enabled") .Values.jaeger.args | toYaml | nindent 8 }}
+        args: {{- default (list "--config=/etc/jaeger/jaeger-config.yaml") .Values.jaeger.args | toYaml | nindent 8 }}
         env:
         {{- range $name, $item := .Values.jaeger.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         ports:
-        - containerPort: 5775
-          protocol: UDP
-        - containerPort: 6831
-          protocol: UDP
-        - containerPort: 6832
-          protocol: UDP
         - containerPort: 5778
           protocol: TCP
-        - containerPort: 14250
+        - containerPort: 16686
+          name: http
           protocol: TCP
-        - name: grpc-collector
-          containerPort: 4320
+        - containerPort: 4317
+          name: grpc-otlp
           protocol: TCP
-        - name: http-collector
-          containerPort: 4321
+        - containerPort: 4318
+          name: http-otlp
           protocol: TCP
-        - name: http
-          containerPort: 16686
+        - containerPort: 13133
+          name: health
           protocol: TCP
         readinessProbe:
           httpGet:
-            path: "/"
-            port: 14269
+            path: "/status"
+            port: 13133
           initialDelaySeconds: 5
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
