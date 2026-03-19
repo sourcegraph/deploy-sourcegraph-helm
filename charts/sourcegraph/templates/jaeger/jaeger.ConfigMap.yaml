@@ -10,5 +10,48 @@ metadata:
   name: {{ .Values.jaeger.name }}
 data:
   jaeger-config.yaml: |
-    {{- toYaml .Values.jaeger.config | nindent 4 }}
+    service:
+      extensions: [jaeger_storage, jaeger_query, remote_sampling, healthcheckv2]
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [jaeger_storage_exporter]
+      telemetry:
+        logs:
+          level: {{ .Values.jaeger.config.logLevel | default "info" }}
+    extensions:
+      healthcheckv2:
+        use_v2: true
+        http:
+          endpoint: "0.0.0.0:13133"
+      jaeger_storage:
+        backends:
+          main_store:
+            memory:
+              max_traces: {{ .Values.jaeger.config.maxTraces | default 20000 }}
+      jaeger_query:
+        storage:
+          traces: main_store
+        base_path: "/-/debug/jaeger"
+        http:
+          endpoint: "0.0.0.0:16686"
+      remote_sampling:
+        file:
+          path: /etc/jaeger/sampling_strategies.json
+          default_sampling_probability: {{ .Values.jaeger.config.samplingDefaultProbability | default 1.0 }}
+        http:
+          endpoint: "0.0.0.0:5778"
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
+    processors:
+      batch: {}
+    exporters:
+      jaeger_storage_exporter:
+        trace_storage: main_store
 {{- end }}

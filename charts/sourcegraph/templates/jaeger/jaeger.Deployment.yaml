@@ -30,7 +30,7 @@ spec:
         kubectl.kubernetes.io/default-container: jaeger
         prometheus.io/port: "16686"
         sourcegraph.prometheus/scrape: "true"
-        checksum/jaeger-config: {{ toYaml .Values.jaeger.config | sha256sum }}
+        checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}

@@ -1183,55 +1183,16 @@ jaeger:
     [
       "--config=/etc/jaeger/jaeger-config.yaml",
     ]
-  # -- Jaeger v2 YAML configuration. This is rendered into a ConfigMap and
-  # mounted at `/etc/jaeger/jaeger-config.yaml`. Customers can override
-  # individual settings (e.g., `max_traces`, sampling) directly in values.yaml.
+  # -- Jaeger v2 configuration overrides. These values are templated into
+  # a ConfigMap mounted at `/etc/jaeger/jaeger-config.yaml`.
   # See https://www.jaegertracing.io/docs/2.16/configuration/
   config:
-    service:
-      extensions: [jaeger_storage, jaeger_query, remote_sampling, healthcheckv2]
-      pipelines:
-        traces:
-          receivers: [otlp]
-          processors: [batch]
-          exporters: [jaeger_storage_exporter]
-      telemetry:
-        logs:
-          level: info
-    extensions:
-      healthcheckv2:
-        use_v2: true
-        http:
-          endpoint: "0.0.0.0:13133"
-      jaeger_storage:
-        backends:
-          main_store:
-            memory:
-              max_traces: 20000
-      jaeger_query:
-        storage:
-          traces: main_store
-        base_path: "/-/debug/jaeger"
-        http:
-          endpoint: "0.0.0.0:16686"
-      remote_sampling:
-        file:
-          path: /etc/jaeger/sampling_strategies.json
-          default_sampling_probability: 1.0
-        http:
-          endpoint: "0.0.0.0:5778"
-    receivers:
-      otlp:
-        protocols:
-          grpc:
-            endpoint: "0.0.0.0:4317"
-          http:
-            endpoint: "0.0.0.0:4318"
-    processors:
-      batch: {}
-    exporters:
-      jaeger_storage_exporter:
-        trace_storage: main_store
+    # -- Maximum number of traces stored in memory
+    maxTraces: 20000
+    # -- Log level for the Jaeger instance (debug, info, warn, error)
+    logLevel: info
+    # -- Default sampling probability (0.0 to 1.0) returned to services that query Jaeger for sampling config
+    samplingDefaultProbability: 1.0
   # -- Security context for the `jaeger` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
