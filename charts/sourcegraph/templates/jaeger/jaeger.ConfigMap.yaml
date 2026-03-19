@@ -1,4 +1,4 @@
-{{- if .Values.jaeger.enabled -}}
+{{- if and .Values.jaeger.enabled (not .Values.jaeger.config.existingConfigMap) -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:

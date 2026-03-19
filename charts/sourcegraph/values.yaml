@@ -1183,10 +1183,11 @@ jaeger:
     [
       "--config=/etc/jaeger/jaeger-config.yaml",
     ]
-  # -- Jaeger v2 configuration overrides. These values are templated into
-  # a ConfigMap mounted at `/etc/jaeger/jaeger-config.yaml`.
-  # See https://www.jaegertracing.io/docs/2.16/configuration/
+  # -- Jaeger v2 configuration overrides. We only provide a limited number of options, use `existingConfigMap` to provide a full config if you need more control.
   config:
+    # -- Name of an preexisting ConfigMap containing Jaeger configuration. They must contain a `jaeger-config.yaml` key. If set, this will be used instead of the `config` values below.
+    # See https://www.jaegertracing.io/docs/2.16/configuration/
+    existingConfigMap: ""
     # -- Maximum number of traces stored in memory
     maxTraces: 20000
     # -- Log level for the Jaeger instance (debug, info, warn, error)

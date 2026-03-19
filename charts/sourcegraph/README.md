@@ -162,7 +162,8 @@ In addition to the documented values, all services also support the following va
 | jaeger.collector.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `collector` service |
 | jaeger.collector.serviceLabels | object | `{}` | Add extra labels to jaeger `collector` service |
 | jaeger.collector.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `collector` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
-| jaeger.config | object | `{"logLevel":"info","maxTraces":20000,"samplingDefaultProbability":1}` | Jaeger v2 configuration overrides. These values are templated into a ConfigMap mounted at `/etc/jaeger/jaeger-config.yaml`. See https://www.jaegertracing.io/docs/2.16/configuration/ |
+| jaeger.config | object | `{"existingConfigMap":"","logLevel":"info","maxTraces":20000,"samplingDefaultProbability":1}` | Jaeger v2 configuration overrides. We only provide a limited number of options, use `existingConfigMap` to provide a full config if you need more control. |
+| jaeger.config.existingConfigMap | string | `""` | Name of an preexisting ConfigMap containing Jaeger configuration. They must contain a `jaeger-config.yaml` key. If set, this will be used instead of the `config` values below. See https://www.jaegertracing.io/docs/2.16/configuration/ |
 | jaeger.config.logLevel | string | `"info"` | Log level for the Jaeger instance (debug, info, warn, error) |
 | jaeger.config.maxTraces | int | `20000` | Maximum number of traces stored in memory |
 | jaeger.config.samplingDefaultProbability | float | `1` | Default sampling probability (0.0 to 1.0) returned to services that query Jaeger for sampling config |
