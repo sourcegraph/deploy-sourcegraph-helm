@@ -30,6 +30,7 @@ spec:
         kubectl.kubernetes.io/default-container: jaeger
         prometheus.io/port: "16686"
         sourcegraph.prometheus/scrape: "true"
+        checksum/jaeger-config: {{ toYaml .Values.jaeger.config | sha256sum }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -86,6 +87,10 @@ spec:
         securityContext:
           {{- toYaml .Values.jaeger.containerSecurityContext | nindent 10 }}
         volumeMounts:
+        - name: jaeger-config
+          mountPath: /etc/jaeger/jaeger-config.yaml
+          subPath: jaeger-config.yaml
+          readOnly: true
         {{- if .Values.jaeger.extraVolumeMounts }}
         {{- toYaml .Values.jaeger.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -104,6 +109,12 @@ spec:
       {{- end }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "jaeger") | trim | nindent 6 }}
       volumes:
+      - name: jaeger-config
+        configMap:
+          name: {{ .Values.jaeger.name }}
+          items:
+          - key: jaeger-config.yaml
+            path: jaeger-config.yaml
       {{- if .Values.jaeger.extraVolumes }}
       {{- toYaml .Values.jaeger.extraVolumes | nindent 6 }}
       {{- end }}
