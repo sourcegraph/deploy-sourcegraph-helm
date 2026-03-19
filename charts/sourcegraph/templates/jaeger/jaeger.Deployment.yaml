@@ -30,7 +30,9 @@ spec:
         kubectl.kubernetes.io/default-container: jaeger
         prometheus.io/port: "16686"
         sourcegraph.prometheus/scrape: "true"
+        {{- if not .Values.jaeger.config.existingConfigMap }}
         checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
+        {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -111,7 +113,7 @@ spec:
       volumes:
       - name: jaeger-config
         configMap:
-          name: {{ .Values.jaeger.name }}
+          name: {{ default .Values.jaeger.name .Values.jaeger.config.existingConfigMap }}
           items:
           - key: jaeger-config.yaml
             path: jaeger-config.yaml
