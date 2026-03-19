@@ -157,11 +157,16 @@ In addition to the documented values, all services also support the following va
 | indexedSearchIndexer.image.defaultTag | string | `"6.0.0@sha256:11539e07040b85045a9aa07f970aa310066e240dc28e6c9627653ee2bc6e0b91"` | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
-| jaeger.args | list | `["--memory.max-traces=20000","--sampling.strategies-file=/etc/jaeger/sampling_strategies.json","--collector.otlp.enabled","--collector.otlp.grpc.host-port=:4320","--collector.otlp.http.host-port=:4321"]` | Default args passed to the `jaeger` binary |
+| jaeger.args | list | `["--config=/etc/jaeger/jaeger-config.yaml"]` | Default args passed to the `jaeger` binary. Jaeger v2.16+ uses a YAML config file instead of CLI flags. See https://www.jaegertracing.io/docs/2.16/configuration/ |
 | jaeger.collector.name | string | `""` | Name of jaeger `collector` service |
 | jaeger.collector.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `collector` service |
 | jaeger.collector.serviceLabels | object | `{}` | Add extra labels to jaeger `collector` service |
 | jaeger.collector.serviceType | string | "ClusterIP" | Kubernetes service type of jaeger `collector` service, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) |
+| jaeger.config | object | `{"existingConfigMap":"","logLevel":"info","maxTraces":20000,"samplingDefaultProbability":1}` | Jaeger v2 configuration overrides. We only provide a limited number of options, use `existingConfigMap` to provide a full config if you need more control. |
+| jaeger.config.existingConfigMap | string | `""` | Name of an preexisting ConfigMap containing Jaeger configuration. They must contain a `jaeger-config.yaml` key. If set, this will be used instead of the `config` values below. See https://www.jaegertracing.io/docs/2.16/configuration/ |
+| jaeger.config.logLevel | string | `"info"` | Log level for the Jaeger instance (debug, info, warn, error) |
+| jaeger.config.maxTraces | int | `20000` | Maximum number of traces stored in memory |
+| jaeger.config.samplingDefaultProbability | float | `1` | Default sampling probability (0.0 to 1.0) returned to services that query Jaeger for sampling config |
 | jaeger.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | jaeger.enabled | bool | `false` | Enable `jaeger` |
 | jaeger.image.defaultTag | string | `"6.0.0@sha256:79548aa11d7e2e6bf3e2012fb9e046df12ba5c5410bc24ec8f4d7cbb880336b9"` | Docker image tag for the `jaeger` image |
