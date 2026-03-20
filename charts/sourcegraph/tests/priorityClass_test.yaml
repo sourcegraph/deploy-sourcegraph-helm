@@ -114,3 +114,12 @@ tests:
   - equal:
       path: spec.template.spec.priorityClassName
       value: redis-store-class
+- it: set priority class on cadvisor
+  template: cadvisor/cadvisor.DaemonSet.yaml
+  set:
+    cadvisor:
+      priorityClassName: cadvisor-class
+  asserts:
+  - equal:
+      path: spec.template.spec.priorityClassName
+      value: cadvisor-class
