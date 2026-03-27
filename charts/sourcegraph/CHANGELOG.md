@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added livenessProbe to zoekt-webserver in indexed-search to detect and restart hung pods
 - Fix Pod Disruption Budget for sourcegraph-frontend
 - Added a startup probe to the gitserver statefulset to give it time to run the on-disk migration from repo names to repo IDs
 - The repo-updater service is no longer needed and has been removed from the chart.
