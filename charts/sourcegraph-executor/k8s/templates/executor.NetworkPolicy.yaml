@@ -1,0 +1,63 @@
+{{- if .Values.executor.networkPolicy.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "executor.name" . }}-deny-private-networks
+  labels:
+    {{- include "executor.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ include "executor.name" . }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+      {{- range .Values.executor.networkPolicy.privateNetworks }}
+        - ipBlock:
+            cidr: {{ .cidr }}
+            {{- if .except }}
+            except:
+              {{- toYaml .except | nindent 14 }}
+            {{- end }}
+      {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "executor.name" . }}-deny-multicast-networks
+  labels:
+    {{- include "executor.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ include "executor.name" . }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+      {{- range .Values.executor.networkPolicy.multicastNetworks }}
+        - ipBlock:
+            cidr: {{ .cidr }}
+      {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "executor.name" . }}-deny-metadata-server
+  labels:
+    {{- include "executor.labels" . | nindent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ include "executor.name" . }}
+  policyTypes:
+    - Egress
+  egress:
+    - to:
+      {{- range .Values.executor.networkPolicy.metadataServers }}
+        - ipBlock:
+            cidr: {{ . }}/32
+      {{- end }}
+{{- end }}
