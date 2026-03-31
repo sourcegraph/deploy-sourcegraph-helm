@@ -21,7 +21,7 @@ spec:
   serviceName: indexed-search
   template:
     metadata:
-      {{- if or .Values.sourcegraph.podAnnotations .Values.indexedSearch.podAnnotations }}
+      {{- if or .Values.sourcegraph.podAnnotations .Values.indexedSearch.podAnnotations -}}
       annotations:
         {{- if .Values.sourcegraph.podAnnotations }}
         {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
@@ -41,6 +41,7 @@ spec:
         app: indexed-search
         deploy: sourcegraph
     spec:
+      {{- include "sourcegraph.initContainers" (list . "indexedSearch") | nindent 6 }}
       containers:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
