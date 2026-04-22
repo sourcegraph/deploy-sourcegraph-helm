@@ -10,9 +10,9 @@
 #
 #   RBAC
 #     Some cluster security policies may block the Helm chart from creating RBAC resources,
-#       such as service accounts, roles, and role bindings.
-#       Sourcegraph only uses RBAC resources for Kubernetes service discovery, and
-#       workarounds are available if needed
+#     such as service accounts, roles, and role bindings.
+#     Sourcegraph only uses RBAC resources for Kubernetes service discovery, and
+#     workarounds are available if needed
 #
 #   UID / GID / fsGroup
 #     Containers must run as UID / GID / fsGroup numbers assigned when the OpenShift
@@ -252,8 +252,9 @@ frontend:
     annotations:
       # If using HAProxy router, add the timeout to prevent SSE / streaming timeouts
       haproxy.router.openshift.io/timeout: 5m
-      kubernetes.io/ingress.class: openshift-default
+      kubernetes.io/ingress.class: openshift-default-example
       nginx.ingress.kubernetes.io/proxy-body-size: 150m
+      # If terminating TLS on the router
       route.openshift.io/termination: edge
     host: sourcegraph.example.com
 
@@ -366,7 +367,6 @@ executor:
   #   keepWorkspaces: true
 
   # Requires -list format, not the cleaner map format
-
   extraEnv:
 
     - name: KUBERNETES_EXECUTOR_CONTAINER_SECURITY_CONTEXT
