@@ -1,17 +1,51 @@
-### EXPERIMENTAL ###
-# Draft example of a Helm values override file to work with OpenShift
-# We do not have an OpenShift cluster to test this on,
-# so this example is the result of testing with customers
-
-####################################################################################################
-# Deployment specs
-####################################################################################################
-
-# Kubernetes
-# Using Azure's managed OpenShift service as a Kubernetes platform
-
-# Databases
-# Using our Postgres pods
+################################################################################
+# OpenShift Helm Override Example
+#
+# Key considerations for OpenShift:
+#
+#   Executors
+#     If deploying Kubernetes-native Executors using the sourcegraph-executor/k8s Helm chart,
+#     deploy them in a separate OpenShift project for namespace network isolation, but
+#     re-use the same override file to reduce duplication
+#
+#   RBAC
+#     Some cluster security policies may block the Helm chart from creating RBAC resources,
+#       such as service accounts, roles, and role bindings.
+#       Sourcegraph only uses RBAC resources for Kubernetes service discovery, and
+#       workarounds are available if needed
+#
+#   UID / GID / fsGroup
+#     Containers must run as UID / GID / fsGroup numbers assigned when the OpenShift
+#     project is created.
+#     Sourcegraph Docker images specify UIDs by default, so they must be overridden.
+#
+#   Security Context Controls
+#     Default is "restricted"
+#     Requires many configs to be specified explicitly
+#
+#   Image registry
+#     Most of our OpenShift customers use an internal image registry
+#
+#   StorageClass
+#     OpenShift instances often have their own StorageClasses already created,
+#     instead of letting this Helm chart create one
+#
+#   File count limits per PV
+#     OpenShift has a limit of 1 million files per volume
+#     so you need to scale gitserver and indexedSearch horizontally by incrementing replicaCount
+#     when they grow large enough to fail mounting the PV to a new host
+#
+#   Ingress / Router
+#
+#     HAProxy router timeout
+#       OpenShift's default HAProxy router has a 30-60s timeout
+#       Features like Deep Search streaming (SSE) require longer-lived connections
+#       Add the haproxy timeout annotation to your Route
+#
+#     TLS termination
+#       Likely handled at the Route level via edge termination
+#
+################################################################################
 
 ####################################################################################################
 # RBAC
@@ -27,54 +61,73 @@ x-serviceAccount: &serviceAccount
   create: false
   name: sourcegraph
 
-# Use of "privileged" values in sourcegraph Helm chart
+# Non-standard use of "privileged" in Sourcegraph Helm chart
 #
 #   frontend.privileged (default: true)
+#
 #     "privileged" is misnomer here
+#
 #     Sourcegraph Helm values config to control how RBAC is handled for the frontend service account
+#
 #     true:  Creates a custom, least-privilege, namespaced Role, and binds to it via namespaced RoleBinding,
 #            granting only get, list, and watch on endpoints, services, and statefulsets within the same namespace
+#
 #     false: Uses the default "view" ClusterRole, and binds to it via namespaced RoleBinding
 #            Only use "false" if cluster policy blocks creation of custom Roles
 #            Sourcegraph functionality is the same in either case
 #
 #   prometheus.privileged (default: true)
+#
 #     Sourcegraph Helm values config to control how RBAC is handled for the Prometheus service account
+#
 #     true:  Creates a ClusterRole + ClusterRoleBinding granting cluster-wide read access to
 #            endpoints, nodes, pods, services, and /metrics.
 #            Enables kubernetes-apiservers and kubernetes-nodes scrape jobs in the Prometheus config
 #            If Executors are deployed in a separate namespace (recommended), then this allows
 #            Prometheus to scrape metrics from them
+#
 #     false: Binds its ServiceAccount to the built-in "view" ClusterRole (namespace-scoped)
 #            Only use "false" if cluster policy blocks creation of custom, cluster-wide Roles
 
 # Creation of RBAC resources in sourcegraph-executor/k8s Helm chart
 #
 #   executor.configureRbac (default: true)
+#
 #     Controls whether the chart creates RBAC resources for the executor.
+#
 #     true:  Creates a ServiceAccount (sg-executor), a Role (sg-executor-role), and a RoleBinding.
 #            The Role grants create/delete on batch jobs and secrets/PVCs, and get/list/watch on
 #            pods/logs — needed for the executor to spawn and manage Kubernetes jobs for batch
 #            changes and code intelligence indexing.
-#     false: Skips creation of ServiceAccount, Role, and RoleBinding. Use if these are
-#            pre-created externally, or if deploying multiple executor releases (RBAC only
-#            needs to be created once). The executor Deployment still hardcodes
-#            serviceAccountName: sg-executor, so that SA must exist.
+#
+#     false: Skips creation of ServiceAccount, Role, and RoleBinding
+#            Use if these are pre-created externally
+#            The executor Deployment hardcodes serviceAccountName: sg-executor, so it must exist
 
 ####################################################################################################
-# Security context configs for OpenShift "Restricted" Security Context Control
+# UID / GID / fsGroup
 ####################################################################################################
 
-# OpenShift requires that containers are run as UIDs / GIDs assigned by the OpenShift Project
-# This requires that Docker images run without specified UIDs / GIDs,
-# however, Sourcegraph's images do have UIDs / GIDs baked in,
-# but these UIDs / GIDs can be overridden with specified values
-# Set GID and UID in one place, to be reused as needed
-x-gid: &gid 1001
+## Sourcegraph Helm chart
+# Get these numbers from the OpenShift Project
+# Set in one place, reuse throughout the override file
 x-uid: &uid 1000
+x-gid: &gid 1000
+x-fsGroup: &fsGroup 1000 # Should usually match GID
 
-# Build reusable chunks, to apply to each service below
-# Define containerSecurityContext separately, as some containers take this as an input
+## sourcegraph-executor/k8s Helm chart
+# Recommended to deploy in a separate OpenShift Project
+# These also need to be changed again in the JSON blob in the
+# KUBERNETES_EXECUTOR_CONTAINER_SECURITY_CONTEXT env var
+x-executor-uid: &executor-uid 2000
+x-executor-gid: &executor-gid 2000
+x-executor-fsGroup: &executor-fsGroup 2000
+
+####################################################################################################
+# Security Context Controls
+####################################################################################################
+
+# Some containers need this specified separately
 x-containerSecurityContext: &containerSecurityContext
   allowPrivilegeEscalation: false
   capabilities:
@@ -88,7 +141,7 @@ x-containerSecurityContext: &containerSecurityContext
     type: RuntimeDefault
 
 x-podSecurityContext: &podSecurityContext
-  fsGroup: *gid
+  fsGroup: *fsGroup
   fsGroupChangePolicy: "OnRootMismatch"
   runAsGroup: *gid
   runAsNonRoot: true
@@ -108,33 +161,33 @@ x-securityContext: &securityContext
 
 sourcegraph:
 
+  # Image registry
   image:
-
-    # If using an internal image registry
     repository: registry.example.com/sourcegraph
+    # If needed to use the release tag for images, ex. v7.2.0
+    # then read the release tag from the Helm chart,
+    # to keep the versions in sync
+    # defaultTag: "{{ .Chart.AppVersion }}"
+    # useGlobalTagAsDefault: true
 
-    # Use the "version" value from
-    # deploy-sourcegraph-helm/charts/sourcegraph/Chart.yaml
-    # to pull the correct images from your image registry
-    defaultTag: "{{ .Chart.AppVersion }}"
-    useGlobalTagAsDefault: true
+  # If the image registry requires authentication, then create a Kubernetes secret
+  # externally, containing the credentials
+  # See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry
+  # imagePullSecrets:
+  # - name: registry-creds
 
-# If your internal image registry requires authentication
-# See https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry
-#   imagePullSecrets:
-#   - name: registry-creds # Kubernetes secret containing the credentials needed to pull images from the registry
-
-# If your OpenShift does not allow the Helm chart to create a storageClass,
-# then disable it, and provide the name here
 storageClass:
   create: false
-  name: "sourcegraph"
+  name: "ssd"
 
 ################################################################################
 # Databases
-# Using Sourcegraph's bundled Postgres pods
 ################################################################################
 
+# If using external databases, then see the example file in ../external-databases
+
+# If using Sourcegraph's Postgres database pods,
+# they need the security contexts applied
 codeInsightsDB:
   <<: *securityContext
   init:
@@ -159,39 +212,50 @@ alpine:
 migrator:
   <<: *securityContext
 
-### Use the args list to operate migrator commands if needed for multi-version upgrades
-### Available commands can be found at
-### https://sourcegraph.com/docs/admin/updates/migrator/migrator-operations#commands
+  ### Use the args list to operate migrator commands, if needed
+  ### Available commands can be found at
+  ### https://sourcegraph.com/docs/admin/updates/migrator/migrator-operations#commands
 
-### Drift check
+  ### Drift check
+  ### https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations#drift
+  ### NOTE: Run the drift check against the current version, before the upgrade,
+  ### and / or against the new version, after the upgrade,
+  ### NOT the new version, before the upgrade
   # args:
   # - drift
-  # - --version=v6.12.5040
+  # - --version=v6.5.2654
+  # - --db=frontend
+  # - --db=codeintel
+  # - --db=codeinsights
 
-### Multi-version upgrades
-### https://sourcegraph.com/docs/admin/deploy/kubernetes#multi-version-upgrades
-#   args:
-#   - upgrade
-#   - --from=v6.12.5040
-#   - --to=v8.0.0
+  ### Multi-version upgrades
+  ### https://sourcegraph.com/docs/admin/deploy/kubernetes#multi-version-upgrades
+  # args:
+  # - upgrade
+  # - --from=v6.5.2654
+  # - --to=v7.2.0
 
 ################################################################################
-# Frontend and ingress
+# Ingress / Router / Frontend
 ################################################################################
 
 frontend:
   <<: *securityContext
 
-  # If using an OpenShift Router (CRD) instead of an ingress
-  ingress:
-    enabled: false
-
   env:
-
-    # With readOnlyRootFilesystem, this prevents log spam, from trying to write to /home/sourcegraph/site-config.json every second
-    # Alternative, if we find the site config escape hatch is needed, we could create and mount a new volume at /home/sourcegraph
+    # With readOnlyRootFilesystem, this prevents log spam,
+    # from trying to write to /home/sourcegraph/site-config.json every second
     NO_SITE_CONFIG_ESCAPE_HATCH:
       value: "true"
+
+  ingress:
+    annotations:
+      # If using HAProxy router, add the timeout to prevent SSE / streaming timeouts
+      haproxy.router.openshift.io/timeout: 5m
+      kubernetes.io/ingress.class: openshift-default
+      nginx.ingress.kubernetes.io/proxy-body-size: 150m
+      route.openshift.io/termination: edge
+    host: sourcegraph.example.com
 
 ################################################################################
 # Core services
@@ -202,25 +266,23 @@ blobstore:
 
 # OpenShift has a max of 1 million files per PVC,
 # otherwise attaching the volume to a worker node times out;
-# need to horzontally scale pods with large file systems,
+# need to horizontally scale pods with large file systems,
+# i.e. gitserver and indexedSearch,
 # by increasing replicaCount,
 # to prevent each volume from growing > 1 million files
 gitserver:
   <<: *securityContext
   replicaCount: 1
-  storageSize: 1Ti
 
 indexedSearch:
   <<: *securityContext
   replicaCount: 1
-  storageSize: 1Ti
 
 indexedSearchIndexer:
   <<: *securityContext
 
 preciseCodeIntel:
   <<: *securityContext
-  replicaCount: 1
 
 redisCache:
   <<: *securityContext
@@ -245,28 +307,22 @@ worker:
 
 ################################################################################
 # Observability
-# TODO: Sort out a delivery mechanism for HTTP traces
 ################################################################################
 
-# Required for in-app performance metrics and alerts
-grafana:
-  <<: *securityContext
-
-# Required for in-app performance metrics and alerts
-# TODO: Sort out readOnlyRootFilesystem: true
-prometheus:
-  <<: *securityContext
-  privileged: false
-
-# DaemonSet; similar visibility should already be provided by OpenShift, ex. pod restarts, CPU and memory utilization
+# OpenShift provides container and node resource metrics
 cadvisor:
   enabled: false
-
-# DaemonSet; similar visibility should already be provided by OpenShift, ex. node performance issues
 nodeExporter:
   enabled: false
 
-# DaemonSet, for HTTP traces
+# Needed for app-internal alerts and metrics
+prometheus:
+  <<: *securityContext
+  privileged: false
+grafana:
+  <<: *securityContext
+
+# otel-agent is a DaemonSet, and uses hostPorts, which are often blocked on OpenShift
 openTelemetry:
   enabled: false
 
@@ -274,48 +330,20 @@ openTelemetry:
 sgTestConnection:
   enabled: false
 
-####################################################################################################
-# Additional resources
-# List of additional Kubernetes manifests to deploy and manage with the Sourcegraph Helm chart
-####################################################################################################
-
-extraResources:
-
-  - apiVersion: route.openshift.io/v1
-    kind: Route
-    metadata:
-      name: sourcegraph-route
-      annotations:
-        haproxy.router.openshift.io/balance: roundrobin
-        haproxy.router.openshift.io/disable_cookies: 'true'
-    spec:
-      host: sourcegraph.example.com
-      to:
-        kind: Service
-        name: sourcegraph-frontend
-        weight: 100
-      tls:
-        termination: edge
-        insecureEdgeTerminationPolicy: Redirect
-      wildcardPolicy: None
-
-####################################################################################################
-# sourcegraph-executor/k8s chart
-# Reuse the same override.yaml file with this other Helm chart, to reduce duplication
-####################################################################################################
-
-# Executors should be deployed in a separate OpenShift project / Kubernetes namespace,
-# with network isolation,
-# to prevent the Executor job pods from being able to connet to internal APIs
-
-# OpenShift requires that containers are run as UIDs / GIDs assigned by the OpenShift Project
-# This requires that Docker images run without specified UIDs / GIDs,
-# however, Sourcegraph's images do have UIDs / GIDs baked in,
-# but these UIDs / GIDs can be overridden with specified values
-# Set GID and UID in one place, to be reused as needed
-# NOTE: the UID / GID also needs to be updated in the JSON blob in KUBERNETES_EXECUTOR_CONTAINER_SECURITY_CONTEXT
-x-executor-gid: &executor-gid 2001
-x-executor-uid: &executor-uid 2000
+################################################################################
+# Executors
+# Recommended to deploy in a separate OpenShift Project
+# with network isolation from the Sourcegraph project
+# Reuse the same Helm override file with the sourcegraph-executor/k8s Helm chart to reduce duplication
+# Helm chart
+# https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph-executor/k8s
+# Docs
+# https://sourcegraph.com/docs/self-hosted/executors/deploy-executors-kubernetes
+# https://sourcegraph.com/docs/self-hosted/executors/executors-config
+# Requires the native-ssbc-execution=true feature flag in Site admin > Feature flags (<=6.12)
+# Or the native-ssbc-execution=true feature flag in GraphQL (7.0)
+# Or "batchChanges.nativeServerSideExecution": true in Site admin > Advanced settings (>=7.1)
+################################################################################
 
 executor:
 
@@ -332,6 +360,13 @@ executor:
     seccompProfile:
       type: RuntimeDefault
 
+  # Keep jobs for troubleshooting
+  # debug:
+  #   keepJobs: true
+  #   keepWorkspaces: true
+
+  # Requires -list format, not the cleaner map format
+
   extraEnv:
 
     - name: KUBERNETES_EXECUTOR_CONTAINER_SECURITY_CONTEXT
@@ -345,7 +380,7 @@ executor:
           },
           "privileged": false,
           "readOnlyRootFilesystem": true,
-          "runAsGroup": 2001,
+          "runAsGroup": 2000,
           "runAsNonRoot": true,
           "runAsUser": 2000,
           "seccompProfile": {
@@ -356,20 +391,21 @@ executor:
   # Must match executors.accessToken in Site Config
   frontendPassword: "REDACTED"
 
-  # TODO: Verify this URL works with namespace isolation network policies
+  # URL to sourcegraph-frontend via cluster-internal service,
+  # to avoid additional network data transfer costs
   frontendUrl: "http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080"
 
   # Ensure the spawned jobs are not run as root
   kubernetesJob:
-    fsGroup: *executor-gid
+    fsGroup: *executor-fsGroup
     runAsGroup: *executor-gid
     runAsUser: *executor-uid
 
   # Kubernetes namespace to create jobs
-  namespace: sourcegraph-executors
+  namespace: sourcegraph-executor
 
   podSecurityContext:
-    fsGroup: *executor-gid
+    fsGroup: *executor-fsGroup
     fsGroupChangePolicy: "OnRootMismatch"
     runAsGroup: *executor-gid
     runAsNonRoot: true
