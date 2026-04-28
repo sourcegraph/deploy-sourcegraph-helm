@@ -34,6 +34,9 @@
 #     OpenShift has a limit of 1 million files per volume
 #     so you need to scale gitserver and indexedSearch horizontally by incrementing replicaCount
 #     when they grow large enough to fail mounting the PV to a new host
+#     Create a free OpenShift developer account to see their docs:
+#     - https://access.redhat.com/solutions/7079407
+#     - https://access.redhat.com/solutions/6221251
 #
 #   Ingress / Router
 #
