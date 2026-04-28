@@ -11,8 +11,10 @@
 #   RBAC
 #     Some cluster security policies may block the Helm chart from creating RBAC resources,
 #     such as service accounts, roles, and role bindings.
-#     Sourcegraph only uses RBAC resources for Kubernetes service discovery, and
-#     workarounds are available if needed
+#     Sourcegraph only uses RBAC resources for Kubernetes service discovery, so that
+#     frontend and Prometheus can find how many replicas of gitserver, indexServer, 
+#     searcher, and worker are running. Workarounds are available if needed:
+#     https://sourcegraph.com/docs/self-hosted/deploy/without-service-discovery
 #
 #   UID / GID / fsGroup
 #     Containers must run as UID / GID / fsGroup numbers assigned when the OpenShift
@@ -41,9 +43,11 @@
 #   Ingress / Router
 #
 #     HAProxy router timeout
-#       OpenShift's default HAProxy router has a 30-60s timeout
+#       OpenShift's default HAProxy router has a 30 or 60s timeout by default
 #       Features like Deep Search streaming (SSE) require longer-lived connections
 #       Add the haproxy timeout annotation to your Route
+#       And check for any other proxies upstream which may require overrides, if extending 
+#       the HAProxy timeout doesn't resolve SSE issues
 #
 #     TLS termination
 #       Likely handled at the Route level via edge termination
