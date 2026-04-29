@@ -257,13 +257,17 @@ frontend:
 
   ingress:
     annotations:
-      # If using HAProxy router, add the timeout to prevent SSE / streaming timeouts
-      haproxy.router.openshift.io/timeout: 5m
-      kubernetes.io/ingress.class: openshift-default-example
-      nginx.ingress.kubernetes.io/proxy-body-size: 150m
-      # If terminating TLS on the router
-      route.openshift.io/termination: edge
-    host: sourcegraph.example.com
+    # Null out nginx defaults from values.yaml — not applicable
+    kubernetes.io/ingress.class: null
+    nginx.ingress.kubernetes.io/proxy-body-size: null
+    # HAProxy router: prevent SSE / streaming timeouts
+    haproxy.router.openshift.io/timeout: 5m
+    # HAProxy router: equivalent of nginx proxy-body-size, for large Git pushes / file uploads
+    haproxy.router.openshift.io/request-body-size: 150m
+    # TLS termination at the router
+    route.openshift.io/termination: edge
+  ingressClassName: openshift-default-example
+  host: sourcegraph.example.com
 
 ################################################################################
 # Core services
