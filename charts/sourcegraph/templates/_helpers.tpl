@@ -171,7 +171,7 @@ app.kubernetes.io/name: jaeger
 {{- if .Values.openTelemetry.enabled -}}
 {{- if eq (.Values.openTelemetry.agent.kind | default "DaemonSet") "Deployment" -}}
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
-  value: http://otel-agent:4317
+  value: http://otel-collector:4317
 {{- else -}}
 # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
 - name: OTEL_AGENT_HOST

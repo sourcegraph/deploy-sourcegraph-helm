@@ -203,7 +203,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.agent.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.agent.containerSecurityContext.runAsUser | int | `100` |  |
 | openTelemetry.agent.hostPorts | object | `{"grpcOtlp":4317,"httpOtlp":4318,"httpZpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| openTelemetry.agent.kind | string | `"DaemonSet"` | The workload kind for the otel-agent. Valid values are `DaemonSet` and `Deployment`. Use `Deployment` in environments where DaemonSets are restricted (e.g. some managed Kubernetes offerings). When set to `Deployment`, a ClusterIP Service is created for the agent and application pods send traces directly to that Service instead of using the node's host IP. |
+| openTelemetry.agent.kind | string | `"DaemonSet"` | The workload kind for the otel-agent. Valid values are `DaemonSet` and `Deployment`. Use `Deployment` in environments where DaemonSets are restricted (e.g. some managed Kubernetes offerings). When set to `Deployment`, the otel-agent DaemonSet is not created and application pods send traces directly to the existing otel-collector Deployment (otel-collector:4317) instead. |
 | openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
 | openTelemetry.agent.resources.limits.cpu | string | `"500m"` |  |
 | openTelemetry.agent.resources.limits.memory | string | `"500Mi"` |  |
