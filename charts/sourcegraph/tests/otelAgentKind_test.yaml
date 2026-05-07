@@ -1,0 +1,112 @@
+---
+suite: otelAgentKind
+tests:
+  - it: should render a DaemonSet by default
+    template: otel-collector/otel-agent.DaemonSet.yaml
+    asserts:
+      - isKind:
+          of: DaemonSet
+  - it: should render a DaemonSet when kind is DaemonSet
+    template: otel-collector/otel-agent.DaemonSet.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "DaemonSet"
+    asserts:
+      - isKind:
+          of: DaemonSet
+  - it: should not render a DaemonSet when kind is Deployment
+    template: otel-collector/otel-agent.DaemonSet.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should render a Deployment when kind is Deployment
+    template: otel-collector/otel-agent.Deployment.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - isKind:
+          of: Deployment
+  - it: should not render a Deployment by default
+    template: otel-collector/otel-agent.Deployment.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should render a Service when kind is Deployment
+    template: otel-collector/otel-agent.Service.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - isKind:
+          of: Service
+      - equal:
+          path: metadata.name
+          value: otel-agent
+      - contains:
+          path: spec.ports
+          content:
+            name: grpc-otlp
+            port: 4317
+            protocol: TCP
+            targetPort: grpc-otlp
+  - it: should not render a Service by default (DaemonSet mode)
+    template: otel-collector/otel-agent.Service.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should set OTEL_EXPORTER_OTLP_ENDPOINT to otel-agent service when kind is Deployment
+    template: searcher/searcher.StatefulSet.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://otel-agent:4317"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_AGENT_HOST
+  - it: should set default replica count of 1 for Deployment kind
+    template: otel-collector/otel-agent.Deployment.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 1
+  - it: should allow configuring replicas for Deployment kind
+    template: otel-collector/otel-agent.Deployment.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+          replicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+  - it: should not have hostPorts in Deployment mode
+    template: otel-collector/otel-agent.Deployment.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - notContains:
+          path: spec.template.spec.containers[0].ports
+          content:
+            hostPort: 4317
