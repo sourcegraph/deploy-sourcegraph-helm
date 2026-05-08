@@ -12,8 +12,13 @@ data:
     receivers:
       otlp:
         protocols:
-          grpc: # port 4317
-          http: # port 4318
+          grpc:
+            # Bind to all interfaces. Since v0.104.0, the collector defaults the OTLP
+            # receiver to 127.0.0.1 (CVE-2024-36129 hardening), which silently drops
+            # traffic from other pods. See https://opentelemetry.io/blog/2024/hardening-the-collector-one/
+            endpoint: "0.0.0.0:4317"
+          http:
+            endpoint: "0.0.0.0:4318"
 
     exporters:
       otlp:
