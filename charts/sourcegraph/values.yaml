@@ -658,6 +658,11 @@ openTelemetry:
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-agent"
+    # -- The workload kind for the otel-agent. Valid values are `DaemonSet` and `Deployment`.
+    # Use `Deployment` in environments where DaemonSets are restricted (e.g. some managed Kubernetes offerings).
+    # When set to `Deployment`, the otel-agent DaemonSet is not created and application pods send
+    # traces directly to the existing otel-collector Deployment (otel-collector:4317) instead.
+    kind: "DaemonSet"
     # -- Resource requests & limits for the `otel-agent` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     hostPorts:
