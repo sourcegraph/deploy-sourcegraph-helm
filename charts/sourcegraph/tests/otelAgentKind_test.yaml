@@ -1,0 +1,42 @@
+---
+suite: otelAgentKind
+tests:
+  - it: should render a DaemonSet by default
+    template: otel-collector/otel-agent.DaemonSet.yaml
+    asserts:
+      - isKind:
+          of: DaemonSet
+  - it: should render a DaemonSet when kind is DaemonSet
+    template: otel-collector/otel-agent.DaemonSet.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "DaemonSet"
+    asserts:
+      - isKind:
+          of: DaemonSet
+  - it: should not render a DaemonSet when kind is Deployment
+    template: otel-collector/otel-agent.DaemonSet.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should set OTEL_EXPORTER_OTLP_ENDPOINT to otel-collector when kind is Deployment
+    template: searcher/searcher.StatefulSet.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://otel-collector:4317"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_AGENT_HOST
