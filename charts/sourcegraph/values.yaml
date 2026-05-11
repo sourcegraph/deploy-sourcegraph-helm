@@ -225,6 +225,8 @@ codeInsightsDB:
     name: ""
   # -- PVC Storage Request for `codeinsights-db` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `codeinsights-db` primary data volume mount
+  storageSubPath: ""
 
 codeIntelDB:
   # -- Enable `codeintel-db` PostgreSQL server
@@ -290,6 +292,8 @@ codeIntelDB:
     name: ""
   # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `codeintel-db` primary data volume mount
+  storageSubPath: ""
 
 frontend:
   # -- Environment variables for the `frontend` container
@@ -446,6 +450,8 @@ gitserver:
     name: ""
   # -- PVC Storage Request for `gitserver` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `gitserver` primary data volume mount
+  storageSubPath: ""
 
 grafana:
   # -- Enable `grafana` dashboard (recommended)
@@ -508,6 +514,8 @@ grafana:
     name: grafana
   # -- PVC Storage Request for `grafana` data volume
   storageSize: 2Gi
+  # -- Optional subPath for the `grafana` primary data volume mount
+  storageSubPath: ""
 
 indexedSearch:
   image:
@@ -549,6 +557,8 @@ indexedSearch:
   # The size of disk to used for search indexes.
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
   storageSize: 200Gi
+  # -- Optional subPath for the `indexed-search` primary data volume mount
+  storageSubPath: ""
 
 indexedSearchIndexer:
   image:
@@ -614,6 +624,8 @@ blobstore:
     name: ""
   # -- PVC Storage Request for `blobstore` data volume
   storageSize: 100Gi
+  # -- Optional subPath for the `blobstore` primary data volume mount
+  storageSubPath: ""
 
 openTelemetry:
   enabled: true
@@ -795,6 +807,8 @@ pgsql:
     name: ""
   # -- PVC Storage Request for `pgsql` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `pgsql` primary data volume mount
+  storageSubPath: ""
 
 postgresExporter:
   image:
@@ -943,6 +957,8 @@ prometheus:
     name: prometheus
   # -- PVC Storage Request for `prometheus` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `prometheus` primary data volume mount
+  storageSubPath: ""
 
 redisCache:
   # -- Enable `redis-cache` Redis server
@@ -989,6 +1005,8 @@ redisCache:
     name: ""
   # -- PVC Storage Request for `redis-cache` data volume
   storageSize: 100Gi
+  # -- Optional subPath for the `redis-cache` primary data volume mount
+  storageSubPath: ""
 
 redisExporter:
   image:
@@ -1058,6 +1076,8 @@ redisStore:
     name: ""
   # -- PVC Storage Request for `redis-store` data volume
   storageSize: 100Gi
+  # -- Optional subPath for the `redis-store` primary data volume mount
+  storageSubPath: ""
 
 searcher:
   image:
@@ -1098,6 +1118,8 @@ searcher:
     name: ""
   # -- Size of the PVC for searcher pods to store cache data
   storageSize: 26Gi
+  # -- Optional subPath for the `searcher` primary data volume mount
+  storageSubPath: ""
 
 storageClass:
   # -- Enable creation of storageClass.

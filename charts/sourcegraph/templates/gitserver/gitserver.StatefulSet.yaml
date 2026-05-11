@@ -85,6 +85,9 @@ spec:
           name: tmpdir
         - mountPath: /data/repos
           name: repos
+          {{- if .Values.gitserver.storageSubPath }}
+          subPath: {{ .Values.gitserver.storageSubPath }}
+          {{- end }}
         {{- if .Values.gitserver.sshSecret }}
         - mountPath: /home/sourcegraph/.ssh
           name: ssh

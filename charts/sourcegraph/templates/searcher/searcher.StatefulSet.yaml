@@ -99,6 +99,9 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache
+          {{- if .Values.searcher.storageSubPath }}
+          subPath: {{ .Values.searcher.storageSubPath }}
+          {{- end }}
         - mountPath: /tmp
           name: tmpdir
         {{- if .Values.searcher.extraVolumeMounts }}

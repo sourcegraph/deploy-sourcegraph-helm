@@ -51,6 +51,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: disk
+          {{- if .Values.pgsql.storageSubPath }}
+          subPath: {{ .Values.pgsql.storageSubPath }}
+          {{- end }}
         securityContext:
         {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
@@ -101,6 +104,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: disk
+          {{- if .Values.pgsql.storageSubPath }}
+          subPath: {{ .Values.pgsql.storageSubPath }}
+          {{- end }}
         - mountPath: /conf
           name: pgsql-conf
         - mountPath: /dev/shm

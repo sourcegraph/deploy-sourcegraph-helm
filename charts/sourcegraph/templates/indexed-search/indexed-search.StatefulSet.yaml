@@ -89,6 +89,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+          {{- if .Values.indexedSearch.storageSubPath }}
+          subPath: {{ .Values.indexedSearch.storageSubPath }}
+          {{- end }}
         {{- if .Values.indexedSearch.extraVolumeMounts }}
         {{- toYaml .Values.indexedSearch.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -118,6 +121,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: data
+          {{- if .Values.indexedSearch.storageSubPath }}
+          subPath: {{ .Values.indexedSearch.storageSubPath }}
+          {{- end }}
         {{- if .Values.indexedSearchIndexer.extraVolumeMounts }}
         {{- toYaml .Values.indexedSearchIndexer.extraVolumeMounts | nindent 8 }}
         {{- end }}
