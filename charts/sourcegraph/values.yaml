@@ -227,6 +227,8 @@ codeInsightsDB:
   storageSize: 200Gi
   # -- Optional subPath for the `codeinsights-db` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `codeinsights-db` PVC
+  storageAnnotations: {}
 
 codeIntelDB:
   # -- Enable `codeintel-db` PostgreSQL server
@@ -294,6 +296,8 @@ codeIntelDB:
   storageSize: 200Gi
   # -- Optional subPath for the `codeintel-db` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `codeintel-db` PVC
+  storageAnnotations: {}
 
 frontend:
   # -- Environment variables for the `frontend` container
@@ -452,6 +456,8 @@ gitserver:
   storageSize: 200Gi
   # -- Optional subPath for the `gitserver` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `gitserver` PVC
+  storageAnnotations: {}
 
 grafana:
   # -- Enable `grafana` dashboard (recommended)
@@ -516,6 +522,8 @@ grafana:
   storageSize: 2Gi
   # -- Optional subPath for the `grafana` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `grafana` PVC
+  storageAnnotations: {}
 
 indexedSearch:
   image:
@@ -559,6 +567,8 @@ indexedSearch:
   storageSize: 200Gi
   # -- Optional subPath for the `indexed-search` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `indexed-search` PVC
+  storageAnnotations: {}
 
 indexedSearchIndexer:
   image:
@@ -626,6 +636,8 @@ blobstore:
   storageSize: 100Gi
   # -- Optional subPath for the `blobstore` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `blobstore` PVC
+  storageAnnotations: {}
 
 openTelemetry:
   enabled: true
@@ -809,6 +821,8 @@ pgsql:
   storageSize: 200Gi
   # -- Optional subPath for the `pgsql` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `pgsql` PVC
+  storageAnnotations: {}
 
 postgresExporter:
   image:
@@ -959,6 +973,8 @@ prometheus:
   storageSize: 200Gi
   # -- Optional subPath for the `prometheus` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `prometheus` PVC
+  storageAnnotations: {}
 
 redisCache:
   # -- Enable `redis-cache` Redis server
@@ -1007,6 +1023,8 @@ redisCache:
   storageSize: 100Gi
   # -- Optional subPath for the `redis-cache` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `redis-cache` PVC
+  storageAnnotations: {}
 
 redisExporter:
   image:
@@ -1078,6 +1096,8 @@ redisStore:
   storageSize: 100Gi
   # -- Optional subPath for the `redis-store` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `redis-store` PVC
+  storageAnnotations: {}
 
 searcher:
   image:
@@ -1120,6 +1140,8 @@ searcher:
   storageSize: 26Gi
   # -- Optional subPath for the `searcher` primary data volume mount
   storageSubPath: ""
+  # -- Optional annotations to add to the `searcher` PVC
+  storageAnnotations: {}
 
 storageClass:
   # -- Enable creation of storageClass.

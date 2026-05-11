@@ -108,6 +108,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: grafana-data
+      {{- if .Values.grafana.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.grafana.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce"]
       resources:

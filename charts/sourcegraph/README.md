@@ -40,6 +40,7 @@ In addition to the documented values, all services also support the following va
 | blobstore.resources | object | `{"limits":{"cpu":"1","memory":"500M"},"requests":{"cpu":"1","memory":"500M"}}` | Resource requests & limits for the `blobstore` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | blobstore.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `blobstore` |
 | blobstore.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| blobstore.storageAnnotations | object | `{}` | Optional annotations to add to the `blobstore` PVC |
 | blobstore.storageSize | string | `"100Gi"` | PVC Storage Request for `blobstore` data volume |
 | blobstore.storageSubPath | string | `""` | Optional subPath for the `blobstore` primary data volume mount |
 | cadvisor.containerSecurityContext | object | `{"privileged":true}` | Security context for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -72,6 +73,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.resources | object | `{"limits":{"cpu":"4","memory":"2Gi"},"requests":{"cpu":"4","memory":"2Gi"}}` | Resource requests & limits for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| codeInsightsDB.storageAnnotations | object | `{}` | Optional annotations to add to the `codeinsights-db` PVC |
 | codeInsightsDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeinsights-db` data volume |
 | codeInsightsDB.storageSubPath | string | `""` | Optional subPath for the `codeinsights-db` primary data volume mount |
 | codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
@@ -93,6 +95,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| codeIntelDB.storageAnnotations | object | `{}` | Optional annotations to add to the `codeintel-db` PVC |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | codeIntelDB.storageSubPath | string | `""` | Optional subPath for the `codeintel-db` primary data volume mount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
@@ -126,6 +129,7 @@ In addition to the documented values, all services also support the following va
 | gitserver.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `gitserver` |
 | gitserver.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.sshSecret | string | `""` | Name of existing Secret that contains SSH credentials to clone repositories. It usually contains keys, such as `id_rsa` (private key) and `known_hosts`. Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories) |
+| gitserver.storageAnnotations | object | `{}` | Optional annotations to add to the `gitserver` PVC |
 | gitserver.storageSize | string | `"200Gi"` | PVC Storage Request for `gitserver` data volume |
 | gitserver.storageSubPath | string | `""` | Optional subPath for the `gitserver` primary data volume mount |
 | grafana.auth | object | `{"database":"","existingSecret":"","host":"","password":"","port":"","sslmode":"","user":""}` | NOTE: Create a separate user in the pgsql database with read-only perms on the minimum set of tables |
@@ -146,6 +150,7 @@ In addition to the documented values, all services also support the following va
 | grafana.resources | object | `{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests & limits for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | grafana.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `grafana` |
 | grafana.serviceAccount.name | string | `"grafana"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| grafana.storageAnnotations | object | `{}` | Optional annotations to add to the `grafana` PVC |
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -157,6 +162,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | indexedSearch.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-search` |
 | indexedSearch.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| indexedSearch.storageAnnotations | object | `{}` | Optional annotations to add to the `indexed-search` PVC |
 | indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multipled by the number of gitserver shards. |
 | indexedSearch.storageSubPath | string | `""` | Optional subPath for the `indexed-search` primary data volume mount |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -248,6 +254,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pgsql.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `pgsql` |
 | pgsql.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| pgsql.storageAnnotations | object | `{}` | Optional annotations to add to the `pgsql` PVC |
 | pgsql.storageSize | string | `"200Gi"` | PVC Storage Request for `pgsql` data volume |
 | pgsql.storageSubPath | string | `""` | Optional subPath for the `pgsql` primary data volume mount |
 | postgresExporter.image.defaultTag | string | `"6.0.0@sha256:685a18f482e4a71a54e15814ffd6b8cd62844f6af056a81f7ec0ba5cf23fce27"` | Docker image tag for the `pgsql-exporter` image |
@@ -276,6 +283,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.resources | object | `{"limits":{"cpu":"2","memory":"6G"},"requests":{"cpu":"500m","memory":"6G"}}` | Resource requests & limits for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) Prometheus is relied upon to monitor services for sending alerts to site admins when something is wrong with Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough memory to perform its job reliably and prevent conflicts with other pods on the same host node. The limit chosen here is based on what works reliably on Sourcegraph.com with lots of traffic. |
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| prometheus.storageAnnotations | object | `{}` | Optional annotations to add to the `prometheus` PVC |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
 | prometheus.storageSubPath | string | `""` | Optional subPath for the `prometheus` primary data volume mount |
 | redisCache.connection.endpoint | string | `"redis-cache:6379"` | Endpoint to use for redis-cache. Supports either host:port or IANA specification |
@@ -289,6 +297,7 @@ In addition to the documented values, all services also support the following va
 | redisCache.resources | object | `{"limits":{"cpu":"1","memory":"7Gi"},"requests":{"cpu":"1","memory":"7Gi"}}` | Resource requests & limits for the `redis-cache` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | redisCache.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `redis-cache` |
 | redisCache.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| redisCache.storageAnnotations | object | `{}` | Optional annotations to add to the `redis-cache` PVC |
 | redisCache.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-cache` data volume |
 | redisCache.storageSubPath | string | `""` | Optional subPath for the `redis-cache` primary data volume mount |
 | redisExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -306,6 +315,7 @@ In addition to the documented values, all services also support the following va
 | redisStore.resources | object | `{"limits":{"cpu":"1","memory":"7Gi"},"requests":{"cpu":"1","memory":"7Gi"}}` | Resource requests & limits for the `redis-store` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | redisStore.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `redis-store` |
 | redisStore.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| redisStore.storageAnnotations | object | `{}` | Optional annotations to add to the `redis-store` PVC |
 | redisStore.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-store` data volume |
 | redisStore.storageSubPath | string | `""` | Optional subPath for the `redis-store` primary data volume mount |
 | searcher.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -317,6 +327,7 @@ In addition to the documented values, all services also support the following va
 | searcher.resources | object | `{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| searcher.storageAnnotations | object | `{}` | Optional annotations to add to the `searcher` PVC |
 | searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
 | searcher.storageSubPath | string | `""` | Optional subPath for the `searcher` primary data volume mount |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |

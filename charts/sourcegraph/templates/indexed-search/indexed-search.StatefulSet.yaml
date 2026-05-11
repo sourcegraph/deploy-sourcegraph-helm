@@ -153,6 +153,10 @@ spec:
       labels:
         deploy: sourcegraph
       name: data
+      {{- if .Values.indexedSearch.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.indexedSearch.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce

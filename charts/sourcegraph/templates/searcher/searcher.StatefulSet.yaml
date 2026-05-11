@@ -138,6 +138,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: cache
+      {{- if .Values.searcher.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.searcher.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce

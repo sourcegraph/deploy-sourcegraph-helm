@@ -127,6 +127,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: repos
+      {{- if .Values.gitserver.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.gitserver.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce
