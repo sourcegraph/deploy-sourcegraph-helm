@@ -65,6 +65,9 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/grafana
           name: grafana-data
+          {{- if .Values.grafana.storageSubPath }}
+          subPath: {{ .Values.grafana.storageSubPath }}
+          {{- end }}
         - mountPath: /sg_config_grafana/provisioning/datasources
           name: config
         # Grafana is relied upon to send alerts to site admins when something is wrong with
@@ -105,6 +108,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: grafana-data
+      {{- if .Values.grafana.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.grafana.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes: [ "ReadWriteOnce"]
       resources:

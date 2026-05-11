@@ -51,6 +51,9 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
+          {{- if .Values.codeInsightsDB.storageSubPath }}
+          subPath: {{ .Values.codeInsightsDB.storageSubPath }}
+          {{- end }}
         securityContext:
         {{- toYaml .Values.codeInsightsDB.init.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
@@ -90,6 +93,9 @@ spec:
         volumeMounts:
         - mountPath: /var/lib/postgresql/data/
           name: disk
+          {{- if .Values.codeInsightsDB.storageSubPath }}
+          subPath: {{ .Values.codeInsightsDB.storageSubPath }}
+          {{- end }}
         - mountPath: /conf
           name: codeinsights-conf
         - mountPath: /var/run/postgresql

@@ -80,6 +80,9 @@ spec:
         volumeMounts:
         - name: blobstore-data
           mountPath: /data
+          {{- if .Values.blobstore.storageSubPath }}
+          subPath: {{ .Values.blobstore.storageSubPath }}
+          {{- end }}
         - name: blobstore
           mountPath: /blobstore
         {{- if .Values.blobstore.extraVolumeMounts }}

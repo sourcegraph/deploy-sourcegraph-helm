@@ -70,6 +70,9 @@ spec:
         volumeMounts:
         - mountPath: /prometheus
           name: data
+          {{- if .Values.prometheus.storageSubPath }}
+          subPath: {{ .Values.prometheus.storageSubPath }}
+          {{- end }}
         - mountPath: /sg_prometheus_add_ons
           name: config
         {{- if .Values.prometheus.extraVolumeMounts }}

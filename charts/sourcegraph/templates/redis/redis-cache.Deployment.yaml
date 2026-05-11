@@ -97,6 +97,9 @@ spec:
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
+          {{- if .Values.redisCache.storageSubPath }}
+          subPath: {{ .Values.redisCache.storageSubPath }}
+          {{- end }}
         {{- if .Values.redisCache.extraVolumeMounts }}
         {{- toYaml .Values.redisCache.extraVolumeMounts | nindent 8 }}
         {{- end }}
