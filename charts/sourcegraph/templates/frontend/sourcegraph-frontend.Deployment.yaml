@@ -125,6 +125,10 @@ spec:
           containerPort: 3080
         - name: http-debug
           containerPort: 6060
+        {{- if .Values.frontend.internalRegistry.enabled }}
+        - name: registry
+          containerPort: 5000
+        {{- end }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.frontend.resources | nindent 10 }}
