@@ -24,9 +24,9 @@ spec:
     port: 6060
     targetPort: http-debug
   {{- if .Values.frontend.internalRegistry.enabled }}
-  - name: registry
+  - name: http-registry
     port: 5000
-    targetPort: registry
+    targetPort: http-registry
   {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
