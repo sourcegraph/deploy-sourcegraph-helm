@@ -4,6 +4,7 @@ templates:
   - executor.Service.yaml
   - executor.ConfigMap.yaml
   - executor.PersistentVolumeClaim.yaml
+  - executor.CiliumNetworkPolicy.yaml
 tests:
   - it: should render the Deployment, Service, ConfigMap, PVC if executor is enabled
     set:
@@ -131,3 +132,74 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should render CiliumNetworkPolicy deny guards when enabled
+    template: executor.CiliumNetworkPolicy.yaml
+    set:
+      executor:
+        queueNames:
+          - batches
+          - codeintel
+        namespace: executor-jobs
+        ciliumNetworkPolicy:
+          enabled: true
+          sourcegraphNamespace: sourcegraph
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: apiVersion
+          value: cilium.io/v2
+        documentIndex: 0
+      - equal:
+          path: kind
+          value: CiliumNetworkPolicy
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: executor-batches-codeintel-controller-egress-deny
+        documentIndex: 0
+      - equal:
+          path: metadata.namespace
+          value: NAMESPACE
+        documentIndex: 0
+      - equal:
+          path: spec.enableDefaultDeny.egress
+          value: false
+        documentIndex: 0
+      - equal:
+          path: spec.endpointSelector.matchLabels.app
+          value: executor-batches-codeintel
+        documentIndex: 0
+      - equal:
+          path: apiVersion
+          value: cilium.io/v2
+        documentIndex: 1
+      - equal:
+          path: kind
+          value: CiliumNetworkPolicy
+        documentIndex: 1
+      - equal:
+          path: metadata.name
+          value: executor-batches-codeintel-jobs-egress-deny
+        documentIndex: 1
+      - equal:
+          path: metadata.namespace
+          value: executor-jobs
+        documentIndex: 1
+      - equal:
+          path: spec.endpointSelector.matchExpressions
+          value:
+            - key: sourcegraph/job-id
+              operator: Exists
+            - key: sourcegraph/run-id
+              operator: Exists
+        documentIndex: 1
+      - equal:
+          path: spec.egressDeny[0].toEndpoints[0].matchExpressions[0]
+          value:
+            key: io.kubernetes.pod.namespace
+            operator: In
+            values:
+              - sourcegraph
+        documentIndex: 1

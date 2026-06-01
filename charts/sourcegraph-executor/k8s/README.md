@@ -53,6 +53,11 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| executor.ciliumNetworkPolicy.deniedFrontendPorts | list | `["6060","3090","80"]` | Frontend pod ports to deny directly, even though the frontend pod is otherwise excluded from the broad Sourcegraph pod deny rule. |
+| executor.ciliumNetworkPolicy.deniedFrontendServiceNames | list | `["sourcegraph-frontend-internal"]` | Sourcegraph services that are backed by frontend pods but should still be denied to executors. |
+| executor.ciliumNetworkPolicy.enabled | bool | `false` | Create CiliumNetworkPolicy deny rules that prevent executor controller and job pods from reaching Sourcegraph pods and services other than the user-facing frontend service. This is a deny-only guard: it does not replace existing DNS, code host, package registry, or frontend allow policies. |
+| executor.ciliumNetworkPolicy.frontendPodAppLabelValue | string | `"sourcegraph-frontend"` | Value of the `app` label on Sourcegraph frontend pods. |
+| executor.ciliumNetworkPolicy.sourcegraphNamespace | string | `""` | Namespace where the Sourcegraph frontend and the rest of the Sourcegraph Helm chart run. Defaults to the Helm release namespace. |
 | executor.configureRbac | bool | `true` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
 | executor.containerSecurityContext | object | `{"privileged":false}` | Security context for the container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | executor.debug.keepJobs | string | `"false"` | If true, Kubernetes jobs will not be deleted after they complete. Not recommended for production use as it can hit cluster limits. |
