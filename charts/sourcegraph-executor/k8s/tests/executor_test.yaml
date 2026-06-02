@@ -172,6 +172,12 @@ tests:
           value: executor-batches-codeintel
         documentIndex: 0
       - equal:
+          path: spec.egress[0].toServices[0].k8sService
+          value:
+            namespace: sourcegraph
+            serviceName: sourcegraph-frontend
+        documentIndex: 0
+      - equal:
           path: apiVersion
           value: cilium.io/v2
         documentIndex: 1
@@ -194,6 +200,12 @@ tests:
               operator: Exists
             - key: sourcegraph/run-id
               operator: Exists
+        documentIndex: 1
+      - equal:
+          path: spec.egress[0].toServices[0].k8sService
+          value:
+            namespace: sourcegraph
+            serviceName: sourcegraph-frontend
         documentIndex: 1
       - equal:
           path: spec.egressDeny[0].toEndpoints[0].matchExpressions[0]

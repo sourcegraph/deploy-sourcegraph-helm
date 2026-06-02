@@ -35,11 +35,21 @@
 {{- end }}
 {{- end }}
 
+{{- define "executor.ciliumNetworkPolicy.egressAllow" -}}
+{{- $policy := .policy -}}
+{{- $sourcegraphNamespace := .sourcegraphNamespace -}}
+- toServices:
+    - k8sService:
+        namespace: {{ $sourcegraphNamespace | quote }}
+        serviceName: {{ $policy.frontendServiceName | quote }}
+{{- end }}
+
 {{- if .Values.executor.ciliumNetworkPolicy.enabled }}
 {{- $policy := .Values.executor.ciliumNetworkPolicy }}
 {{- $sourcegraphNamespace := default .Release.Namespace $policy.sourcegraphNamespace }}
 {{- $jobNamespace := default .Release.Namespace .Values.executor.namespace }}
 {{- $egressDenyContext := dict "policy" $policy "sourcegraphNamespace" $sourcegraphNamespace }}
+{{- $egressAllowContext := dict "policy" $policy "sourcegraphNamespace" $sourcegraphNamespace }}
 ---
 apiVersion: cilium.io/v2
 kind: CiliumNetworkPolicy
@@ -55,6 +65,8 @@ spec:
   endpointSelector:
     matchLabels:
       app: {{ include "executor.name" . | quote }}
+  egress:
+{{ include "executor.ciliumNetworkPolicy.egressAllow" $egressAllowContext | indent 4 }}
   egressDeny:
 {{ include "executor.ciliumNetworkPolicy.egressDeny" $egressDenyContext | indent 4 }}
 ---
@@ -75,6 +87,8 @@ spec:
         operator: Exists
       - key: sourcegraph/run-id
         operator: Exists
+  egress:
+{{ include "executor.ciliumNetworkPolicy.egressAllow" $egressAllowContext | indent 4 }}
   egressDeny:
 {{ include "executor.ciliumNetworkPolicy.egressDeny" $egressDenyContext | indent 4 }}
 {{- end }}
