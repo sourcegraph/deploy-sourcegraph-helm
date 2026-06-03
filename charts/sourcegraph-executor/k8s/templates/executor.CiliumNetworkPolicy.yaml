@@ -1,0 +1,94 @@
+{{- define "executor.ciliumNetworkPolicy.egressDeny" -}}
+{{- $policy := .policy -}}
+{{- $sourcegraphNamespace := .sourcegraphNamespace -}}
+- toEndpoints:
+    - matchExpressions:
+        - key: io.kubernetes.pod.namespace
+          operator: In
+          values:
+            - {{ $sourcegraphNamespace | quote }}
+        - key: deploy
+          operator: In
+          values:
+            - sourcegraph
+        - key: app
+          operator: NotIn
+          values:
+            - {{ $policy.frontendPodAppLabelValue | quote }}
+{{- range $serviceName := $policy.deniedFrontendServiceNames }}
+- toServices:
+    - k8sService:
+        namespace: {{ $sourcegraphNamespace | quote }}
+        serviceName: {{ $serviceName | quote }}
+{{- end }}
+{{- if $policy.deniedFrontendPorts }}
+- toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: {{ $sourcegraphNamespace | quote }}
+        app: {{ $policy.frontendPodAppLabelValue | quote }}
+  toPorts:
+    - ports:
+{{- range $port := $policy.deniedFrontendPorts }}
+        - port: {{ $port | quote }}
+          protocol: TCP
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "executor.ciliumNetworkPolicy.egressAllow" -}}
+{{- $policy := .policy -}}
+{{- $sourcegraphNamespace := .sourcegraphNamespace -}}
+- toServices:
+    - k8sService:
+        namespace: {{ $sourcegraphNamespace | quote }}
+        serviceName: {{ $policy.frontendServiceName | quote }}
+{{- end }}
+
+{{- if .Values.executor.ciliumNetworkPolicy.enabled }}
+{{- $policy := .Values.executor.ciliumNetworkPolicy }}
+{{- $sourcegraphNamespace := default .Release.Namespace $policy.sourcegraphNamespace }}
+{{- $jobNamespace := default .Release.Namespace .Values.executor.namespace }}
+{{- $egressDenyContext := dict "policy" $policy "sourcegraphNamespace" $sourcegraphNamespace }}
+{{- $egressAllowContext := dict "policy" $policy "sourcegraphNamespace" $sourcegraphNamespace }}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ printf "%s-controller-egress-deny" (include "executor.name" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace | quote }}
+spec:
+  description: >-
+    Deny Sourcegraph executor controller pods from reaching Sourcegraph pods and
+    services other than the user-facing frontend service.
+  enableDefaultDeny:
+    egress: false
+  endpointSelector:
+    matchLabels:
+      app: {{ include "executor.name" . | quote }}
+  egress:
+{{ include "executor.ciliumNetworkPolicy.egressAllow" $egressAllowContext | indent 4 }}
+  egressDeny:
+{{ include "executor.ciliumNetworkPolicy.egressDeny" $egressDenyContext | indent 4 }}
+---
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: {{ printf "%s-jobs-egress-deny" (include "executor.name" .) | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $jobNamespace | quote }}
+spec:
+  description: >-
+    Deny Sourcegraph executor job pods from reaching Sourcegraph pods and
+    services other than the user-facing frontend service.
+  enableDefaultDeny:
+    egress: false
+  endpointSelector:
+    matchExpressions:
+      - key: sourcegraph/job-id
+        operator: Exists
+      - key: sourcegraph/run-id
+        operator: Exists
+  egress:
+{{ include "executor.ciliumNetworkPolicy.egressAllow" $egressAllowContext | indent 4 }}
+  egressDeny:
+{{ include "executor.ciliumNetworkPolicy.egressDeny" $egressDenyContext | indent 4 }}
+{{- end }}
