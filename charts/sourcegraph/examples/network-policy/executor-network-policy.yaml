@@ -1,0 +1,106 @@
+# Sourcegraph Executor network policies for native Kubernetes
+#
+# Description:
+#
+# - Executors must not be allowed to connect to any Sourcegraph-internal services,
+#   except the sourcegraph-frontend service
+#
+# - Many Kubernetes platforms do not block inter-namespace communication by default
+#
+# - Unless your instance requires external pods to be able to connect to
+#   Sourcegraph-internal services, ex. external Prometheus scraping pod metrics,
+#   then Sourcegraph-internal services should not be reachable outside of
+#   the instance's namespace
+#
+# Native Kubernetes NetworkPolicy supports allow rules only, like:
+#
+# - Block all ingress by default
+# - Allow ingress by specified exceptions
+#
+# Usage:
+#
+# - Deploy both network policies in your Sourcegraph instance's namespace
+#
+# - You can still use `frontendUrl: http://sourcegraph-frontend:30080`
+#   in your override file for the sourcegraph-executor Helm charts,
+#   to avoid paying egress / ingress charges for the Executors' traffic
+#
+# Effect:
+#
+# - Executor pods can reach the frontend HTTP service
+# - Executor pods cannot reach frontend internal/debug ports
+# - Executor pods cannot reach other Sourcegraph pods or services
+# - Executor egress to DNS, kube API, code hosts, package registries, and other
+#   external services is unchanged
+#
+# Notes:
+#
+# - Kubernetes NetworkPolicy rules are additive; if another policy already allows
+#   executor ingress to backend pods, remove or narrow that broader allow policy
+#
+# - This policy relies on all Sourcegraph + executor pods having at least
+#   the default labels from their respective Helm charts
+#
+# - To protect additional pods (ex. src-serve-git), either:
+#   - Apply the deploy=sourcegraph label to them
+#   - Or add an identifying label for them in the spec.podSelector.matchExpressions
+#     of the sourcegraph-internal-pods-block-executors policy
+#
+# - If you need pods from outside of your Sourcegraph instance's namespace
+#   to continue to be able to connect to backend pods, then uncomment the
+#   `namespaceSelector: {}` line
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sourcegraph-pods-block-executors
+spec:
+  podSelector:
+    matchExpressions:
+      - key: deploy
+        operator: In
+        values:
+          - sourcegraph
+      - key: app.kubernetes.io/component
+        operator: NotIn
+        values:
+          - executor
+      - key: sourcegraph/job-id
+        operator: DoesNotExist
+      - key: sourcegraph/run-id
+        operator: DoesNotExist
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: NotIn
+                values:
+                  - executor
+              - key: sourcegraph/job-id
+                operator: DoesNotExist
+              - key: sourcegraph/run-id
+                operator: DoesNotExist
+          # namespaceSelector: {}
+
+---
+
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: sourcegraph-frontend-allow-http-from-anywhere
+spec:
+  podSelector:
+    matchLabels:
+      deploy: sourcegraph
+      app: sourcegraph-frontend
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: http
