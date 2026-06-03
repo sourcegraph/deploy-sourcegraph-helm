@@ -43,6 +43,13 @@ sourcegraph:
   # -- Disable the creation of Kubernetes secrets objects
   disableKubernetesSecrets: false
 
+networkPolicy:
+  executor:
+    # -- Enable NetworkPolicies to block Executor access to Sourcegraph backend pods
+    enabled: false
+    # -- Allow non-executor pods from other namespaces to reach Sourcegraph backend pods
+    allowOtherNamespacesToReachBackendPods: false
+
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
 #   replicaCount: 1
