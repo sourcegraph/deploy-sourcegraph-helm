@@ -1,4 +1,4 @@
-{{- if .Values.executor.enabled -}}
+{{- if or .Values.queues .Values.executor.enabled -}}
 apiVersion: v1
 data:
   daemon.json: |

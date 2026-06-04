@@ -114,7 +114,7 @@ spec:
             - 'dockerd'
             - '--tls=false'
             - '--mtu=1200'
-            - '--registry-mirror=http://executor:5000'
+            - '--registry-mirror=http://private-docker-registry:5000'
             - '--host=tcp://0.0.0.0:2375'
           livenessProbe:
             tcpSocket:
@@ -273,7 +273,7 @@ spec:
             - 'dockerd'
             - '--tls=false'
             - '--mtu=1200'
-            - '--registry-mirror=http://executor:5000'
+            - '--registry-mirror=http://private-docker-registry:5000'
             - '--host=tcp://0.0.0.0:2375'
           livenessProbe:
             tcpSocket:
