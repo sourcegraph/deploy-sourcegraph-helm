@@ -1,9 +1,4 @@
-{{- if or .Values.queues .Values.executor.enabled -}}
 apiVersion: v1
-data:
-  daemon.json: |
-    { "insecure-registries":["private-docker-registry:5000"] }
-
 kind: ConfigMap
 metadata:
   labels:
@@ -11,4 +6,6 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: executor
   name: docker-config
-{{- end }}
+data:
+  daemon.json: |
+    {{- .Values.dind.daemonConfig | toPrettyJson | nindent 4 }}

@@ -196,7 +196,7 @@ spec:
             defaultMode: 420
             name: docker-config
 {{- end }}
-{{- else if .Values.executor.enabled }}
+{{- else }}
 {{- include "executor.validateEnv" (list .Values.executor.env "executor.env") }}
 apiVersion: apps/v1
 kind: Deployment
@@ -286,14 +286,8 @@ spec:
               value: {{ .Values.executor.log.level | quote }}
             - name: SRC_LOG_FORMAT
               value: {{ .Values.executor.log.format | quote }}
-            - name: EXECUTOR_MAXIMUM_NUM_JOBS
-              value: {{ .Values.executor.maximumNumJobs | quote }}
             - name: EXECUTOR_MAXIMUM_RUNTIME_PER_JOB
               value: {{ .Values.executor.maximumRuntimePerJob | quote }}
-            - name: EXECUTOR_DOCKER_ADD_HOST_GATEWAY
-              value: {{ .Values.executor.dockerAddHostGateway | quote }}
-            - name: EXECUTOR_KEEP_WORKSPACES
-              value: {{ .Values.executor.debug.keepWorkspaces | quote }}
             - name: EXECUTOR_USE_FIRECRACKER
               value: "false"
             - name: EXECUTOR_HEALTH_SERVER_ADDR

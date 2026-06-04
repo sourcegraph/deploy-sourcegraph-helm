@@ -80,7 +80,6 @@ queues: []
 #   env: {}
 
 executor:
-  enabled: true
   # -- The external URL of the Sourcegraph instance. Required.
   frontendUrl: ""
   # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured.
@@ -124,6 +123,10 @@ dind:
     registry: index.docker.io
     repository: docker
     tag: 20.10.22-dind
+  # -- Docker daemon configuration passed as daemon.json to the dind sidecar.
+  daemonConfig:
+    insecure-registries:
+      - private-docker-registry:5000
 
 privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
