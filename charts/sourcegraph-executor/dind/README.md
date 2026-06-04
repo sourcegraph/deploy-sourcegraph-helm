@@ -69,11 +69,13 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.image.defaultTag | string | `"6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508"` |  |
 | executor.image.name | string | `"executor"` |  |
 | executor.replicaCount | int | `1` |  |
+| executor.resources | object | `{}` | Resource requests and limits for the executor container. Each queue can override this with its own resources field. |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
-| privateDockerRegistry.image.repository | string | `"docker/regisry"` |  |
-| privateDockerRegistry.image.tag | int | `2` |  |
+| privateDockerRegistry.image.repository | string | `"registry"` |  |
+| privateDockerRegistry.image.tag | int | `3` |  |
 | privateDockerRegistry.storageSize | string | `"10Gi"` |  |
+| queues | list | `[]` | Optional list of queues to deploy as standalone Deployments. When set, the single executor Deployment is not rendered. Each entry supports: name (required), replicaCount, resources, env (merged with executor.env, queue overrides). |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
