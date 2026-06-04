@@ -1,6 +1,8 @@
 {{- if .Values.queues }}
 {{- range .Values.queues }}
 {{- $queue := . }}
+{{- include "executor.validateEnv" (list $.Values.executor.env "executor.env") }}
+{{- include "executor.validateEnv" (list ($queue.env | default dict) (printf "queues[%s].env" $queue.name)) }}
 {{- $mergedEnv := mergeOverwrite (deepCopy $.Values.executor.env) ($queue.env | default dict) }}
 {{- $replicaCount := ($queue.replicaCount | default $.Values.executor.replicaCount) }}
 {{- $resources := ($queue.resources | default $.Values.executor.resources) }}
@@ -80,10 +82,31 @@ spec:
               containerPort: 8080
           terminationMessagePolicy: FallbackToLogsOnError
           env:
-            {{- range $name, $item := $mergedEnv }}
-            - name: {{ $name }}
-              {{- $item | toYaml | nindent 14 }}
-            {{- end }}
+            - name: EXECUTOR_FRONTEND_URL
+              value: {{ $.Values.executor.frontendUrl | quote }}
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              {{- if $.Values.executor.frontendExistingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $.Values.executor.frontendExistingSecret }}
+                  key: EXECUTOR_FRONTEND_PASSWORD
+              {{- else }}
+              value: {{ $.Values.executor.frontendPassword | quote }}
+              {{- end }}
+            - name: EXECUTOR_QUEUE_NAME
+              value: {{ $queue.name | quote }}
+            - name: SRC_LOG_LEVEL
+              value: {{ $.Values.executor.log.level | quote }}
+            - name: SRC_LOG_FORMAT
+              value: {{ $.Values.executor.log.format | quote }}
+            - name: EXECUTOR_MAXIMUM_NUM_JOBS
+              value: {{ $.Values.executor.maximumNumJobs | quote }}
+            - name: EXECUTOR_MAXIMUM_RUNTIME_PER_JOB
+              value: {{ $.Values.executor.maximumRuntimePerJob | quote }}
+            - name: EXECUTOR_DOCKER_ADD_HOST_GATEWAY
+              value: {{ $.Values.executor.dockerAddHostGateway | quote }}
+            - name: EXECUTOR_KEEP_WORKSPACES
+              value: {{ $.Values.executor.debug.keepWorkspaces | quote }}
             - name: EXECUTOR_USE_FIRECRACKER
               value: "false"
             - name: EXECUTOR_HEALTH_SERVER_ADDR
@@ -98,6 +121,10 @@ spec:
               value: /scratch
             - name: EXECUTOR_USE_KUBERNETES
               value: "false"
+            {{- range $name, $item := $mergedEnv }}
+            - name: {{ $name }}
+              {{- $item | toYaml | nindent 14 }}
+            {{- end }}
           volumeMounts:
             - mountPath: /scratch
               name: executor-scratch
@@ -170,6 +197,7 @@ spec:
             name: docker-config
 {{- end }}
 {{- else if .Values.executor.enabled }}
+{{- include "executor.validateEnv" (list .Values.executor.env "executor.env") }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -239,10 +267,33 @@ spec:
               containerPort: 8080
           terminationMessagePolicy: FallbackToLogsOnError
           env:
-            {{- range $name, $item := .Values.executor.env }}
-            - name: {{ $name }}
-              {{- $item | toYaml | nindent 14 }}
-            {{- end }}
+            - name: EXECUTOR_FRONTEND_URL
+              value: {{ .Values.executor.frontendUrl | quote }}
+            - name: EXECUTOR_FRONTEND_PASSWORD
+              {{- if .Values.executor.frontendExistingSecret }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.executor.frontendExistingSecret }}
+                  key: EXECUTOR_FRONTEND_PASSWORD
+              {{- else }}
+              value: {{ .Values.executor.frontendPassword | quote }}
+              {{- end }}
+            - name: EXECUTOR_QUEUE_NAME
+              value: {{ .Values.executor.queueName | quote }}
+            - name: EXECUTOR_QUEUE_NAMES
+              value: {{ join "," .Values.executor.queueNames | quote }}
+            - name: SRC_LOG_LEVEL
+              value: {{ .Values.executor.log.level | quote }}
+            - name: SRC_LOG_FORMAT
+              value: {{ .Values.executor.log.format | quote }}
+            - name: EXECUTOR_MAXIMUM_NUM_JOBS
+              value: {{ .Values.executor.maximumNumJobs | quote }}
+            - name: EXECUTOR_MAXIMUM_RUNTIME_PER_JOB
+              value: {{ .Values.executor.maximumRuntimePerJob | quote }}
+            - name: EXECUTOR_DOCKER_ADD_HOST_GATEWAY
+              value: {{ .Values.executor.dockerAddHostGateway | quote }}
+            - name: EXECUTOR_KEEP_WORKSPACES
+              value: {{ .Values.executor.debug.keepWorkspaces | quote }}
             - name: EXECUTOR_USE_FIRECRACKER
               value: "false"
             - name: EXECUTOR_HEALTH_SERVER_ADDR
@@ -257,6 +308,10 @@ spec:
               value: /scratch
             - name: EXECUTOR_USE_KUBERNETES
               value: "false"
+            {{- range $name, $item := .Values.executor.env }}
+            - name: {{ $name }}
+              {{- $item | toYaml | nindent 14 }}
+            {{- end }}
           volumeMounts:
             - mountPath: /scratch
               name: executor-scratch

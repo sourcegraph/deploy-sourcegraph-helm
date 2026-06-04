@@ -56,7 +56,7 @@ storageClass:
 
 # -- Optional list of queues to deploy as standalone Deployments.
 # When set, the single executor Deployment is not rendered.
-# Each entry supports: name (required), replicaCount, resources, env (merged with executor.env, queue overrides).
+# Each entry supports: name (required, automatically used as EXECUTOR_QUEUE_NAME), replicaCount, resources, env (merged with executor.env, queue overrides).
 queues: []
 # - name: codeintel
 #   replicaCount: 2
@@ -67,9 +67,7 @@ queues: []
 #     limits:
 #       cpu: "4"
 #       memory: 8Gi
-#   env:
-#     EXECUTOR_QUEUE_NAME:
-#       value: codeintel
+#   env: {}
 # - name: batches
 #   replicaCount: 1
 #   resources:
@@ -79,12 +77,34 @@ queues: []
 #     limits:
 #       cpu: "2"
 #       memory: 4Gi
-#   env:
-#     EXECUTOR_QUEUE_NAME:
-#       value: batches
+#   env: {}
 
 executor:
   enabled: true
+  # -- The external URL of the Sourcegraph instance. Required.
+  frontendUrl: ""
+  # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured.
+  frontendPassword: ""
+  # -- Name of existing k8s Secret to use for frontend password.
+  # The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value.
+  # frontendPassword is ignored if this is set.
+  frontendExistingSecret: ""
+  # -- The name of the queue to pull jobs from. Possible values: batches and codeintel. Either this or queueNames is required (when not using queues).
+  queueName: ""
+  # -- The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues).
+  queueNames: []
+  # -- The maximum amount of jobs that can be executed concurrently.
+  maximumNumJobs: 10
+  # -- The maximum wall time that can be spent on a single job.
+  maximumRuntimePerJob: "30m"
+  log:
+    # -- Possible values are dbug, info, warn, eror, crit.
+    level: "warn"
+    format: "condensed"
+  # -- For local deployments the host is 'host.docker.internal' and this needs to be true.
+  dockerAddHostGateway: "false"
+  debug:
+    keepWorkspaces: "false"
   # -- Resource requests and limits for the executor container.
   # Each queue can override this with its own resources field.
   resources: {}
@@ -92,19 +112,12 @@ executor:
     defaultTag: 6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508
     name: "executor"
   replicaCount: 1
-  env:
-    # -- The external URL of the Sourcegraph instance. Required.
-    EXECUTOR_FRONTEND_URL:
-      value: ""
-    # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
-    EXECUTOR_FRONTEND_PASSWORD:
-      value: ""
-    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAMES is required.**
-    EXECUTOR_QUEUE_NAME:
-      value: ""
-    # -- The comma-separated list of names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAME is required.**
-    EXECUTOR_QUEUE_NAMES:
-      value: ""
+  # -- Extra environment variables to set on the executor container.
+  # Must NOT contain managed env vars (EXECUTOR_FRONTEND_URL, EXECUTOR_FRONTEND_PASSWORD,
+  # EXECUTOR_QUEUE_NAME, EXECUTOR_QUEUE_NAMES, SRC_LOG_LEVEL, SRC_LOG_FORMAT,
+  # EXECUTOR_MAXIMUM_NUM_JOBS, EXECUTOR_MAXIMUM_RUNTIME_PER_JOB,
+  # EXECUTOR_DOCKER_ADD_HOST_GATEWAY, EXECUTOR_KEEP_WORKSPACES).
+  env: {}
 
 dind:
   image:

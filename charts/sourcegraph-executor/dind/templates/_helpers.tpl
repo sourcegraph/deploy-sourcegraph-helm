@@ -100,10 +100,10 @@ tolerations:
 
 
 {{- define "executor.name" -}}
-{{- if .Values.executor.env.EXECUTOR_QUEUE_NAME.value -}}
-executor-{{.Values.executor.env.EXECUTOR_QUEUE_NAME.value}}
-{{- else if .Values.executor.env.EXECUTOR_QUEUE_NAMES.value -}}
-executor-{{replace "," "-" .Values.executor.env.EXECUTOR_QUEUE_NAMES.value }}
+{{- if .Values.executor.queueName -}}
+executor-{{.Values.executor.queueName}}
+{{- else if .Values.executor.queueNames -}}
+executor-{{join "-" .Values.executor.queueNames }}
 {{- end }}
 {{- end }}
 
@@ -113,3 +113,28 @@ deploy: sourcegraph
 sourcegraph-resource-requires: no-cluster-admin
 app.kubernetes.io/component: executor
 {{- end}}
+
+{{/*
+Validate that an env dict does not contain managed environment variable names.
+Usage: include "executor.validateEnv" (list $envDict "label")
+*/}}
+{{- define "executor.validateEnv" -}}
+{{- $envDict := index . 0 }}
+{{- $label := index . 1 }}
+{{- $managed := list
+    "EXECUTOR_FRONTEND_URL"
+    "EXECUTOR_FRONTEND_PASSWORD"
+    "EXECUTOR_QUEUE_NAME"
+    "EXECUTOR_QUEUE_NAMES"
+    "SRC_LOG_LEVEL"
+    "SRC_LOG_FORMAT"
+    "EXECUTOR_MAXIMUM_NUM_JOBS"
+    "EXECUTOR_MAXIMUM_RUNTIME_PER_JOB"
+    "EXECUTOR_DOCKER_ADD_HOST_GATEWAY"
+    "EXECUTOR_KEEP_WORKSPACES" -}}
+{{- range $managed -}}
+{{- if hasKey $envDict . -}}
+{{- fail (printf "%s: env must not contain managed variable %s; use the structured executor fields instead" $label .) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

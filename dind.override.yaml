@@ -1,0 +1,21 @@
+storageClass:
+  create: false
+  name: sourcegraph
+
+sourcegraph: 
+  image:
+    repository: us-docker.pkg.dev/sourcegraph-images/external
+    defaultTag: docker-images-notest-06-03-fix_374565_2026-06-04_7.3-e87902b59ff0
+    useGlobalTagAsDefault: true
+
+executor:
+  replicaCount: 4
+  frontendUrl: "http://frontend.sourcegraph.internal"
+  frontendPassword: SrHY0aVe0keHeh9MBzcX097NBXXdpcQs
+
+queues:
+  - name: batches
+    replicaCount: 4
+  - name: codeintel
+    replicaCount: 4
+
