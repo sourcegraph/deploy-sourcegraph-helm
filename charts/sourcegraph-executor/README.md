@@ -5,10 +5,9 @@ This directory contains two Helm charts for deploying executors on Kubernetes. [
 ## Native Kubernetes (k8s)
 This chart deploys executors that interact with the Kubernetes API to handle jobs.
 
-> ⚠️ **Beta:** Native Kubernetes executors are not recommended for production use. This deployment
-> mode has known durability and reliability limitations. For production workloads, deploy using
+> ⚠️ **Beta:** Native Kubernetes executors are in beta. For production workloads, consider deploying using
 > [Terraform](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-terraform) or the
-> [Linux binary](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-binary) instead.
+> [Linux binary](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-binary) for better long-term support.
 
 Your cluster will need to allow configuration of the following RBAC rules:
 
