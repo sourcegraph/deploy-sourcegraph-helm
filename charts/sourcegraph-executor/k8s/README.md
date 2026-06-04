@@ -7,6 +7,12 @@
 
 This chart contains two deployments, Sourcegraph Kubernetes native Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy Kubernetes native executors.
 
+> ⚠️ **Beta:** Native Kubernetes executors are not recommended for production use. This deployment
+> mode has known durability and reliability limitations including job loss on node failure and
+> best-effort resource cleanup. For production workloads, deploy using
+> [Terraform](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-terraform) or the
+> [Linux binary](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-binary).
+
 Use cases:
 
 - Deploy Sourcegraph Kubernetes native Executors on Kubernetes
