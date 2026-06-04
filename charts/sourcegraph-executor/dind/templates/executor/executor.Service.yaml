@@ -1,4 +1,35 @@
-{{- if .Values.executor.enabled -}}
+{{- if .Values.queues }}
+{{- range .Values.queues }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+    {{- if $.Values.executor.serviceAnnotations }}
+    {{- toYaml $.Values.executor.serviceAnnotations | nindent 4 }}
+    {{- end }}
+  labels:
+    {{- if $.Values.executor.serviceLabels }}
+    {{- toYaml $.Values.executor.serviceLabels | nindent 4 }}
+    {{- end }}
+    app: executor-{{ .name }}
+    deploy: sourcegraph
+    sourcegraph-resource-requires: no-cluster-admin
+    app.kubernetes.io/component: executor
+  name: executor-{{ .name }}
+spec:
+  ports:
+    - name: http-debug
+      port: 6060
+      targetPort: http-debug
+  selector:
+    {{- include "sourcegraph.selectorLabels" $ | nindent 4 }}
+    app: executor-{{ .name }}
+  type: {{ $.Values.executor.serviceType | default "ClusterIP" }}
+{{- end }}
+{{- else if .Values.executor.enabled }}
 apiVersion: v1
 kind: Service
 metadata:

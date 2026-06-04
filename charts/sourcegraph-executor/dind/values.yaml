@@ -54,8 +54,40 @@ storageClass:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: {}
 
+# -- Optional list of queues to deploy as standalone Deployments.
+# When set, the single executor Deployment is not rendered.
+# Each entry supports: name (required), replicaCount, resources, env (merged with executor.env, queue overrides).
+queues: []
+# - name: codeintel
+#   replicaCount: 2
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: 4Gi
+#     limits:
+#       cpu: "4"
+#       memory: 8Gi
+#   env:
+#     EXECUTOR_QUEUE_NAME:
+#       value: codeintel
+# - name: batches
+#   replicaCount: 1
+#   resources:
+#     requests:
+#       cpu: "1"
+#       memory: 2Gi
+#     limits:
+#       cpu: "2"
+#       memory: 4Gi
+#   env:
+#     EXECUTOR_QUEUE_NAME:
+#       value: batches
+
 executor:
   enabled: true
+  # -- Resource requests and limits for the executor container.
+  # Each queue can override this with its own resources field.
+  resources: {}
   image:
     defaultTag: 6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508
     name: "executor"
@@ -86,6 +118,6 @@ privateDockerRegistry:
   enabled: true
   image:
     registry: index.docker.io
-    repository: docker/regisry
-    tag: 2
+    repository: registry
+    tag: 3
   storageSize: 10Gi
