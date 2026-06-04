@@ -99,11 +99,7 @@ executor:
   log:
     # -- Possible values are dbug, info, warn, eror, crit.
     level: "warn"
-    format: "condensed"
-  # -- For local deployments the host is 'host.docker.internal' and this needs to be true.
-  dockerAddHostGateway: "false"
-  debug:
-    keepWorkspaces: "false"
+    format: "json"
   # -- Resource requests and limits for the executor container.
   # Each queue can override this with its own resources field.
   resources: {}
@@ -124,6 +120,7 @@ dind:
     repository: docker
     tag: 20.10.22-dind
   # -- Docker daemon configuration passed as daemon.json to the dind sidecar.
+  # Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux
   daemonConfig:
     insecure-registries:
       - private-docker-registry:5000
