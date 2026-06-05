@@ -248,13 +248,35 @@ spec:
           image: "{{ $r.Values.dind.image.registry }}/{{ $r.Values.dind.image.repository }}:{{ $r.Values.dind.image.tag }}"
           imagePullPolicy: {{ $r.Values.sourcegraph.image.pullPolicy }}
           securityContext:
+            {{- if $r.Values.dind.gVisor.enabled }}
+            capabilities:
+              add:
+                - NET_ADMIN
+                - SYS_ADMIN
+                - AUDIT_WRITE
+                - CHOWN
+                - DAC_OVERRIDE
+                - FOWNER
+                - FSETID
+                - KILL
+                - MKNOD
+                - NET_BIND_SERVICE
+                - NET_RAW
+                - SETFCAP
+                - SETGID
+                - SETPCAP
+                - SETUID
+                - SYS_CHROOT
+                - SYS_PTRACE
+            {{- else }}
             privileged: true
+            {{- end }}
           command:
             - dockerd
             - --tls=false
             - --mtu=1200
             - --registry-mirror=http://private-docker-registry:5000
-            - --host=tcp://0.0.0.0:2375
+            - --host=tcp://127.0.0.1:2375
           livenessProbe:
             tcpSocket:
               port: 2375
@@ -283,6 +305,9 @@ spec:
               subPath: daemon.json
               name: docker-config
       enableServiceLinks: false
+      {{- if $r.Values.dind.gVisor.enabled }}
+      runtimeClassName: gvisor
+      {{- end }}
       {{- with $r.Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
