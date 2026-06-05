@@ -271,8 +271,8 @@ spec:
             {{- else }}
             privileged: true
             {{- end }}
-          {{- if $r.Values.dind.gVisor.enabled }}
           command:
+            {{- if $r.Values.dind.gVisor.enabled }}
             - /bin/sh
             - -c
             - |
@@ -283,14 +283,13 @@ spec:
               iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
               iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
               exec dockerd --tls=false --mtu=1200 --registry-mirror=http://private-docker-registry:5000 --host=tcp://127.0.0.1:2375
-          {{- else }}
-          command:
+            {{- else }}
             - dockerd
             - --tls=false
             - --mtu=1200
             - --registry-mirror=http://private-docker-registry:5000
             - --host=tcp://127.0.0.1:2375
-          {{- end }}
+            {{- end }}
           livenessProbe:
             exec:
               command:
