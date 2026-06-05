@@ -54,31 +54,150 @@ storageClass:
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: {}
 
+# -- Optional list of queues to deploy as standalone Deployments.
+# When set, the single executor Deployment is not rendered.
+# Each entry supports:
+#   name        (required) — used as the deployment name suffix (executor-<name>)
+#   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted
+#   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set
+#   replicaCount, resources, env (merged with executor.env, queue overrides)
+queues: []
+# - name: codeintel
+#   queueName: codeintel
+#   replicaCount: 2
+#   resources:
+#     requests:
+#       cpu: "2"
+#       memory: 4Gi
+#     limits:
+#       cpu: "4"
+#       memory: 8Gi
+#   env: {}
+# - name: batches
+#   queueName: batches
+#   replicaCount: 1
+#   resources:
+#     requests:
+#       cpu: "1"
+#       memory: 2Gi
+#     limits:
+#       cpu: "2"
+#       memory: 4Gi
+#   env: {}
+
 executor:
-  enabled: true
+  # -- The external URL of the Sourcegraph instance. Required.
+  frontendUrl: ""
+  # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured.
+  frontendPassword: ""
+  # -- Name of existing k8s Secret to use for frontend password.
+  # The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value.
+  # frontendPassword is ignored if this is set.
+  frontendExistingSecret: ""
+  # -- The name of the queue to pull jobs from. Possible values: batches and codeintel. Either this or queueNames is required (when not using queues).
+  queueName: ""
+  # -- The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues).
+  queueNames: []
+  # -- The maximum amount of jobs that can be executed concurrently.
+  maximumNumJobs: 10
+  # -- The maximum wall time that can be spent on a single job.
+  maximumRuntimePerJob: "30m"
+  log:
+    # -- Possible values are dbug, info, warn, eror, crit.
+    level: "warn"
+    format: "json"
+  # -- Resource requests and limits for the executor container.
+  # Each queue can override this with its own resources field.
+  resources: {}
   image:
     defaultTag: 6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508
     name: "executor"
   replicaCount: 1
-  env:
-    # -- The external URL of the Sourcegraph instance. Required.
-    EXECUTOR_FRONTEND_URL:
-      value: ""
-    # -- The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required.
-    EXECUTOR_FRONTEND_PASSWORD:
-      value: ""
-    # -- The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAMES is required.**
-    EXECUTOR_QUEUE_NAME:
-      value: ""
-    # -- The comma-separated list of names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAME is required.**
-    EXECUTOR_QUEUE_NAMES:
-      value: ""
+  # -- Extra environment variables to set on the executor container.
+  env: {}
+  storage:
+    # -- Type of scratch volume for job workspaces. One of: emptyDir, ephemeral.
+    # emptyDir: plain emptyDir, no storage class required.
+    # ephemeral: per-pod PVC via the cluster default storage class; size is required.
+    type: emptyDir
+    # -- Size of the scratch volume.
+    # emptyDir: sets sizeLimit (optional, leave empty for unlimited).
+    # ephemeral: sets the PVC storage request (required).
+    size: ""
+    # -- StorageClass for the ephemeral volume. Only used when type is ephemeral.
+    # Defaults to the cluster default StorageClass when empty.
+    class: ""
 
 dind:
   image:
     registry: index.docker.io
     repository: docker
-    tag: 20.10.22-dind
+    tag: 29.5.3-dind
+  # -- Command for the dind container.
+  command:
+    - dockerd
+  # -- Docker daemon configuration passed as daemon.json to the dind sidecar.
+  # Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux
+  daemonConfig:
+    tls: false
+    mtu: 1200
+    hosts:
+      - tcp://127.0.0.1:2375
+    registry-mirrors:
+      - http://private-docker-registry:5000
+    insecure-registries:
+      - private-docker-registry:5000
+  gVisor:
+    # -- Enable gVisor sandbox (GKE only). Requires the GKE node pool to have sandbox type set to gvisor.
+    # When enabled, sets runtimeClassName: gvisor on executor pods and replaces privileged: true with
+    # explicit capabilities — these are intercepted in-sandbox and never granted to the host kernel.
+    # See: https://gvisor.dev/docs/tutorials/docker-in-gvisor/
+    enabled: false
+    # -- Extra daemon.json settings merged into dind.daemonConfig when gVisor is enabled.
+    # These defaults configure Docker to work within gVisor's kernel constraints.
+    daemonConfig:
+      storage-driver: vfs
+      iptables: false
+      ip6tables: false
+      features:
+        containerd-snapshotter: false
+    # -- securityContext for the dind container when gVisor is enabled.
+    # Replaces privileged: true — gVisor intercepts these capabilities in-sandbox and never
+    # grants them to the host kernel.
+    securityContext:
+      capabilities:
+        add:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - AUDIT_WRITE
+          - CHOWN
+          - DAC_OVERRIDE
+          - FOWNER
+          - FSETID
+          - KILL
+          - MKNOD
+          - NET_BIND_SERVICE
+          - NET_RAW
+          - SETFCAP
+          - SETGID
+          - SETPCAP
+          - SETUID
+          - SYS_CHROOT
+          - SYS_PTRACE
+    # -- Command for the dind container when gVisor is enabled.
+    # Overrides dind.command. Prepares the network environment that gVisor does not
+    # initialise automatically before handing off to dockerd.
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip link del docker0 2>/dev/null || true
+        echo 1 > /proc/sys/net/ipv4/ip_forward
+        dev=$(ip route show default | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
+        addr=$(ip addr show dev "$dev" | awk '/inet /{gsub(/\/.*/, "", $2); print $2; exit}')
+        iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
+        iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
+        exec dockerd
 
 privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
@@ -86,6 +205,6 @@ privateDockerRegistry:
   enabled: true
   image:
     registry: index.docker.io
-    repository: docker/regisry
-    tag: 2
+    repository: registry
+    tag: 3
   storageSize: 10Gi
