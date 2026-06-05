@@ -56,9 +56,14 @@ storageClass:
 
 # -- Optional list of queues to deploy as standalone Deployments.
 # When set, the single executor Deployment is not rendered.
-# Each entry supports: name (required, automatically used as EXECUTOR_QUEUE_NAME), replicaCount, resources, env (merged with executor.env, queue overrides).
+# Each entry supports:
+#   name        (required) — used as the deployment name suffix (executor-<name>)
+#   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted
+#   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set
+#   replicaCount, resources, env (merged with executor.env, queue overrides)
 queues: []
 # - name: codeintel
+#   queueName: codeintel
 #   replicaCount: 2
 #   resources:
 #     requests:
@@ -69,6 +74,7 @@ queues: []
 #       memory: 8Gi
 #   env: {}
 # - name: batches
+#   queueName: batches
 #   replicaCount: 1
 #   resources:
 #     requests:

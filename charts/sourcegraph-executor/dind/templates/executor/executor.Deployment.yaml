@@ -6,8 +6,8 @@
 {{ include "executor.deployment" (dict
     "root"        $
     "name"        (printf "executor-%s" .name)
-    "queueName"   .name
-    "queueNames"  (list)
+    "queueName"   (.queueName | default .name)
+    "queueNames"  (.queueNames | default (list))
     "replicaCount" (.replicaCount | default $.Values.executor.replicaCount)
     "resources"   (.resources | default $.Values.executor.resources)
     "env"         (mergeOverwrite (deepCopy $.Values.executor.env) (.env | default dict))

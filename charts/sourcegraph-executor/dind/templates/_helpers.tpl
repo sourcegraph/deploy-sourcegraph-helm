@@ -206,11 +206,12 @@ spec:
               {{- else }}
               value: {{ $r.Values.executor.frontendPassword | quote }}
               {{- end }}
-            - name: EXECUTOR_QUEUE_NAME
-              value: {{ .queueName | quote }}
             {{- if .queueNames }}
             - name: EXECUTOR_QUEUE_NAMES
               value: {{ join "," .queueNames | quote }}
+            {{- else }}
+            - name: EXECUTOR_QUEUE_NAME
+              value: {{ .queueName | quote }}
             {{- end }}
             - name: SRC_LOG_LEVEL
               value: {{ $r.Values.executor.log.level | quote }}
