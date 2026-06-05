@@ -58,9 +58,12 @@ In addition to the documented values, the `executor` and `private-docker-registr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| dind.command | list | `["dockerd"]` | Command for the dind container. |
 | dind.daemonConfig | object | `{"hosts":["tcp://127.0.0.1:2375"],"insecure-registries":["private-docker-registry:5000"],"mtu":1200,"registry-mirrors":["http://private-docker-registry:5000"],"tls":false}` | Docker daemon configuration passed as daemon.json to the dind sidecar. Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux |
+| dind.gVisor.command | list | `["/bin/sh","-c","ip link del docker0 2>/dev/null || true\necho 1 > /proc/sys/net/ipv4/ip_forward\ndev=$(ip route show default | awk '{for(i=1;i<=NF;i++) if($i==\"dev\"){print $(i+1); exit}}')\naddr=$(ip addr show dev \"$dev\" | awk '/inet /{gsub(/\\/.*/, \"\", $2); print $2; exit}')\niptables-legacy -t nat -A POSTROUTING -o \"$dev\" -j SNAT --to-source \"$addr\" -p tcp || true\niptables-legacy -t nat -A POSTROUTING -o \"$dev\" -j SNAT --to-source \"$addr\" -p udp || true\nexec dockerd\n"]` | Command for the dind container when gVisor is enabled. Overrides dind.command. Prepares the network environment that gVisor does not initialise automatically before handing off to dockerd. |
 | dind.gVisor.daemonConfig | object | `{"features":{"containerd-snapshotter":false},"ip6tables":false,"iptables":false,"storage-driver":"vfs"}` | Extra daemon.json settings merged into dind.daemonConfig when gVisor is enabled. These defaults configure Docker to work within gVisor's kernel constraints. |
 | dind.gVisor.enabled | bool | `false` | Enable gVisor sandbox (GKE only). Requires the GKE node pool to have sandbox type set to gvisor. When enabled, sets runtimeClassName: gvisor on executor pods and replaces privileged: true with explicit capabilities — these are intercepted in-sandbox and never granted to the host kernel. See: https://gvisor.dev/docs/tutorials/docker-in-gvisor/ |
+| dind.gVisor.securityContext | object | `{"capabilities":{"add":["NET_ADMIN","SYS_ADMIN","AUDIT_WRITE","CHOWN","DAC_OVERRIDE","FOWNER","FSETID","KILL","MKNOD","NET_BIND_SERVICE","NET_RAW","SETFCAP","SETGID","SETPCAP","SETUID","SYS_CHROOT","SYS_PTRACE"]}}` | securityContext for the dind container when gVisor is enabled. Replaces privileged: true — gVisor intercepts these capabilities in-sandbox and never grants them to the host kernel. |
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"29.5.3-dind"` |  |
@@ -78,6 +81,9 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues). |
 | executor.replicaCount | int | `1` |  |
 | executor.resources | object | `{}` | Resource requests and limits for the executor container. Each queue can override this with its own resources field. |
+| executor.storage.class | string | `""` | StorageClass for the ephemeral volume. Only used when type is ephemeral. Defaults to the cluster default StorageClass when empty. |
+| executor.storage.size | string | `""` | Size of the scratch volume. emptyDir: sets sizeLimit (optional, leave empty for unlimited). ephemeral: sets the PVC storage request (required). |
+| executor.storage.type | string | `"emptyDir"` | Type of scratch volume for job workspaces. One of: emptyDir, ephemeral. emptyDir: plain emptyDir, no storage class required. ephemeral: per-pod PVC via the cluster default storage class; size is required. |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
 | privateDockerRegistry.image.repository | string | `"registry"` |  |

@@ -119,6 +119,18 @@ executor:
   # EXECUTOR_MAXIMUM_NUM_JOBS, EXECUTOR_MAXIMUM_RUNTIME_PER_JOB,
   # EXECUTOR_DOCKER_ADD_HOST_GATEWAY, EXECUTOR_KEEP_WORKSPACES).
   env: {}
+  storage:
+    # -- Type of scratch volume for job workspaces. One of: emptyDir, ephemeral.
+    # emptyDir: plain emptyDir, no storage class required.
+    # ephemeral: per-pod PVC via the cluster default storage class; size is required.
+    type: emptyDir
+    # -- Size of the scratch volume.
+    # emptyDir: sets sizeLimit (optional, leave empty for unlimited).
+    # ephemeral: sets the PVC storage request (required).
+    size: ""
+    # -- StorageClass for the ephemeral volume. Only used when type is ephemeral.
+    # Defaults to the cluster default StorageClass when empty.
+    class: ""
 
 dind:
   image:

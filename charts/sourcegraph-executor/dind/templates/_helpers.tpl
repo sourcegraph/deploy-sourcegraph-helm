@@ -330,7 +330,23 @@ spec:
       {{- end }}
       volumes:
         - name: executor-scratch
-          emptyDir: {}
+          {{- if eq $r.Values.executor.storage.type "ephemeral" }}
+          ephemeral:
+            volumeClaimTemplate:
+              spec:
+                accessModes: ["ReadWriteOnce"]
+                {{- if $r.Values.executor.storage.class }}
+                storageClassName: {{ $r.Values.executor.storage.class }}
+                {{- end }}
+                resources:
+                  requests:
+                    storage: {{ required "executor.storage.size is required when storage.type is ephemeral" $r.Values.executor.storage.size }}
+          {{- else }}
+          emptyDir:
+            {{- if $r.Values.executor.storage.size }}
+            sizeLimit: {{ $r.Values.executor.storage.size }}
+            {{- end }}
+          {{- end }}
         - name: docker-config
           configMap:
             defaultMode: 420

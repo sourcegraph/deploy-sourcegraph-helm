@@ -9,6 +9,10 @@ executor:
   queueNames: ["batches", "codeintel"]
   log:
     format: "json_gcp"
+  storage:
+    type: ephemeral
+    size: 50Gi
+    class: premium-rwo
 
 dind:
   # enable gVisor to run executor instances on GKE Sandbox
