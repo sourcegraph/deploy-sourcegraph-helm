@@ -1,6 +1,6 @@
 {{- if .Values.privateDockerRegistry.enabled -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: private-docker-registry
   labels:
@@ -11,13 +11,14 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: private-docker-registry
 spec:
-  replicas: {{ .Values.privateDockerRegistry.replicaCount }}
+  replicas: 1
+  serviceName: private-docker-registry
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: private-docker-registry
-  strategy:
-    type: Recreate
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       annotations:
@@ -83,8 +84,17 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: cache
-          persistentVolumeClaim:
-            claimName: private-docker-registry
+  volumeClaimTemplates:
+    - metadata:
+        name: cache
+        labels:
+          deploy: sourcegraph
+          app.kubernetes.io/component: private-docker-registry
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.privateDockerRegistry.storageSize }}
+        storageClassName: {{ .Values.storageClass.name }}
 {{- end }}
