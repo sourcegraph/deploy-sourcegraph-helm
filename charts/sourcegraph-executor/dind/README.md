@@ -67,7 +67,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"29.5.3-dind"` |  |
-| executor.env | object | `{}` | Extra environment variables to set on the executor container. Must NOT contain managed env vars (EXECUTOR_FRONTEND_URL, EXECUTOR_FRONTEND_PASSWORD, EXECUTOR_QUEUE_NAME, EXECUTOR_QUEUE_NAMES, SRC_LOG_LEVEL, SRC_LOG_FORMAT, EXECUTOR_MAXIMUM_NUM_JOBS, EXECUTOR_MAXIMUM_RUNTIME_PER_JOB, EXECUTOR_DOCKER_ADD_HOST_GATEWAY, EXECUTOR_KEEP_WORKSPACES). |
+| executor.env | object | `{}` | Extra environment variables to set on the executor container. |
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password. The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value. frontendPassword is ignored if this is set. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. |
