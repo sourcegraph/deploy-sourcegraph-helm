@@ -5,7 +5,13 @@
 
 # Sourcegraph Executor Helm Chart
 
-This chart contains two deployments, Sourcegraph Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy executors
+This chart contains two deployments, Sourcegraph Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy executors.
+
+> ⚠️ **Beta:** Docker-in-Docker Kubernetes executors are not recommended for production use.
+> This method requires privileged access to a container runtime daemon. For production workloads,
+> consider deploying via
+> [Terraform](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-terraform) or
+> [binary](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-binary).
 
 Use cases:
 
