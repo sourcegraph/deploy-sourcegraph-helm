@@ -271,26 +271,36 @@ spec:
             {{- else }}
             privileged: true
             {{- end }}
+          {{- if $r.Values.dind.gVisor.enabled }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              ip link del docker0 2>/dev/null || true
+              echo 1 > /proc/sys/net/ipv4/ip_forward
+              dev=$(ip route show default | sed 's/.*\sdev\s\(\S*\)\s.*$/\1/')
+              addr=$(ip addr show dev "$dev" | grep -w inet | sed 's/^\s*inet\s\(\S*\)\/.*$/\1/')
+              iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
+              iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
+              exec dockerd --tls=false --mtu=1200 --registry-mirror=http://private-docker-registry:5000 --host=tcp://127.0.0.1:2375 --storage-driver=vfs --feature containerd-snapshotter=false --iptables=false --ip6tables=false
+          {{- else }}
           command:
             - dockerd
             - --tls=false
             - --mtu=1200
             - --registry-mirror=http://private-docker-registry:5000
             - --host=tcp://127.0.0.1:2375
-            {{- if $r.Values.dind.gVisor.enabled }}
-            - --storage-driver=vfs
-            - --iptables=false
-            {{- end }}
+          {{- end }}
           livenessProbe:
             tcpSocket:
               port: 2375
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 5
           readinessProbe:
             tcpSocket:
               port: 2375
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 5
             failureThreshold: 5
           env:
@@ -308,6 +318,10 @@ spec:
             - mountPath: /etc/docker/daemon.json
               subPath: daemon.json
               name: docker-config
+            {{- if $r.Values.dind.gVisor.enabled }}
+            - mountPath: /var/lib/docker
+              name: docker
+            {{- end }}
       enableServiceLinks: false
       {{- if $r.Values.dind.gVisor.enabled }}
       runtimeClassName: gvisor
@@ -336,6 +350,10 @@ spec:
           configMap:
             defaultMode: 420
             name: docker-config
+        {{- if $r.Values.dind.gVisor.enabled }}
+        - name: docker
+          emptyDir: {}
+        {{- end }}
 {{- end }}
 
 {{/*

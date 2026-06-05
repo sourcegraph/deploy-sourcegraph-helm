@@ -124,7 +124,7 @@ dind:
   image:
     registry: index.docker.io
     repository: docker
-    tag: 20.10.22-dind
+    tag: 29.5.3-dind
   # -- Docker daemon configuration passed as daemon.json to the dind sidecar.
   # Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux
   daemonConfig:
