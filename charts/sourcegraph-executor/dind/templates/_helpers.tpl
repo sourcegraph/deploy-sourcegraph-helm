@@ -292,14 +292,22 @@ spec:
             - --host=tcp://127.0.0.1:2375
           {{- end }}
           livenessProbe:
-            tcpSocket:
-              port: 2375
+            exec:
+              command:
+                - docker
+                - -H
+                - tcp://127.0.0.1:2375
+                - version
             initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 5
           readinessProbe:
-            tcpSocket:
-              port: 2375
+            exec:
+              command:
+                - docker
+                - -H
+                - tcp://127.0.0.1:2375
+                - version
             initialDelaySeconds: 20
             periodSeconds: 5
             failureThreshold: 5
