@@ -1,149 +1,28 @@
-{{- if .Values.executor.enabled -}}
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  annotations:
-    description: Runs sourcegraph executors
-    kubectl.kubernetes.io/default-container: executor
-  labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.executor.labels }}
-      {{- toYaml .Values.executor.labels | nindent 4 }}
-    {{- end }}
-    {{- include "executor.labels" . | nindent 4 }}
-spec:
-  selector:
-    matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
-      app: {{ include "executor.name" . }}
-  minReadySeconds: 10
-  replicas: {{ .Values.executor.replicaCount }}
-  revisionHistoryLimit: 10
-  strategy:
-    rollingUpdate:
-      maxSurge: 1
-      maxUnavailable: 1
-    type: RollingUpdate
-  template:
-    metadata:
-      annotations:
-        kubectl.kubernetes.io/default-container: executor
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.executor.podAnnotations }}
-      {{- toYaml .Values.executor.podAnnotations | nindent 8 }}
-      {{- end }}
-      labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.executor.podLabels }}
-      {{- toYaml .Values.executor.podLabels | nindent 8 }}
-      {{- end }}
-        {{- include "executor.labels" . | nindent 8 }}
-    spec:
-      containers:
-        - name: executor
-          image: {{ include "sourcegraph.image" (list . "executor") }}
-          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: http-debug
-              scheme: HTTP
-            initialDelaySeconds: 60
-            timeoutSeconds: 5
-          readinessProbe:
-            httpGet:
-              path: /ready
-              port: http-debug
-              scheme: HTTP
-            periodSeconds: 5
-            timeoutSeconds: 5
-          ports:
-            - name: http-debug
-              containerPort: 6060
-          terminationMessagePolicy: FallbackToLogsOnError
-          env:
-            {{- range $name, $item := .Values.executor.env }}
-            - name: {{ $name }}
-              {{- $item | toYaml | nindent 14 }}
-            {{- end }}
-            - name: EXECUTOR_USE_FIRECRACKER
-              value: "false"
-            - name: EXECUTOR_JOB_NUM_CPUS
-              value: "0"
-            - name: EXECUTOR_JOB_MEMORY
-              value: "0"
-            - name: DOCKER_HOST
-              value: tcp://localhost:2375
-            - name: TMPDIR
-              value: /scratch
-          volumeMounts:
-            - mountPath: /scratch
-              name: executor-scratch
-        - name: dind
-          image: "{{ .Values.dind.image.registry}}/{{ .Values.dind.image.repository}}:{{ .Values.dind.image.tag}}"
-          imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-          securityContext:
-            privileged: true
-          command:
-            - 'dockerd'
-            - '--tls=false'
-            - '--mtu=1200'
-            - '--registry-mirror=http://executor:5000'
-            - '--host=tcp://0.0.0.0:2375'
-          livenessProbe:
-            tcpSocket:
-              port: 2375
-            initialDelaySeconds: 5
-            periodSeconds: 5
-            failureThreshold: 5
-          readinessProbe:
-            tcpSocket:
-              port: 2375
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 5
-          env:
-            - name: POD_NAME
-              valueFrom:
-                fieldRef:
-                  apiVersion: v1
-                  fieldPath: metadata.name
-          ports:
-            - containerPort: 2375
-              protocol: TCP
-          volumeMounts:
-            - mountPath: /scratch
-              name: executor-scratch
-            - mountPath: /etc/docker/daemon.json
-              subPath: daemon.json
-              name: docker-config
-      {{- with .Values.sourcegraph.nodeSelector }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
-      affinity:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with include "sourcegraph.priorityClassName" (list . "executor") | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
-      tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.sourcegraph.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      volumes:
-        - name: executor-scratch
-          emptyDir: {}
-        - name: docker-config
-          configMap:
-            defaultMode: 420
-            name: docker-config
+{{- if .Values.queues }}
+{{- range .Values.queues }}
+{{- include "executor.validateEnv" (list $.Values.executor.env "executor.env") }}
+{{- include "executor.validateEnv" (list (.env | default dict) (printf "queues[%s].env" .name)) }}
+---
+{{ include "executor.deployment" (dict
+    "root"        $
+    "name"        (printf "executor-%s" .name)
+    "queueName"   (.queueName | default .name)
+    "queueNames"  (.queueNames | default (list))
+    "replicaCount" (.replicaCount | default $.Values.executor.replicaCount)
+    "resources"   (.resources | default $.Values.executor.resources)
+    "env"         (mergeOverwrite (deepCopy $.Values.executor.env) (.env | default dict))
+) }}
+{{- end }}
+{{- else }}
+{{- include "executor.validateEnv" (list .Values.executor.env "executor.env") }}
+---
+{{ include "executor.deployment" (dict
+    "root"        .
+    "name"        (include "executor.name" .)
+    "queueName"   .Values.executor.queueName
+    "queueNames"  .Values.executor.queueNames
+    "replicaCount" .Values.executor.replicaCount
+    "resources"   .Values.executor.resources
+    "env"         .Values.executor.env
+) }}
 {{- end }}

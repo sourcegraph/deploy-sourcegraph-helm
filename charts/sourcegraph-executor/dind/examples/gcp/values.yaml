@@ -1,0 +1,21 @@
+storageClass:
+  create: false
+  name: standard-rwo
+
+executor:
+  replicaCount: 4
+  frontendUrl: "http://<sourcegraph-frontend-url>"
+  frontendPassword: "<redacted>"
+  queueNames: ["batches", "codeintel"]
+  log:
+    format: "json_gcp"
+  storage:
+    type: ephemeral
+    size: 50Gi
+    class: premium-rwo
+
+dind:
+  # enable gVisor to run executor instances on GKE Sandbox
+  # for security hardening.
+  gVisor:
+    enabled: true
