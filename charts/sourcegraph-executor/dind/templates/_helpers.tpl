@@ -276,13 +276,18 @@ spec:
             - /bin/sh
             - -c
             - |
-              ip link del docker0 2>/dev/null || true
-              ip link add name docker0 type bridge 2>/dev/null || true
-              ip addr add 172.17.0.1/16 dev docker0 2>/dev/null || true
-              ip link set docker0 up 2>/dev/null || true
+              set -x
+              ip link del docker0 || true
+              ip link show 2>&1
+              ip link add name docker0 type bridge || true
+              ip link show docker0 2>&1
+              ip addr add 172.17.0.1/16 dev docker0 || true
+              ip link set docker0 up || true
               echo 1 > /proc/sys/net/ipv4/ip_forward
               dev=$(ip route show default | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
+              echo "dev=$dev"
               addr=$(ip addr show dev "$dev" | awk '/inet /{gsub(/\/.*/, "", $2); print $2; exit}')
+              echo "addr=$addr"
               iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
               iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
               exec dockerd --tls=false --mtu=1200 --registry-mirror=http://private-docker-registry:5000 --host=tcp://127.0.0.1:2375 --storage-driver=vfs --feature containerd-snapshotter=false --iptables=false --ip6tables=false
