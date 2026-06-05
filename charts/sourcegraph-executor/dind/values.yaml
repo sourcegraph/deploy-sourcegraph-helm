@@ -128,6 +128,12 @@ dind:
   # -- Docker daemon configuration passed as daemon.json to the dind sidecar.
   # Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux
   daemonConfig:
+    tls: false
+    mtu: 1200
+    hosts:
+      - tcp://127.0.0.1:2375
+    registry-mirrors:
+      - http://private-docker-registry:5000
     insecure-registries:
       - private-docker-registry:5000
   gVisor:
