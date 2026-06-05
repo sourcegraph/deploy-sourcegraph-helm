@@ -258,25 +258,7 @@ spec:
           imagePullPolicy: {{ $r.Values.sourcegraph.image.pullPolicy }}
           securityContext:
             {{- if $r.Values.dind.gVisor.enabled }}
-            capabilities:
-              add:
-                - NET_ADMIN
-                - SYS_ADMIN
-                - AUDIT_WRITE
-                - CHOWN
-                - DAC_OVERRIDE
-                - FOWNER
-                - FSETID
-                - KILL
-                - MKNOD
-                - NET_BIND_SERVICE
-                - NET_RAW
-                - SETFCAP
-                - SETGID
-                - SETPCAP
-                - SETUID
-                - SYS_CHROOT
-                - SYS_PTRACE
+            {{- toYaml $r.Values.dind.gVisor.securityContext | nindent 12 }}
             {{- else }}
             privileged: true
             {{- end }}
@@ -285,12 +267,7 @@ spec:
             - /bin/sh
             - -c
             - |
-              ip link del docker0 2>/dev/null || true
-              echo 1 > /proc/sys/net/ipv4/ip_forward
-              dev=$(ip route show default | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
-              addr=$(ip addr show dev "$dev" | awk '/inet /{gsub(/\/.*/, "", $2); print $2; exit}')
-              iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
-              iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
+              {{- $r.Values.dind.gVisor.setupScript | trim | nindent 14 }}
               exec dockerd
             {{- else }}
             - dockerd
