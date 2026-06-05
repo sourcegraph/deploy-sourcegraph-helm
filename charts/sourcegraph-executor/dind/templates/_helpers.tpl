@@ -114,6 +114,14 @@ sourcegraph-resource-requires: no-cluster-admin
 app.kubernetes.io/component: executor
 {{- end}}
 
+{{- define "dind.daemonConfig" -}}
+{{- $config := .Values.dind.daemonConfig | deepCopy }}
+{{- if .Values.dind.gVisor.enabled }}
+{{- $config = mergeOverwrite $config .Values.dind.gVisor.daemonConfig }}
+{{- end }}
+{{- $config | toPrettyJson }}
+{{- end }}
+
 {{/*
 Render a single executor Deployment.
 Usage: include "executor.deployment" (dict "root" $ "name" "executor-foo" "queueName" "foo" "queueNames" (list) "replicaCount" 1 "resources" $res "env" $env)
@@ -153,6 +161,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: executor
+        checksum/docker-config: {{ include "dind.daemonConfig" $r | sha256sum }}
       {{- if $r.Values.sourcegraph.podAnnotations }}
       {{- toYaml $r.Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
