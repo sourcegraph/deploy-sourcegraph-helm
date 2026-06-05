@@ -58,10 +58,12 @@ In addition to the documented values, the `executor` and `private-docker-registr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| dind.daemonConfig | object | `{"insecure-registries":["private-docker-registry:5000"]}` | Docker daemon configuration passed as daemon.json to the dind sidecar. Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux |
+| dind.daemonConfig | object | `{"hosts":["tcp://127.0.0.1:2375"],"insecure-registries":["private-docker-registry:5000"],"mtu":1200,"registry-mirrors":["http://private-docker-registry:5000"],"tls":false}` | Docker daemon configuration passed as daemon.json to the dind sidecar. Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux |
+| dind.gVisor.daemonConfig | object | `{"features":{"containerd-snapshotter":false},"ip6tables":false,"iptables":false,"storage-driver":"vfs"}` | Extra daemon.json settings merged into dind.daemonConfig when gVisor is enabled. These defaults configure Docker to work within gVisor's kernel constraints. |
+| dind.gVisor.enabled | bool | `false` | Enable gVisor sandbox (GKE only). Requires the GKE node pool to have sandbox type set to gvisor. When enabled, sets runtimeClassName: gvisor on executor pods and replaces privileged: true with explicit capabilities — these are intercepted in-sandbox and never granted to the host kernel. See: https://gvisor.dev/docs/tutorials/docker-in-gvisor/ |
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
-| dind.image.tag | string | `"20.10.22-dind"` |  |
+| dind.image.tag | string | `"29.5.3-dind"` |  |
 | executor.env | object | `{}` | Extra environment variables to set on the executor container. Must NOT contain managed env vars (EXECUTOR_FRONTEND_URL, EXECUTOR_FRONTEND_PASSWORD, EXECUTOR_QUEUE_NAME, EXECUTOR_QUEUE_NAMES, SRC_LOG_LEVEL, SRC_LOG_FORMAT, EXECUTOR_MAXIMUM_NUM_JOBS, EXECUTOR_MAXIMUM_RUNTIME_PER_JOB, EXECUTOR_DOCKER_ADD_HOST_GATEWAY, EXECUTOR_KEEP_WORKSPACES). |
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password. The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value. frontendPassword is ignored if this is set. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured. |
