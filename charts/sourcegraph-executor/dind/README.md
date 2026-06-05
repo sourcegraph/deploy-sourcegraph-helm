@@ -58,16 +58,22 @@ In addition to the documented values, the `executor` and `private-docker-registr
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| dind.daemonConfig | object | `{"insecure-registries":["private-docker-registry:5000"]}` | Docker daemon configuration passed as daemon.json to the dind sidecar. Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux |
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"20.10.22-dind"` |  |
-| executor.enabled | bool | `true` |  |
-| executor.env.EXECUTOR_FRONTEND_PASSWORD | object | `{"value":""}` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required. |
-| executor.env.EXECUTOR_FRONTEND_URL | object | `{"value":""}` | The external URL of the Sourcegraph instance. Required. |
-| executor.env.EXECUTOR_QUEUE_NAME | object | `{"value":""}` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAMES is required.** |
-| executor.env.EXECUTOR_QUEUE_NAMES | object | `{"value":""}` | The comma-separated list of names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or EXECUTOR_QUEUE_NAME is required.** |
+| executor.env | object | `{}` | Extra environment variables to set on the executor container. Must NOT contain managed env vars (EXECUTOR_FRONTEND_URL, EXECUTOR_FRONTEND_PASSWORD, EXECUTOR_QUEUE_NAME, EXECUTOR_QUEUE_NAMES, SRC_LOG_LEVEL, SRC_LOG_FORMAT, EXECUTOR_MAXIMUM_NUM_JOBS, EXECUTOR_MAXIMUM_RUNTIME_PER_JOB, EXECUTOR_DOCKER_ADD_HOST_GATEWAY, EXECUTOR_KEEP_WORKSPACES). |
+| executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password. The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value. frontendPassword is ignored if this is set. |
+| executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured. |
+| executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. |
 | executor.image.defaultTag | string | `"6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508"` |  |
 | executor.image.name | string | `"executor"` |  |
+| executor.log.format | string | `"json"` |  |
+| executor.log.level | string | `"warn"` | Possible values are dbug, info, warn, eror, crit. |
+| executor.maximumNumJobs | int | `10` | The maximum amount of jobs that can be executed concurrently. |
+| executor.maximumRuntimePerJob | string | `"30m"` | The maximum wall time that can be spent on a single job. |
+| executor.queueName | string | `""` | The name of the queue to pull jobs from. Possible values: batches and codeintel. Either this or queueNames is required (when not using queues). |
+| executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues). |
 | executor.replicaCount | int | `1` |  |
 | executor.resources | object | `{}` | Resource requests and limits for the executor container. Each queue can override this with its own resources field. |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries |
@@ -75,7 +81,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | privateDockerRegistry.image.repository | string | `"registry"` |  |
 | privateDockerRegistry.image.tag | int | `3` |  |
 | privateDockerRegistry.storageSize | string | `"10Gi"` |  |
-| queues | list | `[]` | Optional list of queues to deploy as standalone Deployments. When set, the single executor Deployment is not rendered. Each entry supports: name (required), replicaCount, resources, env (merged with executor.env, queue overrides). |
+| queues | list | `[]` | Optional list of queues to deploy as standalone Deployments. When set, the single executor Deployment is not rendered. Each entry supports:   name        (required) — used as the deployment name suffix (executor-<name>)   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set   replicaCount, resources, env (merged with executor.env, queue overrides) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
