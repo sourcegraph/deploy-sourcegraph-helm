@@ -125,6 +125,9 @@ dind:
     registry: index.docker.io
     repository: docker
     tag: 29.5.3-dind
+  # -- Command for the dind container.
+  command:
+    - dockerd
   # -- Docker daemon configuration passed as daemon.json to the dind sidecar.
   # Learn more from: https://docs.docker.com/reference/cli/dockerd/#on-linux
   daemonConfig:
@@ -173,15 +176,20 @@ dind:
           - SETUID
           - SYS_CHROOT
           - SYS_PTRACE
-    # -- Shell script run before dockerd on gVisor nodes.
-    # Prepares the network environment that gVisor does not initialise automatically.
-    setupScript: |
-      ip link del docker0 2>/dev/null || true
-      echo 1 > /proc/sys/net/ipv4/ip_forward
-      dev=$(ip route show default | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
-      addr=$(ip addr show dev "$dev" | awk '/inet /{gsub(/\/.*/, "", $2); print $2; exit}')
-      iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
-      iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
+    # -- Command for the dind container when gVisor is enabled.
+    # Overrides dind.command. Prepares the network environment that gVisor does not
+    # initialise automatically before handing off to dockerd.
+    command:
+      - /bin/sh
+      - -c
+      - |
+        ip link del docker0 2>/dev/null || true
+        echo 1 > /proc/sys/net/ipv4/ip_forward
+        dev=$(ip route show default | awk '{for(i=1;i<=NF;i++) if($i=="dev"){print $(i+1); exit}}')
+        addr=$(ip addr show dev "$dev" | awk '/inet /{gsub(/\/.*/, "", $2); print $2; exit}')
+        iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p tcp || true
+        iptables-legacy -t nat -A POSTROUTING -o "$dev" -j SNAT --to-source "$addr" -p udp || true
+        exec dockerd
 
 privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.

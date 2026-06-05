@@ -264,13 +264,9 @@ spec:
             {{- end }}
           command:
             {{- if $r.Values.dind.gVisor.enabled }}
-            - /bin/sh
-            - -c
-            - |
-              {{- $r.Values.dind.gVisor.setupScript | trim | nindent 14 }}
-              exec dockerd
+            {{- toYaml $r.Values.dind.gVisor.command | nindent 12 }}
             {{- else }}
-            - dockerd
+            {{- toYaml $r.Values.dind.command | nindent 12 }}
             {{- end }}
           livenessProbe:
             exec:
