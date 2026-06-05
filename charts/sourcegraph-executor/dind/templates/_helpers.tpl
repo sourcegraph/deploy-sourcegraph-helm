@@ -271,20 +271,18 @@ spec:
           livenessProbe:
             exec:
               command:
-                - docker
-                - -H
-                - tcp://127.0.0.1:2375
-                - version
+                - wget
+                - -qO-
+                - http://127.0.0.1:2375/_ping
             initialDelaySeconds: 15
             periodSeconds: 5
             failureThreshold: 5
           readinessProbe:
             exec:
               command:
-                - docker
-                - -H
-                - tcp://127.0.0.1:2375
-                - version
+                - wget
+                - -qO-
+                - http://127.0.0.1:2375/_ping
             initialDelaySeconds: 20
             periodSeconds: 5
             failureThreshold: 5
