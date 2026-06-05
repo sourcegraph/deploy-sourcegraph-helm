@@ -279,6 +279,7 @@ spec:
             - --host=tcp://127.0.0.1:2375
             {{- if $r.Values.dind.gVisor.enabled }}
             - --storage-driver=vfs
+            - --iptables=false
             {{- end }}
           livenessProbe:
             tcpSocket:
