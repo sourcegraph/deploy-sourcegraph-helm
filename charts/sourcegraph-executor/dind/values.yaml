@@ -203,6 +203,8 @@ privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
   # More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries
   enabled: true
+  # -- Remote registry URL used by the private registry pull-through cache.
+  registryProxyRemoteUrl: https://registry-1.docker.io
   image:
     registry: index.docker.io
     repository: registry

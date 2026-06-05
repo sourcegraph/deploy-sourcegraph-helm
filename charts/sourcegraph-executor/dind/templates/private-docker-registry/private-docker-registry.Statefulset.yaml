@@ -46,7 +46,7 @@ spec:
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
             - name: REGISTRY_PROXY_REMOTEURL
-              value: http://registry-1.docker.io
+              value: {{ .Values.privateDockerRegistry.registryProxyRemoteUrl | quote }}
           ports:
             - name: http
               containerPort: 5000

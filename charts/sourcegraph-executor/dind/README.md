@@ -88,6 +88,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
 | privateDockerRegistry.image.repository | string | `"registry"` |  |
 | privateDockerRegistry.image.tag | int | `3` |  |
+| privateDockerRegistry.registryProxyRemoteUrl | string | `"https://registry-1.docker.io"` | Remote registry URL used by the private registry pull-through cache. |
 | privateDockerRegistry.storageSize | string | `"10Gi"` |  |
 | queues | list | `[]` | Optional list of queues to deploy as standalone Deployments. When set, the single executor Deployment is not rendered. Each entry supports:   name        (required) — used as the deployment name suffix (executor-<name>)   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set   replicaCount, resources, env (merged with executor.env, queue overrides) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
