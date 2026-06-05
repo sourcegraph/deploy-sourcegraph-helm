@@ -2,7 +2,8 @@
 {{- range .Values.queues }}
 {{- include "executor.validateEnv" (list $.Values.executor.env "executor.env") }}
 {{- include "executor.validateEnv" (list (.env | default dict) (printf "queues[%s].env" .name)) }}
-{{- include "executor.deployment" (dict
+---
+{{ include "executor.deployment" (dict
     "root"        $
     "name"        (printf "executor-%s" .name)
     "queueName"   .name
@@ -14,7 +15,8 @@
 {{- end }}
 {{- else }}
 {{- include "executor.validateEnv" (list .Values.executor.env "executor.env") }}
-{{- include "executor.deployment" (dict
+---
+{{ include "executor.deployment" (dict
     "root"        .
     "name"        (include "executor.name" .)
     "queueName"   .Values.executor.queueName

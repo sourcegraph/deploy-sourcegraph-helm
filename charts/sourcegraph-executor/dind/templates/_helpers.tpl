@@ -120,7 +120,6 @@ Usage: include "executor.deployment" (dict "root" $ "name" "executor-foo" "queue
 */}}
 {{- define "executor.deployment" -}}
 {{- $r := .root -}}
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
