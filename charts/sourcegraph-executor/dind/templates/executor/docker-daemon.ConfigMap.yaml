@@ -8,4 +8,8 @@ metadata:
   name: docker-config
 data:
   daemon.json: |
-    {{- .Values.dind.daemonConfig | toPrettyJson | nindent 4 }}
+    {{- $config := .Values.dind.daemonConfig | deepCopy }}
+    {{- if .Values.dind.gVisor.enabled }}
+    {{- $config = mergeOverwrite $config .Values.dind.gVisor.daemonConfig }}
+    {{- end }}
+    {{- $config | toPrettyJson | nindent 4 }}

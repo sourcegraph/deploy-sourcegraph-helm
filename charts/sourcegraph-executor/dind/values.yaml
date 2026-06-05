@@ -134,8 +134,16 @@ dind:
     # -- Enable gVisor sandbox (GKE only). Requires the GKE node pool to have sandbox type set to gvisor.
     # When enabled, sets runtimeClassName: gvisor on executor pods and replaces privileged: true with
     # explicit capabilities — these are intercepted in-sandbox and never granted to the host kernel.
-    # See: https://gvisor.dev/docs/tutorials/docker-in-gke-sandbox/
+    # See: https://gvisor.dev/docs/tutorials/docker-in-gvisor/
     enabled: false
+    # -- Extra daemon.json settings merged into dind.daemonConfig when gVisor is enabled.
+    # These defaults configure Docker to work within gVisor's kernel constraints.
+    daemonConfig:
+      storage-driver: vfs
+      iptables: false
+      ip6tables: false
+      features:
+        containerd-snapshotter: false
 
 privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
