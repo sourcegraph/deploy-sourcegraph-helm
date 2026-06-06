@@ -45,8 +45,10 @@ spec:
           image: {{ .Values.privateDockerRegistry.image.registry}}/{{ .Values.privateDockerRegistry.image.repository}}:{{ .Values.privateDockerRegistry.image.tag}}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
-            - name: REGISTRY_PROXY_REMOTEURL
-              value: http://registry-1.docker.io
+            {{- range $name, $item := .Values.privateDockerRegistry.env }}
+            - name: {{ $name }}
+              {{- $item | toYaml | nindent 14 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 5000

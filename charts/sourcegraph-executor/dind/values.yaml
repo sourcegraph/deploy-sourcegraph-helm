@@ -208,3 +208,23 @@ privateDockerRegistry:
     repository: registry
     tag: 3
   storageSize: 10Gi
+  # -- Extra environment variables to set on the registry container.
+  # Registry can be configured with environment variables using the pattern
+  # REGISTRY_<SECTION>_<KEY> (uppercase). Full reference:
+  # https://distribution.github.io/distribution/about/configuration
+  #
+  # To proxy an internal private registry with credentials, override REGISTRY_PROXY_REMOTEURL
+  # and supply REGISTRY_PROXY_USERNAME / REGISTRY_PROXY_PASSWORD, e.g.:
+  #   env:
+  #     REGISTRY_PROXY_REMOTEURL:
+  #       value: https://my-internal-registry.example.com
+  #     REGISTRY_PROXY_USERNAME:
+  #       value: myuser
+  #     REGISTRY_PROXY_PASSWORD:
+  #       valueFrom:
+  #         secretKeyRef:
+  #           name: registry-proxy-credentials
+  #           key: password
+  env:
+    REGISTRY_PROXY_REMOTEURL:
+      value: https://registry-1.docker.io
