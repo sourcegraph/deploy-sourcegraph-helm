@@ -77,6 +77,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.log.level | string | `"warn"` | Possible values are dbug, info, warn, eror, crit. |
 | executor.maximumNumJobs | int | `10` | The maximum amount of jobs that can be executed concurrently. |
 | executor.maximumRuntimePerJob | string | `"30m"` | The maximum wall time that can be spent on a single job. |
+| executor.podSecurityContext | object | `{"fsGroup":101}` | Pod-level security context applied to executor pods. fsGroup: 101 ensures the scratch volume is writable by the sourcegraph user (uid=100, gid=101) when running in Docker mode (dind). Set to {} to disable. |
 | executor.queueName | string | `""` | The name of the queue to pull jobs from. Possible values: batches and codeintel. Either this or queueNames is required (when not using queues). |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues). |
 | executor.replicaCount | int | `1` |  |

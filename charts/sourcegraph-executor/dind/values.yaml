@@ -127,6 +127,11 @@ executor:
     # -- StorageClass for the ephemeral volume. Only used when type is ephemeral.
     # Defaults to the cluster default StorageClass when empty.
     class: ""
+  # -- Pod-level security context applied to executor pods.
+  # fsGroup: 101 ensures the scratch volume is writable by the sourcegraph user (uid=100, gid=101)
+  # when running in Docker mode (dind). Set to {} to disable.
+  podSecurityContext:
+    fsGroup: 101
 
 dind:
   image:

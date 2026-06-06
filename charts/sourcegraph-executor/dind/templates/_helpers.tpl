@@ -181,6 +181,10 @@ spec:
         sourcegraph-resource-requires: no-cluster-admin
         app.kubernetes.io/component: executor
     spec:
+      {{- with $r.Values.executor.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: executor
           image: {{ include "sourcegraph.image" (list $r "executor") }}
