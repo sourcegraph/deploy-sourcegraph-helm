@@ -94,6 +94,8 @@ annotations:
 Create the docker image reference and allow it to be overridden on a per-service basis
 Default tags are toggled between a global and service-specific setting by the
 useGlobalTagAsDefault configuration
+The image repository defaults to the global sourcegraph.image.repository, but can be
+overridden on a per-service basis via the service's image.repository setting
 */}}
 {{- define "sourcegraph.image" -}}
 {{- $top := index . 0 }}
@@ -101,9 +103,10 @@ useGlobalTagAsDefault configuration
 {{- $imageName := (index $top.Values $service "image" "name")}}
 {{- $defaultTag := (index $top.Values $service "image" "defaultTag")}}
 {{- $defaultTagPrefix := (index $top.Values $service "image" "defaultTagPrefix")}}
+{{- $repository := default $top.Values.sourcegraph.image.repository (index $top.Values $service "image" "repository") }}
 {{- if $top.Values.sourcegraph.image.useGlobalTagAsDefault }}{{ $defaultTag = (tpl $top.Values.sourcegraph.image.defaultTag $top) }}{{ end }}
 
-{{- $top.Values.sourcegraph.image.repository }}/{{ $imageName }}:{{ $defaultTagPrefix }}{{ default $defaultTag (index $top.Values $service "image" "tag") }}
+{{- $repository }}/{{ $imageName }}:{{ $defaultTagPrefix }}{{ default $defaultTag (index $top.Values $service "image" "tag") }}
 {{- end }}
 
 {{- define "sourcegraph.nodeSelector" -}}

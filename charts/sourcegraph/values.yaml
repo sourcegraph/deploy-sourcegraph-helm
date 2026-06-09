@@ -54,6 +54,8 @@ sourcegraph:
 #     tag:
 #     # Override the default docker image name
 #     name:
+#     # Override the global sourcegraph.image.repository on a service-specific basis
+#     repository:
 #
 #   # Add additional labels and annotations to various resources
 #   labels: {}
