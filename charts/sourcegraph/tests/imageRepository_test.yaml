@@ -1,0 +1,65 @@
+suite: imageRepository
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should use the global repository by default
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend:
+      image:
+        defaultTag: test
+  asserts:
+    - matchRegex:
+        path: "spec.template.spec.containers[0].image"
+        pattern: ^index\.docker\.io/sourcegraph/.+:test$
+- it: should override the repository on a per-service basis
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend:
+      image:
+        defaultTag: test
+        repository: my.registry.example/sg
+  asserts:
+    - matchRegex:
+        path: "spec.template.spec.containers[0].image"
+        pattern: ^my\.registry\.example/sg/.+:test$
+- it: should respect a custom global repository when no per-service override is set
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    sourcegraph:
+      image:
+        repository: global.registry.example/sg
+    frontend:
+      image:
+        defaultTag: test
+  asserts:
+    - matchRegex:
+        path: "spec.template.spec.containers[0].image"
+        pattern: ^global\.registry\.example/sg/.+:test$
+- it: should let the per-service repository win over a custom global repository
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    sourcegraph:
+      image:
+        repository: global.registry.example/sg
+    frontend:
+      image:
+        defaultTag: test
+        repository: my.registry.example/sg
+  asserts:
+    - matchRegex:
+        path: "spec.template.spec.containers[0].image"
+        pattern: ^my\.registry\.example/sg/.+:test$
+- it: should only affect the targeted service and leave others on the global repository
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend:
+      image:
+        defaultTag: test
+        repository: my.registry.example/sg
+  asserts:
+    # The migrator init container should remain on the global repository
+    - matchRegex:
+        path: "spec.template.spec.initContainers[0].image"
+        pattern: ^index\.docker\.io/sourcegraph/.+
