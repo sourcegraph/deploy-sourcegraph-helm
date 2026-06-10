@@ -4,7 +4,7 @@
 {{- end }}
 
 {{- if not .Values.worker.replicas }}
-  {{- include "sourcegraph.worker" (list . "" "" $globalBlocklist .Values.worker.resources ) | nindent 0 }}
+  {{- include "sourcegraph.worker" (list . "" "" $globalBlocklist .Values.worker.resources .Values.worker.replicaCount ) | nindent 0 }}
 {{- else }}
   {{- $dedicatedJobs := list }}
   {{- $dedicatedJobs = $dedicatedJobs | concat .Values.worker.blocklist }}
@@ -13,7 +13,7 @@
   {{- end }}
   {{- $primaryBlocklist := join "," ($dedicatedJobs | uniq | sortAlpha) }}
 ---
-  {{-  include "sourcegraph.worker" (list . "" "all" $primaryBlocklist $.Values.worker.resources) | nindent 0 }}
+  {{-  include "sourcegraph.worker" (list . "" "all" $primaryBlocklist $.Values.worker.resources $.Values.worker.replicaCount) | nindent 0 }}
 
   {{- range $idx, $item := .Values.worker.replicas }}
 ---
@@ -23,6 +23,10 @@
     {{- if $item.resources -}}
     {{- $resources = $item.resources -}}
     {{- end -}}
-    {{- include "sourcegraph.worker" (list $ $replicaName $allowlist "" $resources) | nindent 0 }}
+    {{- $replicaCount := $.Values.worker.replicaCount -}}
+    {{- if $item.replicaCount -}}
+    {{- $replicaCount = $item.replicaCount -}}
+    {{- end -}}
+    {{- include "sourcegraph.worker" (list $ $replicaName $allowlist "" $resources $replicaCount) | nindent 0 }}
   {{- end }}
 {{- end }}
