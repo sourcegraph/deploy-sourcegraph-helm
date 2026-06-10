@@ -1314,6 +1314,9 @@ worker:
   replicas:
     []
     # - jobs: []
+    #   # -- Number of pods for this dedicated worker replica. Defaults to worker.replicaCount.
+    #   # Only increase this for replicas whose jobs are safe to scale horizontally.
+    #   replicaCount: 1
     #   resources:
     #     limits:
     #       cpu: "2"
