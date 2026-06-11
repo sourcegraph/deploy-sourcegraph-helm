@@ -6,6 +6,9 @@ tests:
 - it: should use the global repository by default
   template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
+    sourcegraph:
+      image:
+        repository: index.docker.io/sourcegraph
     frontend:
       image:
         defaultTag: test
@@ -54,6 +57,9 @@ tests:
 - it: should only affect the targeted service and leave others on the global repository
   template: frontend/sourcegraph-frontend.Deployment.yaml
   set:
+    sourcegraph:
+      image:
+        repository: index.docker.io/sourcegraph
     frontend:
       image:
         defaultTag: test
