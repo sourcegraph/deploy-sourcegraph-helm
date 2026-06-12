@@ -96,7 +96,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
 | executor.replicas | int | `1` |  |
 | executor.resources.limits.cpu | string | `"1"` |  |
-| executor.resources.limits.memory | string | `"1Gi"` |  |
+| executor.resources.limits.memory | string | `"4Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
 | executor.resources.requests.memory | string | `"200Mi"` |  |
 | executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
