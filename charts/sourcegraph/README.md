@@ -113,6 +113,7 @@ In addition to the documented values, all services also support the following va
 | frontend.ingress.ingressClassName | string | `nil` | IngressClassName for the Ingress (Available in Kubernetes 1.18+) If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null` |
 | frontend.ingress.tls | list | `[]` | Full TLS configuration for the ingress. Supersedes `tlsSecret` if set. Cannot be set together with `tlsSecret`. Omit `secretName` for controllers that manage certificates themselves (e.g. Tailscale). Example: tls:   - hosts:       - sourcegraph.example.com     secretName: sourcegraph-tls  # optional |
 | frontend.ingress.tlsSecret | string | `""` | Secret containing TLS cert. Cannot be set together with `tls`. |
+| frontend.internalRegistry.enabled | bool | `false` | Enable internal OCI registry port (5000) on frontend service |
 | frontend.name | string | `"sourcegraph-frontend"` | Name used by resources. Does not affect service names or PVCs. |
 | frontend.podSecurityContext | object | `{}` | Security context for the `frontend` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | frontend.privileged | bool | `true` | Enable creation of Role and RoleBinding (RBAC). Uses [view](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) ClusterRole if set to false |
