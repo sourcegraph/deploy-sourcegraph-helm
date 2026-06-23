@@ -206,7 +206,7 @@ dind:
 
 privateDockerRegistry:
   # -- Whether to deploy the private registry. Only one registry is needed when deploying multiple executors.
-  # More information: https://docs.sourcegraph.com/admin/executors/deploy_executors#using-private-registries
+  # More information: https://sourcegraph.com/docs/self-hosted/executors/deploy-executors#using-private-registries
   enabled: true
   image:
     registry: index.docker.io
