@@ -50,8 +50,8 @@ jobs:
 
       - name: Update chart versions
         run: |
-          sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml
-          sed -i '/^version:/ s/"$/-insiders.${{ steps.metadata.outputs.shortSHA }}"/' charts/*/Chart.yaml
+          sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml charts/sourcegraph-executor/*/Chart.yaml
+          sed -i '/^version:/ s/"$/-insiders.${{ steps.metadata.outputs.shortSHA }}"/' charts/*/Chart.yaml charts/sourcegraph-executor/*/Chart.yaml
 
       - name: Package Sourcegraph helm charts
         run: for i in charts/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done

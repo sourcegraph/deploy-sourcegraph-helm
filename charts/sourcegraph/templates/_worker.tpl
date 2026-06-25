@@ -4,6 +4,7 @@
 {{- $allowlist := index . 2 -}}
 {{- $blocklist := index . 3 -}}
 {{- $resources := index . 4 -}}
+{{- $replicaCount := index . 5 -}}
 
 {{- $name := $top.Values.worker.name -}}
 {{- if $suffix -}}
@@ -24,7 +25,7 @@ metadata:
   name: {{ $name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ $top.Values.worker.replicaCount }}
+  replicas: {{ $replicaCount }}
   revisionHistoryLimit: {{ $top.Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:

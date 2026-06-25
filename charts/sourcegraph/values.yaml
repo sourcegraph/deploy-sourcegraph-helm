@@ -61,6 +61,8 @@ networkPolicy:
 #     tag:
 #     # Override the default docker image name
 #     name:
+#     # Override the global sourcegraph.image.repository on a service-specific basis
+#     repository:
 #
 #   # Add additional labels and annotations to various resources
 #   labels: {}
@@ -1319,6 +1321,9 @@ worker:
   replicas:
     []
     # - jobs: []
+    #   # -- Number of pods for this dedicated worker replica. Defaults to worker.replicaCount.
+    #   # Only increase this for replicas whose jobs are safe to scale horizontally.
+    #   replicaCount: 1
     #   resources:
     #     limits:
     #       cpu: "2"

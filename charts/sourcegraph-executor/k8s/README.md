@@ -7,6 +7,10 @@
 
 This chart contains two deployments, Sourcegraph Kubernetes native Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy Kubernetes native executors.
 
+> ⚠️ **Beta:** Native Kubernetes executors are in beta. For production workloads, consider deploying using
+> [Terraform](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-terraform) or the
+> [Linux binary](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-binary) for better long-term support.
+
 Use cases:
 
 - Deploy Sourcegraph Kubernetes native Executors on Kubernetes
@@ -92,7 +96,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
 | executor.replicas | int | `1` |  |
 | executor.resources.limits.cpu | string | `"1"` |  |
-| executor.resources.limits.memory | string | `"1Gi"` |  |
+| executor.resources.limits.memory | string | `"4Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
 | executor.resources.requests.memory | string | `"200Mi"` |  |
 | executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |

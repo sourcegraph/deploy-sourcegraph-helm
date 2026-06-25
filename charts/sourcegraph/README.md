@@ -24,6 +24,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.env` - consult `values.yaml` file
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
+- `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
