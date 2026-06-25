@@ -1,0 +1,92 @@
+suite: frontendIngress
+templates:
+- frontend/sourcegraph-frontend.Ingress.yaml
+tests:
+# Backward-compatible: host + tlsSecret
+- it: should render tls block with secretName when both host and tlsSecret are set
+  set:
+    frontend.ingress.enabled: true
+    frontend.ingress.host: sourcegraph.example.com
+    frontend.ingress.tlsSecret: sourcegraph-tls
+  asserts:
+  - equal:
+      path: spec.tls[0].hosts[0]
+      value: sourcegraph.example.com
+  - equal:
+      path: spec.tls[0].secretName
+      value: sourcegraph-tls
+  - equal:
+      path: spec.rules[0].host
+      value: sourcegraph.example.com
+
+# Backward-compatible: host only → no tls block (use tls list for TLS without a secret)
+- it: should not render tls block when host is set but tlsSecret is not
+  set:
+    frontend.ingress.enabled: true
+    frontend.ingress.host: sourcegraph.example.com
+  asserts:
+  - notExists:
+      path: spec.tls
+
+# Backward-compatible: no tls when host is not set
+- it: should not render tls block when host is not set
+  set:
+    frontend.ingress.enabled: true
+  asserts:
+  - notExists:
+      path: spec.tls
+
+# New: hosts list creates one rule per host
+- it: should render rules per host when hosts list is set
+  values:
+  - frontendIngress_hosts.yaml
+  asserts:
+  - equal:
+      path: spec.rules[0].host
+      value: sourcegraph.example.com
+  - equal:
+      path: spec.rules[1].host
+      value: other.example.com
+
+# New: tls list with secretName
+- it: should render tls from tls list
+  values:
+  - frontendIngress_tls.yaml
+  asserts:
+  - equal:
+      path: spec.tls[0].hosts[0]
+      value: sourcegraph.example.com
+  - equal:
+      path: spec.tls[0].secretName
+      value: sourcegraph-tls
+
+# New: tls list without secretName (e.g. Tailscale)
+- it: should render tls block without secretName when tls list omits secretName
+  values:
+  - frontendIngress_tlsNoSecret.yaml
+  asserts:
+  - equal:
+      path: spec.tls[0].hosts[0]
+      value: sourcegraph.example.com
+  - notExists:
+      path: spec.tls[0].secretName
+
+# Error: hosts and host both set
+- it: should fail when both hosts and host are set
+  values:
+  - frontendIngress_hosts.yaml
+  set:
+    frontend.ingress.host: sourcegraph.example.com
+  asserts:
+  - failedTemplate:
+      errorMessage: frontend.ingress.hosts and frontend.ingress.host cannot both be set
+
+# Error: tls and tlsSecret both set
+- it: should fail when both tls and tlsSecret are set
+  values:
+  - frontendIngress_tls.yaml
+  set:
+    frontend.ingress.tlsSecret: sourcegraph-tls
+  asserts:
+  - failedTemplate:
+      errorMessage: frontend.ingress.tls and frontend.ingress.tlsSecret cannot both be set

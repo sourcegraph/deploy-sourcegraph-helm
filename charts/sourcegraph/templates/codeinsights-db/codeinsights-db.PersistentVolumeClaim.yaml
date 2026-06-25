@@ -5,6 +5,10 @@ metadata:
   labels:
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
+  {{- if .Values.codeInsightsDB.storageAnnotations }}
+  annotations:
+    {{- toYaml .Values.codeInsightsDB.storageAnnotations | nindent 4 }}
+  {{- end }}
   name: codeinsights-db
 spec:
   accessModes:

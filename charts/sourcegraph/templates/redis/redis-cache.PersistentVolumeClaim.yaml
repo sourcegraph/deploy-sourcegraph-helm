@@ -5,6 +5,10 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: redis
+  {{- if .Values.redisCache.storageAnnotations }}
+  annotations:
+    {{- toYaml .Values.redisCache.storageAnnotations | nindent 4 }}
+  {{- end }}
   name: redis-cache
 spec:
   accessModes:

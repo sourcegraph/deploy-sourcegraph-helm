@@ -85,6 +85,9 @@ spec:
           name: tmpdir
         - mountPath: /data/repos
           name: repos
+          {{- if .Values.gitserver.storageSubPath }}
+          subPath: {{ .Values.gitserver.storageSubPath }}
+          {{- end }}
         {{- if .Values.gitserver.sshSecret }}
         - mountPath: /home/sourcegraph/.ssh
           name: ssh
@@ -99,6 +102,7 @@ spec:
         {{- toYaml .Values.gitserver.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "gitserver" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "gitserver" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "gitserver" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
@@ -118,14 +122,15 @@ spec:
       {{- if .Values.gitserver.extraVolumes }}
       {{- toYaml .Values.gitserver.extraVolumes | nindent 6 }}
       {{- end }}
-      {{- if .Values.gitserver.priorityClassName }}
-      priorityClassName: {{ .Values.gitserver.priorityClassName }}
-      {{- end }}
   updateStrategy:
     type: RollingUpdate
   volumeClaimTemplates:
   - metadata:
       name: repos
+      {{- if .Values.gitserver.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.gitserver.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce

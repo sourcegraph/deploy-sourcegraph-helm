@@ -7,6 +7,10 @@
 
 This chart contains two deployments, Sourcegraph Kubernetes native Executors and a private Docker Registry. It is a supplemental chart for the parent [sourcegraph/sourcegraph] Helm Chart if you wish to deploy Kubernetes native executors.
 
+> ⚠️ **Beta:** Native Kubernetes executors are in beta. For production workloads, consider deploying using
+> [Terraform](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-terraform) or the
+> [Linux binary](https://docs.sourcegraph.com/self-hosted/executors/deploy-executors-binary) for better long-term support.
+
 Use cases:
 
 - Deploy Sourcegraph Kubernetes native Executors on Kubernetes
@@ -54,22 +58,23 @@ In addition to the documented values, the `executor` and `private-docker-registr
 |-----|------|---------|-------------|
 | executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | executor.configureRbac | bool | `true` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
+| executor.containerSecurityContext | object | `{"privileged":false}` | Security context for the container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | executor.debug.keepJobs | string | `"false"` | If true, Kubernetes jobs will not be deleted after they complete. Not recommended for production use as it can hit cluster limits. |
 | executor.debug.keepWorkspaces | string | `"false"` |  |
 | executor.dockerAddHostGateway | string | `"false"` | For local deployments the host is 'host.docker.internal' and this needs to be true |
 | executor.extraEnv | string | `nil` | Sets extra environment variables on the executor deployment. See `values.yaml` for the format. |
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password The name of the secret must match `executor.name`, i.e., the name of the helm release used to deploy the helm chart. The k8s Secret must contain the key `EXECUTOR_FRONTEND_PASSWORD` matching the site config `executors.accessToken` value. `executor.frontendPassword` is ignored if this is enabled. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if `executor.frontendExistingSecret`` is not configured. |
-| executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace).  This will avoid unnecessary network charges as traffic will stay within the local network. |
+| executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace). This will avoid unnecessary network charges as traffic will stay within the local network. |
 | executor.image.defaultTag | string | `"6.0.0@sha256:6dc771a0c281a41ef676213f2f84a63d99045cf2e58d43022554a8022070ed65"` |  |
 | executor.image.name | string | `"executor-kubernetes"` |  |
 | executor.kubeconfigPath | string | `""` | The path to the kubeconfig file. If not specified, the in-cluster config is used. |
 | executor.kubernetesJob.deadline | string | `"1200"` | The number of seconds after which a Kubernetes job will be terminated. |
-| executor.kubernetesJob.fsGroup | string | `"1000"` | The group ID which is set on the job PVC file system.  |
-| executor.kubernetesJob.node.name | string | `""` | The name of the Kubernetes Node to create job pods on. If not specified, the pods are created on the first available node.  |
+| executor.kubernetesJob.fsGroup | string | `"1000"` | The group ID which is set on the job PVC file system. |
+| executor.kubernetesJob.node.name | string | `""` | The name of the Kubernetes Node to create job pods on. If not specified, the pods are created on the first available node. |
 | executor.kubernetesJob.node.requiredAffinityMatchExpressions | string | `""` | The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]' |
 | executor.kubernetesJob.node.requiredAffinityMatchFields | string | `""` | The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]' |
-| executor.kubernetesJob.node.selector | string | `""` | A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app`  |
+| executor.kubernetesJob.node.selector | string | `""` | A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app` |
 | executor.kubernetesJob.node.tolerations | string | `""` | The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]' |
 | executor.kubernetesJob.pod.affinity | string | `""` | The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]' |
 | executor.kubernetesJob.pod.antiAffinity | string | `""` | The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]' |
@@ -86,14 +91,19 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.maximumRuntimePerJob | string | `"30m"` |  |
 | executor.namespace | string | `"default"` | The namespace in which jobs are generated by the executor. |
 | executor.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| executor.podSecurityContext | object | `{}` | Security context for the pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or queueNames is required.** |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
 | executor.replicas | int | `1` |  |
 | executor.resources.limits.cpu | string | `"1"` |  |
-| executor.resources.limits.memory | string | `"1Gi"` |  |
+| executor.resources.limits.memory | string | `"4Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
 | executor.resources.requests.memory | string | `"200Mi"` |  |
-| executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | The containerSecurityContext for the executor image |
+| executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.fsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.privileged | bool | `false` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.runAsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext.runAsUser | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.storageSize | string | `"10Gi"` | The storage size of the PVC attached to the executor deployment. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
@@ -108,6 +118,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | object | `{}` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
 | storageClass.create | bool | `false` | Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class |

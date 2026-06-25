@@ -94,6 +94,8 @@ annotations:
 Create the docker image reference and allow it to be overridden on a per-service basis
 Default tags are toggled between a global and service-specific setting by the
 useGlobalTagAsDefault configuration
+The image repository defaults to the global sourcegraph.image.repository, but can be
+overridden on a per-service basis via the service's image.repository setting
 */}}
 {{- define "sourcegraph.image" -}}
 {{- $top := index . 0 }}
@@ -101,9 +103,10 @@ useGlobalTagAsDefault configuration
 {{- $imageName := (index $top.Values $service "image" "name")}}
 {{- $defaultTag := (index $top.Values $service "image" "defaultTag")}}
 {{- $defaultTagPrefix := (index $top.Values $service "image" "defaultTagPrefix")}}
+{{- $repository := default $top.Values.sourcegraph.image.repository (index $top.Values $service "image" "repository") }}
 {{- if $top.Values.sourcegraph.image.useGlobalTagAsDefault }}{{ $defaultTag = (tpl $top.Values.sourcegraph.image.defaultTag $top) }}{{ end }}
 
-{{- $top.Values.sourcegraph.image.repository }}/{{ $imageName }}:{{ $defaultTagPrefix }}{{ default $defaultTag (index $top.Values $service "image" "tag") }}
+{{- $repository }}/{{ $imageName }}:{{ $defaultTagPrefix }}{{ default $defaultTag (index $top.Values $service "image" "tag") }}
 {{- end }}
 
 {{- define "sourcegraph.nodeSelector" -}}
@@ -169,6 +172,10 @@ app.kubernetes.io/name: jaeger
 
 {{- define "sourcegraph.openTelemetryEnv" -}}
 {{- if .Values.openTelemetry.enabled -}}
+{{- if eq (.Values.openTelemetry.agent.kind | default "DaemonSet") "Deployment" -}}
+- name: OTEL_EXPORTER_OTLP_ENDPOINT
+  value: http://otel-collector:4317
+{{- else -}}
 # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
 - name: OTEL_AGENT_HOST
   valueFrom:
@@ -176,6 +183,7 @@ app.kubernetes.io/name: jaeger
       fieldPath: status.hostIP
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
   value: http://$(OTEL_AGENT_HOST):{{ toYaml .Values.openTelemetry.agent.hostPorts.grpcOtlp }}
+{{- end }}
 {{- end }}
 {{- end }}
 
@@ -249,23 +257,35 @@ app.kubernetes.io/name: jaeger
 {{- end }}
 
 {{/*
-Set redisCache and redisStore endpoints
-So that customers can configure them any of these ways:
-1. Create a new Kubernetes secret, with default values (default, no override config required)
-2. Use an existing Kubernetes secret, by configuring .Values.redisCache.connection.existingSecret
-3. Do not create or use Kubernetes secrets, just pass the default values directly as environment variables into the needed pods, by configuring .Values.sourcegraph.disableKubernetesSecrets = true
-4. Do not create or use Kubernetes secrets, but pass custom values (ex. external Redis) directly as environment variables into the needed pods, by configuring .Values.sourcegraph.disableKubernetesSecrets = true, .Values.redisCache.connection.endpoint = "", .Values.redisStore.connection.endpoint = "", and defining the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods
+Set redisCache and redisStore endpoints,
+so that customers can configure them any of these ways:
+
+1. Create new Kubernetes secrets, with default values (default, no override config required)
+
+2. Use existing Kubernetes secrets, managed externally, by configuring:
+.Values.redisCache.connection.existingSecret: <secret name>
+.Values.redisStore.connection.existingSecret: <secret name>
+
+3. Do not create or use Kubernetes secrets, just pass the default values directly as environment variables into the needed pods, by configuring:
+.Values.sourcegraph.disableKubernetesSecrets: true
+
+4. Do not create or use Kubernetes secrets, but provide custom values (ex. external Redis) to have this function pass them into the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods, by configuring:
+.Values.sourcegraph.disableKubernetesSecrets: true
+.Values.redisCache.connection.endpoint: <custom value for REDIS_CACHE_ENDPOINT>
+.Values.redisStore.connection.endpoint: <custom value for REDIS_STORE_ENDPOINT>
+
 */}}
 {{- define "sourcegraph.redisConnection" -}}
 {{- if .Values.sourcegraph.disableKubernetesSecrets -}}
-{{- if .Values.redisCache.connection.endpoint -}}
+{{- $cacheEndpoint := dig "connection" "endpoint" "" .Values.redisCache -}}
+{{- $storeEndpoint := dig "connection" "endpoint" "" .Values.redisStore -}}
+{{- if not (and $cacheEndpoint $storeEndpoint) -}}
+{{- fail ".Values.redisCache.connection.endpoint and .Values.redisStore.connection.endpoint must be set when disableKubernetesSecrets is true!" -}}
+{{- end -}}
 - name: REDIS_CACHE_ENDPOINT
-  value: {{ .Values.redisCache.connection.endpoint }}
-{{- end -}}
-{{- if .Values.redisStore.connection.endpoint -}}
+  value: {{ $cacheEndpoint }}
 - name: REDIS_STORE_ENDPOINT
-  value: {{ .Values.redisStore.connection.endpoint }}
-{{- end -}}
+  value: {{ $storeEndpoint }}
 {{- else -}}
 - name: REDIS_CACHE_ENDPOINT
   valueFrom:

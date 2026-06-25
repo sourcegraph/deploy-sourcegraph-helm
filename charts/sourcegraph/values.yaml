@@ -33,6 +33,8 @@ sourcegraph:
   podAnnotations: {}
   # -- Add extra labels to attach to all pods
   podLabels: {}
+  # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
+  priorityClassName: ""
   # -- Global deployment clean up policy,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
   revisionHistoryLimit: 10
@@ -52,6 +54,8 @@ sourcegraph:
 #     tag:
 #     # Override the default docker image name
 #     name:
+#     # Override the global sourcegraph.image.repository on a service-specific basis
+#     repository:
 #
 #   # Add additional labels and annotations to various resources
 #   labels: {}
@@ -220,6 +224,10 @@ codeInsightsDB:
     name: ""
   # -- PVC Storage Request for `codeinsights-db` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `codeinsights-db` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `codeinsights-db` PVC
+  storageAnnotations: {}
 
 codeIntelDB:
   # -- Enable `codeintel-db` PostgreSQL server
@@ -285,6 +293,10 @@ codeIntelDB:
     name: ""
   # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `codeintel-db` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `codeintel-db` PVC
+  storageAnnotations: {}
 
 frontend:
   # -- Environment variables for the `frontend` container
@@ -317,8 +329,23 @@ frontend:
     # -- IngressClassName for the Ingress (Available in Kubernetes 1.18+)
     # If you set this field, set the annotation `frontend.ingress.annotations."kubernetes.io/ingress.class"` to `null`
     ingressClassName: null
-    # -- Secret containing SSL cert
+    # -- Secret containing TLS cert. Cannot be set together with `tls`.
     tlsSecret: ""
+    # -- List of hosts for the ingress rules. Supersedes `host` if set.
+    # Cannot be set together with `host`.
+    # Example:
+    # hosts:
+    #   - host: sourcegraph.example.com
+    hosts: []
+    # -- Full TLS configuration for the ingress. Supersedes `tlsSecret` if set.
+    # Cannot be set together with `tlsSecret`.
+    # Omit `secretName` for controllers that manage certificates themselves (e.g. Tailscale).
+    # Example:
+    # tls:
+    #   - hosts:
+    #       - sourcegraph.example.com
+    #     secretName: sourcegraph-tls  # optional
+    tls: []
   # -- Security context for the `frontend` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -426,6 +453,10 @@ gitserver:
     name: ""
   # -- PVC Storage Request for `gitserver` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `gitserver` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `gitserver` PVC
+  storageAnnotations: {}
 
 grafana:
   # -- Enable `grafana` dashboard (recommended)
@@ -488,6 +519,10 @@ grafana:
     name: grafana
   # -- PVC Storage Request for `grafana` data volume
   storageSize: 2Gi
+  # -- Optional subPath for the `grafana` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `grafana` PVC
+  storageAnnotations: {}
 
 indexedSearch:
   image:
@@ -529,6 +564,10 @@ indexedSearch:
   # The size of disk to used for search indexes.
   # This should typically be gitserver disk size multipled by the number of gitserver shards.
   storageSize: 200Gi
+  # -- Optional subPath for the `indexed-search` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `indexed-search` PVC
+  storageAnnotations: {}
 
 indexedSearchIndexer:
   image:
@@ -594,6 +633,10 @@ blobstore:
     name: ""
   # -- PVC Storage Request for `blobstore` data volume
   storageSize: 100Gi
+  # -- Optional subPath for the `blobstore` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `blobstore` PVC
+  storageAnnotations: {}
 
 openTelemetry:
   enabled: true
@@ -638,6 +681,11 @@ openTelemetry:
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-agent"
+    # -- The workload kind for the otel-agent. Valid values are `DaemonSet` and `Deployment`.
+    # Use `Deployment` in environments where DaemonSets are restricted (e.g. some managed Kubernetes offerings).
+    # When set to `Deployment`, the otel-agent DaemonSet is not created and application pods send
+    # traces directly to the existing otel-collector Deployment (otel-collector:4317) instead.
+    kind: "DaemonSet"
     # -- Resource requests & limits for the `otel-agent` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     hostPorts:
@@ -772,6 +820,10 @@ pgsql:
     name: ""
   # -- PVC Storage Request for `pgsql` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `pgsql` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `pgsql` PVC
+  storageAnnotations: {}
 
 postgresExporter:
   image:
@@ -920,6 +972,10 @@ prometheus:
     name: prometheus
   # -- PVC Storage Request for `prometheus` data volume
   storageSize: 200Gi
+  # -- Optional subPath for the `prometheus` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `prometheus` PVC
+  storageAnnotations: {}
 
 redisCache:
   # -- Enable `redis-cache` Redis server
@@ -966,6 +1022,10 @@ redisCache:
     name: ""
   # -- PVC Storage Request for `redis-cache` data volume
   storageSize: 100Gi
+  # -- Optional subPath for the `redis-cache` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `redis-cache` PVC
+  storageAnnotations: {}
 
 redisExporter:
   image:
@@ -1035,6 +1095,10 @@ redisStore:
     name: ""
   # -- PVC Storage Request for `redis-store` data volume
   storageSize: 100Gi
+  # -- Optional subPath for the `redis-store` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `redis-store` PVC
+  storageAnnotations: {}
 
 searcher:
   image:
@@ -1075,6 +1139,10 @@ searcher:
     name: ""
   # -- Size of the PVC for searcher pods to store cache data
   storageSize: 26Gi
+  # -- Optional subPath for the `searcher` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `searcher` PVC
+  storageAnnotations: {}
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -1153,15 +1221,24 @@ jaeger:
     name: "jaeger-all-in-one"
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "jaeger"
-  # -- Default args passed to the `jaeger` binary
+  # -- Default args passed to the `jaeger` binary.
+  # Jaeger v2.16+ uses a YAML config file instead of CLI flags.
+  # See https://www.jaegertracing.io/docs/2.16/configuration/
   args:
     [
-      "--memory.max-traces=20000",
-      "--sampling.strategies-file=/etc/jaeger/sampling_strategies.json",
-      "--collector.otlp.enabled",
-      "--collector.otlp.grpc.host-port=:4320",
-      "--collector.otlp.http.host-port=:4321",
+      "--config=/etc/jaeger/jaeger-config.yaml",
     ]
+  # -- Jaeger v2 configuration overrides. We only provide a limited number of options, use `existingConfigMap` to provide a full config if you need more control.
+  config:
+    # -- Name of an preexisting ConfigMap containing Jaeger configuration. They must contain a `jaeger-config.yaml` key. If set, this will be used instead of the `config` values below.
+    # See https://www.jaegertracing.io/docs/2.16/configuration/
+    existingConfigMap: ""
+    # -- Maximum number of traces stored in memory
+    maxTraces: 20000
+    # -- Log level for the Jaeger instance (debug, info, warn, error)
+    logLevel: info
+    # -- Default sampling probability (0.0 to 1.0) returned to services that query Jaeger for sampling config
+    samplingDefaultProbability: 1.0
   # -- Security context for the `jaeger` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -1231,6 +1308,9 @@ worker:
   replicas:
     []
     # - jobs: []
+    #   # -- Number of pods for this dedicated worker replica. Defaults to worker.replicaCount.
+    #   # Only increase this for replicas whose jobs are safe to scale horizontally.
+    #   replicaCount: 1
     #   resources:
     #     limits:
     #       cpu: "2"

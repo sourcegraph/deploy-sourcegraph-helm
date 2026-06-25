@@ -1,0 +1,57 @@
+---
+suite: redisConnection
+templates:
+- frontend/sourcegraph-frontend.Deployment.yaml
+tests:
+- it: should reference the default secret
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-cache
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: redis-store
+- it: should not reference secret when .sourcegraph.disableKubernetesSecrets is true
+  set:
+    sourcegraph:
+      disableKubernetesSecrets: true
+    redisCache:
+      connection:
+        endpoint: redis-cache-svc
+    redisStore:
+      connection:
+        endpoint: redis-store-svc
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_CACHE_ENDPOINT
+          value: redis-cache-svc
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_STORE_ENDPOINT
+          value: redis-store-svc
+- it: should fail when .sourcegraph.disableKubernetesSecrets is true but .Values.redisCache.connection.endpoint and .Values.redisStore.connection.endpoint are not set
+  set:
+    sourcegraph:
+      disableKubernetesSecrets: true
+    redisCache:
+      connection:
+        endpoint: ""
+    redisStore:
+      connection:
+        endpoint: ""
+  asserts:
+    - failedTemplate: 
+        errorMessage: .Values.redisCache.connection.endpoint and .Values.redisStore.connection.endpoint must be set when disableKubernetesSecrets is true!

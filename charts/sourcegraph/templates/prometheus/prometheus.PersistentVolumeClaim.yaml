@@ -5,6 +5,10 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
+  {{- if .Values.prometheus.storageAnnotations }}
+  annotations:
+    {{- toYaml .Values.prometheus.storageAnnotations | nindent 4 }}
+  {{- end }}
   name: prometheus
 spec:
   accessModes:

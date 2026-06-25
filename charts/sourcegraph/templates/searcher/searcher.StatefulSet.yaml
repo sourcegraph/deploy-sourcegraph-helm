@@ -99,6 +99,9 @@ spec:
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache
+          {{- if .Values.searcher.storageSubPath }}
+          subPath: {{ .Values.searcher.storageSubPath }}
+          {{- end }}
         - mountPath: /tmp
           name: tmpdir
         {{- if .Values.searcher.extraVolumeMounts }}
@@ -117,6 +120,7 @@ spec:
         {{- toYaml .Values.searcher.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "searcher" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "searcher" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "searcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "searcher" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
@@ -131,12 +135,13 @@ spec:
       {{- if .Values.searcher.extraVolumes }}
       {{- toYaml .Values.searcher.extraVolumes | nindent 6 }}
       {{- end }}
-      {{- if .Values.searcher.priorityClassName }}
-      priorityClassName: {{ .Values.searcher.priorityClassName }}
-      {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: cache
+      {{- if .Values.searcher.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.searcher.storageAnnotations | nindent 8 }}
+      {{- end }}
     spec:
       accessModes:
       - ReadWriteOnce

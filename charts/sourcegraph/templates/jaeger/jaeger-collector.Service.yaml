@@ -17,14 +17,14 @@ metadata:
   name: {{ default "jaeger-collector" .Values.jaeger.collector.name }}
 spec:
   ports:
-  - name: http-collector
-    port: 4321
+  - name: http-otlp
+    port: 4318
     protocol: TCP
-    targetPort: http-collector
-  - name: grpc-collector
-    port: 4320
+    targetPort: http-otlp
+  - name: grpc-otlp
+    port: 4317
     protocol: TCP
-    targetPort: grpc-collector
+    targetPort: grpc-otlp
   selector:
     {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/instance: {{ .Release.Name }}

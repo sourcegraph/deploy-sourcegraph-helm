@@ -5,6 +5,10 @@ metadata:
   labels:
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
+  {{- if .Values.codeIntelDB.storageAnnotations }}
+  annotations:
+    {{- toYaml .Values.codeIntelDB.storageAnnotations | nindent 4 }}
+  {{- end }}
   name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
 spec:
   accessModes:

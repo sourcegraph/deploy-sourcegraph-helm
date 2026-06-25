@@ -51,6 +51,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: disk
+          {{- if .Values.codeIntelDB.storageSubPath }}
+          subPath: {{ .Values.codeIntelDB.storageSubPath }}
+          {{- end }}
         securityContext:
         {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
         {{- if not .Values.sourcegraph.localDevMode }}
@@ -101,6 +104,9 @@ spec:
         volumeMounts:
         - mountPath: /data
           name: disk
+          {{- if .Values.codeIntelDB.storageSubPath }}
+          subPath: {{ .Values.codeIntelDB.storageSubPath }}
+          {{- end }}
         - mountPath: /conf
           name: pgsql-conf
         - mountPath: /var/run/postgresql
@@ -136,6 +142,7 @@ spec:
         {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "codeIntelDB" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

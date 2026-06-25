@@ -4,6 +4,7 @@
 {{- $allowlist := index . 2 -}}
 {{- $blocklist := index . 3 -}}
 {{- $resources := index . 4 -}}
+{{- $replicaCount := index . 5 -}}
 
 {{- $name := $top.Values.worker.name -}}
 {{- if $suffix -}}
@@ -24,7 +25,7 @@ metadata:
   name: {{ $name }}
 spec:
   minReadySeconds: 10
-  replicas: {{ $top.Values.worker.replicaCount }}
+  replicas: {{ $replicaCount }}
   revisionHistoryLimit: {{ $top.Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
@@ -135,6 +136,7 @@ spec:
         {{- toYaml $top.Values.worker.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list $top "worker" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list $top "worker" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list $top "worker") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list $top "worker" ) | trim | nindent 6 }}
       {{- with $top.Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

@@ -1,6 +1,6 @@
 {{- if .Values.privateDockerRegistry.enabled -}}
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: private-docker-registry
   labels:
@@ -11,13 +11,14 @@ metadata:
     deploy: sourcegraph
     app.kubernetes.io/component: private-docker-registry
 spec:
-  replicas: {{ .Values.privateDockerRegistry.replicaCount }}
+  replicas: 1
+  serviceName: private-docker-registry
   selector:
     matchLabels:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: private-docker-registry
-  strategy:
-    type: Recreate
+  updateStrategy:
+    type: RollingUpdate
   template:
     metadata:
       annotations:
@@ -44,8 +45,10 @@ spec:
           image: {{ .Values.privateDockerRegistry.image.registry}}/{{ .Values.privateDockerRegistry.image.repository}}:{{ .Values.privateDockerRegistry.image.tag}}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           env:
-            - name: REGISTRY_PROXY_REMOTEURL
-              value: http://registry-1.docker.io
+            {{- range $name, $item := .Values.privateDockerRegistry.env }}
+            - name: {{ $name }}
+              {{- $item | toYaml | nindent 14 }}
+            {{- end }}
           ports:
             - name: http
               containerPort: 5000
@@ -74,6 +77,7 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- with include "sourcegraph.priorityClassName" (list . "privateDockerRegistry") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
@@ -82,8 +86,17 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: cache
-          persistentVolumeClaim:
-            claimName: private-docker-registry
+  volumeClaimTemplates:
+    - metadata:
+        name: cache
+        labels:
+          deploy: sourcegraph
+          app.kubernetes.io/component: private-docker-registry
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.privateDockerRegistry.storageSize }}
+        storageClassName: {{ .Values.storageClass.name }}
 {{- end }}

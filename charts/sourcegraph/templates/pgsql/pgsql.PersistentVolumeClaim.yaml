@@ -5,6 +5,10 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql
+  {{- if .Values.pgsql.storageAnnotations }}
+  annotations:
+    {{- toYaml .Values.pgsql.storageAnnotations | nindent 4 }}
+  {{- end }}
   name: pgsql
 spec:
   accessModes:
