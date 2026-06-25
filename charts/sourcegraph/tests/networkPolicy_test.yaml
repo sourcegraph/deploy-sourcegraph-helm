@@ -1,0 +1,48 @@
+suite: networkPolicy
+templates:
+  - network-policy/executor.NetworkPolicy.yaml
+tests:
+  - it: should not render executor NetworkPolicies by default
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should render executor NetworkPolicies when enabled
+    set:
+      networkPolicy:
+        executor:
+          enabled: true
+    asserts:
+      - hasDocuments:
+          count: 2
+      - equal:
+          path: metadata.name
+          value: sourcegraph-pods-block-executors
+        documentIndex: 0
+      - equal:
+          path: metadata.name
+          value: sourcegraph-frontend-allow-http-from-anywhere
+        documentIndex: 1
+      - equal:
+          path: spec.policyTypes[0]
+          value: Ingress
+        documentIndex: 0
+      - equal:
+          path: spec.ingress[0].ports[0].port
+          value: http
+        documentIndex: 1
+      - notExists:
+          path: spec.ingress[0].from[0].namespaceSelector
+        documentIndex: 0
+
+  - it: should allow matching pods from every namespace when configured
+    set:
+      networkPolicy:
+        executor:
+          enabled: true
+          allowOtherNamespacesToReachBackendPods: true
+    asserts:
+      - equal:
+          path: spec.ingress[0].from[0].namespaceSelector
+          value: {}
+        documentIndex: 0
