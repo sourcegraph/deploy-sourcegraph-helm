@@ -44,8 +44,14 @@ data:
             - otlp
           {{- if .Values.openTelemetry.gateway.config.traces.processors }}
           processors:
+            {{- if .Values.openTelemetry.gateway.config.traces.processorOrderedList }}
+            {{- range .Values.openTelemetry.gateway.config.traces.processorOrderedList }}
+            - {{ . }}
+            {{- end }}
+            {{- else }}
             {{- range $key, $val := .Values.openTelemetry.gateway.config.traces.processors }}
             - {{ $key }}
+            {{- end }}
             {{- end }}
           {{- end }}
           exporters:

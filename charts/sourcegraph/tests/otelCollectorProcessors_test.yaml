@@ -1,0 +1,72 @@
+---
+suite: otelCollectorProcessors
+templates:
+  - otel-collector/otel-collector.ConfigMap.yaml
+set:
+  openTelemetry:
+    gateway:
+      config:
+        traces:
+          exporters:
+            otlp:
+              endpoint: "otlp.service.com:443"
+tests:
+  - it: should not render a processors section when none are configured
+    asserts:
+      - notMatchRegex:
+          path: data["config.yaml"]
+          pattern: "processors:"
+  - it: should order pipeline processors by map key when processorOrderedList is not set
+    set:
+      openTelemetry:
+        gateway:
+          config:
+            traces:
+              processors:
+                memory_limiter:
+                  check_interval: 1s
+                batch:
+                  timeout: 1s
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "processors:\\s*\\n\\s*- batch\\s*\\n\\s*- memory_limiter"
+  - it: should order pipeline processors using processorOrderedList when set
+    set:
+      openTelemetry:
+        gateway:
+          config:
+            traces:
+              processors:
+                memory_limiter:
+                  check_interval: 1s
+                batch:
+                  timeout: 1s
+              processorOrderedList:
+                - memory_limiter
+                - batch
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "processors:\\s*\\n\\s*- memory_limiter\\s*\\n\\s*- batch"
+  - it: should still define processor configs regardless of ordering source
+    set:
+      openTelemetry:
+        gateway:
+          config:
+            traces:
+              processors:
+                memory_limiter:
+                  check_interval: 1s
+                batch:
+                  timeout: 1s
+              processorOrderedList:
+                - memory_limiter
+                - batch
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "check_interval: 1s"
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "timeout: 1s"
