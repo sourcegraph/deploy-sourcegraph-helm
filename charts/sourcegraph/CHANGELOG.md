@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added optional NetworkPolicies to block Executor access to Sourcegraph backend pods
 - Added support for overriding `replicaCount` per dedicated `worker` replica via `worker.replicas[].replicaCount`, falling back to `worker.replicaCount` when unset
 - Added support for overriding the image repository on a per-service basis via `<serviceName>.image.repository`, falling back to the global `sourcegraph.image.repository` when unset
 - Added livenessProbe to zoekt-webserver in indexed-search to detect and restart hung pods

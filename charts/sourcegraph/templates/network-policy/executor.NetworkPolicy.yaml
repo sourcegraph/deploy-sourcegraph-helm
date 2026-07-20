@@ -1,0 +1,60 @@
+{{- if .Values.networkPolicy.executor.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "sourcegraph.name" . }}-pods-block-executors
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+    matchExpressions:
+      - key: app.kubernetes.io/component
+        operator: NotIn
+        values:
+          - executor
+      - key: sourcegraph/job-id
+        operator: DoesNotExist
+      - key: sourcegraph/run-id
+        operator: DoesNotExist
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/component
+                operator: NotIn
+                values:
+                  - executor
+              - key: sourcegraph/job-id
+                operator: DoesNotExist
+              - key: sourcegraph/run-id
+                operator: DoesNotExist
+          {{- if .Values.networkPolicy.executor.allowOtherNamespacesToReachBackendPods }}
+          namespaceSelector: {}
+          {{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "sourcegraph.name" . }}-frontend-allow-http-from-anywhere
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: network-policy
+spec:
+  podSelector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: sourcegraph-frontend
+  policyTypes:
+    - Ingress
+  ingress:
+    - ports:
+        - protocol: TCP
+          port: http
+{{- end }}
