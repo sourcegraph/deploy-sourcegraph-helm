@@ -16,7 +16,7 @@ tests:
       - notMatchRegex:
           path: data["config.yaml"]
           pattern: "processors:"
-  - it: should order pipeline processors by map key when processorOrderedList is not set
+  - it: should order pipeline processors by map key when tracePipelineProcessors is not set
     set:
       openTelemetry:
         gateway:
@@ -31,7 +31,7 @@ tests:
       - matchRegex:
           path: data["config.yaml"]
           pattern: "processors:\\s*\\n\\s*- batch\\s*\\n\\s*- memory_limiter"
-  - it: should order pipeline processors using processorOrderedList when set
+  - it: should order pipeline processors using tracePipelineProcessors when set
     set:
       openTelemetry:
         gateway:
@@ -42,7 +42,7 @@ tests:
                   check_interval: 1s
                 batch:
                   timeout: 1s
-              processorOrderedList:
+              tracePipelineProcessors:
                 - memory_limiter
                 - batch
     asserts:
@@ -60,7 +60,7 @@ tests:
                   check_interval: 1s
                 batch:
                   timeout: 1s
-              processorOrderedList:
+              tracePipelineProcessors:
                 - memory_limiter
                 - batch
     asserts:
