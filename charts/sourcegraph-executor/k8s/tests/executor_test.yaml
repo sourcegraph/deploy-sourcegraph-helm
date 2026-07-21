@@ -125,3 +125,43 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should JSON-encode kubernetesJob.node.tolerations when given a YAML list (issue #349)
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations:
+              - key: foo
+                operator: Equal
+                value: bar
+                effect: NoSchedule
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"effect":"NoSchedule","key":"foo","operator":"Equal","value":"bar"}]'
+
+  - it: should pass through kubernetesJob.node.tolerations when given a pre-encoded JSON string
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations: '[{"key":"foo","operator":"Equal","value":"bar","effect":"NoSchedule"}]'
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"key":"foo","operator":"Equal","value":"bar","effect":"NoSchedule"}]'
+
+  - it: should render default kubernetesJob.node.tolerations as empty string
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: ""
