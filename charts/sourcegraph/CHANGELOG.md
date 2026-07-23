@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added support for ordering trace processors via `openTelemetry.gateway.config.traces.tracePipelineProcessors`, falling back to processors ordered by name when unset
 - Removed the unused executor controller `/data` PersistentVolumeClaim from the Kubernetes-native executor chart (`sourcegraph-executor/k8s`), along with the now-orphaned `storageClass` and `executor.storageSize` values and the vestigial `EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME` env var. Since single-job-pod became the only k8s execution mode, job pods use their own ephemeral `emptyDir` volume and the controller writes nothing to `/data`.
 - Removed the non-functional `executor.replicas` value from the Kubernetes-native executor chart; the controller is a singleton (it pins Job pods to its own node), so `replicas > 1` never worked.
 - Added support for overriding `replicaCount` per dedicated `worker` replica via `worker.replicas[].replicaCount`, falling back to `worker.replicaCount` when unset
