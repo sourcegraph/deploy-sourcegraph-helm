@@ -11,7 +11,7 @@ blobstore:
 # Use YAML anchors and aliases to keep override file clean
 x-object-storage-env: &objectStorageEnv
   SOURCEGRAPH_UPLOAD_BACKEND:
-    value: S3 # Either S3 or GCS
+    value: S3
   SOURCEGRAPH_UPLOAD_BUCKET:
     value: sourcegraph-bucket
   SOURCEGRAPH_UPLOAD_AWS_ENDPOINT: # Optional
