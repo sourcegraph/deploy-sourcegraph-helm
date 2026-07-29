@@ -1,0 +1,47 @@
+# Override file demonstrating the use of external Object Storage services
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
+
+# Using an AWS S3 bucket, with access key authentication
+
+# Disable deployment of the built-in object storage
+blobstore:
+  enabled: false
+
+# Use YAML anchors and aliases to keep override file clean
+x-object-storage-env: &objectStorageEnv
+  SOURCEGRAPH_UPLOAD_BACKEND:
+    value: S3
+  SOURCEGRAPH_UPLOAD_BUCKET:
+    value: sourcegraph-bucket
+  SOURCEGRAPH_UPLOAD_AWS_ENDPOINT: # Optional
+    value: https://s3.us-east-1.amazonaws.com
+  SOURCEGRAPH_UPLOAD_AWS_REGION:
+    value: us-east-1
+  SOURCEGRAPH_UPLOAD_MANAGE_BUCKET:
+    value: "false"
+  SOURCEGRAPH_UPLOAD_AWS_ACCESS_KEY_ID:
+    secretKeyRef:
+      name: sourcegraph-s3-credentials # Pre-existing Kubernetes secret, not created by this Helm chart
+      key: SOURCEGRAPH_UPLOAD_AWS_ACCESS_KEY_ID
+  SOURCEGRAPH_UPLOAD_AWS_SECRET_ACCESS_KEY:
+    secretKeyRef:
+      name: sourcegraph-s3-credentials
+      key: SOURCEGRAPH_UPLOAD_AWS_SECRET_ACCESS_KEY
+
+# Apply the needed configs to the pods which use blob storage
+frontend:
+  env:
+    <<: *objectStorageEnv
+
+preciseCodeIntel:
+  env:
+    <<: *objectStorageEnv
+
+syntacticCodeIntel:
+  env:
+    <<: *objectStorageEnv
+
+worker:
+  env:
+    <<: *objectStorageEnv
