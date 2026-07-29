@@ -1,0 +1,50 @@
+# Override file demonstrating the use of external Object Storage services
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
+
+# Using an AWS S3 bucket, with IRSA authentication
+
+# Disable deployment of the built-in object storage
+blobstore:
+  enabled: false
+
+# Use YAML anchors and aliases to keep override file clean
+x-object-storage-env: &objectStorageEnv
+  SOURCEGRAPH_UPLOAD_BACKEND:
+    value: S3 # Either S3 or GCS
+  SOURCEGRAPH_UPLOAD_BUCKET:
+    value: sourcegraph-bucket
+  SOURCEGRAPH_UPLOAD_AWS_ENDPOINT: # Optional
+    value: https://s3.us-east-1.amazonaws.com
+  SOURCEGRAPH_UPLOAD_AWS_REGION:
+    value: us-east-1
+  SOURCEGRAPH_UPLOAD_MANAGE_BUCKET:
+    value: "false"
+  SOURCEGRAPH_UPLOAD_AWS_USE_EC2_ROLE_CREDENTIALS:
+    value: "true"
+
+# Pods must run using a Kubernetes service account with the IRSA role annotation
+x-service-account: &serviceAccount
+  create: false
+  name: sourcegraph-irsa
+
+# Apply the needed configs to the pods which use blob storage
+frontend:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+preciseCodeIntel:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+syntacticCodeIntel:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+worker:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount

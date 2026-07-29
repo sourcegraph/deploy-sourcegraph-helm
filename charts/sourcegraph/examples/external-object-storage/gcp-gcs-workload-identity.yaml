@@ -1,0 +1,35 @@
+# Override file demonstrating the use of external Object Storage services
+# Learn more from the tutorial below
+# - https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-object-storage
+
+# Using a GCP GCS bucket, with workload identity authentication
+
+# Disable deployment of the built-in object storage
+blobstore:
+  enabled: false
+
+# Use YAML anchors and aliases to keep override file clean
+x-object-storage-env: &objectStorageEnv
+  SOURCEGRAPH_UPLOAD_BACKEND:
+    value: GCS
+  SOURCEGRAPH_UPLOAD_BUCKET:
+    value: sourcegraph-bucket
+  SOURCEGRAPH_UPLOAD_MANAGE_BUCKET:
+    value: "false"
+
+# Apply the needed configs to the pods which use blob storage
+frontend:
+  env:
+    <<: *objectStorageEnv
+
+preciseCodeIntel:
+  env:
+    <<: *objectStorageEnv
+
+syntacticCodeIntel:
+  env:
+    <<: *objectStorageEnv
+
+worker:
+  env:
+    <<: *objectStorageEnv
