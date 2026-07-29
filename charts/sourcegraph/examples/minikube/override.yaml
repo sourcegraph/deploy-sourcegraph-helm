@@ -1,0 +1,12 @@
+frontend:
+  ingress:
+    enabled: true
+    annotations: null
+    ingressClassName: nginx
+    host: localhost
+
+storageClass:
+  create: true
+  type: null
+  provisioner: kubernetes.io/no-provisioner
+  volumeBindingMode: WaitForFirstConsumer
