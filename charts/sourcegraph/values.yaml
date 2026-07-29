@@ -383,6 +383,10 @@ frontend:
     create: true
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: sourcegraph-frontend
+  # Internal registry configuration
+  internalRegistry:
+    # -- Enable internal OCI registry port (5000) on frontend service
+    enabled: false
 
 migrator:
   # -- Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in
