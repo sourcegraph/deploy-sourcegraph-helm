@@ -111,7 +111,7 @@ executor:
   # Each queue can override this with its own resources field.
   resources: {}
   image:
-    defaultTag: 6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508
+    defaultTag: 7.5.4453@sha256:921b1e99702bda38950006f18211a77c65771b859894c25b55ce28e0ef84b018
     name: "executor"
   replicaCount: 1
   # -- Extra environment variables to set on the executor container.
