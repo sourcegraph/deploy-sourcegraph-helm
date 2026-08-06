@@ -321,6 +321,7 @@ In addition to the documented values, all services also support the following va
 | redisStore.storageAnnotations | object | `{}` | Optional annotations to add to the `redis-store` PVC |
 | redisStore.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-store` data volume |
 | redisStore.storageSubPath | string | `""` | Optional subPath for the `redis-store` primary data volume mount |
+| searcher.autoCacheSize | bool | `false` | When enabled, omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` env vars so `searcher` auto-sizes its cache to ~45% of the live cache volume. This tracks PVC expansion automatically, whereas the hardcoded env vars are frozen to the initial `storageSize` and do not follow later disk growth. |
 | searcher.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | searcher.image.defaultTag | string | `"6.0.0@sha256:c7508abda2202d4a33400ce23a95dd8d59fe6220d85d7fbee6fb186c55931336"` | Docker image tag for the `searcher` image |
 | searcher.image.name | string | `"searcher"` | Docker image name for the `searcher` image |

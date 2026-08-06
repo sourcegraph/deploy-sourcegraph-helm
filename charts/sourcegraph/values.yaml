@@ -1148,6 +1148,11 @@ searcher:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- When enabled, omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB`
+  # env vars so `searcher` auto-sizes its cache to ~45% of the live cache volume.
+  # This tracks PVC expansion automatically, whereas the hardcoded env vars are
+  # frozen to the initial `storageSize` and do not follow later disk growth.
+  autoCacheSize: false
   # -- Size of the PVC for searcher pods to store cache data
   storageSize: 26Gi
   # -- Optional subPath for the `searcher` primary data volume mount

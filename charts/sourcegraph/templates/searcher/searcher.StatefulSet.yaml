@@ -55,6 +55,11 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- if not .Values.searcher.autoCacheSize }}
+        # When autoCacheSize is enabled, these env vars are omitted so searcher
+        # sizes its cache to ~45% of the live cache volume, tracking PVC
+        # expansion automatically. SEARCHER_CACHE_SIZE_MB / SYMBOLS_CACHE_SIZE_MB
+        # are deprecated in favor of this auto-detection.
         - name: SEARCHER_CACHE_SIZE_MB
           # Set the cache size to ~45% of the PVC size
           {{- if .Values.searcher.storageSize }}
@@ -73,6 +78,7 @@ spec:
           # storageSize in the VolumeClaimTemplate below
           value: "11700"
           {{- end }}
+        {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
