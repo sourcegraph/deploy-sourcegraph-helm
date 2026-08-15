@@ -312,3 +312,60 @@ checksum/auth: {{ toJson $checksum | sha256sum }}
 {{- $checksum := append $checksum .Values.redisCache.connection -}}
 checksum/redis: {{ toJson $checksum | sha256sum }}
 {{- end -}}
+
+{{/*
+Resolve the redis `maxmemory` directive for a service.
+Usage: include "sourcegraph.redis.maxmemory" (list . "redisCache")
+
+Resolution order:
+  1. <service>.config.maxmemory, used verbatim.
+  2. floor(<service>.config.maxmemoryRatio * <service>.resources.limits.memory),
+     rendered as a plain byte count.
+  3. Empty string, when there is no memory limit or the quantity is not
+     recognised. The caller then emits no `maxmemory` and the vendored default
+     stands.
+*/}}
+{{- define "sourcegraph.redis.maxmemory" -}}
+{{- $top := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $values := index $top.Values $service -}}
+{{- $config := $values.config | default dict -}}
+{{- if $config.maxmemory -}}
+{{- $config.maxmemory -}}
+{{- else -}}
+{{- $limit := dig "resources" "limits" "memory" "" $values | toString -}}
+{{- $number := regexReplaceAll "^([0-9]+(\\.[0-9]+)?).*$" $limit "${1}" -}}
+{{- $suffix := regexReplaceAll "^[0-9]+(\\.[0-9]+)?" $limit "" -}}
+{{- /* Kubernetes quantity suffixes: binary (1024^n) and decimal (1000^n). */ -}}
+{{- $units := dict "" 1.0 "k" 1e3 "M" 1e6 "G" 1e9 "T" 1e12 "P" 1e15 "E" 1e18 "Ki" 1024.0 "Mi" 1048576.0 "Gi" 1073741824.0 "Ti" 1099511627776.0 "Pi" 1125899906842624.0 "Ei" 1152921504606846976.0 -}}
+{{- if and (regexMatch "^[0-9]+(\\.[0-9]+)?$" $number) (hasKey $units $suffix) -}}
+{{- $ratio := $config.maxmemoryRatio | default 0.75 | float64 -}}
+{{- $bytes := floor (mulf (float64 $number) (index $units $suffix) $ratio) -}}
+{{- if gt $bytes 0.0 -}}
+{{- printf "%d" (int64 $bytes) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Fail the render when a service's extra volumes or volume mounts collide with the
+chart-managed redis config mount. Without this the collision only surfaces as an
+opaque "must be unique" rejection from the API server.
+Usage: include "sourcegraph.redis.assertNoConfClash" (list . "redisCache")
+*/}}
+{{- define "sourcegraph.redis.assertNoConfClash" -}}
+{{- $top := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $values := index $top.Values $service -}}
+{{- range ($values.extraVolumeMounts | default list) -}}
+{{- if has .mountPath (list "/etc/redis/redis.conf" "/etc/redis" "/etc/redis/") -}}
+{{- fail (printf "%s.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to %s.config.existingConfig or %s.config.additionalConfig." $service $service $service) -}}
+{{- end -}}
+{{- end -}}
+{{- range (concat ($values.extraVolumes | default list) ($values.extraVolumeMounts | default list)) -}}
+{{- if eq (.name | toString) "redis-conf" -}}
+{{- fail (printf "%s must not define a volume named 'redis-conf'; the chart reserves that name for the redis config mount." $service) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

@@ -1,0 +1,118 @@
+---
+suite: redisConfigMount
+# The ConfigMap templates are listed so the Deployments' checksum annotation can
+# include them.
+templates:
+- redis/redis-cache.Deployment.yaml
+- redis/redis-store.Deployment.yaml
+- redis/redis-cache.ConfigMap.yaml
+- redis/redis-store.ConfigMap.yaml
+tests:
+- it: should mount the chart-managed ConfigMap over the image path for redis-cache
+  template: redis/redis-cache.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        mountPath: /etc/redis/redis.conf
+        name: redis-conf
+        subPath: redis.conf
+        readOnly: true
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: redis-conf
+        configMap:
+          name: redis-cache-conf
+          items:
+          - key: redis.conf
+            path: redis.conf
+  - isNotEmpty:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+  - notExists:
+      path: spec.template.spec.containers[0].command
+- it: should mount the chart-managed ConfigMap over the image path for redis-store
+  template: redis/redis-store.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        mountPath: /etc/redis/redis.conf
+        name: redis-conf
+        subPath: redis.conf
+        readOnly: true
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: redis-conf
+        configMap:
+          name: redis-store-conf
+          items:
+          - key: redis.conf
+            path: redis.conf
+  - isNotEmpty:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+  - notExists:
+      path: spec.template.spec.containers[0].command
+- it: should mount an existing ConfigMap and drop the checksum annotation
+  template: redis/redis-cache.Deployment.yaml
+  set:
+    redisCache:
+      config:
+        existingConfig: my-redis-conf
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: redis-conf
+        configMap:
+          name: my-redis-conf
+          items:
+          - key: redis.conf
+            path: redis.conf
+  - notExists:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+- it: should fail when redis-cache extraVolumeMounts collide with the chart-managed redis.conf
+  template: redis/redis-cache.Deployment.yaml
+  set:
+    redisCache:
+      extraVolumeMounts:
+      - name: my-conf
+        mountPath: /etc/redis/redis.conf
+        subPath: redis.conf
+  asserts:
+  - failedTemplate:
+      errorMessage: "redisCache.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to redisCache.config.existingConfig or redisCache.config.additionalConfig."
+- it: should fail when redis-store extraVolumeMounts mount the whole /etc/redis directory
+  template: redis/redis-store.Deployment.yaml
+  set:
+    redisStore:
+      extraVolumeMounts:
+      - name: my-conf
+        mountPath: /etc/redis
+  asserts:
+  - failedTemplate:
+      errorMessage: "redisStore.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to redisStore.config.existingConfig or redisStore.config.additionalConfig."
+- it: should fail when an extra volume reuses the reserved redis-conf name
+  template: redis/redis-cache.Deployment.yaml
+  set:
+    redisCache:
+      extraVolumes:
+      - name: redis-conf
+        emptyDir: {}
+  asserts:
+  - failedTemplate:
+      errorMessage: "redisCache must not define a volume named 'redis-conf'; the chart reserves that name for the redis config mount."
+- it: should still allow unrelated extraVolumeMounts
+  template: redis/redis-cache.Deployment.yaml
+  set:
+    redisCache:
+      extraVolumeMounts:
+      - name: my-extra
+        mountPath: /somewhere-else
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        name: my-extra
+        mountPath: /somewhere-else

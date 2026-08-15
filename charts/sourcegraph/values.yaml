@@ -1037,6 +1037,24 @@ redisCache:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-cache` PVC
   storageAnnotations: {}
+  config:
+    # -- Name of an existing ConfigMap for `redis-cache`. It must contain a `redis.conf` key.
+    # When set, the chart-managed ConfigMap is not rendered and this one is mounted instead,
+    # so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`.
+    existingConfig: ""
+    # -- Explicit redis `maxmemory` for `redis-cache` (for example `6gb`). Overrides the
+    # auto-computed value. Empty means compute it from the container memory limit.
+    maxmemory: ""
+    # -- Fraction of `redisCache.resources.limits.memory` used for `maxmemory` when
+    # `maxmemory` is empty. Ignored when no memory limit is set.
+    maxmemoryRatio: 0.75
+    # -- Override the redis `maxmemory-policy` for `redis-cache`.
+    # Empty keeps the vendored default (`allkeys-lru`).
+    maxmemoryPolicy: ""
+    # -- Additional raw redis directives appended to the vendored `redis-cache` config.
+    # Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext,
+    # so do not put secrets such as `requirepass` here; use `existingConfig` instead.
+    additionalConfig: ""
 
 redisExporter:
   image:
@@ -1110,6 +1128,24 @@ redisStore:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-store` PVC
   storageAnnotations: {}
+  config:
+    # -- Name of an existing ConfigMap for `redis-store`. It must contain a `redis.conf` key.
+    # When set, the chart-managed ConfigMap is not rendered and this one is mounted instead,
+    # so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`.
+    existingConfig: ""
+    # -- Explicit redis `maxmemory` for `redis-store` (for example `6gb`). Overrides the
+    # auto-computed value. Empty means compute it from the container memory limit.
+    maxmemory: ""
+    # -- Fraction of `redisStore.resources.limits.memory` used for `maxmemory` when
+    # `maxmemory` is empty. Ignored when no memory limit is set.
+    maxmemoryRatio: 0.75
+    # -- Override the redis `maxmemory-policy` for `redis-store`.
+    # Empty keeps the vendored default (`noeviction`).
+    maxmemoryPolicy: ""
+    # -- Additional raw redis directives appended to the vendored `redis-store` config.
+    # Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext,
+    # so do not put secrets such as `requirepass` here; use `existingConfig` instead.
+    additionalConfig: ""
 
 searcher:
   image:
