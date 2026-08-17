@@ -1,0 +1,190 @@
+---
+suite: redisConfig
+templates:
+- redis/redis-cache.ConfigMap.yaml
+- redis/redis-store.ConfigMap.yaml
+tests:
+- it: should render the vendored config with an auto-sized maxmemory by default
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\ndir /redis-data/\n"
+    # 7Gi * 0.75
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 5637144576\n?$"
+- it: should keep the vendored maxmemory-policy of each service
+  template: redis/redis-cache.ConfigMap.yaml
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory-policy allkeys-lru\n"
+- it: should keep the vendored maxmemory-policy for redis-store
+  template: redis/redis-store.ConfigMap.yaml
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory-policy noeviction\n"
+- it: should size maxmemory from a binary memory limit
+  set:
+    redisCache:
+      resources:
+        limits:
+          memory: 4Gi
+    redisStore:
+      resources:
+        limits:
+          memory: 512Mi
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory (3221225472|402653184)\n?$"
+- it: should size maxmemory from a decimal memory limit
+  set:
+    redisCache:
+      resources:
+        limits:
+          memory: 2G
+    redisStore:
+      resources:
+        limits:
+          memory: 2G
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 1500000000\n?$"
+- it: should size maxmemory from a suffixless byte count
+  set:
+    redisCache:
+      resources:
+        limits:
+          memory: "6442450944"
+    redisStore:
+      resources:
+        limits:
+          memory: "6442450944"
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 4831838208\n?$"
+- it: should size maxmemory from a fractional memory limit
+  set:
+    redisCache:
+      resources:
+        limits:
+          memory: 1.5Gi
+    redisStore:
+      resources:
+        limits:
+          memory: 1.5Gi
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 1207959552\n?$"
+- it: should honour maxmemoryRatio
+  set:
+    redisCache:
+      config:
+        maxmemoryRatio: 0.5
+    redisStore:
+      config:
+        maxmemoryRatio: 0.5
+  asserts:
+    # 7Gi * 0.5
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 3758096384\n?$"
+- it: should not append maxmemory when there is no memory limit
+  set:
+    redisCache:
+      resources:
+        limits: null
+    redisStore:
+      resources:
+        limits: null
+  asserts:
+  - notMatchRegex:
+      path: data["redis.conf"]
+      pattern: "Chart-managed directives"
+- it: should not append maxmemory when the memory limit is unparseable
+  set:
+    redisCache:
+      resources:
+        limits:
+          memory: 7Gib
+    redisStore:
+      resources:
+        limits:
+          memory: notaquantity
+  asserts:
+  - notMatchRegex:
+      path: data["redis.conf"]
+      pattern: "Chart-managed directives"
+- it: should use an explicit maxmemory verbatim
+  set:
+    redisCache:
+      config:
+        maxmemory: 6gb
+    redisStore:
+      config:
+        maxmemory: 6gb
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 6gb\n?$"
+- it: should append maxmemory-policy and additionalConfig overrides
+  set:
+    redisCache:
+      config:
+        maxmemoryPolicy: volatile-lru
+        additionalConfig: |
+          lazyfree-lazy-eviction yes
+    redisStore:
+      config:
+        maxmemoryPolicy: volatile-lru
+        additionalConfig: |
+          lazyfree-lazy-eviction yes
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 5637144576\nmaxmemory-policy volatile-lru\nlazyfree-lazy-eviction yes\n?$"
+- it: should not render the redis-cache ConfigMap when existingConfig is set
+  template: redis/redis-cache.ConfigMap.yaml
+  set:
+    redisCache:
+      config:
+        existingConfig: my-redis-conf
+  asserts:
+  - hasDocuments:
+      count: 0
+- it: should not render the redis-store ConfigMap when existingConfig is set
+  template: redis/redis-store.ConfigMap.yaml
+  set:
+    redisStore:
+      config:
+        existingConfig: my-redis-conf
+  asserts:
+  - hasDocuments:
+      count: 0
+- it: should fail when both redisCache existingConfig and additionalConfig are defined
+  template: redis/redis-cache.ConfigMap.yaml
+  set:
+    redisCache:
+      config:
+        existingConfig: i-will-break-rendering
+        additionalConfig: |
+          maxmemory 1gb
+  asserts:
+  - failedTemplate:
+      errorMessage: You can only define one of 'redisCache.config.existingConfig' and 'redisCache.config.additionalConfig' at a time
+- it: should fail when both redisStore existingConfig and additionalConfig are defined
+  template: redis/redis-store.ConfigMap.yaml
+  set:
+    redisStore:
+      config:
+        existingConfig: i-will-break-rendering
+        additionalConfig: |
+          maxmemory 1gb
+  asserts:
+  - failedTemplate:
+      errorMessage: You can only define one of 'redisStore.config.existingConfig' and 'redisStore.config.additionalConfig' at a time

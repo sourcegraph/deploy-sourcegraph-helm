@@ -1,0 +1,35 @@
+{{- if and .Values.redisCache.enabled (and .Values.redisCache.config.existingConfig .Values.redisCache.config.additionalConfig) -}}
+{{- fail "You can only define one of 'redisCache.config.existingConfig' and 'redisCache.config.additionalConfig' at a time" }}
+{{- end }}
+{{- if and .Values.redisCache.enabled (not .Values.redisCache.config.existingConfig) -}}
+{{- $body := .Files.Get "files/redis-cache/redis.conf" | trimSuffix "\n" -}}
+{{- $overrides := list -}}
+{{- with include "sourcegraph.redis.maxmemory" (list . "redisCache") -}}
+{{- $overrides = append $overrides (printf "maxmemory %s" .) -}}
+{{- end -}}
+{{- with .Values.redisCache.config.maxmemoryPolicy -}}
+{{- $overrides = append $overrides (printf "maxmemory-policy %s" .) -}}
+{{- end -}}
+{{- with .Values.redisCache.config.additionalConfig -}}
+{{- $overrides = append $overrides (tpl . $ | trim) -}}
+{{- end -}}
+{{- if $overrides -}}
+{{- $body = printf "%s\n\n# Chart-managed directives. Redis applies the last occurrence of a directive.\n%s" $body (join "\n" $overrides) -}}
+{{- end -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  annotations:
+    description: Configuration for redis-cache
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.redisCache.labels }}
+      {{- toYaml .Values.redisCache.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
+  name: {{ .Values.redisCache.name }}-conf
+data:
+  redis.conf: |
+    {{- $body | nindent 4 }}
+{{- end }}
