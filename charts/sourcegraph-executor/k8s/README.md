@@ -57,6 +57,10 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| executor.cleanup.enabled | bool | `false` | If true, deploy a CronJob that deletes leftover executor job resources (Jobs, Secrets, and PersistentVolumeClaims named `sg-executor-job-*`). The executor deletes these itself after each job, but leaves them behind when it is killed mid-job (e.g. OOM kill, node scale-down, rollout). |
+| executor.cleanup.image | string | `"index.docker.io/alpine/kubectl:1.33.4"` | A kubectl image that includes a shell, used by the cleanup CronJob. |
+| executor.cleanup.minimumAgeSeconds | string | `"3600"` | Only delete resources older than this many seconds. Must be greater than `executor.kubernetesJob.deadline`, so resources of running jobs are never deleted. |
+| executor.cleanup.schedule | string | `"*/30 * * * *"` | Cron schedule of the cleanup CronJob. |
 | executor.configureRbac | bool | `true` | Whether to configure the necessary RBAC resources. Required only once for all executor deployments. |
 | executor.containerSecurityContext | object | `{"privileged":false}` | Security context for the container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | executor.debug.keepJobs | string | `"false"` | If true, Kubernetes jobs will not be deleted after they complete. Not recommended for production use as it can hit cluster limits. |
