@@ -454,6 +454,8 @@ gitserver:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Access modes for the `gitserver` PVC. Set to `["ReadWriteOncePod"]` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) so Kubernetes mounts the volume with `-o context` instead of recursively relabeling every file on each pod start
+  storageAccessModes: ["ReadWriteOnce"]
   # -- PVC Storage Request for `gitserver` data volume
   storageSize: 200Gi
   # -- Optional subPath for the `gitserver` primary data volume mount
