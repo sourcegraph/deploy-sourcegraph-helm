@@ -4,20 +4,49 @@ set -euf -o pipefail
 
 ### Run the helm tests
 function lint_chart() {
-  echo "Linting chart $1"
-  LINT_OUTPUT=$(helm lint charts/$1)
-  ORG_STATUS=$?
+  local chart_path="$1"
+  local lint_output
+  local lint_status
 
-  printf "\n\n===== Lint Output =====\n$LINT_OUTPUT\n"
+  shift
 
-  LINT_OUTPUT_LOWER=$(echo "$LINT_OUTPUT" | awk '{print tolower($0)}')
-  if grep -q "warning" <<<"$LINT_OUTPUT_LOWER"; then
-    exit 255
+  echo "Linting chart ${chart_path}"
+  if lint_output=$(helm lint "${chart_path}" "$@" 2>&1); then
+    lint_status=0
   else
-    exit $ORG_STATUS
+    lint_status=$?
   fi
+
+  printf "\n\n===== Lint Output: %s =====\n%s\n" "${chart_path}" "${lint_output}"
+
+  if grep -qi "warning" <<<"${lint_output}"; then
+    printf "Helm lint emitted warnings for %s\n" "${chart_path}" >&2
+    return 255
+  fi
+
+  return "${lint_status}"
 }
 
-lint_chart "sourcegraph"
-lint_chart "sourcegraph-migrator"
-lint_chart "sourcegraph-executor"
+function lint_and_record() {
+  local chart_status
+
+  if lint_chart "$@"; then
+    return 0
+  else
+    chart_status=$?
+  fi
+
+  if [ "${exit_status}" -eq 0 ]; then
+    exit_status="${chart_status}"
+  fi
+
+  return 0
+}
+
+exit_status=0
+lint_and_record "charts/sourcegraph"
+lint_and_record "charts/sourcegraph-migrator"
+lint_and_record "charts/sourcegraph-executor/k8s" --set "executor.queueName=batches"
+lint_and_record "charts/sourcegraph-executor/dind" --set "executor.queueName=batches"
+
+exit "${exit_status}"
