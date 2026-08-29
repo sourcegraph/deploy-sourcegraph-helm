@@ -3,6 +3,11 @@ release:
   name: sourcegraph
   namespace: sourcegraph
 tests:
+- it: should not render podDisruptionBudget for searcher by default
+  template: searcher/searcher.PodDisruptionBudget.yaml
+  asserts:
+  - hasDocuments:
+      count: 0
 - it: should render podDisruptionBudget for frontend
   template: frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
   set:
@@ -16,3 +21,28 @@ tests:
   - equal:
       path: spec.selector.matchLabels.app
       value: sourcegraph-frontend
+- it: should render podDisruptionBudget for searcher
+  template: searcher/searcher.PodDisruptionBudget.yaml
+  set:
+    searcher:
+      podDisruptionBudget:
+        maxUnavailable: 1
+  asserts:
+  - equal:
+      path: apiVersion
+      value: policy/v1
+  - equal:
+      path: metadata.name
+      value: searcher
+  - equal:
+      path: spec.maxUnavailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: searcher
+  - equal:
+      path: spec.selector.matchLabels["app.kubernetes.io/name"]
+      value: sourcegraph
+  - equal:
+      path: spec.selector.matchLabels["app.kubernetes.io/instance"]
+      value: sourcegraph

@@ -1170,6 +1170,8 @@ searcher:
   name: "searcher"
   # -- Number of `searcher` pod
   replicaCount: 1
+  # -- Pod disruption budget for `searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `searcher` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
