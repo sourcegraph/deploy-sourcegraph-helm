@@ -331,6 +331,7 @@ In addition to the documented values, all services also support the following va
 | searcher.image.defaultTag | string | `"6.0.0@sha256:c7508abda2202d4a33400ce23a95dd8d59fe6220d85d7fbee6fb186c55931336"` | Docker image tag for the `searcher` image |
 | searcher.image.name | string | `"searcher"` | Docker image name for the `searcher` image |
 | searcher.name | string | `"searcher"` | Name used by resources. Does not affect service names or PVCs. |
+| searcher.podDisruptionBudget | object | `{}` | Pod disruption budget for `searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | searcher.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":100}` | Security context for the `searcher` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | searcher.replicaCount | int | `1` | Number of `searcher` pod |
 | searcher.resources | object | `{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |

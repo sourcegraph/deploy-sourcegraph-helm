@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added optional `searcher.podDisruptionBudget` support
 - Set `DEPLOY_TYPE=helm` consistently for all Sourcegraph application containers
 - Fixed the grafana StatefulSet rendering invalid YAML when `grafana.extraContainers` and a service account are both set, by emitting `extraContainers` inside the `containers` list before `serviceAccountName`, matching the other templates
 - Added `searcher.autoCacheSize` (default `false`) to omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` env vars, letting `searcher` auto-size its cache to ~45% of the live cache volume so it tracks PVC expansion instead of staying frozen to the initial `storageSize`
