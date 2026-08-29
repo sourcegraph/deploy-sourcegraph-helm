@@ -64,9 +64,11 @@ spec:
         worker-replica: {{ $name | quote }}
         {{- end }}
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list $top "worker") | nindent 6 }}
       containers:
       - name: worker
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list $top "worker") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" $top | nindent 8 }}
         {{- if $allowlist }}
         - name: WORKER_JOB_ALLOWLIST
