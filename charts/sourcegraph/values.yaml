@@ -1244,6 +1244,8 @@ syntectServer:
   podSecurityContext: {}
   # -- Number of `syntect-server` pod
   replicaCount: 1
+  # -- Pod disruption budget for `syntect-server`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `syntect-server` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
