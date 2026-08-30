@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added optional `syntectServer.podDisruptionBudget` support
 - Added optional `searcher.podDisruptionBudget` support
 - Set `DEPLOY_TYPE=helm` consistently for all Sourcegraph application containers
 - Fixed the grafana StatefulSet rendering invalid YAML when `grafana.extraContainers` and a service account are both set, by emitting `extraContainers` inside the `containers` list before `serviceAccountName`, matching the other templates

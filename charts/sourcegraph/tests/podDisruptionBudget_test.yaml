@@ -8,6 +8,11 @@ tests:
   asserts:
   - hasDocuments:
       count: 0
+- it: should not render podDisruptionBudget for syntax highlighter by default
+  template: syntect-server/syntect-server.PodDisruptionBudget.yaml
+  asserts:
+  - hasDocuments:
+      count: 0
 - it: should render podDisruptionBudget for frontend
   template: frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
   set:
@@ -40,6 +45,31 @@ tests:
   - equal:
       path: spec.selector.matchLabels.app
       value: searcher
+  - equal:
+      path: spec.selector.matchLabels["app.kubernetes.io/name"]
+      value: sourcegraph
+  - equal:
+      path: spec.selector.matchLabels["app.kubernetes.io/instance"]
+      value: sourcegraph
+- it: should render podDisruptionBudget for syntax highlighter
+  template: syntect-server/syntect-server.PodDisruptionBudget.yaml
+  set:
+    syntectServer:
+      podDisruptionBudget:
+        maxUnavailable: 1
+  asserts:
+  - equal:
+      path: apiVersion
+      value: policy/v1
+  - equal:
+      path: metadata.name
+      value: syntect-server
+  - equal:
+      path: spec.maxUnavailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: syntect-server
   - equal:
       path: spec.selector.matchLabels["app.kubernetes.io/name"]
       value: sourcegraph
