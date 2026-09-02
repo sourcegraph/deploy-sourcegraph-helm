@@ -43,12 +43,14 @@ spec:
         type: gitserver
         deploy: sourcegraph
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "gitserver") | nindent 6 }}
       containers:
       - name: gitserver
         args: {{- default (list "run") .Values.gitserver.args | toYaml | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "gitserver") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "gitserver") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- range $name, $item := .Values.gitserver.env}}
         - name: {{ $name }}

@@ -43,6 +43,7 @@ spec:
         deploy: sourcegraph
         app: searcher
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "searcher") | nindent 6 }}
       containers:
       - name: searcher
         {{- with .Values.searcher.args }}
@@ -50,6 +51,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "searcher") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- range $name, $item := .Values.searcher.env}}
         - name: {{ $name }}

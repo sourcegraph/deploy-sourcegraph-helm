@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added configurable pre-shutdown pauses, graceful-shutdown timeouts, and termination grace periods for application services
 - Added optional `syntectServer.podDisruptionBudget` support
 - Added optional `searcher.podDisruptionBudget` support
 - Set `DEPLOY_TYPE=helm` consistently for all Sourcegraph application containers

@@ -45,9 +45,11 @@ spec:
         deploy: sourcegraph
         app: syntect-server
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntectServer") | nindent 6 }}
       containers:
       - name: syntect-server
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "syntectServer") | nindent 8 }}
         {{- range $name, $item := .Values.syntectServer.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}

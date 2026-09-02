@@ -46,9 +46,11 @@ spec:
         deploy: sourcegraph
         app: syntactic-code-intel-worker
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntacticCodeIntel") | nindent 6 }}
       containers:
       - name: syntactic-code-intel-worker
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "syntacticCodeIntel") | nindent 8 }}
         {{- range $name, $item := .Values.syntacticCodeIntel.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
