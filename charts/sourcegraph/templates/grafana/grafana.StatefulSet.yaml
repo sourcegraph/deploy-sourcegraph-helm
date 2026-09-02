@@ -83,10 +83,10 @@ spec:
         {{- end }}
         securityContext:
           {{- toYaml .Values.grafana.containerSecurityContext | nindent 10 }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "grafana") | trim | nindent 6 }}
       {{- if .Values.grafana.extraContainers }}
         {{- toYaml .Values.grafana.extraContainers | nindent 6 }}
       {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "grafana") | trim | nindent 6 }}
       securityContext:
         {{- toYaml .Values.grafana.podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "grafana" ) | trim | nindent 6 }}

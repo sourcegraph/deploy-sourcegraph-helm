@@ -394,7 +394,10 @@ migrator:
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
-  env: {}
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   # -- Resource requests & limits for the `migrator` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -413,6 +416,11 @@ migrator:
     readOnlyRootFilesystem: true
 
 gitserver:
+  # -- Environment variables for the `gitserver` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `gitserver` image
     defaultTag: 6.0.0@sha256:aec9bf6993c243a283109104cd7c44be3c85680b77e3e8be0c5fba8f01a3bd35
@@ -530,6 +538,11 @@ grafana:
   storageAnnotations: {}
 
 indexedSearch:
+  # -- Environment variables for the `zoekt-webserver` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `zoekt-webserver` image
     defaultTag: 6.0.0@sha256:99038e0ec9bef930030c118d774fcdcd67d7fe57ad4c80d216703a4d29d64323
@@ -575,6 +588,11 @@ indexedSearch:
   storageAnnotations: {}
 
 indexedSearchIndexer:
+  # -- Environment variables for the `zoekt-indexserver` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `zoekt-indexserver` image
     defaultTag: 6.0.0@sha256:11539e07040b85045a9aa07f970aa310066e240dc28e6c9627653ee2bc6e0b91
@@ -602,6 +620,11 @@ indexedSearchIndexer:
 blobstore:
   # -- Enable `blobstore` (S3 compatible storage)
   enabled: true
+  # -- Environment variables for the `blobstore` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `blobstore` image
     defaultTag: 6.0.0@sha256:82caab40f920282069c84e0e4ca503857926e934c67fb022f6d93823b4ea98b5
@@ -856,6 +879,11 @@ postgresExporter:
 
 syntacticCodeIntel:
   enabled: false
+  # -- Environment variables for the `syntactic-code-intel-worker` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   properties:
     # -- port to whick worker API will bind
     workerPort: 3188
@@ -895,7 +923,10 @@ syntacticCodeIntel:
 
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container
+  # @default -- the chart will add some default environment values
   env:
+    DEPLOY_TYPE:
+      value: helm
     NUM_WORKERS:
       value: "4"
   image:
@@ -1114,6 +1145,11 @@ redisStore:
   storageAnnotations: {}
 
 searcher:
+  # -- Environment variables for the `searcher` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `searcher` image
     defaultTag: 6.0.0@sha256:c7508abda2202d4a33400ce23a95dd8d59fe6220d85d7fbee6fb186c55931336
@@ -1136,6 +1172,8 @@ searcher:
   name: "searcher"
   # -- Number of `searcher` pod
   replicaCount: 1
+  # -- Pod disruption budget for `searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `searcher` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1184,6 +1222,11 @@ storageClass:
   allowedTopologies: []
 
 syntectServer:
+  # -- Environment variables for the `syntect-server` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `syntect-server` image
     defaultTag: 6.0.0@sha256:1e35f77690222a76724b45f2305b838c40c35201e60b0f619b3fe8499504ff60
@@ -1203,6 +1246,8 @@ syntectServer:
   podSecurityContext: {}
   # -- Number of `syntect-server` pod
   replicaCount: 1
+  # -- Pod disruption budget for `syntect-server`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `syntect-server` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1311,7 +1356,10 @@ worker:
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "worker"
   # -- Environment variables for the `worker` container
-  env: {}
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   # -- Security context for the `worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}

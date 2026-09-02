@@ -9,6 +9,10 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Added `gitserver.storageAccessModes` (default `["ReadWriteOnce"]`) to allow `["ReadWriteOncePod"]`, which lets Kubernetes mount the repos volume with `-o context` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) instead of recursively relabeling every file on each pod start. Changing this on an existing deployment requires recreating the StatefulSet and PVC, as both fields are immutable.
+- Added optional `syntectServer.podDisruptionBudget` support
+- Added optional `searcher.podDisruptionBudget` support
+- Set `DEPLOY_TYPE=helm` consistently for all Sourcegraph application containers
+- Fixed the grafana StatefulSet rendering invalid YAML when `grafana.extraContainers` and a service account are both set, by emitting `extraContainers` inside the `containers` list before `serviceAccountName`, matching the other templates
 - Added `searcher.autoCacheSize` (default `false`) to omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` env vars, letting `searcher` auto-size its cache to ~45% of the live cache volume so it tracks PVC expansion instead of staying frozen to the initial `storageSize`
 - Added support for ordering trace processors via `openTelemetry.gateway.config.traces.tracePipelineProcessors`, falling back to processors ordered by name when unset
 - Removed the unused executor controller `/data` PersistentVolumeClaim from the Kubernetes-native executor chart (`sourcegraph-executor/k8s`), along with the now-orphaned `storageClass` and `executor.storageSize` values and the vestigial `EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME` env var. Since single-job-pod became the only k8s execution mode, job pods use their own ephemeral `emptyDir` volume and the controller writes nothing to `/data`.
