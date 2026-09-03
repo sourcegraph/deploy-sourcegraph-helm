@@ -449,6 +449,8 @@ gitserver:
     readOnlyRootFilesystem: true
   # -- Number of `gitserver` pod
   replicaCount: 1
+  # -- Pod disruption budget for `gitserver`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `gitserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -567,6 +569,8 @@ indexedSearch:
   name: "indexed-search"
   # -- Number of `indexed-search` pod
   replicaCount: 1
+  # -- Pod disruption budget for `indexed-search`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `zoekt-webserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -914,6 +918,8 @@ syntacticCodeIntel:
   podSecurityContext: {}
   # -- Number of `syntactic-code-intel-worker` pod
   replicaCount: 2
+  # -- Pod disruption budget for `syntactic-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `syntactic-code-intel-worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -956,6 +962,8 @@ preciseCodeIntel:
   podSecurityContext: {}
   # -- Number of `precise-code-intel-worker` pod
   replicaCount: 2
+  # -- Pod disruption budget for `precise-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `precise-code-intel-worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1067,6 +1075,8 @@ redisCache:
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Pod disruption budget for `redis-cache`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `redis-cache`
     create: false
@@ -1140,6 +1150,8 @@ redisStore:
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Pod disruption budget for `redis-store`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `redis-store`
     create: false
@@ -1373,6 +1385,8 @@ worker:
   podSecurityContext: {}
   # -- Number of `worker` pod
   replicaCount: 1
+  # -- Pod disruption budget for every `worker` deployment. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- List of jobs to block globally
   # If replicas are configured, use this values to block jobs instead of manually setting WORKER_JOB_BLOCKLIST
   blocklist: []

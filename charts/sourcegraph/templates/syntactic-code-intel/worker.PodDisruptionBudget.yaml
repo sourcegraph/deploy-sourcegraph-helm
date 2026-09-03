@@ -1,0 +1,12 @@
+{{- if and .Values.syntacticCodeIntel.enabled .Values.syntacticCodeIntel.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.syntacticCodeIntel.name }}
+spec:
+  {{- toYaml .Values.syntacticCodeIntel.podDisruptionBudget | nindent 2 }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: syntactic-code-intel-worker
+{{- end }}
