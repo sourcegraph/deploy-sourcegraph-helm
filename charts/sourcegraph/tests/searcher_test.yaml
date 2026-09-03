@@ -1,0 +1,14 @@
+suite: searcher
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should check readiness on the debug server
+  template: searcher/searcher.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.httpGet
+      value:
+        path: /ready
+        port: http-debug
+        scheme: HTTP

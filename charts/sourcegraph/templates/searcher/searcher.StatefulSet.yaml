@@ -99,8 +99,8 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            path: /healthz
-            port: grpc
+            path: /ready
+            port: http-debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5
