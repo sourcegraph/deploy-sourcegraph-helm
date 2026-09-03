@@ -76,3 +76,129 @@ tests:
   - equal:
       path: spec.selector.matchLabels["app.kubernetes.io/instance"]
       value: sourcegraph
+- it: should render podDisruptionBudget for gitserver
+  template: gitserver/gitserver.PodDisruptionBudget.yaml
+  set:
+    gitserver.podDisruptionBudget.minAvailable: 1
+  asserts:
+  - equal:
+      path: metadata.name
+      value: gitserver
+  - equal:
+      path: spec.minAvailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: gitserver
+- it: should render podDisruptionBudget for indexed search
+  template: indexed-search/indexed-search.PodDisruptionBudget.yaml
+  set:
+    indexedSearch.podDisruptionBudget.maxUnavailable: 1
+  asserts:
+  - equal:
+      path: metadata.name
+      value: indexed-search
+  - equal:
+      path: spec.maxUnavailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: indexed-search
+- it: should render podDisruptionBudget for precise code intel
+  template: precise-code-intel/worker.PodDisruptionBudget.yaml
+  set:
+    preciseCodeIntel.podDisruptionBudget.maxUnavailable: 1
+  asserts:
+  - equal:
+      path: metadata.name
+      value: precise-code-intel-worker
+  - equal:
+      path: spec.maxUnavailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: precise-code-intel-worker
+- it: should render podDisruptionBudget for redis cache
+  template: redis/redis-cache.PodDisruptionBudget.yaml
+  set:
+    redisCache.podDisruptionBudget.minAvailable: 1
+  asserts:
+  - equal:
+      path: metadata.name
+      value: redis-cache
+  - equal:
+      path: spec.minAvailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: redis-cache
+- it: should render podDisruptionBudget for redis store
+  template: redis/redis-store.PodDisruptionBudget.yaml
+  set:
+    redisStore.podDisruptionBudget.minAvailable: 1
+  asserts:
+  - equal:
+      path: metadata.name
+      value: redis-store
+  - equal:
+      path: spec.minAvailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: redis-store
+- it: should render podDisruptionBudget for syntactic code intel when enabled
+  template: syntactic-code-intel/worker.PodDisruptionBudget.yaml
+  set:
+    syntacticCodeIntel.enabled: true
+    syntacticCodeIntel.podDisruptionBudget.maxUnavailable: 1
+  asserts:
+  - equal:
+      path: metadata.name
+      value: syntactic-code-intel-worker
+  - equal:
+      path: spec.maxUnavailable
+      value: 1
+  - equal:
+      path: spec.selector.matchLabels.app
+      value: syntactic-code-intel-worker
+- it: should render a podDisruptionBudget for every worker deployment
+  template: worker/worker.PodDisruptionBudget.yaml
+  set:
+    worker:
+      podDisruptionBudget:
+        maxUnavailable: 1
+      replicas:
+      - jobs: ["job1"]
+      - jobs: ["job2"]
+  asserts:
+  - hasDocuments:
+      count: 3
+  - equal:
+      path: metadata.name
+      value: worker
+    documentIndex: 0
+  - notExists:
+      path: spec.selector.matchLabels.worker-replica
+    documentIndex: 0
+  - equal:
+      path: spec.selector.matchExpressions[0]
+      value:
+        key: worker-replica
+        operator: DoesNotExist
+    documentIndex: 0
+  - equal:
+      path: metadata.name
+      value: worker-0
+    documentIndex: 1
+  - equal:
+      path: spec.selector.matchLabels.worker-replica
+      value: worker-0
+    documentIndex: 1
+  - equal:
+      path: metadata.name
+      value: worker-1
+    documentIndex: 2
+  - equal:
+      path: spec.selector.matchLabels.worker-replica
+      value: worker-1
+    documentIndex: 2
