@@ -135,7 +135,7 @@ spec:
       {{- end }}
     spec:
       accessModes:
-      - ReadWriteOnce
+      {{- toYaml .Values.gitserver.storageAccessModes | nindent 6 }}
       resources:
         requests:
           # The size of disk used to mirror your git repositories.
