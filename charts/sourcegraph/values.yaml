@@ -38,6 +38,12 @@ sourcegraph:
   # -- Global deployment clean up policy,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
   revisionHistoryLimit: 10
+  # -- Time Sourcegraph services continue accepting requests after shutdown begins so Kubernetes endpoint changes can propagate
+  preShutdownPause: 5s
+  # -- Total time Sourcegraph services have for the pre-shutdown pause and graceful drain
+  gracefulShutdownTimeout: 15s
+  # -- Time Kubernetes allows Sourcegraph services to shut down before forced termination
+  terminationGracePeriodSeconds: 30
   # -- Add extra labels to all services
   serviceLabels: {}
   # -- Disable the creation of Kubernetes secrets objects
@@ -65,6 +71,10 @@ sourcegraph:
 #   serviceAnnotations: {}
 #   # Provide custom environment variables
 #   env: {}
+#   # Override the global graceful shutdown settings
+#   preShutdownPause: ""
+#   gracefulShutdownTimeout: ""
+#   terminationGracePeriodSeconds: null
 #   # Set resource requests / limits
 #   resources: {}
 #   containerSecurityContext: {}

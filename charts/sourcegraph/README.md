@@ -20,6 +20,9 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 - `<serviceName>.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 - `<serviceName>.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `<serviceName>.preShutdownPause` - override `sourcegraph.preShutdownPause` for this service
+- `<serviceName>.gracefulShutdownTimeout` - override `sourcegraph.gracefulShutdownTimeout` for this service
+- `<serviceName>.terminationGracePeriodSeconds` - override `sourcegraph.terminationGracePeriodSeconds` for this service
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
 - `<serviceName>.serivceAccount.create` - create service account for service
@@ -344,6 +347,7 @@ In addition to the documented values, all services also support the following va
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.disableKubernetesSecrets | bool | `false` | Disable the creation of Kubernetes secrets objects |
+| sourcegraph.gracefulShutdownTimeout | string | `"15s"` | Total time Sourcegraph services have for the pre-shutdown pause and graceful drain |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
@@ -355,9 +359,11 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.preShutdownPause | string | `"5s"` | Time Sourcegraph services continue accepting requests after shutdown begins so Kubernetes endpoint changes can propagate |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
+| sourcegraph.terminationGracePeriodSeconds | int | `30` | Time Kubernetes allows Sourcegraph services to shut down before forced termination |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | list | `[]` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
 | storageClass.create | bool | `true` | Enable creation of storageClass. Disable if you have your own existing storage class |

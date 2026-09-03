@@ -1,0 +1,43 @@
+suite: syntect server
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- syntect-server/syntect-server.Deployment.yaml
+tests:
+- it: should render rollout-safe defaults
+  asserts:
+  - equal:
+      path: spec.strategy.type
+      value: RollingUpdate
+  - equal:
+      path: spec.strategy.rollingUpdate.maxSurge
+      value: 1
+  - equal:
+      path: spec.strategy.rollingUpdate.maxUnavailable
+      value: 0
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 30
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_PRE_SHUTDOWN_PAUSE
+        value: 5s
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 15s
+- it: should render replica and termination grace overrides
+  set:
+    syntectServer:
+      replicaCount: 2
+      terminationGracePeriodSeconds: 60
+  asserts:
+  - equal:
+      path: spec.replicas
+      value: 2
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 60

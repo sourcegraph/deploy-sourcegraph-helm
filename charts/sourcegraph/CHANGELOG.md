@@ -9,6 +9,7 @@ Use `**BREAKING**:` to denote a breaking change
 ## Unreleased
 
 - Added `gitserver.storageAccessModes` (default `["ReadWriteOnce"]`) to allow `["ReadWriteOncePod"]`, which lets Kubernetes mount the repos volume with `-o context` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) instead of recursively relabeling every file on each pod start. Changing this on an existing deployment requires recreating the StatefulSet and PVC, as both fields are immutable.
+- Added configurable pre-shutdown pauses, graceful-shutdown timeouts, and termination grace periods for application services
 - Added optional `syntectServer.podDisruptionBudget` support
 - Added optional `searcher.podDisruptionBudget` support
 - Set `DEPLOY_TYPE=helm` consistently for all Sourcegraph application containers

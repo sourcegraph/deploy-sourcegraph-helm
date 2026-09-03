@@ -45,9 +45,11 @@ spec:
         deploy: sourcegraph
         app: precise-code-intel-worker
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "preciseCodeIntel") | nindent 6 }}
       containers:
       - name: precise-code-intel-worker
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "preciseCodeIntel") | nindent 8 }}
         {{- range $name, $item := .Values.preciseCodeIntel.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
