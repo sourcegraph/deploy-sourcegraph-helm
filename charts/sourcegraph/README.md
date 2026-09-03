@@ -136,6 +136,7 @@ In addition to the documented values, all services also support the following va
 | gitserver.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `gitserver` |
 | gitserver.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.sshSecret | string | `""` | Name of existing Secret that contains SSH credentials to clone repositories. It usually contains keys, such as `id_rsa` (private key) and `known_hosts`. Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories) |
+| gitserver.storageAccessModes | list | `["ReadWriteOnce"]` | Access modes for the `gitserver` PVC. Set to `["ReadWriteOncePod"]` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) so Kubernetes mounts the volume with `-o context` instead of recursively relabeling every file on each pod start |
 | gitserver.storageAnnotations | object | `{}` | Optional annotations to add to the `gitserver` PVC |
 | gitserver.storageSize | string | `"200Gi"` | PVC Storage Request for `gitserver` data volume |
 | gitserver.storageSubPath | string | `""` | Optional subPath for the `gitserver` primary data volume mount |
