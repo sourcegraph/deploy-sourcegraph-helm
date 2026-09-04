@@ -333,7 +333,7 @@ frontend:
     enabled: true
     # -- Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/)
     annotations:
-      # --  [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier.
+      # --  [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifying the IngressClass in Kubernetes 1.17 and earlier.
       # If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation.
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/proxy-body-size: 150m
@@ -594,7 +594,7 @@ indexedSearch:
     name: ""
   # -- PVC Storage Request for `indexed-search` data volume
   # The size of disk to used for search indexes.
-  # This should typically be gitserver disk size multipled by the number of gitserver shards.
+  # This should typically be gitserver disk size multiplied by the number of gitserver shards.
   storageSize: 200Gi
   # -- Optional subPath for the `indexed-search` primary data volume mount
   storageSubPath: ""
@@ -899,7 +899,7 @@ syntacticCodeIntel:
     DEPLOY_TYPE:
       value: helm
   properties:
-    # -- port to whick worker API will bind
+    # -- port to which worker API will bind
     workerPort: 3188
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
