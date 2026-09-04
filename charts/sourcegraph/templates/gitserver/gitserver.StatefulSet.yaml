@@ -62,18 +62,31 @@ spec:
         # gitserver can take a little while to start up. To avoid killing the
         # pod because of a failed liveness probe, we give it 2 minutes to start up.
         startupProbe:
-          tcpSocket:
-            port: grpc
+          httpGet:
+            path: /ready
+            port: http-debug
+            scheme: HTTP
           failureThreshold: 120
           periodSeconds: 1
         livenessProbe:
+          httpGet:
+            path: /healthz
+            port: http-debug
+            scheme: HTTP
           initialDelaySeconds: 5
-          tcpSocket:
-            port: grpc
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: http-debug
+            scheme: HTTP
+          periodSeconds: 5
           timeoutSeconds: 5
         ports:
         - name: grpc
           containerPort: 3178
+        - name: http-clone
+          containerPort: 3179
         - name: http-debug
           containerPort: 6060
         {{- if not .Values.sourcegraph.localDevMode }}
