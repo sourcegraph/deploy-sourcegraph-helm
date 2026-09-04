@@ -110,7 +110,7 @@ In addition to the documented values, all services also support the following va
 | frontend.image.defaultTag | string | `"6.0.0@sha256:d4f21178096da5fdb3804099ae9de2e050b06e859a327aa79452b1ea2f3ede0a"` | Docker image tag for the `frontend` image |
 | frontend.image.name | string | `"frontend"` | Docker image name for the `frontend` image |
 | frontend.ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
-| frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
+| frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifying the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
 | frontend.ingress.enabled | bool | `true` | Enable ingress for the Sourcegraph server |
 | frontend.ingress.host | string | `""` | External hostname for the Sourcegraph server ingress (SSL) |
 | frontend.ingress.hosts | list | `[]` | List of hosts for the ingress rules. Supersedes `host` if set. Cannot be set together with `host`. Example: hosts:   - host: sourcegraph.example.com |
@@ -173,7 +173,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-search` |
 | indexedSearch.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | indexedSearch.storageAnnotations | object | `{}` | Optional annotations to add to the `indexed-search` PVC |
-| indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multipled by the number of gitserver shards. |
+| indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multiplied by the number of gitserver shards. |
 | indexedSearch.storageSubPath | string | `""` | Optional subPath for the `indexed-search` primary data volume mount |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | indexedSearchIndexer.env | object | the chart will add some default environment values | Environment variables for the `zoekt-indexserver` container |
@@ -384,7 +384,7 @@ In addition to the documented values, all services also support the following va
 | syntacticCodeIntel.name | string | `"syntactic-code-intel-worker"` | Name used by resources. Does not affect service names or PVCs. |
 | syntacticCodeIntel.podDisruptionBudget | object | `{}` | Pod disruption budget for `syntactic-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | syntacticCodeIntel.podSecurityContext | object | `{}` | Security context for the `syntactic-code-intel-worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| syntacticCodeIntel.properties.workerPort | int | `3188` | port to whick worker API will bind |
+| syntacticCodeIntel.properties.workerPort | int | `3188` | port to which worker API will bind |
 | syntacticCodeIntel.replicaCount | int | `2` | Number of `syntactic-code-intel-worker` pod |
 | syntacticCodeIntel.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |

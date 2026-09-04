@@ -56,7 +56,7 @@ Make sure you test both enabled and disabled toggles. For example, if you added 
 
 ### Update the image tag
 
-You have two options to target specificy Sourcegraph version. Add the below to your `override.yaml`:
+You have two options to target specific Sourcegraph version. Add the below to your `override.yaml`:
 
 ```yaml
 sourcegraph:
