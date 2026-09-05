@@ -17,9 +17,6 @@ metadata:
   name: precise-code-intel-worker
 spec:
   ports:
-  - name: http
-    port: 3188
-    targetPort: http
   - name: http-debug
     port: 6060
     targetPort: http-debug
