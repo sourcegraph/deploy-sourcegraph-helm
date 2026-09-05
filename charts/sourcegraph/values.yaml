@@ -507,6 +507,8 @@ grafana:
     sslmode: ""
   # -- Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key.
   existingConfig: "" # Name of an existing configmap
+  # -- Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml`
+  initContainers: []
   image:
     # -- Docker image tag for the `grafana` image
     defaultTag: 6.0.0@sha256:e40236d0143d0735ff87374afce95b878b8cde448ef65cfdc7008056a03097e8
