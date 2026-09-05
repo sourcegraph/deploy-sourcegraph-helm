@@ -153,6 +153,7 @@ In addition to the documented values, all services also support the following va
 | grafana.existingConfig | string | `""` | Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key. |
 | grafana.image.defaultTag | string | `"6.0.0@sha256:e40236d0143d0735ff87374afce95b878b8cde448ef65cfdc7008056a03097e8"` | Docker image tag for the `grafana` image |
 | grafana.image.name | string | `"grafana"` | Docker image name for the `grafana` image |
+| grafana.initContainers | list | `[]` | Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml` |
 | grafana.name | string | `"grafana"` | Name used by resources. Does not affect service names or PVCs. |
 | grafana.podSecurityContext | object | `{"fsGroup":472,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | grafana.resources | object | `{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests & limits for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
