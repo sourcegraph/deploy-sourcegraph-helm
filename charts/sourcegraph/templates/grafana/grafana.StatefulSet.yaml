@@ -42,6 +42,10 @@ spec:
         app: grafana
         deploy: sourcegraph
     spec:
+      {{- with .Values.grafana.initContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: grafana
         image: {{ include "sourcegraph.image" (list . "grafana") }}
