@@ -87,8 +87,6 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - name: http
-          containerPort: 3188
         - name: http-debug
           containerPort: 6060
         {{- if not .Values.sourcegraph.localDevMode }}

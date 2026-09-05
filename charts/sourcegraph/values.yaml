@@ -898,9 +898,6 @@ syntacticCodeIntel:
   env:
     DEPLOY_TYPE:
       value: helm
-  properties:
-    # -- port to which worker API will bind
-    workerPort: 3188
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
     defaultTag: 6.0.0@sha256:50bdeb38b196f0fc21404969016bf8263f78144292e905867e93480f66c8251c
