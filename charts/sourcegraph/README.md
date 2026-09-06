@@ -384,7 +384,6 @@ In addition to the documented values, all services also support the following va
 | syntacticCodeIntel.name | string | `"syntactic-code-intel-worker"` | Name used by resources. Does not affect service names or PVCs. |
 | syntacticCodeIntel.podDisruptionBudget | object | `{}` | Pod disruption budget for `syntactic-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | syntacticCodeIntel.podSecurityContext | object | `{}` | Security context for the `syntactic-code-intel-worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| syntacticCodeIntel.properties.workerPort | int | `3188` | port to which worker API will bind |
 | syntacticCodeIntel.replicaCount | int | `2` | Number of `syntactic-code-intel-worker` pod |
 | syntacticCodeIntel.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |
