@@ -17,12 +17,23 @@ x-object-storage-env: &objectStorageEnv
   SOURCEGRAPH_UPLOAD_MANAGE_BUCKET:
     value: "false"
 
+# Syntactic Code Intel uses the legacy precise Code Intel upload store configuration
+x-syntactic-code-intel-env: &syntacticCodeIntelEnv
+  PRECISE_CODE_INTEL_UPLOAD_BACKEND:
+    value: GCS
+  PRECISE_CODE_INTEL_UPLOAD_BUCKET:
+    value: sourcegraph-bucket
+  PRECISE_CODE_INTEL_UPLOAD_GCP_PROJECT_ID:
+    value: sourcegraph-project
+  PRECISE_CODE_INTEL_UPLOAD_MANAGE_BUCKET:
+    value: "false"
+
 # Pods must run using a Kubernetes service account configured for Workload Identity
 x-service-account: &serviceAccount
   create: false
   name: sourcegraph-workload-identity
 
-# Apply the needed configs to the pods which use blob storage
+# Apply the shared object storage config to its authoritative consumers
 frontend:
   env:
     <<: *objectStorageEnv
@@ -46,4 +57,10 @@ searcher:
 worker:
   env:
     <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+# Configure syntactic Code Intel's separate legacy precise upload store
+syntacticCodeIntel:
+  env:
+    <<: *syntacticCodeIntelEnv
   serviceAccount: *serviceAccount
