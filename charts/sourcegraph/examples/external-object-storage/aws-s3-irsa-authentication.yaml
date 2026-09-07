@@ -23,21 +23,6 @@ x-object-storage-env: &objectStorageEnv
   SOURCEGRAPH_UPLOAD_AWS_USE_EC2_ROLE_CREDENTIALS:
     value: "true"
 
-# Syntactic Code Intel uses the legacy precise Code Intel upload store configuration
-x-syntactic-code-intel-env: &syntacticCodeIntelEnv
-  PRECISE_CODE_INTEL_UPLOAD_BACKEND:
-    value: S3
-  PRECISE_CODE_INTEL_UPLOAD_BUCKET:
-    value: sourcegraph-bucket
-  PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT: # Optional
-    value: https://s3.us-east-1.amazonaws.com
-  PRECISE_CODE_INTEL_UPLOAD_AWS_REGION:
-    value: us-east-1
-  PRECISE_CODE_INTEL_UPLOAD_MANAGE_BUCKET:
-    value: "false"
-  PRECISE_CODE_INTEL_UPLOAD_AWS_USE_EC2_ROLE_CREDENTIALS:
-    value: "true"
-
 # Pods must run using a Kubernetes service account with the IRSA role annotation
 x-service-account: &serviceAccount
   create: false
@@ -69,8 +54,7 @@ worker:
     <<: *objectStorageEnv
   serviceAccount: *serviceAccount
 
-# Configure syntactic Code Intel's separate legacy precise upload store
 syntacticCodeIntel:
   env:
-    <<: *syntacticCodeIntelEnv
+    <<: *objectStorageEnv
   serviceAccount: *serviceAccount

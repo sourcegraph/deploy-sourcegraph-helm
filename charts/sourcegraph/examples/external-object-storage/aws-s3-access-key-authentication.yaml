@@ -31,29 +31,6 @@ x-object-storage-env: &objectStorageEnv
         name: sourcegraph-s3-credentials
         key: SOURCEGRAPH_UPLOAD_AWS_SECRET_ACCESS_KEY
 
-# Syntactic Code Intel uses the legacy precise Code Intel upload store configuration
-x-syntactic-code-intel-env: &syntacticCodeIntelEnv
-  PRECISE_CODE_INTEL_UPLOAD_BACKEND:
-    value: S3
-  PRECISE_CODE_INTEL_UPLOAD_BUCKET:
-    value: sourcegraph-bucket
-  PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT: # Optional
-    value: https://s3.us-east-1.amazonaws.com
-  PRECISE_CODE_INTEL_UPLOAD_AWS_REGION:
-    value: us-east-1
-  PRECISE_CODE_INTEL_UPLOAD_MANAGE_BUCKET:
-    value: "false"
-  PRECISE_CODE_INTEL_UPLOAD_AWS_ACCESS_KEY_ID:
-    valueFrom:
-      secretKeyRef:
-        name: sourcegraph-s3-credentials
-        key: SOURCEGRAPH_UPLOAD_AWS_ACCESS_KEY_ID
-  PRECISE_CODE_INTEL_UPLOAD_AWS_SECRET_ACCESS_KEY:
-    valueFrom:
-      secretKeyRef:
-        name: sourcegraph-s3-credentials
-        key: SOURCEGRAPH_UPLOAD_AWS_SECRET_ACCESS_KEY
-
 # Apply the shared object storage config to its authoritative consumers
 frontend:
   env:
@@ -75,7 +52,6 @@ worker:
   env:
     <<: *objectStorageEnv
 
-# Configure syntactic Code Intel's separate legacy precise upload store
 syntacticCodeIntel:
   env:
-    <<: *syntacticCodeIntelEnv
+    <<: *objectStorageEnv
