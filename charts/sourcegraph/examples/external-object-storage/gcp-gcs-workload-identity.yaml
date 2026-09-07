@@ -17,19 +17,33 @@ x-object-storage-env: &objectStorageEnv
   SOURCEGRAPH_UPLOAD_MANAGE_BUCKET:
     value: "false"
 
+# Pods must run using a Kubernetes service account configured for Workload Identity
+x-service-account: &serviceAccount
+  create: false
+  name: sourcegraph-workload-identity
+
 # Apply the needed configs to the pods which use blob storage
 frontend:
   env:
     <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
 
 preciseCodeIntel:
   env:
     <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
 
-syntacticCodeIntel:
+gitserver:
   env:
     <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+searcher:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
 
 worker:
   env:
     <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
