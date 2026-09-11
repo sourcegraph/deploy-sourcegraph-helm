@@ -10,6 +10,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 - Corrected the external object storage examples to configure the shared store for frontend, worker, precise code intel, syntactic code intel, gitserver, and searcher, including credentials or workload service accounts as required.
 - Removed the unused application ports from the precise and syntactic code intel worker Deployments and Services; health checks and Prometheus metrics continue to use the debug server on port 6060.
+- Added `grafana.initContainers`, so a native sidecar (`restartPolicy: Always`) can be started before `grafana`, e.g. to write a datasource credential file that `datasources.yml` reads with `$__file{}`
 - Added `gitserver.storageAccessModes` (default `["ReadWriteOnce"]`) to allow `["ReadWriteOncePod"]`, which lets Kubernetes mount the repos volume with `-o context` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) instead of recursively relabeling every file on each pod start. Changing this on an existing deployment requires recreating the StatefulSet and PVC, as both fields are immutable.
 - Added configurable pre-shutdown pauses, graceful-shutdown timeouts, and termination grace periods for application services
 - Added optional `syntectServer.podDisruptionBudget` support
