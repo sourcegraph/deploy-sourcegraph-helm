@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added a `network-policy` example, which limits Executor and Executor job pods to the frontend API
 - Corrected the external object storage examples to configure the shared store for frontend, worker, precise code intel, syntactic code intel, gitserver, and searcher, including credentials or workload service accounts as required.
 - Removed the unused application ports from the precise and syntactic code intel worker Deployments and Services; health checks and Prometheus metrics continue to use the debug server on port 6060.
 - Added `grafana.initContainers`, so a native sidecar (`restartPolicy: Always`) can be started before `grafana`, e.g. to write a datasource credential file that `datasources.yml` reads with `$__file{}`
