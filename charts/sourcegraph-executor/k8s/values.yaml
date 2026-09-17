@@ -135,6 +135,17 @@ executor:
     keepJobs: "false"
     keepWorkspaces: "false"
 
+  cleanup:
+    # -- If true, deploy a CronJob that deletes leftover executor job resources (Jobs, Secrets, and PersistentVolumeClaims named `sg-executor-job-*`).
+    # The executor deletes these itself after each job, but leaves them behind when it is killed mid-job (e.g. OOM kill, node scale-down, rollout).
+    enabled: false
+    # -- Cron schedule of the cleanup CronJob.
+    schedule: "*/30 * * * *"
+    # -- Only delete resources older than this many seconds. Must be greater than `executor.kubernetesJob.deadline`, so resources of running jobs are never deleted.
+    minimumAgeSeconds: "3600"
+    # -- A kubectl image that includes a shell, used by the cleanup CronJob.
+    image: "index.docker.io/alpine/kubectl:1.33.4"
+
   # -- Affinity,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
