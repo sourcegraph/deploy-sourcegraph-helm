@@ -82,7 +82,7 @@ tests:
         subPath: redis.conf
   asserts:
   - failedTemplate:
-      errorMessage: "redisCache.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to redisCache.config.existingConfig or redisCache.config.additionalConfig."
+      errorMessage: "redisCache.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to redisCache.config.existingConfig or redisCache.config.additionalConfig, or set redisCache.config.enabled=false to preserve your existing mount."
 - it: should fail when redis-store extraVolumeMounts mount the whole /etc/redis directory
   template: redis/redis-store.Deployment.yaml
   set:
@@ -92,7 +92,7 @@ tests:
         mountPath: /etc/redis
   asserts:
   - failedTemplate:
-      errorMessage: "redisStore.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to redisStore.config.existingConfig or redisStore.config.additionalConfig."
+      errorMessage: "redisStore.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to redisStore.config.existingConfig or redisStore.config.additionalConfig, or set redisStore.config.enabled=false to preserve your existing mount."
 - it: should fail when an extra volume reuses the reserved redis-conf name
   template: redis/redis-cache.Deployment.yaml
   set:
@@ -116,3 +116,92 @@ tests:
       content:
         name: my-extra
         mountPath: /somewhere-else
+- it: should preserve the image config when management is disabled
+  set:
+    redisCache.config.enabled: false
+    redisStore.config.enabled: false
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].volumeMounts
+      value:
+      - mountPath: /redis-data
+        name: redis-data
+    template: redis/redis-cache.Deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].volumeMounts
+      value:
+      - mountPath: /redis-data
+        name: redis-data
+    template: redis/redis-store.Deployment.yaml
+  - lengthEqual:
+      path: spec.template.spec.volumes
+      count: 1
+    template: redis/redis-cache.Deployment.yaml
+  - lengthEqual:
+      path: spec.template.spec.volumes
+      count: 1
+    template: redis/redis-store.Deployment.yaml
+  - notExists:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+    template: redis/redis-cache.Deployment.yaml
+  - notExists:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+    template: redis/redis-store.Deployment.yaml
+- it: should preserve a Secret-mounted config when management is disabled
+  set:
+    redisCache.config.enabled: false
+    redisStore.config.enabled: false
+    redisCache.extraVolumeMounts: &mounts
+    - name: redis-conf
+      mountPath: /etc/redis/redis.conf
+      subPath: redis.conf
+      readOnly: true
+    redisStore.extraVolumeMounts: *mounts
+    redisCache.extraVolumes: &volumes
+    - name: redis-conf
+      secret:
+        secretName: redis-auth-config
+    redisStore.extraVolumes: *volumes
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].volumeMounts
+      value:
+      - mountPath: /redis-data
+        name: redis-data
+      - name: redis-conf
+        mountPath: /etc/redis/redis.conf
+        subPath: redis.conf
+        readOnly: true
+    template: redis/redis-cache.Deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].volumeMounts
+      value:
+      - mountPath: /redis-data
+        name: redis-data
+      - name: redis-conf
+        mountPath: /etc/redis/redis.conf
+        subPath: redis.conf
+        readOnly: true
+    template: redis/redis-store.Deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes[1]
+      value:
+        name: redis-conf
+        secret:
+          secretName: redis-auth-config
+    template: redis/redis-cache.Deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes[1]
+      value:
+        name: redis-conf
+        secret:
+          secretName: redis-auth-config
+    template: redis/redis-store.Deployment.yaml
+  - lengthEqual:
+      path: spec.template.spec.volumes
+      count: 2
+    template: redis/redis-cache.Deployment.yaml
+  - lengthEqual:
+      path: spec.template.spec.volumes
+      count: 2
+    template: redis/redis-store.Deployment.yaml

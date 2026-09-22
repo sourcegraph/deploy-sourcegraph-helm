@@ -320,7 +320,7 @@ Usage: include "sourcegraph.redis.maxmemory" (list . "redisCache")
 Resolution order:
   1. <service>.config.maxmemory, used verbatim.
   2. floor(<service>.config.maxmemoryRatio * <service>.resources.limits.memory),
-     rendered as a plain byte count.
+     rendered as a plain byte count, unless localDevMode removes the limit.
   3. Empty string, when there is no memory limit or the quantity is not
      recognised. The caller then emits no `maxmemory` and the vendored default
      stands.
@@ -332,14 +332,20 @@ Resolution order:
 {{- $config := $values.config | default dict -}}
 {{- if $config.maxmemory -}}
 {{- $config.maxmemory -}}
-{{- else -}}
+{{- else if not $top.Values.sourcegraph.localDevMode -}}
 {{- $limit := dig "resources" "limits" "memory" "" $values | toString -}}
 {{- $number := regexReplaceAll "^([0-9]+(\\.[0-9]+)?).*$" $limit "${1}" -}}
 {{- $suffix := regexReplaceAll "^[0-9]+(\\.[0-9]+)?" $limit "" -}}
 {{- /* Kubernetes quantity suffixes: binary (1024^n) and decimal (1000^n). */ -}}
 {{- $units := dict "" 1.0 "k" 1e3 "M" 1e6 "G" 1e9 "T" 1e12 "P" 1e15 "E" 1e18 "Ki" 1024.0 "Mi" 1048576.0 "Gi" 1073741824.0 "Ti" 1099511627776.0 "Pi" 1125899906842624.0 "Ei" 1152921504606846976.0 -}}
 {{- if and (regexMatch "^[0-9]+(\\.[0-9]+)?$" $number) (hasKey $units $suffix) -}}
-{{- $ratio := $config.maxmemoryRatio | default 0.75 | float64 -}}
+{{- $ratio := 0.75 -}}
+{{- if hasKey $config "maxmemoryRatio" -}}
+{{- $ratio = float64 $config.maxmemoryRatio -}}
+{{- end -}}
+{{- if not (and (gt $ratio 0.0) (lt $ratio 1.0)) -}}
+{{- fail (printf "%s.config.maxmemoryRatio must be greater than 0 and less than 1" $service) -}}
+{{- end -}}
 {{- $bytes := floor (mulf (float64 $number) (index $units $suffix) $ratio) -}}
 {{- if gt $bytes 0.0 -}}
 {{- printf "%d" (int64 $bytes) -}}
@@ -360,7 +366,7 @@ Usage: include "sourcegraph.redis.assertNoConfClash" (list . "redisCache")
 {{- $values := index $top.Values $service -}}
 {{- range ($values.extraVolumeMounts | default list) -}}
 {{- if has .mountPath (list "/etc/redis/redis.conf" "/etc/redis" "/etc/redis/") -}}
-{{- fail (printf "%s.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to %s.config.existingConfig or %s.config.additionalConfig." $service $service $service) -}}
+{{- fail (printf "%s.extraVolumeMounts must not mount over /etc/redis/redis.conf; the chart now manages that file. Move your custom redis config to %s.config.existingConfig or %s.config.additionalConfig, or set %s.config.enabled=false to preserve your existing mount." $service $service $service $service) -}}
 {{- end -}}
 {{- end -}}
 {{- range (concat ($values.extraVolumes | default list) ($values.extraVolumeMounts | default list)) -}}

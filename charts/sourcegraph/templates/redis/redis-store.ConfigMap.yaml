@@ -1,7 +1,8 @@
-{{- if and .Values.redisStore.enabled (and .Values.redisStore.config.existingConfig .Values.redisStore.config.additionalConfig) -}}
+{{- if and .Values.redisStore.enabled .Values.redisStore.config.enabled -}}
+{{- if and .Values.redisStore.config.existingConfig .Values.redisStore.config.additionalConfig -}}
 {{- fail "You can only define one of 'redisStore.config.existingConfig' and 'redisStore.config.additionalConfig' at a time" }}
 {{- end }}
-{{- if and .Values.redisStore.enabled (not .Values.redisStore.config.existingConfig) -}}
+{{- if not .Values.redisStore.config.existingConfig -}}
 {{- $body := .Files.Get "files/redis-store/redis.conf" | trimSuffix "\n" -}}
 {{- $overrides := list -}}
 {{- with include "sourcegraph.redis.maxmemory" (list . "redisStore") -}}
@@ -32,4 +33,5 @@ metadata:
 data:
   redis.conf: |
     {{- $body | nindent 4 }}
+{{- end }}
 {{- end }}

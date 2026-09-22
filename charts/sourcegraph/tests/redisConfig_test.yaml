@@ -38,7 +38,12 @@ tests:
   asserts:
   - matchRegex:
       path: data["redis.conf"]
-      pattern: "\nmaxmemory (3221225472|402653184)\n?$"
+      pattern: "\nmaxmemory 3221225472\n?$"
+    template: redis/redis-cache.ConfigMap.yaml
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 402653184\n?$"
+    template: redis/redis-store.ConfigMap.yaml
 - it: should size maxmemory from a decimal memory limit
   set:
     redisCache:
@@ -188,3 +193,108 @@ tests:
   asserts:
   - failedTemplate:
       errorMessage: You can only define one of 'redisStore.config.existingConfig' and 'redisStore.config.additionalConfig' at a time
+- it: should reject a zero ratio instead of silently defaulting it
+  template: redis/redis-cache.ConfigMap.yaml
+  set:
+    redisCache.config.maxmemoryRatio: 0
+  asserts:
+  - failedTemplate:
+      errorMessage: redisCache.config.maxmemoryRatio must be greater than 0 and less than 1
+- it: should reject a negative ratio instead of reverting to 6gb
+  template: redis/redis-store.ConfigMap.yaml
+  set:
+    redisStore.config.maxmemoryRatio: -0.5
+  asserts:
+  - failedTemplate:
+      errorMessage: redisStore.config.maxmemoryRatio must be greater than 0 and less than 1
+- it: should reject a ratio of one to reserve memory for Redis overhead
+  template: redis/redis-cache.ConfigMap.yaml
+  set:
+    redisCache.config.maxmemoryRatio: 1
+  asserts:
+  - failedTemplate:
+      errorMessage: redisCache.config.maxmemoryRatio must be greater than 0 and less than 1
+- it: should reject a ratio greater than one
+  template: redis/redis-store.ConfigMap.yaml
+  set:
+    redisStore.config.maxmemoryRatio: 1.5
+  asserts:
+  - failedTemplate:
+      errorMessage: redisStore.config.maxmemoryRatio must be greater than 0 and less than 1
+- it: should reject a nonnumeric ratio
+  template: redis/redis-cache.ConfigMap.yaml
+  set:
+    redisCache.config.maxmemoryRatio: invalid
+  asserts:
+  - failedTemplate:
+      errorMessage: redisCache.config.maxmemoryRatio must be greater than 0 and less than 1
+- it: should floor fractional bytes and accept ratios near either boundary
+  set:
+    redisCache.resources.limits.memory: "1001"
+    redisStore.resources.limits.memory: "1001"
+    redisCache.config.maxmemoryRatio: 0.01
+    redisStore.config.maxmemoryRatio: 0.99
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 10\n?$"
+    template: redis/redis-cache.ConfigMap.yaml
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 990\n?$"
+    template: redis/redis-store.ConfigMap.yaml
+- it: should keep the vendored limit in local development mode
+  set:
+    sourcegraph.localDevMode: true
+    redisCache.resources.limits.memory: 512Mi
+    redisStore.resources.limits.memory: 1Gi
+  asserts:
+  - notMatchRegex:
+      path: data["redis.conf"]
+      pattern: "Chart-managed directives"
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 6gb\n"
+- it: should honour an explicit limit even in local development mode
+  set:
+    sourcegraph.localDevMode: true
+    redisCache.config.maxmemory: 256mb
+    redisStore.config.maxmemory: 256mb
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 256mb\n?$"
+- it: should ignore an unused ratio when an explicit limit is set
+  set:
+    redisCache.config.maxmemory: 300mb
+    redisStore.config.maxmemory: 300mb
+    redisCache.config.maxmemoryRatio: 0
+    redisStore.config.maxmemoryRatio: 2
+  asserts:
+  - matchRegex:
+      path: data["redis.conf"]
+      pattern: "\nmaxmemory 300mb\n?$"
+- it: should skip config rendering and validation when config management is disabled
+  set:
+    redisCache.config:
+      enabled: false
+      existingConfig: ignored
+      additionalConfig: ignored
+      maxmemoryRatio: 0
+    redisStore.config:
+      enabled: false
+      existingConfig: ignored
+      additionalConfig: ignored
+      maxmemoryRatio: 0
+  asserts:
+  - hasDocuments:
+      count: 0
+- it: should skip config rendering and validation for external Redis
+  set:
+    redisCache.enabled: false
+    redisStore.enabled: false
+    redisCache.config.maxmemoryRatio: 0
+    redisStore.config.maxmemoryRatio: 0
+  asserts:
+  - hasDocuments:
+      count: 0

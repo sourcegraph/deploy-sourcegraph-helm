@@ -1,7 +1,8 @@
-{{- if and .Values.redisCache.enabled (and .Values.redisCache.config.existingConfig .Values.redisCache.config.additionalConfig) -}}
+{{- if and .Values.redisCache.enabled .Values.redisCache.config.enabled -}}
+{{- if and .Values.redisCache.config.existingConfig .Values.redisCache.config.additionalConfig -}}
 {{- fail "You can only define one of 'redisCache.config.existingConfig' and 'redisCache.config.additionalConfig' at a time" }}
 {{- end }}
-{{- if and .Values.redisCache.enabled (not .Values.redisCache.config.existingConfig) -}}
+{{- if not .Values.redisCache.config.existingConfig -}}
 {{- $body := .Files.Get "files/redis-cache/redis.conf" | trimSuffix "\n" -}}
 {{- $overrides := list -}}
 {{- with include "sourcegraph.redis.maxmemory" (list . "redisCache") -}}
@@ -32,4 +33,5 @@ metadata:
 data:
   redis.conf: |
     {{- $body | nindent 4 }}
+{{- end }}
 {{- end }}
