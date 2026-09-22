@@ -62,24 +62,11 @@ spec:
         # sizes its cache to ~45% of the live cache volume, tracking PVC
         # expansion automatically. SEARCHER_CACHE_SIZE_MB / SYMBOLS_CACHE_SIZE_MB
         # are deprecated in favor of this auto-detection.
+        # Both caches share the PVC below and each gets ~45% of it.
         - name: SEARCHER_CACHE_SIZE_MB
-          # Set the cache size to ~45% of the PVC size
-          {{- if .Values.searcher.storageSize }}
-          value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 450 | quote }}
-          {{- else }}
-          # This value is ~45% of the default value for
-          # storageSize in the VolumeClaimTemplate below
-          value: "11700"
-          {{- end }}
+          value: {{ include "sourcegraph.searcher.cacheSizeMB" . | quote }}
         - name: SYMBOLS_CACHE_SIZE_MB
-          # Set the cache size to ~45% of the PVC size
-          {{- if .Values.searcher.storageSize }}
-          value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 450 | quote }}
-          {{- else }}
-          # This value is ~45% of the default value for
-          # storageSize in the VolumeClaimTemplate below
-          value: "11700"
-          {{- end }}
+          value: {{ include "sourcegraph.searcher.cacheSizeMB" . | quote }}
         {{- end }}
         - name: POD_NAME
           valueFrom:
