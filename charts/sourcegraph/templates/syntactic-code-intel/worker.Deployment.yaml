@@ -46,9 +46,11 @@ spec:
         deploy: sourcegraph
         app: syntactic-code-intel-worker
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntacticCodeIntel") | nindent 6 }}
       containers:
       - name: syntactic-code-intel-worker
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "syntacticCodeIntel") | nindent 8 }}
         {{- range $name, $item := .Values.syntacticCodeIntel.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -63,8 +65,6 @@ spec:
         - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
           value: http://blobstore:9000
         {{- end }}
-        - name: SYNTACTIC_CODE_INTEL_WORKER_ADDR
-          value: ":{{ .Values.syntacticCodeIntel.properties.workerPort }}"
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "syntacticCodeIntel") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
@@ -76,7 +76,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: http
+            port: http-debug
             scheme: HTTP
           initialDelaySeconds: 60
           timeoutSeconds: 5
@@ -88,8 +88,6 @@ spec:
           periodSeconds: 5
           timeoutSeconds: 5
         ports:
-        - name: http
-          containerPort: {{ .Values.syntacticCodeIntel.properties.workerPort }}
         - name: http-debug
           containerPort: 6060
         {{- if not .Values.sourcegraph.localDevMode }}

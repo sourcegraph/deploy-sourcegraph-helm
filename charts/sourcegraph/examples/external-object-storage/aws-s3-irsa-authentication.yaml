@@ -28,7 +28,7 @@ x-service-account: &serviceAccount
   create: false
   name: sourcegraph-irsa
 
-# Apply the needed configs to the pods which use blob storage
+# Apply the shared object storage config to its authoritative consumers
 frontend:
   env:
     <<: *objectStorageEnv
@@ -39,12 +39,22 @@ preciseCodeIntel:
     <<: *objectStorageEnv
   serviceAccount: *serviceAccount
 
-syntacticCodeIntel:
+gitserver:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+searcher:
   env:
     <<: *objectStorageEnv
   serviceAccount: *serviceAccount
 
 worker:
+  env:
+    <<: *objectStorageEnv
+  serviceAccount: *serviceAccount
+
+syntacticCodeIntel:
   env:
     <<: *objectStorageEnv
   serviceAccount: *serviceAccount

@@ -1,0 +1,12 @@
+{{- if .Values.syntectServer.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.syntectServer.name }}
+spec:
+  {{- toYaml .Values.syntectServer.podDisruptionBudget | nindent 2 }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: syntect-server
+{{- end }}

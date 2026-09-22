@@ -18,9 +18,6 @@ metadata:
   name: syntactic-code-intel-worker
 spec:
   ports:
-  - name: http
-    port: {{ .Values.syntacticCodeIntel.properties.workerPort }}
-    targetPort: http
   - name: http-debug
     port: 6060
     targetPort: http-debug

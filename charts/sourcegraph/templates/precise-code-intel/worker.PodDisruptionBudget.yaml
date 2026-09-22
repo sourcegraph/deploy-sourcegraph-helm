@@ -1,0 +1,12 @@
+{{- if .Values.preciseCodeIntel.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.preciseCodeIntel.name }}
+spec:
+  {{- toYaml .Values.preciseCodeIntel.podDisruptionBudget | nindent 2 }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: precise-code-intel-worker
+{{- end }}
