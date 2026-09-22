@@ -187,6 +187,20 @@ app.kubernetes.io/name: jaeger
 {{- end }}
 {{- end }}
 
+{{/*
+~45% of searcher.storageSize in megabytes, for SEARCHER_CACHE_SIZE_MB and
+SYMBOLS_CACHE_SIZE_MB. Accepts a whole number of G or Gi (e.g. 150G, 100Gi).
+Any other unit fails the render: a non-numeric value would otherwise cast to 0,
+which searcher treats as "never evict" and the cache volume fills up.
+*/}}
+{{- define "sourcegraph.searcher.cacheSizeMB" -}}
+{{- $size := .Values.searcher.storageSize | default "26Gi" | toString }}
+{{- if not (regexMatch "^[0-9]+Gi?$" $size) }}
+{{- fail (printf "searcher.storageSize must be a whole number of G or Gi (got %q), or set searcher.autoCacheSize=true" $size) }}
+{{- end }}
+{{- $size | trimSuffix "Gi" | trimSuffix "G" | mul 450 }}
+{{- end }}
+
 {{- define "sourcegraph.databaseAuth" -}}
 {{- $top := index . 0 -}}
 {{- $service := index . 1 -}}
