@@ -38,6 +38,12 @@ sourcegraph:
   # -- Global deployment clean up policy,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
   revisionHistoryLimit: 10
+  # -- Time Sourcegraph services continue accepting requests after shutdown begins so Kubernetes endpoint changes can propagate
+  preShutdownPause: 5s
+  # -- Total time Sourcegraph services have for the pre-shutdown pause and graceful drain
+  gracefulShutdownTimeout: 15s
+  # -- Time Kubernetes allows Sourcegraph services to shut down before forced termination
+  terminationGracePeriodSeconds: 30
   # -- Add extra labels to all services
   serviceLabels: {}
   # -- Disable the creation of Kubernetes secrets objects
@@ -65,6 +71,10 @@ sourcegraph:
 #   serviceAnnotations: {}
 #   # Provide custom environment variables
 #   env: {}
+#   # Override the global graceful shutdown settings
+#   preShutdownPause: ""
+#   gracefulShutdownTimeout: ""
+#   terminationGracePeriodSeconds: null
 #   # Set resource requests / limits
 #   resources: {}
 #   containerSecurityContext: {}
@@ -323,7 +333,7 @@ frontend:
     enabled: true
     # -- Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/)
     annotations:
-      # --  [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier.
+      # --  [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifying the IngressClass in Kubernetes 1.17 and earlier.
       # If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation.
       kubernetes.io/ingress.class: nginx
       nginx.ingress.kubernetes.io/proxy-body-size: 150m
@@ -394,7 +404,10 @@ migrator:
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
-  env: {}
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   # -- Resource requests & limits for the `migrator` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -413,6 +426,11 @@ migrator:
     readOnlyRootFilesystem: true
 
 gitserver:
+  # -- Environment variables for the `gitserver` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `gitserver` image
     defaultTag: 6.0.0@sha256:aec9bf6993c243a283109104cd7c44be3c85680b77e3e8be0c5fba8f01a3bd35
@@ -431,6 +449,8 @@ gitserver:
     readOnlyRootFilesystem: true
   # -- Number of `gitserver` pod
   replicaCount: 1
+  # -- Pod disruption budget for `gitserver`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `gitserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -454,6 +474,8 @@ gitserver:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Access modes for the `gitserver` PVC. Set to `["ReadWriteOncePod"]` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) so Kubernetes mounts the volume with `-o context` instead of recursively relabeling every file on each pod start
+  storageAccessModes: ["ReadWriteOnce"]
   # -- PVC Storage Request for `gitserver` data volume
   storageSize: 200Gi
   # -- Optional subPath for the `gitserver` primary data volume mount
@@ -485,6 +507,8 @@ grafana:
     sslmode: ""
   # -- Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key.
   existingConfig: "" # Name of an existing configmap
+  # -- Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml`
+  initContainers: []
   image:
     # -- Docker image tag for the `grafana` image
     defaultTag: 6.0.0@sha256:e40236d0143d0735ff87374afce95b878b8cde448ef65cfdc7008056a03097e8
@@ -528,6 +552,11 @@ grafana:
   storageAnnotations: {}
 
 indexedSearch:
+  # -- Environment variables for the `zoekt-webserver` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `zoekt-webserver` image
     defaultTag: 6.0.0@sha256:99038e0ec9bef930030c118d774fcdcd67d7fe57ad4c80d216703a4d29d64323
@@ -544,6 +573,8 @@ indexedSearch:
   name: "indexed-search"
   # -- Number of `indexed-search` pod
   replicaCount: 1
+  # -- Pod disruption budget for `indexed-search`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `zoekt-webserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -565,7 +596,7 @@ indexedSearch:
     name: ""
   # -- PVC Storage Request for `indexed-search` data volume
   # The size of disk to used for search indexes.
-  # This should typically be gitserver disk size multipled by the number of gitserver shards.
+  # This should typically be gitserver disk size multiplied by the number of gitserver shards.
   storageSize: 200Gi
   # -- Optional subPath for the `indexed-search` primary data volume mount
   storageSubPath: ""
@@ -573,6 +604,11 @@ indexedSearch:
   storageAnnotations: {}
 
 indexedSearchIndexer:
+  # -- Environment variables for the `zoekt-indexserver` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `zoekt-indexserver` image
     defaultTag: 6.0.0@sha256:11539e07040b85045a9aa07f970aa310066e240dc28e6c9627653ee2bc6e0b91
@@ -600,6 +636,11 @@ indexedSearchIndexer:
 blobstore:
   # -- Enable `blobstore` (S3 compatible storage)
   enabled: true
+  # -- Environment variables for the `blobstore` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `blobstore` image
     defaultTag: 6.0.0@sha256:82caab40f920282069c84e0e4ca503857926e934c67fb022f6d93823b4ea98b5
@@ -854,9 +895,11 @@ postgresExporter:
 
 syntacticCodeIntel:
   enabled: false
-  properties:
-    # -- port to whick worker API will bind
-    workerPort: 3188
+  # -- Environment variables for the `syntactic-code-intel-worker` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
     defaultTag: 6.0.0@sha256:50bdeb38b196f0fc21404969016bf8263f78144292e905867e93480f66c8251c
@@ -876,6 +919,8 @@ syntacticCodeIntel:
   podSecurityContext: {}
   # -- Number of `syntactic-code-intel-worker` pod
   replicaCount: 2
+  # -- Pod disruption budget for `syntactic-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `syntactic-code-intel-worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -893,7 +938,10 @@ syntacticCodeIntel:
 
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container
+  # @default -- the chart will add some default environment values
   env:
+    DEPLOY_TYPE:
+      value: helm
     NUM_WORKERS:
       value: "4"
   image:
@@ -915,6 +963,8 @@ preciseCodeIntel:
   podSecurityContext: {}
   # -- Number of `precise-code-intel-worker` pod
   replicaCount: 2
+  # -- Pod disruption budget for `precise-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `precise-code-intel-worker` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1026,6 +1076,8 @@ redisCache:
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Pod disruption budget for `redis-cache`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `redis-cache`
     create: false
@@ -1117,6 +1169,8 @@ redisStore:
   podSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Pod disruption budget for `redis-store`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `redis-store`
     create: false
@@ -1148,6 +1202,11 @@ redisStore:
     additionalConfig: ""
 
 searcher:
+  # -- Environment variables for the `searcher` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `searcher` image
     defaultTag: 6.0.0@sha256:c7508abda2202d4a33400ce23a95dd8d59fe6220d85d7fbee6fb186c55931336
@@ -1170,6 +1229,8 @@ searcher:
   name: "searcher"
   # -- Number of `searcher` pod
   replicaCount: 1
+  # -- Pod disruption budget for `searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `searcher` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1218,6 +1279,11 @@ storageClass:
   allowedTopologies: []
 
 syntectServer:
+  # -- Environment variables for the `syntect-server` container
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   image:
     # -- Docker image tag for the `syntect-server` image
     defaultTag: 6.0.0@sha256:1e35f77690222a76724b45f2305b838c40c35201e60b0f619b3fe8499504ff60
@@ -1237,6 +1303,8 @@ syntectServer:
   podSecurityContext: {}
   # -- Number of `syntect-server` pod
   replicaCount: 1
+  # -- Pod disruption budget for `syntect-server`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- Resource requests & limits for the `syntect-server` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1345,12 +1413,17 @@ worker:
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "worker"
   # -- Environment variables for the `worker` container
-  env: {}
+  # @default -- the chart will add some default environment values
+  env:
+    DEPLOY_TYPE:
+      value: helm
   # -- Security context for the `worker` pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}
   # -- Number of `worker` pod
   replicaCount: 1
+  # -- Pod disruption budget for every `worker` deployment. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
   # -- List of jobs to block globally
   # If replicas are configured, use this values to block jobs instead of manually setting WORKER_JOB_BLOCKLIST
   blocklist: []

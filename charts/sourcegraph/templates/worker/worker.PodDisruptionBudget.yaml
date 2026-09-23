@@ -1,0 +1,34 @@
+{{- define "sourcegraph.worker.podDisruptionBudget" -}}
+{{- $top := index . 0 -}}
+{{- $suffix := index . 1 -}}
+{{- $name := $top.Values.worker.name -}}
+{{- if $suffix -}}
+{{- $name = printf "%s-%s" $name $suffix -}}
+{{- end -}}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $name }}
+spec:
+  {{- toYaml $top.Values.worker.podDisruptionBudget | nindent 2 }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" $top | nindent 6 }}
+      app: worker
+      {{- if $suffix }}
+      worker-replica: {{ $name | quote }}
+      {{- end }}
+    {{- if and (not $suffix) $top.Values.worker.replicas }}
+    matchExpressions:
+    - key: worker-replica
+      operator: DoesNotExist
+    {{- end }}
+{{- end -}}
+
+{{- if .Values.worker.podDisruptionBudget }}
+{{- include "sourcegraph.worker.podDisruptionBudget" (list . "") }}
+{{- range $idx, $_ := .Values.worker.replicas }}
+---
+{{- include "sourcegraph.worker.podDisruptionBudget" (list $ (printf "%d" $idx)) | nindent 0 }}
+{{- end }}
+{{- end }}

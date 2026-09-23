@@ -1,4 +1,4 @@
-# These values are dervied from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
+# These values are derived from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
 
 ### Common Configuration ###
 sourcegraph:

@@ -1,0 +1,125 @@
+suite: graceful shutdown
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render global defaults for frontend
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 30
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_PRE_SHUTDOWN_PAUSE
+        value: 5s
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 15s
+- it: should render global defaults for gitserver
+  template: gitserver/gitserver.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 30
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_PRE_SHUTDOWN_PAUSE
+        value: 5s
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 15s
+- it: should render service overrides for searcher
+  template: searcher/searcher.StatefulSet.yaml
+  set:
+    searcher:
+      preShutdownPause: 7s
+      gracefulShutdownTimeout: 25s
+      terminationGracePeriodSeconds: 35
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 35
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_PRE_SHUTDOWN_PAUSE
+        value: 7s
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 25s
+- it: should preserve explicit env overrides
+  template: precise-code-intel/worker.Deployment.yaml
+  set:
+    preciseCodeIntel:
+      env:
+        SRC_PRE_SHUTDOWN_PAUSE:
+          value: 8s
+        SRC_GRACEFUL_SHUTDOWN_TIMEOUT:
+          value: 28s
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_PRE_SHUTDOWN_PAUSE
+        value: 8s
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 28s
+- it: should preserve a zero-second service termination override
+  template: precise-code-intel/worker.Deployment.yaml
+  set:
+    preciseCodeIntel.terminationGracePeriodSeconds: 0
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 0
+- it: should render defaults for syntactic code intel
+  template: syntactic-code-intel/worker.Deployment.yaml
+  set:
+    syntacticCodeIntel.enabled: true
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 30
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_PRE_SHUTDOWN_PAUSE
+        value: 5s
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 15s
+- it: should render defaults for worker replicas
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      replicas:
+      - jobs: [job1]
+  asserts:
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 30
+    documentIndex: 0
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 30
+    documentIndex: 1
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_GRACEFUL_SHUTDOWN_TIMEOUT
+        value: 15s
+    documentIndex: 0

@@ -1,0 +1,110 @@
+suite: deploy type
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should identify blobstore as a Helm deployment
+  template: blobstore/blobstore.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify frontend as a Helm deployment
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify gitserver as a Helm deployment
+  template: gitserver/gitserver.StatefulSet.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify both indexed search containers as Helm deployments
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+  - contains:
+      path: spec.template.spec.containers[1].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify migrator as a Helm deployment
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.initContainers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify precise code intel as a Helm deployment
+  template: precise-code-intel/worker.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify searcher as a Helm deployment
+  template: searcher/searcher.StatefulSet.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify syntactic code intel as a Helm deployment
+  template: syntactic-code-intel/worker.Deployment.yaml
+  set:
+    syntacticCodeIntel.enabled: true
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify syntect server as a Helm deployment
+  template: syntect-server/syntect-server.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+- it: should identify every worker replica as a Helm deployment
+  template: worker/worker.Deployment.yaml
+  set:
+    worker:
+      replicas:
+      - jobs: ["job1"]
+      - jobs: ["job2"]
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+    documentIndex: 0
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+    documentIndex: 1
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DEPLOY_TYPE
+        value: helm
+    documentIndex: 2
