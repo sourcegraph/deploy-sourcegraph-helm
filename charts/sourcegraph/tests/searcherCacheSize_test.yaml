@@ -1,0 +1,72 @@
+suite: searcher cache size
+templates:
+- searcher/searcher.StatefulSet.yaml
+tests:
+- it: should size both caches to ~45% of the default storageSize
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "11700"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "11700"
+- it: should accept storageSize in Gi
+  set:
+    searcher:
+      storageSize: 100Gi
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "45000"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "45000"
+- it: should accept storageSize in G
+  set:
+    searcher:
+      storageSize: 150G
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "67500"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "67500"
+  - equal:
+      path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
+      value: 150G
+- it: should fail on units other than G or Gi instead of disabling eviction
+  set:
+    searcher:
+      storageSize: 1Ti
+  asserts:
+  - failedTemplate:
+      errorMessage: searcher.storageSize must be a whole number of G or Gi (got "1Ti"), or set searcher.autoCacheSize=true
+- it: should not need a G or Gi storageSize when autoCacheSize is enabled
+  set:
+    searcher:
+      autoCacheSize: true
+      storageSize: 1Ti
+  asserts:
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+      any: true
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+      any: true

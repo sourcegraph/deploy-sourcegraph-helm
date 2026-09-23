@@ -1214,7 +1214,9 @@ searcher:
   # This tracks PVC expansion automatically, whereas the hardcoded env vars are
   # frozen to the initial `storageSize` and do not follow later disk growth.
   autoCacheSize: false
-  # -- Size of the PVC for searcher pods to store cache data
+  # -- Size of the PVC for searcher pods to store cache data. Unless `autoCacheSize`
+  # is enabled, this must be a whole number of `G` or `Gi` (e.g. `150G`, `100Gi`)
+  # so the chart can derive `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` from it
   storageSize: 26Gi
   # -- Optional subPath for the `searcher` primary data volume mount
   storageSubPath: ""

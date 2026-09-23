@@ -348,7 +348,7 @@ In addition to the documented values, all services also support the following va
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | searcher.storageAnnotations | object | `{}` | Optional annotations to add to the `searcher` PVC |
-| searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
+| searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data. Unless `autoCacheSize` is enabled, this must be a whole number of `G` or `Gi` (e.g. `150G`, `100Gi`) so the chart can derive `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` from it |
 | searcher.storageSubPath | string | `""` | Optional subPath for the `searcher` primary data volume mount |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |

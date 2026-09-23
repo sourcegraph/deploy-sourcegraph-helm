@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- `searcher.storageSize` now accepts `G` as well as `Gi` when deriving `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB`. Previously a value like `150G` silently rendered both as `0`, which disables cache eviction and lets the cache volume fill up. Any other unit now fails the render unless `searcher.autoCacheSize` is enabled
 - Added a `network-policy` example, which limits Executor and Executor job pods to the frontend API
 - Corrected the external object storage examples to configure the shared store for frontend, worker, precise code intel, syntactic code intel, gitserver, and searcher, including credentials or workload service accounts as required.
 - Removed the unused application ports from the precise and syntactic code intel worker Deployments and Services; health checks and Prometheus metrics continue to use the debug server on port 6060.
