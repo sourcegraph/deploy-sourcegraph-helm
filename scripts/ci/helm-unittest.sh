@@ -11,3 +11,4 @@ helm plugin install https://github.com/helm-unittest/helm-unittest --version "$H
 
 ### Run the helm tests
 helm unittest -q charts/sourcegraph
+helm unittest -q charts/sourcegraph-executor/k8s

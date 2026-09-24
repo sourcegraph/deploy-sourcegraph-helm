@@ -21,7 +21,7 @@ data:
 
   EXECUTOR_KUBERNETES_NODE_NAME: "{{ .Values.executor.kubernetesJob.node.name }}"
   EXECUTOR_KUBERNETES_NODE_SELECTOR: "{{ .Values.executor.kubernetesJob.node.selector }}"
-  EXECUTOR_KUBERNETES_NODE_TOLERATIONS: "{{ .Values.executor.kubernetesJob.node.tolerations }}"
+  EXECUTOR_KUBERNETES_NODE_TOLERATIONS: {{ if kindIs "string" .Values.executor.kubernetesJob.node.tolerations }}{{ .Values.executor.kubernetesJob.node.tolerations | quote }}{{ else }}{{ .Values.executor.kubernetesJob.node.tolerations | toJson | quote }}{{ end }}
   EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_EXPRESSIONS: "{{ .Values.executor.kubernetesJob.node.requiredAffinityMatchExpressions }}"
   EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_FIELDS: "{{ .Values.executor.kubernetesJob.node.requiredAffinityMatchFields }}"
 
