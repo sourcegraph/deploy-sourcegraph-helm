@@ -7,36 +7,51 @@
 
 Visit the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes) for guidance on using this chart.
 
-## Upgrading Redis configuration
+## Enabling Redis config management
 
-The chart now mounts `/etc/redis/redis.conf` for both Redis services and sizes
-`maxmemory` to 75% of each container's memory limit. At the default 7Gi limit,
-this changes the cap from 6GiB to 5.25GiB. `redis-cache` evicts earlier;
+Redis config management is **disabled by default**. Upgrading the chart preserves
+existing image configs, custom mounts, authentication, and memory settings.
+The standard images retain their 6GiB cap, which can cause OOM kills if the pod
+memory limit is lower. Opt in for either service independently, or both:
+
+```yaml
+redisCache:
+  config:
+    enabled: true
+redisStore:
+  config:
+    enabled: true
+```
+
+For each enabled service, the chart mounts `/etc/redis/redis.conf` and sizes
+`maxmemory` to 75% of the container's memory limit. At the default 7Gi limit,
+opting in changes the cap from 6GiB to 5.25GiB. `redis-cache` evicts earlier;
 `redis-store` keeps `noeviction` and rejects writes sooner when full. Set
 `redisStore.config.maxmemory: 6gb` to retain its old cap, provided the pod has
 enough memory for Redis overhead. Auto-sizing reserves headroom but cannot
 guarantee against OOM kills, particularly during persistence operations.
 
-Before upgrading:
+Before opting in:
 
 - **Custom images:** the mounted config replaces the image's config, including
-  any `requirepass`, ACL, TLS, or persistence settings. Set
+  any `requirepass`, ACL, TLS, or persistence settings. Leave
   `redisCache.config.enabled: false` and/or `redisStore.config.enabled: false`
   to preserve the corresponding image config. Otherwise, migrate those settings
   explicitly; image-baked authentication is not inherited.
-- **Existing config mounts:** either disable config management as above and
+- **Existing config mounts:** either leave config management disabled and
   keep your `extraVolumes` / `extraVolumeMounts`, or remove those mounts and set
-  `config.existingConfig` to the name of a ConfigMap with a complete `redis.conf`
-  key. An existing ConfigMap bypasses all chart sizing and directive overrides.
+  `config.enabled: true` and `config.existingConfig` to the name of a ConfigMap
+  with a complete `redis.conf` key. An existing ConfigMap bypasses all chart
+  sizing and directive overrides.
 - **Secrets:** both `additionalConfig` and `existingConfig` use plaintext
-  ConfigMaps. For a config containing credentials, disable config management
+  ConfigMaps. For a config containing credentials, leave config management disabled
   and mount a Secret at `/etc/redis/redis.conf` with `extraVolumeMounts` instead.
   Configure the clients' `connection.existingSecret` and the exporter's
   `redisExporter.env.REDIS_PASSWORD.valueFrom.secretKeyRef` as appropriate.
   Redis readiness alone does not verify exporter authentication; check `redis_up`.
 
-Disabling config management disables all other `config` options, including
-auto-sizing, so you must size Redis memory yourself. With management enabled,
+While config management is disabled, all other `config` options are ignored,
+including auto-sizing, so you must size Redis memory yourself. With management enabled,
 an explicit `config.maxmemory` takes precedence over auto-sizing, and
 `additionalConfig` is appended last. Supported memory limits are plain byte
 counts or numbers with `k`, `M`, `G`, `T`, `P`, `E`, `Ki`, `Mi`, `Gi`, `Ti`,
@@ -343,7 +358,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
 | prometheus.storageSubPath | string | `""` | Optional subPath for the `prometheus` primary data volume mount |
 | redisCache.config.additionalConfig | string | `""` | Additional raw redis directives appended to the vendored `redis-cache` config. Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext, so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap). For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`. |
-| redisCache.config.enabled | bool | `true` | Mount a chart-managed Redis config. Set to false to preserve image-baked configuration or custom `extraVolumeMounts` (including Secret mounts). When false, all other `config` options are ignored and auto-sizing is disabled. |
+| redisCache.config.enabled | bool | `false` | Opt in to a chart-managed Redis config and automatic memory sizing. Disabled by default to preserve image-baked configuration and custom `extraVolumeMounts` (including Secret mounts). When false, all other `config` options are ignored and auto-sizing is disabled. |
 | redisCache.config.existingConfig | string | `""` | Name of an existing ConfigMap for `redis-cache`. It must contain a `redis.conf` key. When set, the chart-managed ConfigMap is not rendered and this one is mounted instead, so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`. |
 | redisCache.config.maxmemory | string | `""` | Explicit redis `maxmemory` for `redis-cache` (for example `6gb`). Overrides the auto-computed value. Empty means compute it from the container memory limit. |
 | redisCache.config.maxmemoryPolicy | string | `""` | Override the redis `maxmemory-policy` for `redis-cache`. Empty keeps the vendored default (`allkeys-lru`). |
@@ -368,7 +383,7 @@ In addition to the documented values, all services also support the following va
 | redisExporter.image.name | string | `"redis_exporter"` | Docker image name for the `redis-exporter` image |
 | redisExporter.resources | object | `{"limits":{"cpu":"10m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"100Mi"}}` | Resource requests & limits for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | redisStore.config.additionalConfig | string | `""` | Additional raw redis directives appended to the vendored `redis-store` config. Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext, so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap). For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`. |
-| redisStore.config.enabled | bool | `true` | Mount a chart-managed Redis config. Set to false to preserve image-baked configuration or custom `extraVolumeMounts` (including Secret mounts). When false, all other `config` options are ignored and auto-sizing is disabled. |
+| redisStore.config.enabled | bool | `false` | Opt in to a chart-managed Redis config and automatic memory sizing. Disabled by default to preserve image-baked configuration and custom `extraVolumeMounts` (including Secret mounts). When false, all other `config` options are ignored and auto-sizing is disabled. |
 | redisStore.config.existingConfig | string | `""` | Name of an existing ConfigMap for `redis-store`. It must contain a `redis.conf` key. When set, the chart-managed ConfigMap is not rendered and this one is mounted instead, so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`. |
 | redisStore.config.maxmemory | string | `""` | Explicit redis `maxmemory` for `redis-store` (for example `6gb`). Overrides the auto-computed value. Empty means compute it from the container memory limit. |
 | redisStore.config.maxmemoryPolicy | string | `""` | Override the redis `maxmemory-policy` for `redis-store`. Empty keeps the vendored default (`noeviction`). |

@@ -1090,10 +1090,11 @@ redisCache:
   # -- Optional annotations to add to the `redis-cache` PVC
   storageAnnotations: {}
   config:
-    # -- Mount a chart-managed Redis config. Set to false to preserve image-baked
-    # configuration or custom `extraVolumeMounts` (including Secret mounts).
+    # -- Opt in to a chart-managed Redis config and automatic memory sizing.
+    # Disabled by default to preserve image-baked configuration and custom
+    # `extraVolumeMounts` (including Secret mounts).
     # When false, all other `config` options are ignored and auto-sizing is disabled.
-    enabled: true
+    enabled: false
     # -- Name of an existing ConfigMap for `redis-cache`. It must contain a `redis.conf` key.
     # When set, the chart-managed ConfigMap is not rendered and this one is mounted instead,
     # so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`.
@@ -1190,10 +1191,11 @@ redisStore:
   # -- Optional annotations to add to the `redis-store` PVC
   storageAnnotations: {}
   config:
-    # -- Mount a chart-managed Redis config. Set to false to preserve image-baked
-    # configuration or custom `extraVolumeMounts` (including Secret mounts).
+    # -- Opt in to a chart-managed Redis config and automatic memory sizing.
+    # Disabled by default to preserve image-baked configuration and custom
+    # `extraVolumeMounts` (including Secret mounts).
     # When false, all other `config` options are ignored and auto-sizing is disabled.
-    enabled: true
+    enabled: false
     # -- Name of an existing ConfigMap for `redis-store`. It must contain a `redis.conf` key.
     # When set, the chart-managed ConfigMap is not rendered and this one is mounted instead,
     # so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`.

@@ -3,8 +3,11 @@ suite: redisConfig
 templates:
 - redis/redis-cache.ConfigMap.yaml
 - redis/redis-store.ConfigMap.yaml
+set:
+  redisCache.config.enabled: true
+  redisStore.config.enabled: true
 tests:
-- it: should render the vendored config with an auto-sized maxmemory by default
+- it: should render the vendored config with an auto-sized maxmemory when enabled
   asserts:
   - matchRegex:
       path: data["redis.conf"]

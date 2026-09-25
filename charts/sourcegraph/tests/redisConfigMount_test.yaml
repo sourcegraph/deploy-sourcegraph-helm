@@ -8,8 +8,10 @@ templates:
 - redis/redis-cache.ConfigMap.yaml
 - redis/redis-store.ConfigMap.yaml
 tests:
-- it: should mount the chart-managed ConfigMap over the image path for redis-cache
+- it: should enable config management for redis-cache independently
   template: redis/redis-cache.Deployment.yaml
+  set:
+    redisCache.config.enabled: true
   asserts:
   - contains:
       path: spec.template.spec.containers[0].volumeMounts
@@ -31,8 +33,27 @@ tests:
       path: spec.template.metadata.annotations["checksum/redis-config"]
   - notExists:
       path: spec.template.spec.containers[0].command
-- it: should mount the chart-managed ConfigMap over the image path for redis-store
+  - hasDocuments:
+      count: 1
+    template: redis/redis-cache.ConfigMap.yaml
+  - hasDocuments:
+      count: 0
+    template: redis/redis-store.ConfigMap.yaml
+  - lengthEqual:
+      path: spec.template.spec.containers[0].volumeMounts
+      count: 1
+    template: redis/redis-store.Deployment.yaml
+  - lengthEqual:
+      path: spec.template.spec.volumes
+      count: 1
+    template: redis/redis-store.Deployment.yaml
+  - notExists:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+    template: redis/redis-store.Deployment.yaml
+- it: should enable config management for redis-store independently
   template: redis/redis-store.Deployment.yaml
+  set:
+    redisStore.config.enabled: true
   asserts:
   - contains:
       path: spec.template.spec.containers[0].volumeMounts
@@ -54,11 +75,29 @@ tests:
       path: spec.template.metadata.annotations["checksum/redis-config"]
   - notExists:
       path: spec.template.spec.containers[0].command
+  - hasDocuments:
+      count: 1
+    template: redis/redis-store.ConfigMap.yaml
+  - hasDocuments:
+      count: 0
+    template: redis/redis-cache.ConfigMap.yaml
+  - lengthEqual:
+      path: spec.template.spec.containers[0].volumeMounts
+      count: 1
+    template: redis/redis-cache.Deployment.yaml
+  - lengthEqual:
+      path: spec.template.spec.volumes
+      count: 1
+    template: redis/redis-cache.Deployment.yaml
+  - notExists:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+    template: redis/redis-cache.Deployment.yaml
 - it: should mount an existing ConfigMap and drop the checksum annotation
   template: redis/redis-cache.Deployment.yaml
   set:
     redisCache:
       config:
+        enabled: true
         existingConfig: my-redis-conf
   asserts:
   - contains:
@@ -76,6 +115,8 @@ tests:
   template: redis/redis-cache.Deployment.yaml
   set:
     redisCache:
+      config:
+        enabled: true
       extraVolumeMounts:
       - name: my-conf
         mountPath: /etc/redis/redis.conf
@@ -87,6 +128,8 @@ tests:
   template: redis/redis-store.Deployment.yaml
   set:
     redisStore:
+      config:
+        enabled: true
       extraVolumeMounts:
       - name: my-conf
         mountPath: /etc/redis
@@ -97,6 +140,8 @@ tests:
   template: redis/redis-cache.Deployment.yaml
   set:
     redisCache:
+      config:
+        enabled: true
       extraVolumes:
       - name: redis-conf
         emptyDir: {}
@@ -107,6 +152,8 @@ tests:
   template: redis/redis-cache.Deployment.yaml
   set:
     redisCache:
+      config:
+        enabled: true
       extraVolumeMounts:
       - name: my-extra
         mountPath: /somewhere-else
@@ -116,11 +163,14 @@ tests:
       content:
         name: my-extra
         mountPath: /somewhere-else
-- it: should preserve the image config when management is disabled
-  set:
-    redisCache.config.enabled: false
-    redisStore.config.enabled: false
+- it: should preserve the image config by default
   asserts:
+  - hasDocuments:
+      count: 0
+    template: redis/redis-cache.ConfigMap.yaml
+  - hasDocuments:
+      count: 0
+    template: redis/redis-store.ConfigMap.yaml
   - equal:
       path: spec.template.spec.containers[0].volumeMounts
       value:
@@ -147,10 +197,8 @@ tests:
   - notExists:
       path: spec.template.metadata.annotations["checksum/redis-config"]
     template: redis/redis-store.Deployment.yaml
-- it: should preserve a Secret-mounted config when management is disabled
+- it: should preserve a Secret-mounted config by default
   set:
-    redisCache.config.enabled: false
-    redisStore.config.enabled: false
     redisCache.extraVolumeMounts: &mounts
     - name: redis-conf
       mountPath: /etc/redis/redis.conf
