@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added opt-in Redis config management through `redisCache.config.enabled` and `redisStore.config.enabled` (both default to `false`). Default deployments retain their image configs, custom mounts, authentication, and memory settings. When enabled, the chart mounts `/etc/redis/redis.conf` and supports `existingConfig`, `maxmemory`, `maxmemoryRatio`, `maxmemoryPolicy`, and `additionalConfig`. See [Enabling Redis config management](README.md#enabling-redis-config-management) before opting in, especially when using custom images or Secret-mounted configs.
+- With Redis config management enabled, the chart sizes `maxmemory` at 75% of `resources.limits.memory` to leave room for overhead; this reduces, but does not eliminate, OOM risk. Ratios must be greater than 0 and less than 1. Auto-sizing is skipped in local development mode or when the limit is absent or unrecognised. At the default 7Gi limit, opting in lowers the effective cap from 6GiB to 5.25GiB: `redis-cache` evicts earlier, but `redis-store` uses `noeviction`, so its write-error ceiling drops too. Set `redisStore.config.maxmemory: 6gb` to keep the old ceiling if the pod has sufficient memory.
 - Added a `network-policy` example, which limits Executor and Executor job pods to the frontend API
 - Corrected the external object storage examples to configure the shared store for frontend, worker, precise code intel, syntactic code intel, gitserver, and searcher, including credentials or workload service accounts as required.
 - Removed the unused application ports from the precise and syntactic code intel worker Deployments and Services; health checks and Prometheus metrics continue to use the debug server on port 6060.

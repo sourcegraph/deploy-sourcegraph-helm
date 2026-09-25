@@ -7,6 +7,62 @@
 
 Visit the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes) for guidance on using this chart.
 
+## Enabling Redis config management
+
+Redis config management is **disabled by default**. Upgrading the chart preserves
+existing image configs, custom mounts, authentication, and memory settings.
+The standard images retain their 6GiB cap, which can cause OOM kills if the pod
+memory limit is lower. Opt in for either service independently, or both:
+
+```yaml
+redisCache:
+  config:
+    enabled: true
+redisStore:
+  config:
+    enabled: true
+```
+
+For each enabled service, the chart mounts `/etc/redis/redis.conf` and sizes
+`maxmemory` to 75% of the container's memory limit. At the default 7Gi limit,
+opting in changes the cap from 6GiB to 5.25GiB. `redis-cache` evicts earlier;
+`redis-store` keeps `noeviction` and rejects writes sooner when full. Set
+`redisStore.config.maxmemory: 6gb` to retain its old cap, provided the pod has
+enough memory for Redis overhead. Auto-sizing reserves headroom but cannot
+guarantee against OOM kills, particularly during persistence operations.
+
+Before opting in:
+
+- **Custom images:** the mounted config replaces the image's config, including
+  any `requirepass`, ACL, TLS, or persistence settings. Leave
+  `redisCache.config.enabled: false` and/or `redisStore.config.enabled: false`
+  to preserve the corresponding image config. Otherwise, migrate those settings
+  explicitly; image-baked authentication is not inherited.
+- **Existing config mounts:** either leave config management disabled and
+  keep your `extraVolumes` / `extraVolumeMounts`, or remove those mounts and set
+  `config.enabled: true` and `config.existingConfig` to the name of a ConfigMap
+  with a complete `redis.conf` key. An existing ConfigMap bypasses all chart
+  sizing and directive overrides.
+- **Secrets:** both `additionalConfig` and `existingConfig` use plaintext
+  ConfigMaps. For a config containing credentials, leave config management disabled
+  and mount a Secret at `/etc/redis/redis.conf` with `extraVolumeMounts` instead.
+  Configure the clients' `connection.existingSecret` and the exporter's
+  `redisExporter.env.REDIS_PASSWORD.valueFrom.secretKeyRef` as appropriate.
+  Redis readiness alone does not verify exporter authentication; check `redis_up`.
+
+While config management is disabled, all other `config` options are ignored,
+including auto-sizing, so you must size Redis memory yourself. With management enabled,
+an explicit `config.maxmemory` takes precedence over auto-sizing, and
+`additionalConfig` is appended last. Supported memory limits are plain byte
+counts or numbers with `k`, `M`, `G`, `T`, `P`, `E`, `Ki`, `Mi`, `Gi`, `Ti`,
+`Pi`, or `Ei` suffixes. If the limit is absent or unrecognised, or
+`sourcegraph.localDevMode` is enabled, the vendored 6gb default remains unless
+overridden explicitly.
+
+Chart-managed config changes restart the Redis pod through a checksum
+annotation. Changes to an existing ConfigMap or Secret require a manual pod
+restart because `subPath` mounts do not update in running containers.
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.

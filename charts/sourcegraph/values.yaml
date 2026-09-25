@@ -1089,6 +1089,32 @@ redisCache:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-cache` PVC
   storageAnnotations: {}
+  config:
+    # -- Opt in to a chart-managed Redis config and automatic memory sizing.
+    # Disabled by default to preserve image-baked configuration and custom
+    # `extraVolumeMounts` (including Secret mounts).
+    # When false, all other `config` options are ignored and auto-sizing is disabled.
+    enabled: false
+    # -- Name of an existing ConfigMap for `redis-cache`. It must contain a `redis.conf` key.
+    # When set, the chart-managed ConfigMap is not rendered and this one is mounted instead,
+    # so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`.
+    existingConfig: ""
+    # -- Explicit redis `maxmemory` for `redis-cache` (for example `6gb`). Overrides the
+    # auto-computed value. Empty means compute it from the container memory limit.
+    maxmemory: ""
+    # -- Fraction of `redisCache.resources.limits.memory` used for `maxmemory` when
+    # `maxmemory` is empty. Must be greater than 0 and less than 1. Ignored when no
+    # memory limit is set or `sourcegraph.localDevMode` is enabled. An absent or
+    # unrecognised limit keeps the vendored 6gb default; use an explicit maxmemory if needed.
+    maxmemoryRatio: 0.75
+    # -- Override the redis `maxmemory-policy` for `redis-cache`.
+    # Empty keeps the vendored default (`allkeys-lru`).
+    maxmemoryPolicy: ""
+    # -- Additional raw redis directives appended to the vendored `redis-cache` config.
+    # Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext,
+    # so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap).
+    # For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`.
+    additionalConfig: ""
 
 redisExporter:
   image:
@@ -1164,6 +1190,32 @@ redisStore:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-store` PVC
   storageAnnotations: {}
+  config:
+    # -- Opt in to a chart-managed Redis config and automatic memory sizing.
+    # Disabled by default to preserve image-baked configuration and custom
+    # `extraVolumeMounts` (including Secret mounts).
+    # When false, all other `config` options are ignored and auto-sizing is disabled.
+    enabled: false
+    # -- Name of an existing ConfigMap for `redis-store`. It must contain a `redis.conf` key.
+    # When set, the chart-managed ConfigMap is not rendered and this one is mounted instead,
+    # so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`.
+    existingConfig: ""
+    # -- Explicit redis `maxmemory` for `redis-store` (for example `6gb`). Overrides the
+    # auto-computed value. Empty means compute it from the container memory limit.
+    maxmemory: ""
+    # -- Fraction of `redisStore.resources.limits.memory` used for `maxmemory` when
+    # `maxmemory` is empty. Must be greater than 0 and less than 1. Ignored when no
+    # memory limit is set or `sourcegraph.localDevMode` is enabled. An absent or
+    # unrecognised limit keeps the vendored 6gb default; use an explicit maxmemory if needed.
+    maxmemoryRatio: 0.75
+    # -- Override the redis `maxmemory-policy` for `redis-store`.
+    # Empty keeps the vendored default (`noeviction`).
+    maxmemoryPolicy: ""
+    # -- Additional raw redis directives appended to the vendored `redis-store` config.
+    # Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext,
+    # so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap).
+    # For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`.
+    additionalConfig: ""
 
 searcher:
   # -- Environment variables for the `searcher` container
