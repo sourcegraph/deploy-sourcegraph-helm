@@ -143,6 +143,17 @@ tests:
       - isNull:
           path: metadata.annotations
 
+  - it: should create the job ServiceAccount in the job namespace
+    template: executor.JobServiceAccount.yaml
+    set:
+      executor:
+        queueName: "test"
+        namespace: sourcegraph-executor-jobs
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: sourcegraph-executor-jobs
+
   - it: should pass the job ServiceAccount settings to the executor by default
     template: executor.ConfigMap.yaml
     set:

@@ -103,7 +103,7 @@ executor:
     serviceAccount:
       # -- Create a ServiceAccount for job pods, with no RBAC bindings. Rendered only when `executor.configureRbac` is also true, so a second executor release in the same namespace does not try to own it. Set to false to use an existing ServiceAccount named by `executor.kubernetesJob.serviceAccount.name`.
       create: true
-      # -- The ServiceAccount job pods run as. Must exist in `executor.namespace`. Empty falls back to the namespace `default` ServiceAccount. Requires an executor image that includes sourcegraph/sourcegraph#16392; older executors ignore this setting.
+      # -- The ServiceAccount job pods run as. Created in `executor.namespace`, where the job pods run. Empty falls back to the namespace `default` ServiceAccount. Requires an executor image that includes sourcegraph/sourcegraph#16392; older executors ignore this setting.
       name: sg-executor-job
       # -- Annotations to add to the created ServiceAccount
       annotations: { }
