@@ -7,42 +7,23 @@ helmdocsv=1.7.0
 bindir=$( cd "${0%/*}" && pwd ) # Change to script dir and set bin dir to this
 targetbin=$( cd "$bindir"/.. && pwd )/target/bin
 helmdocsbin=$targetbin/helm-docs-$helmdocsv
-os=""
-arch=""
 
 if [ ! -f "$helmdocsbin" ]; then
-    case $(uname | tr '[:upper:]' '[:lower:]') in
-        darwin*)
-            os=darwin
-            arch=x86_64
-            ;;
-        linux*)
-            os=linux
-            case $(uname -m) in
-                x86_64) arch=x86_64 ;;
-                amd64) arch=amd64 ;;
-                arm)
-                    tmp=$(dpkg --print-architecture)
-                    if echo "$tmp" | grep -q arm64; then
-                        arch=arm64
-                    elif echo "$tmp" | grep -q armv7; then
-                        arch=armv7 
-                    elif echo "$tmp" | grep -q armv6; then
-                        arch=armv6
-                    fi
-                ;;
-            esac
-            ;;
-        msys*)
-            os=windows
-            arch=x86_64
-            ;;
+    # Release assets are named helm-docs_<version>_<OS>_<arch>.tar.gz,
+    # e.g. Darwin_arm64, Linux_x86_64, Windows_x86_64
+    case $(uname -s) in
+        Darwin) os=Darwin ;;
+        Linux) os=Linux ;;
+        MSYS*|MINGW*|CYGWIN*) os=Windows ;;
+        *) echo "Unsupported OS: $(uname -s)"; exit 126 ;;
     esac
-
-    if [ -z "$os" ]; then
-        echo "Couldn't find a matching binary"
-        exit 126
-    fi
+    case $(uname -m) in
+        x86_64|amd64) arch=x86_64 ;;
+        aarch64|arm64) arch=arm64 ;;
+        armv7l) arch=armv7 ;;
+        armv6l) arch=armv6 ;;
+        *) echo "Unsupported architecture: $(uname -m)"; exit 126 ;;
+    esac
     helmdocscurl="https://github.com/norwoodj/helm-docs/releases/download/v$helmdocsv/helm-docs_${helmdocsv}_${os}_${arch}.tar.gz"
     tmp=$(mktemp -d -t helm-docs.XXX)
     mkdir -p "$targetbin"
