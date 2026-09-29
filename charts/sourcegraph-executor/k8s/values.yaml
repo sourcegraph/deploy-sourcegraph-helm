@@ -100,6 +100,15 @@ executor:
     runAsGroup:
     # -- The group ID which is set on the job PVC file system.
     fsGroup: "1000"
+    serviceAccount:
+      # -- Create a ServiceAccount for job pods, with no RBAC bindings. Rendered only when `executor.configureRbac` is also true, so a second executor release in the same namespace does not try to own it. Set to false to use an existing ServiceAccount named by `executor.kubernetesJob.serviceAccount.name`.
+      create: true
+      # -- The ServiceAccount job pods run as. Must exist in `executor.namespace`. Empty falls back to the namespace `default` ServiceAccount. Requires an executor image that includes sourcegraph/sourcegraph#16392; older executors ignore this setting.
+      name: sg-executor-job
+      # -- Annotations to add to the created ServiceAccount
+      annotations: { }
+      # -- Mount the ServiceAccount token into job pods. Jobs only talk to the Sourcegraph frontend and never need the Kubernetes API. Applied on both the created ServiceAccount and, on executor images that include sourcegraph/sourcegraph#16392, the job pod spec.
+      automountToken: false
     resources:
       requests:
         # -- The requested CPU for a job.
