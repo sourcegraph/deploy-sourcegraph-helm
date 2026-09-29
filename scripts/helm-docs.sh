@@ -3,7 +3,7 @@
 
 set -euf -o pipefail
 
-helmdocsv=1.7.0
+helmdocsv=1.14.2
 bindir=$( cd "${0%/*}" && pwd ) # Change to script dir and set bin dir to this
 targetbin=$( cd "$bindir"/.. && pwd )/target/bin
 helmdocsbin=$targetbin/helm-docs-$helmdocsv
@@ -20,8 +20,8 @@ if [ ! -f "$helmdocsbin" ]; then
     case $(uname -m) in
         x86_64|amd64) arch=x86_64 ;;
         aarch64|arm64) arch=arm64 ;;
-        armv7l) arch=armv7 ;;
-        armv6l) arch=armv6 ;;
+        armv7l) arch=arm7 ;;
+        armv6l) arch=arm6 ;;
         *) echo "Unsupported architecture: $(uname -m)"; exit 126 ;;
     esac
     helmdocscurl="https://github.com/norwoodj/helm-docs/releases/download/v$helmdocsv/helm-docs_${helmdocsv}_${os}_${arch}.tar.gz"
