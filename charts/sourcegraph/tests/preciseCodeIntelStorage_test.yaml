@@ -1,0 +1,130 @@
+---
+suite: preciseCodeIntelStorage
+templates:
+- precise-code-intel/worker.Deployment.yaml
+tests:
+- it: should back tmpdir with a plain emptyDir by default
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir: {}
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        mountPath: /tmp
+        name: tmpdir
+
+- it: should set sizeLimit when storageSize is set on the emptyDir branch
+  set:
+    preciseCodeIntel:
+      storageType: emptyDir
+      storageSize: 20Gi
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir:
+          sizeLimit: 20Gi
+
+- it: should back tmpdir with a per-pod PVC when storageType=pvc
+  set:
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
+              storageClassName: sourcegraph
+  # /tmp mount is unchanged, so no TMPDIR redirect is needed
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        mountPath: /tmp
+        name: tmpdir
+
+- it: should follow storageClass.name like every other PVC in the chart
+  set:
+    storageClass:
+      name: custom-ssd
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - equal:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
+      value: custom-ssd
+
+- it: should fail when storageSize is omitted on the pvc branch
+  set:
+    preciseCodeIntel:
+      storageType: pvc
+  asserts:
+  - failedTemplate:
+      errorMessage: preciseCodeIntel.storageSize is required when preciseCodeIntel.storageType is pvc
+
+- it: should fall back to emptyDir when storageType is absent
+  set:
+    preciseCodeIntel:
+      storageType: null
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir: {}
+
+- it: should fail on an unknown storageType
+  set:
+    preciseCodeIntel:
+      storageType: PVC
+      storageSize: 50Gi
+  asserts:
+  - failedTemplate:
+      errorMessage: 'preciseCodeIntel.storageType must be one of emptyDir, pvc; got "PVC"'
+
+- it: should leave the pod securityContext untouched on the emptyDir branch
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value: {}
+
+- it: should set fsGroup to the container runAsGroup on the pvc branch so /tmp is writable
+  set:
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+
+- it: should keep a user-set fsGroup and other podSecurityContext fields on the pvc branch
+  set:
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+      podSecurityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value:
+        fsGroup: 2000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true

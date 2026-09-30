@@ -45,6 +45,10 @@ spec:
         deploy: sourcegraph
         app: precise-code-intel-worker
     spec:
+      {{- $storageType := .Values.preciseCodeIntel.storageType | default "emptyDir" }}
+      {{- if not (has $storageType (list "emptyDir" "pvc")) }}
+      {{- fail (printf "preciseCodeIntel.storageType must be one of emptyDir, pvc; got %q" $storageType) }}
+      {{- end }}
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "preciseCodeIntel") | nindent 6 }}
       containers:
       - name: precise-code-intel-worker
@@ -104,8 +108,13 @@ spec:
       {{- if .Values.preciseCodeIntel.extraContainers }}
         {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
+      {{- $podSecurityContext := deepCopy .Values.preciseCodeIntel.podSecurityContext }}
+      {{- if eq $storageType "pvc" }}
+      {{- /* A freshly provisioned volume is root-owned, so the non-root worker needs fsGroup to write /tmp. */}}
+      {{- $podSecurityContext = merge $podSecurityContext (dict "fsGroup" (.Values.preciseCodeIntel.containerSecurityContext.runAsGroup | default 101) "fsGroupChangePolicy" "OnRootMismatch") }}
+      {{- end }}
       securityContext:
-        {{- toYaml .Values.preciseCodeIntel.podSecurityContext | nindent 8 }}
+        {{- toYaml $podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "preciseCodeIntel" ) | trim }}{{ . | nindent 6 }}{{- end }}
@@ -117,7 +126,22 @@ spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "preciseCodeIntel") | trim | nindent 6 }}
       volumes:
       - name: tmpdir
+        {{- if eq $storageType "pvc" }}
+        ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: {{ required "preciseCodeIntel.storageSize is required when preciseCodeIntel.storageType is pvc" .Values.preciseCodeIntel.storageSize }}
+              storageClassName: {{ .Values.storageClass.name }}
+        {{- else if .Values.preciseCodeIntel.storageSize }}
+        emptyDir:
+          sizeLimit: {{ .Values.preciseCodeIntel.storageSize }}
+        {{- else }}
         emptyDir: {}
+        {{- end }}
       {{- if .Values.preciseCodeIntel.extraVolumes }}
       {{- toYaml .Values.preciseCodeIntel.extraVolumes | nindent 6 }}
       {{- end }}

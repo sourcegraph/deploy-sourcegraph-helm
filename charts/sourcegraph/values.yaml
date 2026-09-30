@@ -979,6 +979,17 @@ preciseCodeIntel:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Backing store for the `/tmp` scratch volume, used for large SCIP upload
+  # processing. One of: emptyDir, pvc.
+  # emptyDir: node ephemeral storage, i.e. the node boot disk.
+  # pvc: per-pod PVC on `storageClass.name`, discarded with the pod. The pod
+  # `fsGroup` defaults to the container `runAsGroup` so the non-root worker can
+  # write to the volume; set `podSecurityContext.fsGroup` to override it.
+  storageType: emptyDir
+  # -- Size of the `/tmp` scratch volume. Required when storageType is `pvc`.
+  # When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty
+  # for unlimited).
+  storageSize: ""
 
 prometheus:
   # -- Enable `prometheus` (recommended)
