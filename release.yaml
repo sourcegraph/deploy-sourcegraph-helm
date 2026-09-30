@@ -24,114 +24,182 @@ requirements:
   - name: "Docker password"
     env: "DOCKER_PASSWORD"
 
-# Steps shared between sections are defined once with a YAML anchor (&name)
-# and reused with an alias (*name). The release type (patch/minor/major) is
-# recorded in the commit body via {{config}}.
+# Steps shared by more than one section below, defined once here as YAML
+# anchors (&name) and referenced with aliases (*name). `sg release` ignores
+# this top-level key; only the aliases matter. The release type
+# (patch/minor/major) is recorded in the commit body via {{config}}.
+x-shared-steps:
+  internal-images-sourcegraph: &internal-images-sourcegraph
+    name: sg ops:sourcegraph
+    cmd: |
+      set -eu
+      registry=us-docker.pkg.dev/sourcegraph-images/internal
+
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph/
+
+  internal-images-dind: &internal-images-dind
+    name: sg ops:dind
+    cmd: |
+      set -eu
+      registry=us-docker.pkg.dev/sourcegraph-images/internal
+
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph-executor/dind/
+
+  internal-images-k8s: &internal-images-k8s
+    name: sg ops:k8s
+    cmd: |
+      set -eu
+      registry=us-docker.pkg.dev/sourcegraph-images/internal
+
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph-executor/k8s/
+
+  internal-images-migrator: &internal-images-migrator
+    name: sg ops:migrator
+    cmd: |
+      set -eu
+      registry=us-docker.pkg.dev/sourcegraph-images/internal
+
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph-migrator/
+
+  public-images-sourcegraph: &public-images-sourcegraph
+    name: sg ops:sourcegraph
+    cmd: |
+      set -eu
+      registry=index.docker.io/sourcegraph
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph/
+
+  public-images-dind: &public-images-dind
+    name: sg ops:dind
+    cmd: |
+      set -eu
+      registry=index.docker.io/sourcegraph
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph-executor/dind/
+
+  public-images-k8s: &public-images-k8s
+    name: sg ops:k8s
+    cmd: |
+      set -eu
+      registry=index.docker.io/sourcegraph
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph-executor/k8s/
+
+  public-images-migrator: &public-images-migrator
+    name: sg ops:migrator
+    cmd: |
+      set -eu
+      registry=index.docker.io/sourcegraph
+      sg ops update-images \
+        -t {{inputs.server.tag}} \
+        -k helm \
+        --registry "${registry}" \
+        --docker-username $DOCKER_USERNAME \
+        --docker-password $DOCKER_PASSWORD \
+        charts/sourcegraph-migrator/
+
+  chart-version: &chart-version
+    name: "chart:version"
+    cmd: |
+      comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+      comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/examples/subchart/Chart.yaml
+      comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+      comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+      comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+
+  chart-app-version: &chart-app-version
+    name: "chart:appVersion"
+    cmd: |
+      comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
+      comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
+      comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
+      comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
+
+  helm-docs: &helm-docs
+    name: "helm:docs"
+    cmd: ./scripts/helm-docs.sh
+
+  # Shared by internal.create patch/minor/major.
+  internal-create: &internal-create
+    - *internal-images-sourcegraph
+    - *internal-images-dind
+    - *internal-images-k8s
+    - *internal-images-migrator
+    - *chart-version
+    - *chart-app-version
+    - *helm-docs
+
+    - name: "git:branch"
+      cmd: |
+        set -eu
+        branch="internal/release-{{version}}"
+        echo "Creating branch $branch"
+        git switch -c $branch
+
+    - name: "git:commit"
+      cmd: |
+        git commit -am 'release: {{version}}' -m '{{config}}'
+
+    - name: "git:push"
+      cmd: |
+        branch="internal/release-{{version}}"
+        git push origin ${branch}
+
+    - name: "github:pr"
+      cmd: |
+        set -eu
+        gh pr create \
+          --fill \
+          --draft \
+          --title "(internal) release: build {{version}}" \
+          --body "Test plan: automated release PR, CI will perform additional checks"
+        echo "🚢 Please check the associated CI build to ensure the process completed".
+
 internal:
   create:
     steps:
-      patch: &internal_create_steps
-        - name: sg ops:sourcegraph
-          cmd: |
-            set -eu
-            registry=us-docker.pkg.dev/sourcegraph-images/internal
-
-            sg ops update-images \
-              -t {{inputs.server.tag}} \
-              -k helm \
-              --registry "${registry}" \
-              --docker-username $DOCKER_USERNAME \
-              --docker-password $DOCKER_PASSWORD \
-              charts/sourcegraph/
-
-        - name: sg ops:dind
-          cmd: |
-            set -eu
-            registry=us-docker.pkg.dev/sourcegraph-images/internal
-
-            sg ops update-images \
-              -t {{inputs.server.tag}} \
-              -k helm \
-              --registry "${registry}" \
-              --docker-username $DOCKER_USERNAME \
-              --docker-password $DOCKER_PASSWORD \
-              charts/sourcegraph-executor/dind/
-
-        - name: sg ops:k8s
-          cmd: |
-            set -eu
-            registry=us-docker.pkg.dev/sourcegraph-images/internal
-
-            sg ops update-images \
-              -t {{inputs.server.tag}} \
-              -k helm \
-              --registry "${registry}" \
-              --docker-username $DOCKER_USERNAME \
-              --docker-password $DOCKER_PASSWORD \
-              charts/sourcegraph-executor/k8s/
-
-        - name: sg ops:migrator
-          cmd: |
-            set -eu
-            registry=us-docker.pkg.dev/sourcegraph-images/internal
-
-            sg ops update-images \
-              -t {{inputs.server.tag}} \
-              -k helm \
-              --registry "${registry}" \
-              --docker-username $DOCKER_USERNAME \
-              --docker-password $DOCKER_PASSWORD \
-              charts/sourcegraph-migrator/
-
-        - &chart_version
-          name: "chart:version"
-          cmd: |
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph/examples/subchart/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
-            comby -matcher ".generic" -in-place "version: \":[~\d+\.\d+\.\d+]\"" 'version: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-
-        - &chart_app_version
-          name: "chart:appVersion"
-          cmd: |
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph/Chart.yaml
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/dind/Chart.yaml
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-executor/k8s/Chart.yaml
-            comby -matcher ".generic" -in-place "appVersion: \":[~\d+\.\d+\.\d+]\"" 'appVersion: "{{inputs.server.tag}}"' -f charts/sourcegraph-migrator/Chart.yaml
-
-        - &helm_docs
-          name: "helm:docs"
-          cmd: ./scripts/helm-docs.sh
-
-        - name: "git:branch"
-          cmd: |
-            set -eu
-            branch="internal/release-{{version}}"
-            echo "Creating branch $branch"
-            git switch -c $branch
-
-        - name: "git:commit"
-          cmd: |
-            git commit -am 'release: {{version}}' -m '{{config}}'
-
-        - name: "git:push"
-          cmd: |
-            branch="internal/release-{{version}}"
-            git push origin ${branch}
-
-        - name: "github:pr"
-          cmd: |
-            set -eu
-            gh pr create \
-              --fill \
-              --draft \
-              --title "(internal) release: build {{version}}" \
-              --body "Test plan: automated release PR, CI will perform additional checks"
-            echo "🚢 Please check the associated CI build to ensure the process completed".
-
-      minor: *internal_create_steps
-      major: *internal_create_steps
+      patch: *internal-create
+      minor: *internal-create
+      major: *internal-create
 
   finalize:
     steps:
@@ -188,55 +256,11 @@ promoteToPublic:
           echo "Checking out origin/${branch}"
           git fetch origin "${branch}"
           git switch "${branch}"
-      - &public_images_sourcegraph
-        name: sg ops:sourcegraph
-        cmd: |
-          set -eu
-          registry=index.docker.io/sourcegraph
-          sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph/
-      - &public_images_dind
-        name: sg ops:dind
-        cmd: |
-          set -eu
-          registry=index.docker.io/sourcegraph
-          sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/dind/
-      - &public_images_k8s
-        name: sg ops:k8s
-        cmd: |
-          set -eu
-          registry=index.docker.io/sourcegraph
-          sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-executor/k8s/
-      - &public_images_migrator
-        name: sg ops:migrator
-        cmd: |
-          set -eu
-          registry=index.docker.io/sourcegraph
-          sg ops update-images \
-            -t {{inputs.server.tag}} \
-            -k helm \
-            --registry "${registry}" \
-            --docker-username $DOCKER_USERNAME \
-            --docker-password $DOCKER_PASSWORD \
-            charts/sourcegraph-migrator/
-      - *helm_docs
+      - *public-images-sourcegraph
+      - *public-images-dind
+      - *public-images-k8s
+      - *public-images-migrator
+      - *helm-docs
       - name: "git:branch"
         cmd: |
           set -eu
@@ -325,13 +349,13 @@ promoteToPublic:
           echo "Creating branch origin/${branch}"
           git switch -c "${branch}"
 
-      - *public_images_sourcegraph
-      - *public_images_dind
-      - *public_images_k8s
-      - *public_images_migrator
-      - *chart_version
-      - *chart_app_version
-      - *helm_docs
+      - *public-images-sourcegraph
+      - *public-images-dind
+      - *public-images-k8s
+      - *public-images-migrator
+      - *chart-version
+      - *chart-app-version
+      - *helm-docs
 
       - name: "git:commit"
         cmd: |
