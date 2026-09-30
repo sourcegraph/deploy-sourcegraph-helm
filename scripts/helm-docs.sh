@@ -1,11 +1,16 @@
-#!/usr/bin/env bash
-# Copy from https://github.com/linkerd/linkerd2/blob/main/bin/helm-docs
+#!/bin/sh
+# Downloads the pinned helm-docs release into target/bin (gitignored) on first
+# use, then runs it with any arguments passed to this script.
+#
+# POSIX sh only (no bash): this runs on developer machines, in Buildkite, and
+# in the release worker's busybox-based image. Adapted from
+# https://github.com/linkerd/linkerd2/blob/main/bin/helm-docs
 
-set -euf -o pipefail
+set -euf
 
 helmdocsv=1.14.2
-bindir=$( cd "${0%/*}" && pwd ) # Change to script dir and set bin dir to this
-targetbin=$( cd "$bindir"/.. && pwd )/target/bin
+bindir=$(cd "$(dirname "$0")" && pwd)
+targetbin=$(cd "$bindir/.." && pwd)/target/bin
 helmdocsbin=$targetbin/helm-docs-$helmdocsv
 
 if [ ! -f "$helmdocsbin" ]; then
@@ -15,25 +20,28 @@ if [ ! -f "$helmdocsbin" ]; then
         Darwin) os=Darwin ;;
         Linux) os=Linux ;;
         MSYS*|MINGW*|CYGWIN*) os=Windows ;;
-        *) echo "Unsupported OS: $(uname -s)"; exit 126 ;;
+        *) echo "Unsupported OS: $(uname -s)" >&2; exit 126 ;;
     esac
     case $(uname -m) in
         x86_64|amd64) arch=x86_64 ;;
         aarch64|arm64) arch=arm64 ;;
         armv7l) arch=arm7 ;;
         armv6l) arch=arm6 ;;
-        *) echo "Unsupported architecture: $(uname -m)"; exit 126 ;;
+        *) echo "Unsupported architecture: $(uname -m)" >&2; exit 126 ;;
     esac
     helmdocscurl="https://github.com/norwoodj/helm-docs/releases/download/v$helmdocsv/helm-docs_${helmdocsv}_${os}_${arch}.tar.gz"
-    tmp=$(mktemp -d -t helm-docs.XXX)
+
+    # An explicit template works the same in GNU, BSD/macOS, and busybox mktemp.
+    tmp=$(mktemp -d "${TMPDIR:-/tmp}/helm-docs.XXXXXX")
     mkdir -p "$targetbin"
     (
         cd "$tmp"
-        curl --proto '=https' --tlsv1.2 -sSfL -o "./helm-docs.tar.gz" "$helmdocscurl"
-        tar zf "./helm-docs.tar.gz" -x "helm-docs"
-        chmod +x "helm-docs"
+        curl --proto '=https' --tlsv1.2 -sSfL -o helm-docs.tar.gz "$helmdocscurl"
+        tar -xzf helm-docs.tar.gz helm-docs
+        chmod +x helm-docs
     )
     mv "$tmp/helm-docs" "$helmdocsbin"
+    rm -rf "$tmp"
 fi
 
 "$helmdocsbin" "$@"
