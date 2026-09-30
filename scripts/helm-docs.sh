@@ -2,15 +2,26 @@
 # Downloads the pinned helm-docs release into target/bin (gitignored) on first
 # use, then runs it with any arguments passed to this script.
 #
+#   ./scripts/helm-docs.sh          regenerate charts/**/README.md
+#   ./scripts/helm-docs.sh --check  regenerate, then fail if any README changed
+#
 # POSIX sh only (no bash): this runs on developer machines, in Buildkite, and
 # in the release worker's busybox-based image. Adapted from
 # https://github.com/linkerd/linkerd2/blob/main/bin/helm-docs
 
 set -euf
 
+check=false
+if [ "${1:-}" = --check ]; then
+    check=true
+    shift
+fi
+
 helmdocsv=1.14.2
-bindir=$(cd "$(dirname "$0")" && pwd)
-targetbin=$(cd "$bindir/.." && pwd)/target/bin
+# Run from the repository root regardless of the caller's cwd: helm-docs
+# scans the cwd for charts, and it reads .helmdocsignore from there too.
+cd "$(dirname "$0")/.."
+targetbin=$PWD/target/bin
 helmdocsbin=$targetbin/helm-docs-$helmdocsv
 
 if [ ! -f "$helmdocsbin" ]; then
@@ -45,3 +56,13 @@ if [ ! -f "$helmdocsbin" ]; then
 fi
 
 "$helmdocsbin" "$@"
+
+if [ "$check" = true ]; then
+    # Only READMEs helm-docs writes, so unrelated local edits don't fail the check.
+    stale=$(git status --porcelain -- 'charts/*/README.md')
+    if [ -n "$stale" ]; then
+        echo "Chart READMEs are out of date. Run ./scripts/helm-docs.sh and commit:" >&2
+        echo "$stale" >&2
+        exit 1
+    fi
+fi
