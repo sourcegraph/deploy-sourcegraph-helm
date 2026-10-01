@@ -224,6 +224,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.name | string | `"indexed-search"` | Name used by resources. Does not affect service names or PVCs. |
 | indexedSearch.podDisruptionBudget | object | `{}` | Pod disruption budget for `indexed-search`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | indexedSearch.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `indexed-search` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
+| indexedSearch.readinessProbe | object | `{"failureThreshold":3,"periodSeconds":5,"timeoutSeconds":5}` | Readiness probe tuning for the `zoekt-webserver` container. Raise `failureThreshold` on instances with large monorepos: loading a many-shard repo can stall `/healthz` past `timeoutSeconds`, briefly dropping the pod from the service even though it is healthy. |
 | indexedSearch.replicaCount | int | `1` | Number of `indexed-search` pod |
 | indexedSearch.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | indexedSearch.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-search` |

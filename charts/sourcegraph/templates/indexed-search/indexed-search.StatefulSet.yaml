@@ -73,13 +73,13 @@ spec:
           periodSeconds: 60
           failureThreshold: 10
         readinessProbe:
-          failureThreshold: 3
+          failureThreshold: {{ .Values.indexedSearch.readinessProbe.failureThreshold }}
           httpGet:
             path: /healthz
             port: grpc
             scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
+          periodSeconds: {{ .Values.indexedSearch.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.indexedSearch.readinessProbe.timeoutSeconds }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
