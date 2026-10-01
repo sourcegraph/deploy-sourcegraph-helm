@@ -1,10 +1,11 @@
 #!/bin/sh
 # Downloads the pinned helm-docs release into target/bin (gitignored) on first
-# use, then runs it with any arguments passed to this script
+# use, then runs it with any arguments passed to this script. Prints the path
+# of every README.md it rewrote, one per line, on stdout
 #
 # Usage:
 #   ./scripts/helm-docs.sh                Regenerate charts/**/README.md after changing a values.yaml file
-#   ./scripts/helm-docs.sh --check        CI check: regenerate, and fail if any changed
+#   ./scripts/helm-docs.sh --check        CI check: regenerate, and exit 1 if any changed
 #   ./scripts/helm-docs.sh [args]         Run the helm-docs CLI with args
 #   ./scripts/helm-docs.sh --check [args] CI check with helm-docs CLI args
 #
@@ -62,25 +63,25 @@ if [ ! -f "$helmdocsbin" ]; then
     rm -rf "$tmp"
 fi
 
-# Checksum every chart README, so --check can tell which ones helm-docs rewrote
-# without git (the release worker has neither git nor a checkout)
+# Checksum every chart README before and after, to report which ones helm-docs
+# rewrote. Needs no git: the release worker has neither git nor a checkout
 readme_checksums() { find charts -name README.md -exec cksum {} +; }
+before=$(readme_checksums)
 
-if [ "$check" = true ]; then
-    before=$(readme_checksums)
-fi
-
-# Run helm-docs, with any remaining args
+# Run helm-docs, with any remaining args. Its own log lines go to stderr
 "$helmdocsbin" "$@"
 
-if [ "$check" = true ]; then
-    # Paths whose checksum line isn't in the before snapshot (changed or new)
-    stale=$(readme_checksums | while read -r line; do
-        printf '%s\n' "$before" | grep -qxF -- "$line" || echo "${line##* }"
-    done)
-    if [ -n "$stale" ]; then
-        echo "Chart READMEs are out of date. Run ./scripts/helm-docs.sh and commit:" >&2
-        echo "$stale" >&2
+# Paths whose checksum line isn't in the before snapshot (changed or new)
+rewritten=$(readme_checksums | while read -r line; do
+    printf '%s\n' "$before" | grep -qxF -- "$line" || echo "${line##* }"
+done)
+
+# stdout is only ever this list, one path per line; the release worker
+# commits exactly these files
+if [ -n "$rewritten" ]; then
+    echo "$rewritten"
+    if [ "$check" = true ]; then
+        echo "The chart READMEs listed above are out of date. Run ./scripts/helm-docs.sh and commit them" >&2
         exit 1
     fi
 fi
