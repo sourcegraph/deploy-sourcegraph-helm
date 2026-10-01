@@ -62,12 +62,22 @@ if [ ! -f "$helmdocsbin" ]; then
     rm -rf "$tmp"
 fi
 
+# Checksum every chart README, so --check can tell which ones helm-docs rewrote
+# without git (the release worker has neither git nor a checkout)
+readme_checksums() { find charts -name README.md -exec cksum {} +; }
+
+if [ "$check" = true ]; then
+    before=$(readme_checksums)
+fi
+
 # Run helm-docs, with any remaining args
 "$helmdocsbin" "$@"
 
 if [ "$check" = true ]; then
-    # Only check the READMEs written by helm-docs, so unrelated local edits don't fail this check
-    stale=$(git status --porcelain -- 'charts/*/README.md')
+    # Paths whose checksum line isn't in the before snapshot (changed or new)
+    stale=$(readme_checksums | while read -r line; do
+        printf '%s\n' "$before" | grep -qxF -- "$line" || echo "${line##* }"
+    done)
     if [ -n "$stale" ]; then
         echo "Chart READMEs are out of date. Run ./scripts/helm-docs.sh and commit:" >&2
         echo "$stale" >&2

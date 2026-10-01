@@ -2,7 +2,7 @@
 
 ## After Making Changes
 
-After making changes to any `values.yaml` file, regenerate the helm docs and verify the committed READMEs are current:
+After making changes to any `values.yaml` file, regenerate the helm docs; this fails and lists any README it had to rewrite:
 
 ```sh
 ./scripts/helm-docs.sh --check
