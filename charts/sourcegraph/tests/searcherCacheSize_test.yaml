@@ -1,0 +1,36 @@
+suite: searcher cache size
+templates:
+  - searcher/searcher.StatefulSet.yaml
+tests:
+- it: should not set cache size env vars, searcher sizes its caches from the volume
+  set:
+    searcher.storageSize: 150G
+  asserts:
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+      any: true
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+      any: true
+- it: should pass through cache size env vars set under searcher.env
+  set:
+    searcher.env:
+      SEARCHER_CACHE_SIZE_MB:
+        value: "20000"
+      SYMBOLS_CACHE_SIZE_MB:
+        value: "1500"
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "20000"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "1500"
