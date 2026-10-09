@@ -47,7 +47,6 @@ tests:
               resources:
                 requests:
                   storage: 50Gi
-              storageClassName: sourcegraph
   # /tmp mount is unchanged, so no TMPDIR redirect is needed
   - contains:
       path: spec.template.spec.containers[0].volumeMounts
@@ -55,7 +54,17 @@ tests:
         mountPath: /tmp
         name: tmpdir
 
-- it: should follow storageClass.name like every other PVC in the chart
+# The per-pod claim needs a Delete-policy class; storageClass is Retain.
+- it: should omit storageClassName by default so the cluster default class is used
+  set:
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - notExists:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
+
+- it: should not inherit storageClass.name
   set:
     storageClass:
       name: custom-ssd
@@ -63,9 +72,21 @@ tests:
       storageType: pvc
       storageSize: 50Gi
   asserts:
+  - notExists:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
+
+- it: should use preciseCodeIntel.storageClassName when set
+  set:
+    storageClass:
+      name: custom-ssd
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+      storageClassName: premium-rwo
+  asserts:
   - equal:
       path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
-      value: custom-ssd
+      value: premium-rwo
 
 - it: should fail when storageSize is omitted on the pvc branch
   set:

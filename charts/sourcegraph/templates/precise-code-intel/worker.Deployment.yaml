@@ -135,7 +135,9 @@ spec:
               resources:
                 requests:
                   storage: {{ required "preciseCodeIntel.storageSize is required when preciseCodeIntel.storageType is pvc" .Values.preciseCodeIntel.storageSize }}
-              storageClassName: {{ .Values.storageClass.name }}
+              {{- with .Values.preciseCodeIntel.storageClassName }}
+              storageClassName: {{ . }}
+              {{- end }}
         {{- else if .Values.preciseCodeIntel.storageSize }}
         emptyDir:
           sizeLimit: {{ .Values.preciseCodeIntel.storageSize }}
