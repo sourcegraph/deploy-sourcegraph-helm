@@ -84,6 +84,10 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.kubernetesJob.resources.requests.memory | string | `"1Gi"` | The requested memory for a job. |
 | executor.kubernetesJob.runAsGroup | int | `nil`; accepts [0, 2147483647] | The group ID to run Kubernetes jobs as. |
 | executor.kubernetesJob.runAsUser | int | `nil`; accepts [0, 2147483647] | The user ID to run Kubernetes jobs as. |
+| executor.kubernetesJob.serviceAccount.annotations | object | `{}` | Annotations to add to the created ServiceAccount |
+| executor.kubernetesJob.serviceAccount.automountToken | bool | `false` | Mount the ServiceAccount token into job pods. Jobs only talk to the Sourcegraph frontend and never need the Kubernetes API. Applied on both the created ServiceAccount and, on executor images that include sourcegraph/sourcegraph#16392, the job pod spec. |
+| executor.kubernetesJob.serviceAccount.create | bool | `true` | Create a ServiceAccount for job pods, with no RBAC bindings. Rendered only when `executor.configureRbac` is also true, so a second executor release in the same namespace does not try to own it. Set to false to use an existing ServiceAccount named by `executor.kubernetesJob.serviceAccount.name`. |
+| executor.kubernetesJob.serviceAccount.name | string | `"sg-executor-job"` | The ServiceAccount job pods run as. Created in `executor.namespace`, where the job pods run. Empty falls back to the namespace `default` ServiceAccount. Requires an executor image that includes sourcegraph/sourcegraph#16392; older executors ignore this setting. |
 | executor.log.format | string | `"condensed"` |  |
 | executor.log.level | string | `"warn"` | Possible values are `dbug`, `info`, `warn`, `eror`, `crit`. |
 | executor.log.trace | string | `"false"` |  |
