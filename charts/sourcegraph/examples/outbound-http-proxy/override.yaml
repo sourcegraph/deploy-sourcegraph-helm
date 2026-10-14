@@ -11,8 +11,34 @@ proxyEnvVars: &proxy-env-vars
     value: http://proxy.example.com:8080
   # Skip the proxy for local traffic
   # If pods fail their readiness or health checks after adding the proxy, also add the cluster's pod and service CIDR ranges, ex. 10.10.0.0/16,10.20.0.0/16
+  # Each line needs a trailing comma, as YAML folds these lines into one line, separated by spaces
   NO_PROXY:
-    value: blobstore,codeinsights-db,codeintel-db,sourcegraph-frontend-internal,sourcegraph-frontend,gitserver,grafana,indexed-search-indexer,indexed-search,jaeger-query,pgsql,precise-code-intel-worker,prometheus,redis-cache,redis-store,searcher,syntect-server,worker-executors,worker,cloud-sql-proxy,localhost,127.0.0.1,.svc,.svc.cluster.local,kubernetes.default.svc
+    value: >-
+      blobstore,
+      cloud-sql-proxy,
+      codeinsights-db,
+      codeintel-db,
+      gitserver,
+      grafana,
+      indexed-search,
+      indexed-search-indexer,
+      jaeger-query,
+      pgsql,
+      precise-code-intel-worker,
+      prometheus,
+      redis-cache,
+      redis-store,
+      searcher,
+      sourcegraph-frontend,
+      sourcegraph-frontend-internal,
+      syntect-server,
+      worker,
+      worker-executors,
+      localhost,
+      127.0.0.1,
+      .svc,
+      .svc.cluster.local,
+      kubernetes.default.svc
 
 frontend:
   env:
