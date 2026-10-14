@@ -18,22 +18,11 @@ proxyEnvVars: &proxy-env-vars
 frontend:
   env:
     <<: *proxy-env-vars
-    # To proxy only pings and update checks, instead of all outbound traffic,
-    # set this var alone, and drop the HTTP_PROXY / HTTPS_PROXY / NO_PROXY vars
-    # TELEMETRY_HTTP_PROXY:
-    #   value: http://proxy.example.com:8080
 
 gitserver:
-  env:
-    <<: *proxy-env-vars
-
-migrator:
   env:
     <<: *proxy-env-vars
 
 worker:
   env:
     <<: *proxy-env-vars
-
-# Executors are deployed from the separate sourcegraph-executor chart
-# Add the same env vars to its executor.extraEnv list

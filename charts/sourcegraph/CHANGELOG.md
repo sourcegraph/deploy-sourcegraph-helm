@@ -8,7 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
-- Added an `outbound-http-proxy` example, which routes outbound traffic from frontend, gitserver, migrator, and worker through an HTTP proxy with `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
+- Added an `outbound-http-proxy` example, which routes outbound traffic from frontend, gitserver, and worker through an HTTP proxy with `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
 - Added opt-in Redis config management through `redisCache.config.enabled` and `redisStore.config.enabled` (both default to `false`). Default deployments retain their image configs, custom mounts, authentication, and memory settings. When enabled, the chart mounts `/etc/redis/redis.conf` and supports `existingConfig`, `maxmemory`, `maxmemoryRatio`, `maxmemoryPolicy`, and `additionalConfig`. See [Enabling Redis config management](README.md#enabling-redis-config-management) before opting in, especially when using custom images or Secret-mounted configs.
 - With Redis config management enabled, the chart sizes `maxmemory` at 75% of `resources.limits.memory` to leave room for overhead; this reduces, but does not eliminate, OOM risk. Ratios must be greater than 0 and less than 1. Auto-sizing is skipped in local development mode or when the limit is absent or unrecognised. At the default 7Gi limit, opting in lowers the effective cap from 6GiB to 5.25GiB: `redis-cache` evicts earlier, but `redis-store` uses `noeviction`, so its write-error ceiling drops too. Set `redisStore.config.maxmemory: 6gb` to keep the old ceiling if the pod has sufficient memory.
 - Added a `network-policy` example, which limits Executor and Executor job pods to the frontend API
