@@ -32,7 +32,7 @@ helm repo add sourcegraph https://helm.sourcegraph.com/release
 
 By default, the [sourcegraph/sourcegraph-migrator] chart references database credentials from a Kubernetes `Secret` created by the parent [sourcegraph/sourcegraph] chart. If you provide your own `Secret` resources, update the `codeInsightsDB.auth.existingSecret`, `codeIntelDB.auth.existingSecret` and `pgsql.auth.existingSecret` settings in values.yaml to match. Learn more about [using your own PostgreSQL server].
 
-You should consult the list of available [migrator commands]. Below is some example usage.
+You should consult the list of available [migrator commands]. Below is some example usage. Replace `<chart-version>` with the chart version that matches your Sourcegraph version.
 
 ### Run database migration
 
@@ -42,7 +42,7 @@ You should consult the list of available [migrator commands]. Below is some exam
 - Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
 
 ```sh
-helm upgrade --install -f <your-override-file.yaml> --version {{ template "chart.version" . }} sg-migrator sourcegraph/sourcegraph-migrator
+helm upgrade --install -f <your-override-file.yaml> --version <chart-version> sg-migrator sourcegraph/sourcegraph-migrator
 ```
 
 ### Add a migration log entry
@@ -52,7 +52,7 @@ helm upgrade --install -f <your-override-file.yaml> --version {{ template "chart
 Add an entry to the migration log after a site administrator has explicitly applied the contents of a migration file, learn more about troubleshooting a [dirty database].
 
 ```sh
-helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" --version {{ template "chart.version" . }} sg-migrator sourcegraph/sourcegraph-migrator
+helm upgrade --install -f <your-override-file.yaml> --set "migrator.args={add-log,-db=frontend,-version=1528395834}" --version <chart-version> sg-migrator sourcegraph/sourcegraph-migrator
 ```
 
 ## Rendering manifests for kubectl deployment
