@@ -10,6 +10,7 @@ proxyEnvVars: &proxy-env-vars
   HTTPS_PROXY:
     value: http://proxy.example.com:8080
   # Skip the proxy for local traffic
+  # Add your internal code hosts, auth providers, image registries, etc. which are reachable without the proxy
   # If pods fail their readiness or health checks after adding the proxy, also add the cluster's pod and service CIDR ranges, ex. 10.10.0.0/16,10.20.0.0/16
   # Each line needs a trailing comma, as YAML folds these lines into one line, separated by spaces
   NO_PROXY:
@@ -44,9 +45,10 @@ frontend:
   env:
     <<: *proxy-env-vars
 
-gitserver:
-  env:
-    <<: *proxy-env-vars
+# Uncomment if connections to code hosts outside your private network need to use the proxy
+# gitserver:
+#   env:
+#     <<: *proxy-env-vars
 
 worker:
   env:
