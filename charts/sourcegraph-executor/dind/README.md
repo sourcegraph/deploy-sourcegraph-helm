@@ -71,7 +71,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password. The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value. frontendPassword is ignored if this is set. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured. |
 | executor.frontendUrl | string | `""` | The external URL of the Sourcegraph instance. Required. **Recommended:** set to the internal service endpoint (e.g. `http://sourcegraph-frontend.sourcegraph.svc.cluster.local:30080` if Sourcegraph is deployed in the `sourcegraph` namespace). This will avoid unnecessary network charges as traffic will stay within the local network. |
-| executor.image.defaultTag | string | `"6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508"` |  |
+| executor.image.defaultTag | string | `"8.1.0@sha256:5e40e41dec7f24138dcf4244970667386ad1f7fa206f36cdc9d480fe130ff62d"` |  |
 | executor.image.name | string | `"executor"` |  |
 | executor.log.format | string | `"json"` |  |
 | executor.log.level | string | `"warn"` | Possible values are dbug, info, warn, eror, crit. |
@@ -86,7 +86,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.storage.size | string | `""` | Size of the scratch volume. emptyDir: sets sizeLimit (optional, leave empty for unlimited). ephemeral: sets the PVC storage request (required). |
 | executor.storage.type | string | `"emptyDir"` | Type of scratch volume for job workspaces. One of: emptyDir, ephemeral. emptyDir: plain emptyDir, no storage class required. ephemeral: per-pod PVC via the cluster default storage class; size is required. |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://sourcegraph.com/docs/self-hosted/executors/deploy-executors#using-private-registries |
-| privateDockerRegistry.env | object | `{"REGISTRY_PROXY_REMOTEURL":{"value":"https://registry-1.docker.io"}}` | Extra environment variables to set on the registry container. Registry can be configured with environment variables using the pattern REGISTRY_<SECTION>_<KEY> (uppercase). Full reference: https://distribution.github.io/distribution/about/configuration  To proxy an internal private registry with credentials, override REGISTRY_PROXY_REMOTEURL and supply REGISTRY_PROXY_USERNAME / REGISTRY_PROXY_PASSWORD, e.g.:   env:     REGISTRY_PROXY_REMOTEURL:       value: https://my-internal-registry.example.com     REGISTRY_PROXY_USERNAME:       value: myuser     REGISTRY_PROXY_PASSWORD:       valueFrom:         secretKeyRef:           name: registry-proxy-credentials           key: password |
+| privateDockerRegistry.env | object | `{"REGISTRY_PROXY_REMOTEURL":{"value":"https://registry-1.docker.io"}}` | Extra environment variables to set on the registry container. Registry can be configured with environment variables using the pattern REGISTRY_<SECTION>_<KEY> (uppercase). Full reference: https://distribution.github.io/distribution/about/configuration To proxy an internal private registry with credentials, override REGISTRY_PROXY_REMOTEURL and supply REGISTRY_PROXY_USERNAME / REGISTRY_PROXY_PASSWORD, e.g.:   env:     REGISTRY_PROXY_REMOTEURL:       value: https://my-internal-registry.example.com     REGISTRY_PROXY_USERNAME:       value: myuser     REGISTRY_PROXY_PASSWORD:       valueFrom:         secretKeyRef:           name: registry-proxy-credentials           key: password |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
 | privateDockerRegistry.image.repository | string | `"registry"` |  |
 | privateDockerRegistry.image.tag | int | `3` |  |
@@ -95,7 +95,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
-| sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
+| sourcegraph.image.repository | string | `"us-docker.pkg.dev/sourcegraph-images/internal"` | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
