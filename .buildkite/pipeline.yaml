@@ -20,10 +20,7 @@ steps:
     agents: { queue: standard }
 
   - label: ":book: Verify helm-docs is up-to-date"
-    commands:
-      - "./scripts/helm-docs.sh"
-      - "echo \"checking for uncommitted changes\""
-      - "[[ -z $(git status -s) ]]"
+    command: "./scripts/helm-docs.sh --check"
     agents: { queue: standard }
 
   - label: "(internal) Release: test"
