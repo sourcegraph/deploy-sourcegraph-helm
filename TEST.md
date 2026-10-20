@@ -20,11 +20,19 @@ helm-unittest can be installed with:
 helm plugin install https://github.com/helm-unittest/helm-unittest
 ```
 
-Once the plugin is installed, you can run the unit tests using the following:
+Once the plugin is installed, you can run the unit tests for a single chart:
 
 ```bash
 helm unittest ./charts/sourcegraph
 ```
+
+Or run every chart the same way CI does:
+
+```bash
+helm unittest ./charts/sourcegraph ./charts/sourcegraph-migrator ./charts/sourcegraph-executor/k8s ./charts/sourcegraph-executor/dind
+```
+
+Each chart keeps its tests in a `tests/` directory next to its `templates/`. CI runs all of them via `scripts/ci/helm-unittest.sh`, so a new chart only needs a `tests/` directory and an entry in that script.
 
 We currently do not have testing best practices or require unit tests for new changes, so add test cases at your best judgement if possible.
 
