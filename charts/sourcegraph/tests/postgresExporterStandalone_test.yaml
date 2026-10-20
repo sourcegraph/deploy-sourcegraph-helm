@@ -1,0 +1,132 @@
+suite: postgresExporterStandalone
+templates:
+- postgres-exporter/postgres-exporter.Deployment.yaml
+- postgres-exporter/postgres-exporter.Service.yaml
+- pgsql/pgsql.StatefulSet.yaml
+tests:
+- it: should not render standalone exporters by default
+  templates:
+  - postgres-exporter/postgres-exporter.Deployment.yaml
+  - postgres-exporter/postgres-exporter.Service.yaml
+  asserts:
+  - hasDocuments:
+      count: 0
+- it: should not render a standalone exporter for an internal database
+  templates:
+  - postgres-exporter/postgres-exporter.Deployment.yaml
+  - postgres-exporter/postgres-exporter.Service.yaml
+  set:
+    pgsql:
+      postgresExporter:
+        standalone: true
+  asserts:
+  - hasDocuments:
+      count: 0
+- it: should not render a standalone exporter for an external database unless enabled
+  templates:
+  - postgres-exporter/postgres-exporter.Deployment.yaml
+  - postgres-exporter/postgres-exporter.Service.yaml
+  set:
+    pgsql:
+      enabled: false
+  asserts:
+  - hasDocuments:
+      count: 0
+- it: should render one Deployment and Service per external database with standalone enabled
+  templates:
+  - postgres-exporter/postgres-exporter.Deployment.yaml
+  - postgres-exporter/postgres-exporter.Service.yaml
+  set:
+    pgsql:
+      enabled: false
+      postgresExporter:
+        standalone: true
+    codeIntelDB:
+      enabled: false
+      postgresExporter:
+        standalone: true
+    codeInsightsDB:
+      enabled: false
+  asserts:
+  - hasDocuments:
+      count: 2
+  - containsDocument:
+      any: true
+      kind: Deployment
+      apiVersion: apps/v1
+      name: pgsql-exporter
+    template: postgres-exporter/postgres-exporter.Deployment.yaml
+  - containsDocument:
+      any: true
+      kind: Deployment
+      apiVersion: apps/v1
+      name: codeintel-db-exporter
+    template: postgres-exporter/postgres-exporter.Deployment.yaml
+  - containsDocument:
+      any: true
+      kind: Service
+      apiVersion: v1
+      name: pgsql-exporter
+    template: postgres-exporter/postgres-exporter.Service.yaml
+  - containsDocument:
+      any: true
+      kind: Service
+      apiVersion: v1
+      name: codeintel-db-exporter
+    template: postgres-exporter/postgres-exporter.Service.yaml
+- it: should connect to the external host with the sslmode from the secret
+  template: postgres-exporter/postgres-exporter.Deployment.yaml
+  set:
+    codeInsightsDB:
+      enabled: false
+      auth:
+        existingSecret: insights-credentials
+      postgresExporter:
+        standalone: true
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].name
+      value: pgsql-exporter
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DATA_SOURCE_HOST
+        valueFrom:
+          secretKeyRef:
+            key: host
+            name: insights-credentials
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DATA_SOURCE_URI
+        value: "$(DATA_SOURCE_HOST):$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=$(DATA_SOURCE_SSLMODE)"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: PG_EXPORTER_EXTEND_QUERY_PATH
+        value: /config/code_insights_queries.yaml
+- it: should label the Service so Prometheus sets job to the database name
+  template: postgres-exporter/postgres-exporter.Service.yaml
+  set:
+    codeIntelDB:
+      enabled: false
+      postgresExporter:
+        standalone: true
+  asserts:
+  - equal:
+      path: metadata.labels.app
+      value: codeintel-db
+  - equal:
+      path: metadata.annotations["sourcegraph.prometheus/scrape"]
+      value: "true"
+  - equal:
+      path: metadata.annotations["prometheus.io/port"]
+      value: "9187"
+- it: should keep the sidecar exporter connecting to localhost
+  template: pgsql/pgsql.StatefulSet.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[1].env
+      content:
+        name: DATA_SOURCE_URI
+        value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"

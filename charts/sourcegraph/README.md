@@ -130,7 +130,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.init.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.name | string | `"codeinsights-db"` | Name used by resources. Does not affect service names or PVCs. |
 | codeInsightsDB.podSecurityContext | object | `{"fsGroup":70,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":70}` | Security context for the `codeinsights-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| codeInsightsDB.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
+| codeInsightsDB.postgresExporter.standalone | bool | `false` | Deploy `pgsql-exporter` as a standalone Deployment to collect metrics from an external database (e.g. AWS RDS). Only applies when `codeInsightsDB.enabled` is `false`; the internal database always runs `pgsql-exporter` as a sidecar container |
 | codeInsightsDB.resources | object | `{"limits":{"cpu":"4","memory":"2Gi"},"requests":{"cpu":"4","memory":"2Gi"}}` | Resource requests & limits for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -152,7 +152,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.image.name | string | `"postgresql-16"` | Docker image name for the `codeintel-db` image |
 | codeIntelDB.name | string | `"codeintel-db"` | Name used by resources. Does not affect service names or PVCs. |
 | codeIntelDB.podSecurityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":999}` | Security context for the `codeintel-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| codeIntelDB.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
+| codeIntelDB.postgresExporter.standalone | bool | `false` | Deploy `pgsql-exporter` as a standalone Deployment to collect metrics from an external database (e.g. AWS RDS). Only applies when `codeIntelDB.enabled` is `false`; the internal database always runs `pgsql-exporter` as a sidecar container |
 | codeIntelDB.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
@@ -320,7 +320,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.image.name | string | `"postgresql-16"` | Docker image name for the `pgsql` image |
 | pgsql.name | string | `"pgsql"` | Name used by resources. Does not affect service names or PVCs. |
 | pgsql.podSecurityContext | object | `{"fsGroup":999,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":999,"runAsUser":999}` | Security context for the `pgsql` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| pgsql.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
+| pgsql.postgresExporter.standalone | bool | `false` | Deploy `pgsql-exporter` as a standalone Deployment to collect metrics from an external database (e.g. AWS RDS). Only applies when `pgsql.enabled` is `false`; the internal database always runs `pgsql-exporter` as a sidecar container |
 | pgsql.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pgsql.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `pgsql` |
 | pgsql.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |

@@ -1,0 +1,88 @@
+{{- define "sourcegraph.postgresExporter.deployment" -}}
+{{- $top := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $queriesFile := index . 2 -}}
+{{- $database := index $top.Values $service -}}
+{{- $exporterName := printf "%s-exporter" $database.name -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Prometheus exporter for the external {{ $database.name }} database.
+  labels:
+    {{- include "sourcegraph.labels" $top | nindent 4 }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: {{ $exporterName }}
+  name: {{ $exporterName }}
+spec:
+  replicas: 1
+  revisionHistoryLimit: {{ $top.Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" $top | nindent 6 }}
+      app: {{ $database.name }}
+  template:
+    metadata:
+      annotations:
+        checksum/{{ $database.name }}.secret: {{ toJson $database.auth | sha256sum }}
+      {{- if $top.Values.sourcegraph.podAnnotations }}
+      {{- toYaml $top.Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if $database.podAnnotations }}
+      {{- toYaml $database.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" $top | nindent 8 }}
+      {{- if $top.Values.sourcegraph.podLabels }}
+      {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if $database.podLabels }}
+      {{- toYaml $database.podLabels | nindent 8 }}
+      {{- end }}
+        deploy: sourcegraph
+        app: {{ $database.name }}
+    spec:
+      containers:
+      - name: pgsql-exporter
+        env:
+        {{- if not $top.Values.sourcegraph.disableKubernetesSecrets }}
+        {{- include "sourcegraph.dataSource" (list $top $service) | nindent 8 }}
+        {{- end }}
+        {{- range $name, $item := $database.postgresExporter.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: PG_EXPORTER_EXTEND_QUERY_PATH
+          value: /config/{{ $queriesFile }}
+        image: {{ include "sourcegraph.image" (list $top "postgresExporter") }}
+        imagePullPolicy: {{ $top.Values.sourcegraph.image.pullPolicy }}
+        ports:
+        - name: http-metrics
+          containerPort: 9187
+        {{- if not $top.Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml $top.Values.postgresExporter.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml $top.Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        terminationMessagePolicy: FallbackToLogsOnError
+      securityContext:
+        {{- toYaml $database.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list $top $service) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list $top $service) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list $top $service) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- include "sourcegraph.tolerations" (list $top $service) | trim | nindent 6 }}
+      {{- with $top.Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list $top $service) | trim | nindent 6 }}
+{{- end -}}
+
+{{- range $service, $queriesFile := dict "pgsql" "queries.yaml" "codeIntelDB" "code_intel_queries.yaml" "codeInsightsDB" "code_insights_queries.yaml" }}
+{{- $database := index $.Values $service }}
+{{- if and (not $database.enabled) $database.postgresExporter.standalone }}
+---
+{{ include "sourcegraph.postgresExporter.deployment" (list $ $service $queriesFile) }}
+{{- end }}
+{{- end }}

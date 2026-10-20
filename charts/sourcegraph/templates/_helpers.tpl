@@ -252,8 +252,23 @@ app.kubernetes.io/name: jaeger
     secretKeyRef:
       key: user
       name: {{ $secretName }}
+{{- if (index $top.Values $service "enabled") }}
 - name: DATA_SOURCE_URI
   value: "localhost:$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=disable"
+{{- else }}
+- name: DATA_SOURCE_HOST
+  valueFrom:
+    secretKeyRef:
+      key: host
+      name: {{ $secretName }}
+- name: DATA_SOURCE_SSLMODE
+  valueFrom:
+    secretKeyRef:
+      key: sslmode
+      name: {{ $secretName }}
+- name: DATA_SOURCE_URI
+  value: "$(DATA_SOURCE_HOST):$(DATA_SOURCE_PORT)/$(DATA_SOURCE_DB)?sslmode=$(DATA_SOURCE_SSLMODE)"
+{{- end }}
 {{- end }}
 
 {{/*

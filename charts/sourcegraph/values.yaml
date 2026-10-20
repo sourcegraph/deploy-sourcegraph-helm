@@ -211,8 +211,11 @@ codeInsightsDB:
       runAsUser: 70
       runAsGroup: 70
       readOnlyRootFilesystem: true
-  # -- Configuration for the `pgsql-exporter` sidecar container
-  postgresExporter: {}
+  # Configuration for the `pgsql-exporter` container
+  postgresExporter:
+    # -- Deploy `pgsql-exporter` as a standalone Deployment to collect metrics from an external database (e.g. AWS RDS).
+    # Only applies when `codeInsightsDB.enabled` is `false`; the internal database always runs `pgsql-exporter` as a sidecar container
+    standalone: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "codeinsights-db"
   # -- Resource requests & limits for the `codeinsights-db` container,
@@ -280,8 +283,11 @@ codeIntelDB:
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
-  # -- Configuration for the `pgsql-exporter` sidecar container
-  postgresExporter: {}
+  # Configuration for the `pgsql-exporter` container
+  postgresExporter:
+    # -- Deploy `pgsql-exporter` as a standalone Deployment to collect metrics from an external database (e.g. AWS RDS).
+    # Only applies when `codeIntelDB.enabled` is `false`; the internal database always runs `pgsql-exporter` as a sidecar container
+    standalone: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "codeintel-db"
   # -- Resource requests & limits for the `codeintel-db` container,
@@ -844,8 +850,11 @@ pgsql:
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
-  # -- Configuration for the `pgsql-exporter` sidecar container
-  postgresExporter: {}
+  # Configuration for the `pgsql-exporter` container
+  postgresExporter:
+    # -- Deploy `pgsql-exporter` as a standalone Deployment to collect metrics from an external database (e.g. AWS RDS).
+    # Only applies when `pgsql.enabled` is `false`; the internal database always runs `pgsql-exporter` as a sidecar container
+    standalone: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "pgsql"
   # -- Resource requests & limits for the `pgsql` container,

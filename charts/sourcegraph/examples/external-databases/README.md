@@ -12,6 +12,12 @@ For guidance on setup for the external instances, refer to the [Helm docs on usi
 
 The example [override.yaml] demonstrates various options for configuring access to the external databases.
 
+## Database metrics
+
+The internal databases run `pgsql-exporter` as a sidecar container, which feeds the Postgres panels in the Sourcegraph Grafana dashboards. External databases have no sidecar, so those panels stay empty.
+
+Set `<database>.postgresExporter.standalone: true` to deploy `pgsql-exporter` as its own Deployment, connecting to the external database with the same credentials the application uses. The example [override.yaml] enables it for `pgsql`.
+
 ## Providing credentials via Secret
 
 You can provide database credentials in a [Secret](https://kubernetes.io/docs/concepts/configuration/secret/) managed outside the helm chart in a secure manner.
@@ -30,7 +36,7 @@ data:
   password: ""
   port: ""
   user: ""
-  pgsslmode: "require" # optional, enable if using SSL
+  sslmode: "" # "require" if using SSL, otherwise "disable"
 ```
 
 The Secret name should be set in your override file in the `auth.existingSecret` key for each database. See the [override.yaml] for an example.
