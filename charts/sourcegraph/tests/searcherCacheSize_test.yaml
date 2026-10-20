@@ -1,0 +1,124 @@
+suite: searcher cache size
+templates:
+- searcher/searcher.StatefulSet.yaml
+tests:
+- it: should size both caches to 45% of the default storageSize
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "12562"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "12562"
+- it: should accept storageSize in Gi
+  set:
+    searcher:
+      storageSize: 100Gi
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "48318"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "48318"
+- it: should accept storageSize in G
+  set:
+    searcher:
+      storageSize: 150G
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "67500"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "67500"
+  - equal:
+      path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
+      value: 150G
+- it: should accept storageSize in M
+  set:
+    searcher:
+      storageSize: 500000M
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "225000"
+- it: should accept storageSize in Ti
+  set:
+    searcher:
+      storageSize: 1Ti
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "494779"
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+        value: "494779"
+- it: should accept a fractional storageSize
+  set:
+    searcher:
+      storageSize: 1.5G
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "675"
+- it: should accept a suffixless byte count and round down to whole megabytes
+  set:
+    searcher:
+      storageSize: "6442450944"
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+        value: "2898"
+- it: should fail on an unrecognised quantity instead of disabling eviction
+  set:
+    searcher:
+      storageSize: 1Tb
+  asserts:
+  - failedTemplate:
+      errorMessage: searcher.storageSize must be a Kubernetes quantity such as 150G, 100Gi or 1Ti (got "1Tb"), or set searcher.autoCacheSize=true
+- it: should fail when the derived cache size would be 0 instead of disabling eviction
+  set:
+    searcher:
+      storageSize: 2M
+  asserts:
+  - failedTemplate:
+      errorMessage: searcher.storageSize 2M is too small to derive a non-zero cache size; use at least 3M, or set searcher.autoCacheSize=true
+- it: should not need a parseable storageSize when autoCacheSize is enabled
+  set:
+    searcher:
+      autoCacheSize: true
+      storageSize: 1Tb
+  asserts:
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SEARCHER_CACHE_SIZE_MB
+      any: true
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SYMBOLS_CACHE_SIZE_MB
+      any: true
