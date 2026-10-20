@@ -50,37 +50,27 @@ tests:
   asserts:
   - hasDocuments:
       count: 2
-  - containsDocument:
-      any: true
-      kind: Deployment
-      apiVersion: apps/v1
-      name: pgsql-exporter
+  - isKind:
+      of: Deployment
     template: postgres-exporter/postgres-exporter.Deployment.yaml
-  - containsDocument:
-      any: true
-      kind: Deployment
-      apiVersion: apps/v1
-      name: codeintel-db-exporter
-    template: postgres-exporter/postgres-exporter.Deployment.yaml
-  - containsDocument:
-      any: true
-      kind: Service
-      apiVersion: v1
-      name: pgsql-exporter
+  - isKind:
+      of: Service
     template: postgres-exporter/postgres-exporter.Service.yaml
-  - containsDocument:
-      any: true
-      kind: Service
-      apiVersion: v1
-      name: codeintel-db-exporter
-    template: postgres-exporter/postgres-exporter.Service.yaml
+  - equal:
+      path: metadata.name
+      value: pgsql-exporter
+    documentIndex: 0
+  - equal:
+      path: metadata.name
+      value: codeintel-db-exporter
+    documentIndex: 1
 - it: should connect to the external host with the sslmode from the secret
   template: postgres-exporter/postgres-exporter.Deployment.yaml
   set:
     codeInsightsDB:
       enabled: false
       auth:
-        existingSecret: insights-credentials
+        existingSecret: "my-secret"
       postgresExporter:
         standalone: true
   asserts:
@@ -94,7 +84,7 @@ tests:
         valueFrom:
           secretKeyRef:
             key: host
-            name: insights-credentials
+            name: my-secret
   - contains:
       path: spec.template.spec.containers[0].env
       content:

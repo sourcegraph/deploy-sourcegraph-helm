@@ -1,9 +1,9 @@
 {{- define "sourcegraph.postgresExporter.deployment" -}}
 {{- $top := index . 0 -}}
 {{- $service := index . 1 -}}
-{{- $queriesFile := index . 2 -}}
 {{- $database := index $top.Values $service -}}
 {{- $exporterName := printf "%s-exporter" $database.name -}}
+{{- $queriesFile := index (dict "pgsql" "queries.yaml" "codeIntelDB" "code_intel_queries.yaml" "codeInsightsDB" "code_insights_queries.yaml") $service -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -79,10 +79,10 @@ spec:
       {{- include "sourcegraph.renderServiceAccountName" (list $top $service) | trim | nindent 6 }}
 {{- end -}}
 
-{{- range $service, $queriesFile := dict "pgsql" "queries.yaml" "codeIntelDB" "code_intel_queries.yaml" "codeInsightsDB" "code_insights_queries.yaml" }}
+{{- range $service := list "pgsql" "codeIntelDB" "codeInsightsDB" }}
 {{- $database := index $.Values $service }}
 {{- if and (not $database.enabled) $database.postgresExporter.standalone }}
 ---
-{{ include "sourcegraph.postgresExporter.deployment" (list $ $service $queriesFile) }}
+{{ include "sourcegraph.postgresExporter.deployment" (list $ $service) }}
 {{- end }}
 {{- end }}
