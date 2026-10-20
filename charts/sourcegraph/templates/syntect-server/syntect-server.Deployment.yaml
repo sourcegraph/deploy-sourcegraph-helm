@@ -61,21 +61,12 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
+        {{- include "sourcegraph.httpProbes" (dict "top" . "service" .Values.syntectServer "port" "http" "livenessPath" "/health" "readinessPath" "/health") | nindent 8 }}
         ports:
         - name: http
           containerPort: 9238
         - name: http-debug
           containerPort: 6060
-        readinessProbe:
-          tcpSocket:
-            port: http
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.syntectServer.resources | nindent 10 }}

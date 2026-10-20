@@ -58,34 +58,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          initialDelaySeconds: 60
-          periodSeconds: 30
-          failureThreshold: 5
-          timeoutSeconds: 5
-          tcpSocket:
-            port: redis
-        readinessProbe:
-          initialDelaySeconds: 10
-          failureThreshold: 5
-          timeoutSeconds: 5
-          exec:
-            command:
-            - /bin/sh
-            - -c
-            - |
-              #!/bin/bash
-              PASS_CHECK=$(grep -h "requirepass" /etc/redis/redis.conf | cut -d ' ' -f 2)
-              if [ ! -z "$PASS_CHECK" ]; then
-                export REDISCLI_AUTH="$PASS_CHECK"
-              fi
-              response=$(
-                redis-cli ping
-              )
-              if [ "$response" != "PONG" ]; then
-                echo "$response"
-                exit 1
-              fi
+        {{- include "sourcegraph.redisProbes" (list . "redisCache") | nindent 8 }}
         env:
         {{- range $name, $item := .Values.redisCache.env}}
         - name: {{ $name }}

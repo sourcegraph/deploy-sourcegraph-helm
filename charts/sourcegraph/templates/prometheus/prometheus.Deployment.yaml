@@ -57,13 +57,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        readinessProbe:
-          httpGet:
-            path: /-/ready
-            port: http
-          timeoutSeconds: 3
-          failureThreshold: 120
-          periodSeconds: 5
+        {{- include "sourcegraph.httpProbes" (dict "top" . "service" .Values.prometheus "port" "http" "livenessPath" "/-/healthy" "readinessPath" "/-/ready") | nindent 8 }}
         ports:
         - name: http
           containerPort: 9090

@@ -83,14 +83,7 @@ spec:
           containerPort: 3181
         - name: http-debug
           containerPort: 6060
-        readinessProbe:
-          failureThreshold: 3
-          httpGet:
-            path: /ready
-            port: http-debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
+        {{- include "sourcegraph.probes" (list . "searcher") | nindent 8 }}
         volumeMounts:
         - mountPath: /mnt/cache
           name: cache

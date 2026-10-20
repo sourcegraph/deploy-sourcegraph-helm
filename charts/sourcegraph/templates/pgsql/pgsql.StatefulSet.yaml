@@ -69,21 +69,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-        readinessProbe:
-          exec:
-            command:
-              - /ready.sh
-        livenessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command:
-              - /liveness.sh
-        startupProbe:
-          exec:
-            command:
-              - /liveness.sh
-          failureThreshold: 360
-          periodSeconds: 10
+        {{- include "sourcegraph.postgresProbes" (list . "pgsql") | nindent 8 }}
         env:
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "POSTGRES_") | nindent 8 }}
         - name: POSTGRES_DB

@@ -77,21 +77,7 @@ spec:
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
-        readinessProbe:
-          exec:
-            command:
-              - /ready.sh
-        livenessProbe:
-          initialDelaySeconds: 15
-          exec:
-            command:
-              - /liveness.sh
-        startupProbe:
-          exec:
-            command:
-              - /liveness.sh
-          failureThreshold: 360
-          periodSeconds: 10
+        {{- include "sourcegraph.postgresProbes" (list . "codeIntelDB") | nindent 8 }}
         ports:
         - name: pgsql
           containerPort: 5432

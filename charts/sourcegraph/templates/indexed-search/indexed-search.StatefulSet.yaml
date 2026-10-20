@@ -112,6 +112,7 @@ spec:
         ports:
         - name: grpc-indexer
           containerPort: 6072
+        {{- include "sourcegraph.httpProbes" (dict "top" . "service" .Values.indexedSearchIndexer "port" "grpc-indexer" "livenessPath" "/debug") | nindent 8 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.indexedSearchIndexer.resources | nindent 10 }}

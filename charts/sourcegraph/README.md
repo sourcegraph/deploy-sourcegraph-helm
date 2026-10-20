@@ -134,6 +134,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.resources | object | `{"limits":{"cpu":"4","memory":"2Gi"},"requests":{"cpu":"4","memory":"2Gi"}}` | Resource requests & limits for the `codeinsights-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| codeInsightsDB.startupDeadlineSeconds | int | `3600` | Time `codeinsights-db` has to recover from a crash or finish a major-version upgrade before Kubernetes restarts it |
 | codeInsightsDB.storageAnnotations | object | `{}` | Optional annotations to add to the `codeinsights-db` PVC |
 | codeInsightsDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeinsights-db` data volume |
 | codeInsightsDB.storageSubPath | string | `""` | Optional subPath for the `codeinsights-db` primary data volume mount |
@@ -156,6 +157,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `codeintel-db` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| codeIntelDB.startupDeadlineSeconds | int | `3600` | Time `codeintel-db` has to recover from a crash or finish a major-version upgrade before Kubernetes restarts it |
 | codeIntelDB.storageAnnotations | object | `{}` | Optional annotations to add to the `codeintel-db` PVC |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | codeIntelDB.storageSubPath | string | `""` | Optional subPath for the `codeintel-db` primary data volume mount |
@@ -324,6 +326,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.resources | object | `{"limits":{"cpu":"4","memory":"4Gi"},"requests":{"cpu":"4","memory":"4Gi"}}` | Resource requests & limits for the `pgsql` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | pgsql.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `pgsql` |
 | pgsql.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| pgsql.startupDeadlineSeconds | int | `3600` | Time `pgsql` has to recover from a crash or finish a major-version upgrade before Kubernetes restarts it |
 | pgsql.storageAnnotations | object | `{}` | Optional annotations to add to the `pgsql` PVC |
 | pgsql.storageSize | string | `"200Gi"` | PVC Storage Request for `pgsql` data volume |
 | pgsql.storageSubPath | string | `""` | Optional subPath for the `pgsql` primary data volume mount |
@@ -357,6 +360,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.resources | object | `{"limits":{"cpu":"2","memory":"6G"},"requests":{"cpu":"500m","memory":"6G"}}` | Resource requests & limits for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) Prometheus is relied upon to monitor services for sending alerts to site admins when something is wrong with Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough memory to perform its job reliably and prevent conflicts with other pods on the same host node.  The limit chosen here is based on what works reliably on Sourcegraph.com with lots of traffic. |
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| prometheus.startupDeadlineSeconds | int | `3600` | Time `prometheus` has to replay its write-ahead log before Kubernetes restarts it |
 | prometheus.storageAnnotations | object | `{}` | Optional annotations to add to the `prometheus` PVC |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
 | prometheus.storageSubPath | string | `""` | Optional subPath for the `prometheus` primary data volume mount |
@@ -440,6 +444,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
+| sourcegraph.startupDeadlineSeconds | int | `300` | Time a container has to pass its startup probe before Kubernetes restarts it. Liveness and readiness probes do not run until the startup probe passes |
 | sourcegraph.terminationGracePeriodSeconds | int | `30` | Time Kubernetes allows Sourcegraph services to shut down before forced termination |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | list | `[]` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
