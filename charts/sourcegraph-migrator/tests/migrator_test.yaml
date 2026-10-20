@@ -71,7 +71,7 @@ tests:
     set:
       pgsql:
         auth:
-          existingSecret: my-pgsql-secret
+          existingSecret: "my-secret"
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env
@@ -80,7 +80,7 @@ tests:
             valueFrom:
               secretKeyRef:
                 key: host
-                name: my-pgsql-secret
+                name: "my-secret"
       - contains:
           path: spec.template.spec.containers[0].env
           content:
