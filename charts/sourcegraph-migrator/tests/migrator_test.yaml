@@ -1,0 +1,129 @@
+suite: migrator
+templates:
+  - migrator/sourcegraph-migrator.Job.yaml
+tests:
+  - it: should render a Job with a random name suffix and default args
+    asserts:
+      - isKind:
+          of: Job
+      - matchRegex:
+          path: metadata.name
+          pattern: "^migrator-[a-z0-9]{5}$"
+      - matchRegex:
+          path: spec.template.spec.containers[0].image
+          pattern: "^index.docker.io/sourcegraph/migrator:"
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - up
+            - -db=all
+      - equal:
+          path: spec.template.spec.restartPolicy
+          value: Never
+
+  - it: should use migrator.name and migrator.args when set
+    set:
+      migrator:
+        name: db-migrate
+        args:
+          - upto
+          - -db=frontend
+          - -target=1648051770
+    asserts:
+      - matchRegex:
+          path: metadata.name
+          pattern: "^db-migrate-[a-z0-9]{5}$"
+      - equal:
+          path: spec.template.spec.containers[0].args
+          value:
+            - upto
+            - -db=frontend
+            - -target=1648051770
+
+  - it: should read all three database credentials from the default secrets
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PGHOST
+            valueFrom:
+              secretKeyRef:
+                key: host
+                name: pgsql-auth
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CODEINTEL_PGHOST
+            valueFrom:
+              secretKeyRef:
+                key: host
+                name: codeintel-db-auth
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CODEINSIGHTS_PGHOST
+            valueFrom:
+              secretKeyRef:
+                key: host
+                name: codeinsights-db-auth
+
+  - it: should only swap the secret for the database that sets existingSecret
+    set:
+      pgsql:
+        auth:
+          existingSecret: "my-secret"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: PGHOST
+            valueFrom:
+              secretKeyRef:
+                key: host
+                name: "my-secret"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: CODEINTEL_PGHOST
+            valueFrom:
+              secretKeyRef:
+                key: host
+                name: codeintel-db-auth
+
+  - it: should append migrator.env after the database credentials
+    set:
+      migrator:
+        env:
+          SRC_LOG_LEVEL:
+            value: dbug
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: SRC_LOG_LEVEL
+            value: dbug
+
+  - it: should prefer migrator.priorityClassName over the global one
+    set:
+      sourcegraph:
+        priorityClassName: global-class
+      migrator:
+        priorityClassName: migrator-class
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: migrator-class
+
+  - it: should fall back to the global priorityClassName
+    set:
+      sourcegraph:
+        priorityClassName: global-class
+    asserts:
+      - equal:
+          path: spec.template.spec.priorityClassName
+          value: global-class
+
+  - it: should not set priorityClassName by default
+    asserts:
+      - isNull:
+          path: spec.template.spec.priorityClassName
