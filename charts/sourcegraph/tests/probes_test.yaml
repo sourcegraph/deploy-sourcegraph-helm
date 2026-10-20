@@ -1,0 +1,127 @@
+suite: probes
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render the standard probes for a Sourcegraph service
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].startupProbe
+      value:
+        httpGet:
+          path: /ready
+          port: http-debug
+          scheme: HTTP
+        periodSeconds: 1
+        timeoutSeconds: 5
+        failureThreshold: 300
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe
+      value:
+        httpGet:
+          path: /healthz
+          port: http-debug
+          scheme: HTTP
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe
+      value:
+        httpGet:
+          path: /ready
+          port: http-debug
+          scheme: HTTP
+        periodSeconds: 5
+        timeoutSeconds: 5
+  - notExists:
+      path: spec.template.spec.containers[0].livenessProbe.initialDelaySeconds
+- it: should apply the global startup deadline to every helper
+  set:
+    sourcegraph.startupDeadlineSeconds: 42
+    pgsql.startupDeadlineSeconds: null
+  templates:
+  - gitserver/gitserver.StatefulSet.yaml
+  - blobstore/blobstore.Deployment.yaml
+  - pgsql/pgsql.StatefulSet.yaml
+  - redis/redis-store.Deployment.yaml
+  - grafana/grafana.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].startupProbe.failureThreshold
+      value: 42
+- it: should let a service override the global startup deadline
+  set:
+    worker.startupDeadlineSeconds: 900
+  templates:
+  - worker/worker.Deployment.yaml
+  - searcher/searcher.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].startupProbe.failureThreshold
+      value: 900
+    template: worker/worker.Deployment.yaml
+  - equal:
+      path: spec.template.spec.containers[0].startupProbe.failureThreshold
+      value: 300
+    template: searcher/searcher.StatefulSet.yaml
+- it: should give the databases and prometheus a one-hour startup deadline by default
+  templates:
+  - pgsql/pgsql.StatefulSet.yaml
+  - codeintel-db/codeintel-db.StatefulSet.yaml
+  - codeinsights-db/codeinsights-db.StatefulSet.yaml
+  - prometheus/prometheus.Deployment.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].startupProbe.failureThreshold
+      value: 3600
+- it: should probe codeinsights-db like the other databases
+  template: codeinsights-db/codeinsights-db.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.exec.command
+      value: [/liveness.sh]
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.exec.command
+      value: [/ready.sh]
+- it: should keep redis readiness on PONG and liveness on the socket
+  template: redis/redis-cache.Deployment.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.tcpSocket.port
+      value: redis
+  - matchRegex:
+      path: spec.template.spec.containers[0].readinessProbe.exec.command[2]
+      pattern: redis-cli ping
+- it: should probe blobstore on its debug port
+  template: blobstore/blobstore.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].ports
+      content:
+        name: http-debug
+        containerPort: 6060
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.httpGet.port
+      value: http-debug
+- it: should give grafana root-level health paths
+  template: grafana/grafana.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.httpGet.path
+      value: /healthz
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+      value: /api/health
+- it: should not add a readiness probe to zoekt-indexserver
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[1].livenessProbe.httpGet.path
+      value: /debug
+  - notExists:
+      path: spec.template.spec.containers[1].readinessProbe
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+      value: /healthz

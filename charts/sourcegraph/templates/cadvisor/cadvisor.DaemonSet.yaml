@@ -94,6 +94,7 @@ spec:
         - name: http
           containerPort: 48080
           protocol: TCP
+        {{- include "sourcegraph.httpProbes" (dict "top" . "service" .Values.cadvisor "port" "http" "livenessPath" "/healthz") | nindent 8 }}
       {{- if .Values.cadvisor.extraContainers }}
         {{- toYaml .Values.cadvisor.extraContainers | nindent 6 }}
       {{- end }}

@@ -106,20 +106,7 @@ spec:
           value: http://blobstore:9000
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http-debug
-            scheme: HTTP
-          initialDelaySeconds: 300
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: http-debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
+        {{- include "sourcegraph.probes" (list . "frontend") | nindent 8 }}
         ports:
         - name: grpc-internal
           containerPort: 3090

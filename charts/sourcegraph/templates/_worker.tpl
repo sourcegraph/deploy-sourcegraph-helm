@@ -100,20 +100,7 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http-debug
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: http-debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
+        {{- include "sourcegraph.probes" (list $top "worker") | nindent 8 }}
         ports:
         - name: http
           containerPort: 3189

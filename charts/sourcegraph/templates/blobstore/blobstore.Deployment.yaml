@@ -57,20 +57,9 @@ spec:
         ports:
         - name: http
           containerPort: 9000
-        livenessProbe:
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /
-            port: http
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
+        - name: http-debug
+          containerPort: 6060
+        {{- include "sourcegraph.probes" (list . "blobstore") | nindent 8 }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.blobstore.resources | nindent 10 }}

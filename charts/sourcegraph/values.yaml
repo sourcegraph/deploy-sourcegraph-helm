@@ -44,6 +44,9 @@ sourcegraph:
   gracefulShutdownTimeout: 15s
   # -- Time Kubernetes allows Sourcegraph services to shut down before forced termination
   terminationGracePeriodSeconds: 30
+  # -- Time a container has to pass its startup probe before Kubernetes restarts it.
+  # Liveness and readiness probes do not run until the startup probe passes
+  startupDeadlineSeconds: 300
   # -- Add extra labels to all services
   serviceLabels: {}
   # -- Disable the creation of Kubernetes secrets objects
@@ -75,6 +78,8 @@ sourcegraph:
 #   preShutdownPause: ""
 #   gracefulShutdownTimeout: ""
 #   terminationGracePeriodSeconds: null
+#   # Override the global sourcegraph.startupDeadlineSeconds
+#   startupDeadlineSeconds: null
 #   # Set resource requests / limits
 #   resources: {}
 #   containerSecurityContext: {}
@@ -235,6 +240,8 @@ codeInsightsDB:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Time `codeinsights-db` has to recover from a crash or finish a major-version upgrade before Kubernetes restarts it
+  startupDeadlineSeconds: 3600
   # -- PVC Storage Request for `codeinsights-db` data volume
   storageSize: 200Gi
   # -- Optional subPath for the `codeinsights-db` primary data volume mount
@@ -304,6 +311,8 @@ codeIntelDB:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Time `codeintel-db` has to recover from a crash or finish a major-version upgrade before Kubernetes restarts it
+  startupDeadlineSeconds: 3600
   # -- PVC Storage Request for `codeintel-db` data volume
   storageSize: 200Gi
   # -- Optional subPath for the `codeintel-db` primary data volume mount
@@ -870,6 +879,8 @@ pgsql:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Time `pgsql` has to recover from a crash or finish a major-version upgrade before Kubernetes restarts it
+  startupDeadlineSeconds: 3600
   # -- PVC Storage Request for `pgsql` data volume
   storageSize: 200Gi
   # -- Optional subPath for the `pgsql` primary data volume mount
@@ -1047,6 +1058,8 @@ prometheus:
     create: true
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: prometheus
+  # -- Time `prometheus` has to replay its write-ahead log before Kubernetes restarts it
+  startupDeadlineSeconds: 3600
   # -- PVC Storage Request for `prometheus` data volume
   storageSize: 200Gi
   # -- Optional subPath for the `prometheus` primary data volume mount

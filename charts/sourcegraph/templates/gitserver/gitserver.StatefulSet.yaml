@@ -58,30 +58,7 @@ spec:
         {{- end }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         terminationMessagePolicy: FallbackToLogsOnError
-        # Temporary: when migrating from repo names to repo IDs on disk,
-        # gitserver can take a little while to start up. To avoid killing the
-        # pod because of a failed liveness probe, we give it 2 minutes to start up.
-        startupProbe:
-          httpGet:
-            path: /ready
-            port: http-debug
-            scheme: HTTP
-          failureThreshold: 120
-          periodSeconds: 1
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: http-debug
-            scheme: HTTP
-          initialDelaySeconds: 5
-          timeoutSeconds: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: http-debug
-            scheme: HTTP
-          periodSeconds: 5
-          timeoutSeconds: 5
+        {{- include "sourcegraph.probes" (list . "gitserver") | nindent 8 }}
         ports:
         - name: grpc
           containerPort: 3178

@@ -81,6 +81,7 @@ spec:
         - name: POSTGRESQL_CONF_DIR
           value: "/conf"
         terminationMessagePolicy: FallbackToLogsOnError
+        {{- include "sourcegraph.postgresProbes" (list . "codeInsightsDB") | nindent 8 }}
         ports:
         - name: codeinsights-db
           containerPort: 5432

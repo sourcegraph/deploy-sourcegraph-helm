@@ -60,14 +60,7 @@ spec:
           {{- toYaml .Values.openTelemetry.agent.resources | nindent 10 }}
         securityContext:
           {{- toYaml .Values.openTelemetry.agent.containerSecurityContext | nindent 10 }}
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 13133
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 13133
+        {{- include "sourcegraph.httpProbes" (dict "top" . "service" .Values.openTelemetry.agent "port" 13133 "livenessPath" "/" "readinessPath" "/") | nindent 8 }}
         ports:
           - name: grpc-otlp
             containerPort: 4317

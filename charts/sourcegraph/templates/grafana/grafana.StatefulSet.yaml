@@ -66,6 +66,7 @@ spec:
         ports:
         - name: http
           containerPort: 3370
+        {{- include "sourcegraph.httpProbes" (dict "top" . "service" .Values.grafana "port" "http" "livenessPath" "/healthz" "readinessPath" "/api/health") | nindent 8 }}
         volumeMounts:
         - mountPath: /var/lib/grafana
           name: grafana-data
