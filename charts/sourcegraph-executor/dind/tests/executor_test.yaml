@@ -2,32 +2,46 @@ suite: executor
 templates:
   - executor/docker-daemon.ConfigMap.yaml
   - executor/executor.Deployment.yaml
-  - executor/executor.Service.yaml
 tests:
-  - it: should render the Deployment and Service if executor is enabled
+  - it: should render the ConfigMap and a single Deployment named after the queue
     set:
       executor:
-        enabled: true
+        queueName: batches
     asserts:
+      - containsDocument:
+          kind: ConfigMap
+          apiVersion: v1
+          name: docker-config
+        template: executor/docker-daemon.ConfigMap.yaml
       - containsDocument:
           kind: Deployment
           apiVersion: apps/v1
-          name: executor
+          name: executor-batches
         template: executor/executor.Deployment.yaml
-      - containsDocument:
-          kind: Service
-          apiVersion: v1
-          name: executor
-        template: executor/executor.Service.yaml
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_QUEUE_NAME
+            value: batches
+        template: executor/executor.Deployment.yaml
 
-  - it: should not render any resources if executor is disabled
+  - it: should render one Deployment per entry in queues
+    template: executor/executor.Deployment.yaml
     set:
-      executor:
-        enabled: false
+      queues:
+        - name: codeintel
+        - name: batches
+          queueName: batches
     asserts:
       - hasDocuments:
-          count: 0
-    templates:
-      - executor/docker-daemon.ConfigMap.yaml
-      - executor/executor.Deployment.yaml
-      - executor/executor.Service.yaml
+          count: 2
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+          name: executor-codeintel
+        documentIndex: 0
+      - containsDocument:
+          kind: Deployment
+          apiVersion: apps/v1
+          name: executor-batches
+        documentIndex: 1
