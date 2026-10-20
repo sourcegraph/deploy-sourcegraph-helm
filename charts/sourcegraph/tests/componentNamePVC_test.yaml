@@ -1,0 +1,139 @@
+suite: component name does not rename PVCs
+# `<component>.name` renames the workload, but PVC names and the
+# claimName that references them stay fixed, so the workload can
+# always find its volume.
+set:
+  blobstore:
+    name: custom-blobstore
+  codeInsightsDB:
+    name: custom-codeinsights-db
+  codeIntelDB:
+    name: custom-codeintel-db
+  pgsql:
+    name: custom-pgsql
+  prometheus:
+    name: custom-prometheus
+  redisCache:
+    name: custom-redis-cache
+  redisStore:
+    name: custom-redis-store
+tests:
+- it: should keep the blobstore PVC name and claimName fixed
+  templates:
+  - blobstore/blobstore.PersistentVolumeClaim.yaml
+  - blobstore/blobstore.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: blobstore
+    template: blobstore/blobstore.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-blobstore
+    template: blobstore/blobstore.Deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: blobstore
+    template: blobstore/blobstore.Deployment.yaml
+- it: should keep the codeinsights-db PVC name and claimName fixed
+  templates:
+  - codeinsights-db/codeinsights-db.PersistentVolumeClaim.yaml
+  - codeinsights-db/codeinsights-db.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: codeinsights-db
+    template: codeinsights-db/codeinsights-db.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-codeinsights-db
+    template: codeinsights-db/codeinsights-db.StatefulSet.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: codeinsights-db
+    template: codeinsights-db/codeinsights-db.StatefulSet.yaml
+- it: should keep the codeintel-db PVC name and claimName fixed
+  templates:
+  - codeintel-db/codeintel-db.PersistentVolumeClaim.yaml
+  - codeintel-db/codeintel-db.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: codeintel-db
+    template: codeintel-db/codeintel-db.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-codeintel-db
+    template: codeintel-db/codeintel-db.StatefulSet.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: codeintel-db
+    template: codeintel-db/codeintel-db.StatefulSet.yaml
+- it: should keep the pgsql PVC name and claimName fixed
+  templates:
+  - pgsql/pgsql.PersistentVolumeClaim.yaml
+  - pgsql/pgsql.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: pgsql
+    template: pgsql/pgsql.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-pgsql
+    template: pgsql/pgsql.StatefulSet.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: pgsql
+    template: pgsql/pgsql.StatefulSet.yaml
+- it: should keep the prometheus PVC name and claimName fixed
+  templates:
+  - prometheus/prometheus.PersistentVolumeClaim.yaml
+  - prometheus/prometheus.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: prometheus
+    template: prometheus/prometheus.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-prometheus
+    template: prometheus/prometheus.Deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: prometheus
+    template: prometheus/prometheus.Deployment.yaml
+- it: should keep the redis-cache PVC name and claimName fixed
+  templates:
+  - redis/redis-cache.PersistentVolumeClaim.yaml
+  - redis/redis-cache.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: redis-cache
+    template: redis/redis-cache.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-redis-cache
+    template: redis/redis-cache.Deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: redis-cache
+    template: redis/redis-cache.Deployment.yaml
+- it: should keep the redis-store PVC name and claimName fixed
+  templates:
+  - redis/redis-store.PersistentVolumeClaim.yaml
+  - redis/redis-store.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.name
+      value: redis-store
+    template: redis/redis-store.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.name
+      value: custom-redis-store
+    template: redis/redis-store.Deployment.yaml
+  - equal:
+      path: spec.template.spec.volumes[0].persistentVolumeClaim.claimName
+      value: redis-store
+    template: redis/redis-store.Deployment.yaml

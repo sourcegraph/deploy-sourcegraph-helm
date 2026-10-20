@@ -9,7 +9,7 @@ metadata:
   annotations:
     {{- toYaml .Values.codeIntelDB.storageAnnotations | nindent 4 }}
   {{- end }}
-  name: {{ default "codeintel-db" .Values.codeIntelDB.name }}
+  name: codeintel-db
 spec:
   accessModes:
   - ReadWriteOnce
