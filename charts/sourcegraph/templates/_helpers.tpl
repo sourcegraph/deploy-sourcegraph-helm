@@ -314,6 +314,24 @@ checksum/redis: {{ toJson $checksum | sha256sum }}
 {{- end -}}
 
 {{/*
+Convert a Kubernetes resource quantity (e.g. 7Gi, 1.5G, 500M, 1Ti, 6442450944)
+to a whole number of bytes, rounded down. Renders an empty string when the
+value is not a recognised quantity, so callers can decide whether to fall back
+or fail.
+Usage: include "sourcegraph.quantityBytes" .Values.searcher.storageSize
+*/}}
+{{- define "sourcegraph.quantityBytes" -}}
+{{- $quantity := . | toString -}}
+{{- $number := regexReplaceAll "^([0-9]+(\\.[0-9]+)?).*$" $quantity "${1}" -}}
+{{- $suffix := regexReplaceAll "^[0-9]+(\\.[0-9]+)?" $quantity "" -}}
+{{- /* Kubernetes quantity suffixes: binary (1024^n) and decimal (1000^n). */ -}}
+{{- $units := dict "" 1.0 "k" 1e3 "M" 1e6 "G" 1e9 "T" 1e12 "P" 1e15 "E" 1e18 "Ki" 1024.0 "Mi" 1048576.0 "Gi" 1073741824.0 "Ti" 1099511627776.0 "Pi" 1125899906842624.0 "Ei" 1152921504606846976.0 -}}
+{{- if and (regexMatch "^[0-9]+(\\.[0-9]+)?$" $number) (hasKey $units $suffix) -}}
+{{- printf "%d" (int64 (floor (mulf (float64 $number) (index $units $suffix)))) -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Resolve the redis `maxmemory` directive for a service.
 Usage: include "sourcegraph.redis.maxmemory" (list . "redisCache")
 
@@ -333,12 +351,8 @@ Resolution order:
 {{- if $config.maxmemory -}}
 {{- $config.maxmemory -}}
 {{- else if not $top.Values.sourcegraph.localDevMode -}}
-{{- $limit := dig "resources" "limits" "memory" "" $values | toString -}}
-{{- $number := regexReplaceAll "^([0-9]+(\\.[0-9]+)?).*$" $limit "${1}" -}}
-{{- $suffix := regexReplaceAll "^[0-9]+(\\.[0-9]+)?" $limit "" -}}
-{{- /* Kubernetes quantity suffixes: binary (1024^n) and decimal (1000^n). */ -}}
-{{- $units := dict "" 1.0 "k" 1e3 "M" 1e6 "G" 1e9 "T" 1e12 "P" 1e15 "E" 1e18 "Ki" 1024.0 "Mi" 1048576.0 "Gi" 1073741824.0 "Ti" 1099511627776.0 "Pi" 1125899906842624.0 "Ei" 1152921504606846976.0 -}}
-{{- if and (regexMatch "^[0-9]+(\\.[0-9]+)?$" $number) (hasKey $units $suffix) -}}
+{{- $limit := include "sourcegraph.quantityBytes" (dig "resources" "limits" "memory" "" $values) -}}
+{{- if $limit -}}
 {{- $ratio := 0.75 -}}
 {{- if hasKey $config "maxmemoryRatio" -}}
 {{- $ratio = float64 $config.maxmemoryRatio -}}
@@ -346,7 +360,7 @@ Resolution order:
 {{- if not (and (gt $ratio 0.0) (lt $ratio 1.0)) -}}
 {{- fail (printf "%s.config.maxmemoryRatio must be greater than 0 and less than 1" $service) -}}
 {{- end -}}
-{{- $bytes := floor (mulf (float64 $number) (index $units $suffix) $ratio) -}}
+{{- $bytes := floor (mulf (float64 $limit) $ratio) -}}
 {{- if gt $bytes 0.0 -}}
 {{- printf "%d" (int64 $bytes) -}}
 {{- end -}}
