@@ -10,4 +10,4 @@ After making changes to any `values.yaml` file, regenerate the helm docs and ver
 
 If the README was updated, stage and commit the changes alongside your other modifications.
 
-Releases rewrite every pinned image `defaultTag` and the `sourcegraph.image.repository` registry in `values.yaml`. When adding one of these values, give it a `# -- ` description and a `# @default -- ` annotation, like the existing images, so the README does not change on release.
+Releases rewrite every pinned image `defaultTag` and the `sourcegraph.image.repository` registry in `values.yaml`. When adding one of these values, give it a `# -- ` description and a `# @default -- ` annotation, like the existing images, so the README does not change on release. Published charts still list the exact values: the publish workflows run `scripts/ci/render-published-readmes.sh`, which matches these annotations by their exact text, so update it if you reword them.
