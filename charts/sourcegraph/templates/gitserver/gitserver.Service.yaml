@@ -24,6 +24,9 @@ spec:
   - name: grpc
     port: 3178
     targetPort: grpc
+  - name: http-clone
+    port: 3179
+    targetPort: http-clone
   - name: http-debug
     port: 6060
     targetPort: http-debug

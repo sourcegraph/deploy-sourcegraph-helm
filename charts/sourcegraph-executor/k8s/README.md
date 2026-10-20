@@ -94,7 +94,6 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.podSecurityContext | object | `{}` | Security context for the pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | executor.queueName | string | `""` | The name of the queue to pull jobs from to. Possible values: batches and codeintel. **Either this or queueNames is required.** |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.** |
-| executor.replicas | int | `1` |  |
 | executor.resources.limits.cpu | string | `"1"` |  |
 | executor.resources.limits.memory | string | `"4Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
@@ -104,7 +103,6 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.securityContext.privileged | bool | `false` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.securityContext.runAsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.securityContext.runAsUser | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
-| executor.storageSize | string | `"10Gi"` | The storage size of the PVC attached to the executor deployment. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
@@ -120,9 +118,3 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
-| storageClass.allowedTopologies | object | `{}` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
-| storageClass.create | bool | `false` | Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class |
-| storageClass.name | string | `"sourcegraph"` | Name of the storageClass. Use to customize to the existing storage class name |
-| storageClass.parameters | object | `{}` | Extra parameters of storageClass, consult your cloud provider persistent storage documentation |
-| storageClass.provisioner | string | `"kubernetes.io/gce-pd"` | Name of the storageClass provisioner, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner) and consult your cloud provider persistent storage documentation |
-| storageClass.type | string | `"pd-ssd"` | Value of `type` key in storageClass `parameters`, consult your cloud provider persistent storage documentation |

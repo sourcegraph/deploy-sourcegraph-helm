@@ -1,0 +1,12 @@
+{{- if and .Values.redisCache.enabled .Values.redisCache.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.redisCache.name }}
+spec:
+  {{- toYaml .Values.redisCache.podDisruptionBudget | nindent 2 }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      app: redis-cache
+{{- end }}

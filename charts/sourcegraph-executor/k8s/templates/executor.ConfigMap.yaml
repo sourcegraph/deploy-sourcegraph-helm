@@ -18,7 +18,6 @@ data:
 
   EXECUTOR_KUBERNETES_NAMESPACE: "{{ .Values.executor.namespace }}"
   EXECUTOR_KUBERNETES_CONFIG_PATH: "{{ .Values.executor.kubeconfigPath }}"
-  EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME: "sg-{{include "executor.name" . }}"
 
   EXECUTOR_KUBERNETES_NODE_NAME: "{{ .Values.executor.kubernetesJob.node.name }}"
   EXECUTOR_KUBERNETES_NODE_SELECTOR: "{{ .Values.executor.kubernetesJob.node.selector }}"

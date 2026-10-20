@@ -16,7 +16,10 @@ spec:
       {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
       app: {{ include "executor.name" . }}
   minReadySeconds: 10
-  replicas: {{ .Values.executor.replicas }}
+  # The executor controller is a singleton: it pins Job pods to its own node
+  # via EXECUTOR_KUBERNETES_NODE_NAME, so running more than one replica does not
+  # work (replicas contend for the same ReadWriteOnce PVC). Do not make this configurable.
+  replicas: 1
   revisionHistoryLimit: 10
   strategy:
     rollingUpdate:
@@ -97,9 +100,6 @@ spec:
                 - -f
                 - /usr/local/bin/executor
             periodSeconds: 5
-          volumeMounts:
-            - mountPath: /data
-              name: "sg-{{include "executor.name" . }}"
           terminationMessagePolicy: FallbackToLogsOnError
       {{- with .Values.executor.nodeSelector }}
       nodeSelector:
@@ -118,7 +118,3 @@ spec:
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      volumes:
-        - name: "sg-{{include "executor.name" . }}"
-          persistentVolumeClaim:
-            claimName: "sg-{{include "executor.name" . }}"

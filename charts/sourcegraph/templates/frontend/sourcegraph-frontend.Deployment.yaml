@@ -47,6 +47,7 @@ spec:
         app: sourcegraph-frontend
         deploy: sourcegraph
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "frontend") | nindent 6 }}
       initContainers:
       {{- if .Values.migrator.enabled }}
       - name: migrator
@@ -86,6 +87,7 @@ spec:
         {{- end }}
         args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "frontend") | nindent 8 }}
         {{- if not .Values.sourcegraph.disableKubernetesSecrets }}
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
         {{- include "sourcegraph.databaseAuth" (list . "codeIntelDB" "CODEINTEL_PG") | nindent 8 }}

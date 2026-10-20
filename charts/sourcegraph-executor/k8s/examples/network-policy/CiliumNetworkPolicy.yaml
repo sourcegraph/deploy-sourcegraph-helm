@@ -1,0 +1,92 @@
+# Limit Executor pods to the Sourcegraph frontend API. See README.md
+#
+# Before applying, set io.kubernetes.pod.namespace below to the namespace Sourcegraph is deployed in
+
+# Apply in the Executor controller's namespace
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: sourcegraph-executor-frontend-only
+spec:
+  description: Limit Executor pods to the sourcegraph-frontend API
+  # Keep this a deny-only policy; do not turn on default-deny egress
+  enableDefaultDeny:
+    egress: false
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/component: executor
+  egressDeny:
+    # Every Sourcegraph pod except sourcegraph-frontend
+    - toEndpoints:
+        - matchExpressions:
+            - key: io.kubernetes.pod.namespace
+              operator: In
+              values:
+                - sourcegraph
+            - key: deploy
+              operator: In
+              values:
+                - sourcegraph
+            - key: app
+              operator: NotIn
+              values:
+                - sourcegraph-frontend
+    # sourcegraph-frontend's internal (3090) and debug (6060) ports
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: sourcegraph
+            app: sourcegraph-frontend
+      toPorts:
+        - ports:
+            - port: "3090"
+              protocol: TCP
+            - port: "6060"
+              protocol: TCP
+    # Cloud instance metadata service, so job pods cannot read node credentials
+    - toCIDRSet:
+        - cidr: 169.254.169.254/32
+
+---
+# Apply in the Executor jobs' namespace (executor.namespace in values.yaml)
+apiVersion: cilium.io/v2
+kind: CiliumNetworkPolicy
+metadata:
+  name: sourcegraph-executor-jobs-frontend-only
+spec:
+  description: Limit Executor job pods to the sourcegraph-frontend API
+  enableDefaultDeny:
+    egress: false
+  endpointSelector:
+    matchExpressions:
+      # Do not match on sourcegraph/queue; multi-queue Executors can create jobs with an empty queue label
+      - key: sourcegraph/job-id
+        operator: Exists
+      - key: sourcegraph/run-id
+        operator: Exists
+  egressDeny:
+    - toEndpoints:
+        - matchExpressions:
+            - key: io.kubernetes.pod.namespace
+              operator: In
+              values:
+                - sourcegraph
+            - key: deploy
+              operator: In
+              values:
+                - sourcegraph
+            - key: app
+              operator: NotIn
+              values:
+                - sourcegraph-frontend
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: sourcegraph
+            app: sourcegraph-frontend
+      toPorts:
+        - ports:
+            - port: "3090"
+              protocol: TCP
+            - port: "6060"
+              protocol: TCP
+    - toCIDRSet:
+        - cidr: 169.254.169.254/32
