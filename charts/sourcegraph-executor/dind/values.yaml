@@ -138,7 +138,7 @@ dind:
   image:
     registry: index.docker.io
     repository: docker
-    tag: 29.5.3-dind
+    tag: 29.9.1-dind
   # -- Command for the dind container.
   command:
     - dockerd
