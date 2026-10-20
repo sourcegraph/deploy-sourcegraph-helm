@@ -1,6 +1,7 @@
 # Sourcegraph Helm Chart Test Guide
 
-This is a temporary test guide before we have more thorough automated integration tests.
+This is a temporary test guide before we have more thorough automated
+integration tests.
 
 ## Lint
 
@@ -12,7 +13,8 @@ helm lint charts/sourcegraph/.
 
 ## Unit testing
 
-We utilize [helm-unittest](https://github.com/helm-unittest/helm-unittest/), a BDD styled unit test framework, to validate our helm chart.
+We utilize [helm-unittest](https://github.com/helm-unittest/helm-unittest/), a
+BDD styled unit test framework, to validate our helm chart.
 
 helm-unittest can be installed with:
 
@@ -29,14 +31,24 @@ helm unittest ./charts/sourcegraph
 Or run every chart the same way CI does:
 
 ```bash
-helm unittest ./charts/sourcegraph ./charts/sourcegraph-migrator ./charts/sourcegraph-executor/k8s ./charts/sourcegraph-executor/dind
+helm unittest \
+  ./charts/sourcegraph \
+  ./charts/sourcegraph-migrator \
+  ./charts/sourcegraph-executor/k8s \
+  ./charts/sourcegraph-executor/dind
 ```
 
-Each chart keeps its tests in a `tests/` directory next to its `templates/`. CI runs all of them via `scripts/ci/helm-unittest.sh`, so a new chart only needs a `tests/` directory and an entry in that script.
+Each chart keeps its tests in a `tests/` directory next to its `templates/`. CI
+runs all of them via `scripts/ci/helm-unittest.sh`, so a new chart only needs a
+`tests/` directory and an entry in that script.
 
-We currently do not have testing best practices or require unit tests for new changes, so add test cases at your best judgement if possible.
+We currently do not have testing best practices or require unit tests for new
+changes, so add test cases at your best judgement if possible.
 
-You may check out our [existing test cases](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/main/charts/sourcegraph/tests) and helm-unittest [docs](https://github.com/helm-unittest/helm-unittest/blob/master/DOCUMENT.md).
+You may check out our [existing test
+cases](https://github.com/sourcegraph/deploy-sourcegraph-helm/tree/main/charts/sourcegraph/tests)
+and helm-unittest
+[docs](https://github.com/helm-unittest/helm-unittest/blob/master/DOCUMENT.md).
 
 ## Manual testing
 
@@ -60,11 +72,16 @@ sourcegraph:
 # More values to be added in order to test your change
 ```
 
-Make sure you test both enabled and disabled toggles. For example, if you added a new values to conditional render some templates, turn it on and off in the `override.yaml` to make sure they both work. You can also include your `override.yaml` in the `Test plan` during PR review to help others understand your testing strategy.
+Make sure you test both enabled and disabled toggles. For example, if you added
+a new values to conditional render some templates, turn it on and off in the
+`override.yaml` to make sure they both work. You can also include your
+`override.yaml` in the `Test plan` during PR review to help others understand
+your testing strategy.
 
 ### Update the image tag
 
-You have two options to target specific Sourcegraph version. Add the below to your `override.yaml`:
+You have two options to target specific Sourcegraph version. Add the below to
+your `override.yaml`:
 
 ```yaml
 sourcegraph:
@@ -73,11 +90,14 @@ sourcegraph:
     useGlobalTagAsDefault: true
 ```
 
-Alternatively, you can use `sg` to update the image tags directly in the default `values.yaml`, **DO NOT COMMIT** the changes:
+Alternatively, you can use `sg` to update the image tags directly in the default
+`values.yaml`, **DO NOT COMMIT** the changes:
 
 ```sh
 cd charts/sourcegraph
-sg ops update-images -kind helm -pin-tag 6.10.0 -cr-username=$DOCKER_HUB_USERNAME -cr-password=$DOCKER_HUB_PERSONAL_ACCESS_TOKEN .
+sg ops update-images -kind helm -pin-tag 6.10.0 \
+  -cr-username=$DOCKER_HUB_USERNAME \
+  -cr-password=$DOCKER_HUB_PERSONAL_ACCESS_TOKEN .
 ```
 
 ### Inspect the entire rendered template
@@ -90,20 +110,25 @@ helm template -f ./override.yaml sourcegraph charts/sourcegraph/.
 
 ### Inspect the diff
 
-Perform a diff of the rendered helm manifests before and after your change. There're many ways to produce the diff:
+Perform a diff of the rendered helm manifests before and after your change.
+There're many ways to produce the diff:
 
-- Run `helm template` before and after the change, then run `diff bundle.old.yaml bundle.new.yaml`.
-- Run `helm install` before the change, then run `helm diff` to inspect the diff.
+- Run `helm template` before and after the change, then run `diff
+  bundle.old.yaml bundle.new.yaml`.
+- Run `helm install` before the change, then run `helm diff` to inspect the
+  diff.
 
 ### Deploy the chart
 
 You should make sure your change can be deployed
 
 ```sh
-helm upgrade --install --create-namespace -n sourcegraph -f ./override.yaml sourcegraph charts/sourcegraph/.
+helm upgrade --install --create-namespace -n sourcegraph \
+  -f ./override.yaml sourcegraph charts/sourcegraph/.
 ```
 
-Follow the [confirm instance health] guide but use `kubectl port-forward` instead to validate instance health.
+Follow the [confirm instance health] guide but use `kubectl port-forward`
+instead to validate instance health.
 
 ```sh
 kubectl -n sourcegraph port-forward svc/sourcegraph-frontend 30080
