@@ -1,29 +1,23 @@
 suite: privateDockerRegistry
 templates:
-  - private-docker-registry.Deployment.yaml
-  - private-docker-registry.PersistentVolumeClaim.yaml
-  - private-docker-registry.Service.yaml
+  - private-docker-registry/private-docker-registry.Statefulset.yaml
+  - private-docker-registry/private-docker-registry.Service.yaml
 tests:
-  - it: should render the Deployment, Service and PVC if registry is enabled
+  - it: should render the StatefulSet and Service if registry is enabled
     set:
       privateDockerRegistry:
         enabled: true
     asserts:
       - containsDocument:
-          kind: Deployment
+          kind: StatefulSet
           apiVersion: apps/v1
           name: private-docker-registry
-        template:  private-docker-registry.Deployment.yaml
+        template: private-docker-registry/private-docker-registry.Statefulset.yaml
       - containsDocument:
           kind: Service
           apiVersion: v1
           name: private-docker-registry
-        template: private-docker-registry.Service.yaml
-      - containsDocument:
-          kind: PersistentVolumeClaim
-          apiVersion: v1
-          name: private-docker-registry
-        template: private-docker-registry.PersistentVolumeClaim.yaml
+        template: private-docker-registry/private-docker-registry.Service.yaml
 
   - it: should not render any resources if registry is disabled
     set:
@@ -32,7 +26,3 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
-    templates:
-      - private-docker-registry.Deployment.yaml
-      - private-docker-registry.PersistentVolumeClaim.yaml
-      - private-docker-registry.Service.yaml
