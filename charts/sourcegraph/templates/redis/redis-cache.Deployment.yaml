@@ -1,4 +1,7 @@
 {{- if .Values.redisCache.enabled -}}
+{{- if .Values.redisCache.config.enabled -}}
+{{- include "sourcegraph.redis.assertNoConfClash" (list . "redisCache") -}}
+{{- end -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,6 +29,9 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: redis-cache
+        {{- if and .Values.redisCache.config.enabled (not .Values.redisCache.config.existingConfig) }}
+        checksum/redis-config: {{ include (print $.Template.BasePath "/redis/redis-cache.ConfigMap.yaml") . | sha256sum }}
+        {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -100,6 +106,12 @@ spec:
           {{- if .Values.redisCache.storageSubPath }}
           subPath: {{ .Values.redisCache.storageSubPath }}
           {{- end }}
+        {{- if .Values.redisCache.config.enabled }}
+        - mountPath: /etc/redis/redis.conf
+          name: redis-conf
+          subPath: redis.conf
+          readOnly: true
+        {{- end }}
         {{- if .Values.redisCache.extraVolumeMounts }}
         {{- toYaml .Values.redisCache.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -139,6 +151,14 @@ spec:
       - name: redis-data
         persistentVolumeClaim:
           claimName: redis-cache
+      {{- if .Values.redisCache.config.enabled }}
+      - name: redis-conf
+        configMap:
+          name: {{ default (print .Values.redisCache.name "-conf") .Values.redisCache.config.existingConfig }}
+          items:
+          - key: redis.conf
+            path: redis.conf
+      {{- end }}
       {{- if .Values.redisCache.extraVolumes }}
       {{- toYaml .Values.redisCache.extraVolumes | nindent 6 }}
       {{- end }}

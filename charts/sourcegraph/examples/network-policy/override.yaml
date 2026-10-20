@@ -1,0 +1,52 @@
+# Limit Executor pods to the Sourcegraph frontend API. See README.md
+extraResources:
+  # Only allow ingress to Sourcegraph pods from pods which are not Executors or Executor jobs
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: sourcegraph-executor-frontend-only
+      labels:
+        deploy: sourcegraph
+    spec:
+      # Every pod deployed by this chart carries this label
+      podSelector:
+        matchLabels:
+          deploy: sourcegraph
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - podSelector:
+                matchExpressions:
+                  # Executor pods
+                  - key: app.kubernetes.io/component
+                    operator: NotIn
+                    values:
+                      - executor
+                  # Executor job pods
+                  - key: sourcegraph/job-id
+                    operator: DoesNotExist
+                  - key: sourcegraph/run-id
+                    operator: DoesNotExist
+              # Without a namespaceSelector, only pods in the Sourcegraph namespace are allowed
+              # Uncomment to also allow non-Executor pods from every namespace, ex. a cluster-wide Prometheus
+              # namespaceSelector: {}
+
+  # Allow the authenticated frontend HTTP API from anywhere: ingress controllers, users, and Executors
+  # http-internal (3090) and http-debug (6060) stay covered by the policy above
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: sourcegraph-frontend-allow-http
+      labels:
+        deploy: sourcegraph
+    spec:
+      podSelector:
+        matchLabels:
+          app: sourcegraph-frontend
+      policyTypes:
+        - Ingress
+      ingress:
+        - ports:
+            - protocol: TCP
+              port: http

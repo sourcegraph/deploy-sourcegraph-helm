@@ -43,6 +43,7 @@ spec:
         deploy: sourcegraph
         app: searcher
     spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "searcher") | nindent 6 }}
       containers:
       - name: searcher
         {{- with .Values.searcher.args }}
@@ -50,29 +51,23 @@ spec:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         env:
+        {{- include "sourcegraph.gracefulShutdownEnv" (list . "searcher") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- range $name, $item := .Values.searcher.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
+        {{- if not .Values.searcher.autoCacheSize }}
+        # When autoCacheSize is enabled, these env vars are omitted so searcher
+        # sizes its cache to ~45% of the live cache volume, tracking PVC
+        # expansion automatically. SEARCHER_CACHE_SIZE_MB / SYMBOLS_CACHE_SIZE_MB
+        # are deprecated in favor of this auto-detection.
+        # Both caches share the PVC below and each gets ~45% of it.
         - name: SEARCHER_CACHE_SIZE_MB
-          # Set the cache size to ~45% of the PVC size
-          {{- if .Values.searcher.storageSize }}
-          value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 450 | quote }}
-          {{- else }}
-          # This value is ~45% of the default value for
-          # storageSize in the VolumeClaimTemplate below
-          value: "11700"
-          {{- end }}
+          value: {{ include "sourcegraph.searcher.cacheSizeMB" . | quote }}
         - name: SYMBOLS_CACHE_SIZE_MB
-          # Set the cache size to ~45% of the PVC size
-          {{- if .Values.searcher.storageSize }}
-          value: {{ trimSuffix "Gi" .Values.searcher.storageSize | mul 450 | quote }}
-          {{- else }}
-          # This value is ~45% of the default value for
-          # storageSize in the VolumeClaimTemplate below
-          value: "11700"
-          {{- end }}
+          value: {{ include "sourcegraph.searcher.cacheSizeMB" . | quote }}
+        {{- end }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -91,8 +86,8 @@ spec:
         readinessProbe:
           failureThreshold: 3
           httpGet:
-            path: /healthz
-            port: grpc
+            path: /ready
+            port: http-debug
             scheme: HTTP
           periodSeconds: 5
           timeoutSeconds: 5

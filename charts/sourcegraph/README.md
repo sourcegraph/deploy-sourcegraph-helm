@@ -7,6 +7,62 @@
 
 Visit the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes) for guidance on using this chart.
 
+## Enabling Redis config management
+
+Redis config management is **disabled by default**. Upgrading the chart preserves
+existing image configs, custom mounts, authentication, and memory settings.
+The standard images retain their 6GiB cap, which can cause OOM kills if the pod
+memory limit is lower. Opt in for either service independently, or both:
+
+```yaml
+redisCache:
+  config:
+    enabled: true
+redisStore:
+  config:
+    enabled: true
+```
+
+For each enabled service, the chart mounts `/etc/redis/redis.conf` and sizes
+`maxmemory` to 75% of the container's memory limit. At the default 7Gi limit,
+opting in changes the cap from 6GiB to 5.25GiB. `redis-cache` evicts earlier;
+`redis-store` keeps `noeviction` and rejects writes sooner when full. Set
+`redisStore.config.maxmemory: 6gb` to retain its old cap, provided the pod has
+enough memory for Redis overhead. Auto-sizing reserves headroom but cannot
+guarantee against OOM kills, particularly during persistence operations.
+
+Before opting in:
+
+- **Custom images:** the mounted config replaces the image's config, including
+  any `requirepass`, ACL, TLS, or persistence settings. Leave
+  `redisCache.config.enabled: false` and/or `redisStore.config.enabled: false`
+  to preserve the corresponding image config. Otherwise, migrate those settings
+  explicitly; image-baked authentication is not inherited.
+- **Existing config mounts:** either leave config management disabled and
+  keep your `extraVolumes` / `extraVolumeMounts`, or remove those mounts and set
+  `config.enabled: true` and `config.existingConfig` to the name of a ConfigMap
+  with a complete `redis.conf` key. An existing ConfigMap bypasses all chart
+  sizing and directive overrides.
+- **Secrets:** both `additionalConfig` and `existingConfig` use plaintext
+  ConfigMaps. For a config containing credentials, leave config management disabled
+  and mount a Secret at `/etc/redis/redis.conf` with `extraVolumeMounts` instead.
+  Configure the clients' `connection.existingSecret` and the exporter's
+  `redisExporter.env.REDIS_PASSWORD.valueFrom.secretKeyRef` as appropriate.
+  Redis readiness alone does not verify exporter authentication; check `redis_up`.
+
+While config management is disabled, all other `config` options are ignored,
+including auto-sizing, so you must size Redis memory yourself. With management enabled,
+an explicit `config.maxmemory` takes precedence over auto-sizing, and
+`additionalConfig` is appended last. Supported memory limits are plain byte
+counts or numbers with `k`, `M`, `G`, `T`, `P`, `E`, `Ki`, `Mi`, `Gi`, `Ti`,
+`Pi`, or `Ei` suffixes. If the limit is absent or unrecognised, or
+`sourcegraph.localDevMode` is enabled, the vendored 6gb default remains unless
+overridden explicitly.
+
+Chart-managed config changes restart the Redis pod through a checksum
+annotation. Changes to an existing ConfigMap or Secret require a manual pod
+restart because `subPath` mounts do not update in running containers.
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.
@@ -20,6 +76,9 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
 - `<serviceName>.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
 - `<serviceName>.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+- `<serviceName>.preShutdownPause` - override `sourcegraph.preShutdownPause` for this service
+- `<serviceName>.gracefulShutdownTimeout` - override `sourcegraph.gracefulShutdownTimeout` for this service
+- `<serviceName>.terminationGracePeriodSeconds` - override `sourcegraph.terminationGracePeriodSeconds` for this service
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
 - `<serviceName>.serivceAccount.create` - create service account for service
@@ -34,6 +93,7 @@ In addition to the documented values, all services also support the following va
 | alpine.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | blobstore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `blobstore` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | blobstore.enabled | bool | `true` | Enable `blobstore` (S3 compatible storage) |
+| blobstore.env | object | the chart will add some default environment values | Environment variables for the `blobstore` container |
 | blobstore.image.defaultTag | string | `"6.0.0@sha256:82caab40f920282069c84e0e4ca503857926e934c67fb022f6d93823b4ea98b5"` | Docker image tag for the `blobstore` image |
 | blobstore.image.name | string | `"blobstore"` | Docker image name for the `blobstore` image |
 | blobstore.name | string | `"blobstore"` | Name used by resources. Does not affect service names or PVCs. |
@@ -106,7 +166,7 @@ In addition to the documented values, all services also support the following va
 | frontend.image.defaultTag | string | `"6.0.0@sha256:d4f21178096da5fdb3804099ae9de2e050b06e859a327aa79452b1ea2f3ede0a"` | Docker image tag for the `frontend` image |
 | frontend.image.name | string | `"frontend"` | Docker image name for the `frontend` image |
 | frontend.ingress.annotations | object | `{"kubernetes.io/ingress.class":"nginx","nginx.ingress.kubernetes.io/proxy-body-size":"150m"}` | Annotations for the Sourcegraph server ingress. For example, securing ingress with TLS provided by [cert-manager](https://cert-manager.io/docs/usage/ingress/) |
-| frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifing the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
+| frontend.ingress.annotations."kubernetes.io/ingress.class" | string | `"nginx"` | [Deprecated annotation](https://kubernetes.io/docs/concepts/services-networking/ingress/#deprecated-annotation) for specifying the IngressClass in Kubernetes 1.17 and earlier. If you are using Kubernetes 1.18+, use `ingressClassName` instead and set an override value of `null` for this annotation. |
 | frontend.ingress.enabled | bool | `true` | Enable ingress for the Sourcegraph server |
 | frontend.ingress.host | string | `""` | External hostname for the Sourcegraph server ingress (SSL) |
 | frontend.ingress.hosts | list | `[]` | List of hosts for the ingress rules. Supersedes `host` if set. Cannot be set together with `host`. Example: hosts:   - host: sourcegraph.example.com |
@@ -121,15 +181,18 @@ In addition to the documented values, all services also support the following va
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| gitserver.env | object | the chart will add some default environment values | Environment variables for the `gitserver` container |
 | gitserver.image.defaultTag | string | `"6.0.0@sha256:aec9bf6993c243a283109104cd7c44be3c85680b77e3e8be0c5fba8f01a3bd35"` | Docker image tag for the `gitserver` image |
 | gitserver.image.name | string | `"gitserver"` | Docker image name for the `gitserver` image |
 | gitserver.name | string | `"gitserver"` | Name used by resources. Does not affect service names or PVCs. |
+| gitserver.podDisruptionBudget | object | `{}` | Pod disruption budget for `gitserver`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | gitserver.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | gitserver.replicaCount | int | `1` | Number of `gitserver` pod |
 | gitserver.resources | object | `{"limits":{"cpu":"4","memory":"8G"},"requests":{"cpu":"4","memory":"8G"}}` | Resource requests & limits for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | gitserver.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `gitserver` |
 | gitserver.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | gitserver.sshSecret | string | `""` | Name of existing Secret that contains SSH credentials to clone repositories. It usually contains keys, such as `id_rsa` (private key) and `known_hosts`. Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories) |
+| gitserver.storageAccessModes | list | `["ReadWriteOnce"]` | Access modes for the `gitserver` PVC. Set to `["ReadWriteOncePod"]` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) so Kubernetes mounts the volume with `-o context` instead of recursively relabeling every file on each pod start |
 | gitserver.storageAnnotations | object | `{}` | Optional annotations to add to the `gitserver` PVC |
 | gitserver.storageSize | string | `"200Gi"` | PVC Storage Request for `gitserver` data volume |
 | gitserver.storageSubPath | string | `""` | Optional subPath for the `gitserver` primary data volume mount |
@@ -146,6 +209,7 @@ In addition to the documented values, all services also support the following va
 | grafana.existingConfig | string | `""` | Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key. |
 | grafana.image.defaultTag | string | `"6.0.0@sha256:e40236d0143d0735ff87374afce95b878b8cde448ef65cfdc7008056a03097e8"` | Docker image tag for the `grafana` image |
 | grafana.image.name | string | `"grafana"` | Docker image name for the `grafana` image |
+| grafana.initContainers | list | `[]` | Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml` |
 | grafana.name | string | `"grafana"` | Name used by resources. Does not affect service names or PVCs. |
 | grafana.podSecurityContext | object | `{"fsGroup":472,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | grafana.resources | object | `{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests & limits for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -155,18 +219,21 @@ In addition to the documented values, all services also support the following va
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| indexedSearch.env | object | the chart will add some default environment values | Environment variables for the `zoekt-webserver` container |
 | indexedSearch.image.defaultTag | string | `"6.0.0@sha256:99038e0ec9bef930030c118d774fcdcd67d7fe57ad4c80d216703a4d29d64323"` | Docker image tag for the `zoekt-webserver` image |
 | indexedSearch.image.name | string | `"indexed-searcher"` | Docker image name for the `zoekt-webserver` image |
 | indexedSearch.name | string | `"indexed-search"` | Name used by resources. Does not affect service names or PVCs. |
+| indexedSearch.podDisruptionBudget | object | `{}` | Pod disruption budget for `indexed-search`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | indexedSearch.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `indexed-search` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | indexedSearch.replicaCount | int | `1` | Number of `indexed-search` pod |
 | indexedSearch.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | indexedSearch.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-search` |
 | indexedSearch.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | indexedSearch.storageAnnotations | object | `{}` | Optional annotations to add to the `indexed-search` PVC |
-| indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multipled by the number of gitserver shards. |
+| indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multiplied by the number of gitserver shards. |
 | indexedSearch.storageSubPath | string | `""` | Optional subPath for the `indexed-search` primary data volume mount |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| indexedSearchIndexer.env | object | the chart will add some default environment values | Environment variables for the `zoekt-indexserver` container |
 | indexedSearchIndexer.image.defaultTag | string | `"6.0.0@sha256:11539e07040b85045a9aa07f970aa310066e240dc28e6c9627653ee2bc6e0b91"` | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
@@ -196,7 +263,7 @@ In addition to the documented values, all services also support the following va
 | jaeger.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | migrator.enabled | bool | `true` | Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in `frontend` deployment to perform database migration |
-| migrator.env | object | `{}` | Environment variables for the `migrator` container |
+| migrator.env | object | the chart will add some default environment values | Environment variables for the `migrator` container |
 | migrator.image.defaultTag | string | `"6.0.0@sha256:ec295eb0b743da6bf56777ca6524972267a5c442b0288095e2fe12fce38ebacc"` | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
 | migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -228,6 +295,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to. Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
 | openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
+| openTelemetry.gateway.config.traces.tracePipelineProcessors | list | `[]` | Define the order in which processors are applied in the traces pipeline. When set, this takes precedence over the iteration order of `processors` (which cannot be relied on to preserve insertion order). Must contain exactly the same processor names as the keys of `processors`. |
 | openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
@@ -263,15 +331,19 @@ In addition to the documented values, all services also support the following va
 | postgresExporter.image.name | string | `"postgres_exporter"` | Docker image name for the `pgsql-exporter` image |
 | postgresExporter.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `pgsql-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | preciseCodeIntel.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `precise-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| preciseCodeIntel.env | object | `{"NUM_WORKERS":{"value":"4"}}` | Environment variables for the `precise-code-intel-worker` container |
+| preciseCodeIntel.env | object | the chart will add some default environment values | Environment variables for the `precise-code-intel-worker` container |
 | preciseCodeIntel.image.defaultTag | string | `"6.0.0@sha256:3a72cf893cb25731d4636593c544c91781d925d867417416255e56debc27ed37"` | Docker image tag for the `precise-code-intel-worker` image |
 | preciseCodeIntel.image.name | string | `"precise-code-intel-worker"` | Docker image name for the `precise-code-intel-worker` image |
 | preciseCodeIntel.name | string | `"precise-code-intel-worker"` | Name used by resources. Does not affect service names or PVCs. |
+| preciseCodeIntel.podDisruptionBudget | object | `{}` | Pod disruption budget for `precise-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | preciseCodeIntel.podSecurityContext | object | `{}` | Security context for the `precise-code-intel-worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | preciseCodeIntel.replicaCount | int | `2` | Number of `precise-code-intel-worker` pod |
 | preciseCodeIntel.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `precise-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | preciseCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `precise-code-intel-worker` |
 | preciseCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| preciseCodeIntel.storageClassName | string | `""` | StorageClass for the `/tmp` scratch PVC when storageType is `pvc`. Empty uses the cluster default class. The claim is per-pod and discarded with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass` is `Retain` for stateful data and is not used here. |
+| preciseCodeIntel.storageSize | string | `""` | Size of the `/tmp` scratch volume. Required when storageType is `pvc`. When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty for unlimited). |
+| preciseCodeIntel.storageType | string | `"emptyDir"` | Backing store for the `/tmp` scratch volume, used for large SCIP upload processing. One of: emptyDir, pvc. emptyDir: node ephemeral storage, i.e. the node boot disk. pvc: per-pod PVC, discarded with the pod. The pod `fsGroup` defaults to the container `runAsGroup` so the non-root worker can write to the volume; set `podSecurityContext.fsGroup` to override it. |
 | priorityClasses | list | `[]` | Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) Sample class definition: - name: gitserver-class   value: 100   preemptionPolicy: Never   description: "gitserver priority class" |
 | prometheus.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":false,"runAsGroup":100,"runAsUser":100}` | Security context for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | prometheus.createRoleBinding | bool | `true` | Disable the creation of a RoleBinding object, for customers who block all RBAC resource creation |
@@ -282,12 +354,18 @@ In addition to the documented values, all services also support the following va
 | prometheus.name | string | `"prometheus"` | Name used by resources. Does not affect service names or PVCs. |
 | prometheus.podSecurityContext | object | `{"fsGroup":100,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `prometheus` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | prometheus.privileged | bool | `true` | Enable RBAC for `prometheus` |
-| prometheus.resources | object | `{"limits":{"cpu":"2","memory":"6G"},"requests":{"cpu":"500m","memory":"6G"}}` | Resource requests & limits for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) Prometheus is relied upon to monitor services for sending alerts to site admins when something is wrong with Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough memory to perform its job reliably and prevent conflicts with other pods on the same host node. The limit chosen here is based on what works reliably on Sourcegraph.com with lots of traffic. |
+| prometheus.resources | object | `{"limits":{"cpu":"2","memory":"6G"},"requests":{"cpu":"500m","memory":"6G"}}` | Resource requests & limits for the `prometheus` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) Prometheus is relied upon to monitor services for sending alerts to site admins when something is wrong with Sourcegraph, thus its memory requests and limits are the same to guarantee it has enough memory to perform its job reliably and prevent conflicts with other pods on the same host node.  The limit chosen here is based on what works reliably on Sourcegraph.com with lots of traffic. |
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | prometheus.storageAnnotations | object | `{}` | Optional annotations to add to the `prometheus` PVC |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
 | prometheus.storageSubPath | string | `""` | Optional subPath for the `prometheus` primary data volume mount |
+| redisCache.config.additionalConfig | string | `""` | Additional raw redis directives appended to the vendored `redis-cache` config. Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext, so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap). For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`. |
+| redisCache.config.enabled | bool | `false` | Opt in to a chart-managed Redis config and automatic memory sizing. Disabled by default to preserve image-baked configuration and custom `extraVolumeMounts` (including Secret mounts). When false, all other `config` options are ignored and auto-sizing is disabled. |
+| redisCache.config.existingConfig | string | `""` | Name of an existing ConfigMap for `redis-cache`. It must contain a `redis.conf` key. When set, the chart-managed ConfigMap is not rendered and this one is mounted instead, so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`. |
+| redisCache.config.maxmemory | string | `""` | Explicit redis `maxmemory` for `redis-cache` (for example `6gb`). Overrides the auto-computed value. Empty means compute it from the container memory limit. |
+| redisCache.config.maxmemoryPolicy | string | `""` | Override the redis `maxmemory-policy` for `redis-cache`. Empty keeps the vendored default (`allkeys-lru`). |
+| redisCache.config.maxmemoryRatio | float | `0.75` | Fraction of `redisCache.resources.limits.memory` used for `maxmemory` when `maxmemory` is empty. Must be greater than 0 and less than 1. Ignored when no memory limit is set or `sourcegraph.localDevMode` is enabled. An absent or unrecognised limit keeps the vendored 6gb default; use an explicit maxmemory if needed. |
 | redisCache.connection.endpoint | string | `"redis-cache:6379"` | Endpoint to use for redis-cache. Supports either host:port or IANA specification |
 | redisCache.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisCache.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-cache` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -295,6 +373,7 @@ In addition to the documented values, all services also support the following va
 | redisCache.image.defaultTag | string | `"6.0.0@sha256:40ea19e8944b93e05d7697c808969fe0c81a014a56245f3a97b645aa34a9ab78"` | Docker image tag for the `redis-cache` image |
 | redisCache.image.name | string | `"redis-cache"` | Docker image name for the `redis-cache` image |
 | redisCache.name | string | `"redis-cache"` | Name used by resources. Does not affect service names or PVCs. |
+| redisCache.podDisruptionBudget | object | `{}` | Pod disruption budget for `redis-cache`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | redisCache.podSecurityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `redis-cache` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | redisCache.resources | object | `{"limits":{"cpu":"1","memory":"7Gi"},"requests":{"cpu":"1","memory":"7Gi"}}` | Resource requests & limits for the `redis-cache` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | redisCache.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `redis-cache` |
@@ -306,6 +385,12 @@ In addition to the documented values, all services also support the following va
 | redisExporter.image.defaultTag | string | `"6.0.0@sha256:b2ec48fc6adef31f36d525170138dec303c1c0c20c530d659f1fb7c6c54698af"` | Docker image tag for the `redis-exporter` image |
 | redisExporter.image.name | string | `"redis_exporter"` | Docker image name for the `redis-exporter` image |
 | redisExporter.resources | object | `{"limits":{"cpu":"10m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"100Mi"}}` | Resource requests & limits for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| redisStore.config.additionalConfig | string | `""` | Additional raw redis directives appended to the vendored `redis-store` config. Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext, so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap). For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`. |
+| redisStore.config.enabled | bool | `false` | Opt in to a chart-managed Redis config and automatic memory sizing. Disabled by default to preserve image-baked configuration and custom `extraVolumeMounts` (including Secret mounts). When false, all other `config` options are ignored and auto-sizing is disabled. |
+| redisStore.config.existingConfig | string | `""` | Name of an existing ConfigMap for `redis-store`. It must contain a `redis.conf` key. When set, the chart-managed ConfigMap is not rendered and this one is mounted instead, so the chart no longer sizes `maxmemory`. Mutually exclusive with `additionalConfig`. |
+| redisStore.config.maxmemory | string | `""` | Explicit redis `maxmemory` for `redis-store` (for example `6gb`). Overrides the auto-computed value. Empty means compute it from the container memory limit. |
+| redisStore.config.maxmemoryPolicy | string | `""` | Override the redis `maxmemory-policy` for `redis-store`. Empty keeps the vendored default (`noeviction`). |
+| redisStore.config.maxmemoryRatio | float | `0.75` | Fraction of `redisStore.resources.limits.memory` used for `maxmemory` when `maxmemory` is empty. Must be greater than 0 and less than 1. Ignored when no memory limit is set or `sourcegraph.localDevMode` is enabled. An absent or unrecognised limit keeps the vendored 6gb default; use an explicit maxmemory if needed. |
 | redisStore.connection.endpoint | string | `"redis-store:6379"` | Endpoint to use for redis-store. Supports either host:port or IANA specification |
 | redisStore.connection.existingSecret | string | `""` | Name of existing secret to use for Redis endpoint The secret must contain the key `endpoint` and should follow IANA specification learn more from the [Helm docs](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-external-redis-instances) |
 | redisStore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-store` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -313,6 +398,7 @@ In addition to the documented values, all services also support the following va
 | redisStore.image.defaultTag | string | `"6.0.0@sha256:39f3b27d993652c202c1f892df83e1a3e8e8ea5ae58291f79ad14b56672ab8be"` | Docker image tag for the `redis-store` image |
 | redisStore.image.name | string | `"redis-store"` | Docker image name for the `redis-store` image |
 | redisStore.name | string | `"redis-store"` | Name used by resources. Does not affect service names or PVCs. |
+| redisStore.podDisruptionBudget | object | `{}` | Pod disruption budget for `redis-store`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | redisStore.podSecurityContext | object | `{"fsGroup":1000,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `redis-store` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | redisStore.resources | object | `{"limits":{"cpu":"1","memory":"7Gi"},"requests":{"cpu":"1","memory":"7Gi"}}` | Resource requests & limits for the `redis-store` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | redisStore.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `redis-store` |
@@ -320,21 +406,25 @@ In addition to the documented values, all services also support the following va
 | redisStore.storageAnnotations | object | `{}` | Optional annotations to add to the `redis-store` PVC |
 | redisStore.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-store` data volume |
 | redisStore.storageSubPath | string | `""` | Optional subPath for the `redis-store` primary data volume mount |
+| searcher.autoCacheSize | bool | `false` | When enabled, omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` env vars so `searcher` auto-sizes its cache to ~45% of the live cache volume. This tracks PVC expansion automatically, whereas the hardcoded env vars are frozen to the initial `storageSize` and do not follow later disk growth. |
 | searcher.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| searcher.env | object | the chart will add some default environment values | Environment variables for the `searcher` container |
 | searcher.image.defaultTag | string | `"6.0.0@sha256:c7508abda2202d4a33400ce23a95dd8d59fe6220d85d7fbee6fb186c55931336"` | Docker image tag for the `searcher` image |
 | searcher.image.name | string | `"searcher"` | Docker image name for the `searcher` image |
 | searcher.name | string | `"searcher"` | Name used by resources. Does not affect service names or PVCs. |
+| searcher.podDisruptionBudget | object | `{}` | Pod disruption budget for `searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | searcher.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":100}` | Security context for the `searcher` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | searcher.replicaCount | int | `1` | Number of `searcher` pod |
 | searcher.resources | object | `{"limits":{"cpu":"2","memory":"2G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | searcher.storageAnnotations | object | `{}` | Optional annotations to add to the `searcher` PVC |
-| searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data |
+| searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data. Unless `autoCacheSize` is enabled, this must be a Kubernetes quantity (e.g. `150G`, `100Gi`, `1Ti`) of at least `3M`, so the chart can derive `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` from it |
 | searcher.storageSubPath | string | `""` | Optional subPath for the `searcher` primary data volume mount |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
 | sourcegraph.affinity | object | `{}` | Global Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.disableKubernetesSecrets | bool | `false` | Disable the creation of Kubernetes secrets objects |
+| sourcegraph.gracefulShutdownTimeout | string | `"15s"` | Total time Sourcegraph services have for the pre-shutdown pause and graceful drain |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | `"index.docker.io/sourcegraph"` | Global docker image registry or prefix |
@@ -346,9 +436,11 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
+| sourcegraph.preShutdownPause | string | `"5s"` | Time Sourcegraph services continue accepting requests after shutdown begins so Kubernetes endpoint changes can propagate |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
+| sourcegraph.terminationGracePeriodSeconds | int | `30` | Time Kubernetes allows Sourcegraph services to shut down before forced termination |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.allowedTopologies | list | `[]` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
 | storageClass.create | bool | `true` | Enable creation of storageClass. Disable if you have your own existing storage class |
@@ -358,19 +450,22 @@ In addition to the documented values, all services also support the following va
 | storageClass.type | string | `"pd-ssd"` | Value of `type` key in storageClass `parameters`, consult your cloud provider persistent storage documentation |
 | syntacticCodeIntel.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | syntacticCodeIntel.enabled | bool | `false` |  |
+| syntacticCodeIntel.env | object | the chart will add some default environment values | Environment variables for the `syntactic-code-intel-worker` container |
 | syntacticCodeIntel.image.defaultTag | string | `"6.0.0@sha256:50bdeb38b196f0fc21404969016bf8263f78144292e905867e93480f66c8251c"` | Docker image tag for the `syntactic-code-intel-worker` image |
 | syntacticCodeIntel.image.name | string | `"syntactic-code-intel-worker"` | Docker image name for the `syntactic-code-intel-worker` image |
 | syntacticCodeIntel.name | string | `"syntactic-code-intel-worker"` | Name used by resources. Does not affect service names or PVCs. |
+| syntacticCodeIntel.podDisruptionBudget | object | `{}` | Pod disruption budget for `syntactic-code-intel-worker`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | syntacticCodeIntel.podSecurityContext | object | `{}` | Security context for the `syntactic-code-intel-worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| syntacticCodeIntel.properties.workerPort | int | `3188` | port to whick worker API will bind |
 | syntacticCodeIntel.replicaCount | int | `2` | Number of `syntactic-code-intel-worker` pod |
 | syntacticCodeIntel.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |
 | syntacticCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | syntectServer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| syntectServer.env | object | the chart will add some default environment values | Environment variables for the `syntect-server` container |
 | syntectServer.image.defaultTag | string | `"6.0.0@sha256:1e35f77690222a76724b45f2305b838c40c35201e60b0f619b3fe8499504ff60"` | Docker image tag for the `syntect-server` image |
 | syntectServer.image.name | string | `"syntax-highlighter"` | Docker image name for the `syntect-server` image |
 | syntectServer.name | string | `"syntect-server"` | Name used by resources. Does not affect service names or PVCs. |
+| syntectServer.podDisruptionBudget | object | `{}` | Pod disruption budget for `syntect-server`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | syntectServer.podSecurityContext | object | `{}` | Security context for the `syntect-server` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | syntectServer.replicaCount | int | `1` | Number of `syntect-server` pod |
 | syntectServer.resources | object | `{"limits":{"cpu":"4","memory":"6G"},"requests":{"cpu":"250m","memory":"2G"}}` | Resource requests & limits for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -378,10 +473,11 @@ In addition to the documented values, all services also support the following va
 | syntectServer.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | worker.blocklist | list | `[]` | List of jobs to block globally If replicas are configured, use this values to block jobs instead of manually setting WORKER_JOB_BLOCKLIST |
 | worker.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| worker.env | object | `{}` | Environment variables for the `worker` container |
+| worker.env | object | the chart will add some default environment values | Environment variables for the `worker` container |
 | worker.image.defaultTag | string | `"6.0.0@sha256:4892c5aa107d4384f811afcf1980e0fb2cb8beb5585a15adcb64353a2d8abf5a"` | Docker image tag for the `worker` image |
 | worker.image.name | string | `"worker"` | Docker image name for the `worker` image |
 | worker.name | string | `"worker"` | Name used by resources. Does not affect service names or PVCs. |
+| worker.podDisruptionBudget | object | `{}` | Pod disruption budget for every `worker` deployment. Configure either `minAvailable` or `maxUnavailable` to enable it. |
 | worker.podSecurityContext | object | `{}` | Security context for the `worker` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | worker.replicaCount | int | `1` | Number of `worker` pod |
 | worker.replicas | list | `[]` | Scale worker horizontally by configuring additional replicas dedicated to specific jobs. for each replica, configure the dedicated jobs to run on this replica. learn more from https://sourcegraph.com/docs/admin/workers#3-split-jobs-and-scale-independently |
