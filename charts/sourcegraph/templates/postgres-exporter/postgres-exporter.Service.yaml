@@ -1,0 +1,34 @@
+{{- define "sourcegraph.postgresExporter.service" -}}
+{{- $top := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $database := index $top.Values $service -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    prometheus.io/port: "9187"
+    sourcegraph.prometheus/scrape: "true"
+  labels:
+    # Prometheus derives the `job` label, which the Grafana dashboards group by, from `app`
+    app: {{ $database.name }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: {{ $database.name }}-exporter
+  name: {{ $database.name }}-exporter
+spec:
+  ports:
+  - name: http-metrics
+    port: 9187
+    targetPort: http-metrics
+  selector:
+    {{- include "sourcegraph.selectorLabels" $top | nindent 4 }}
+    app: {{ $database.name }}
+  type: ClusterIP
+{{- end -}}
+
+{{- range $service := list "pgsql" "codeIntelDB" "codeInsightsDB" }}
+{{- $database := index $.Values $service }}
+{{- if and (not $database.enabled) $database.postgresExporter.standalone }}
+---
+{{ include "sourcegraph.postgresExporter.service" (list $ $service) }}
+{{- end }}
+{{- end }}

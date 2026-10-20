@@ -8,6 +8,9 @@ pgsql:
   enabled: false # disable internal pgsql database
   auth:
     host: pgsql.database.company.com # external pgsql host
+    sslmode: require
+  postgresExporter:
+    standalone: true # deploy pgsql-exporter against the external database, so the Grafana dashboards show its metrics
 
 
 # Connect to an external postgres instance with custom settings
