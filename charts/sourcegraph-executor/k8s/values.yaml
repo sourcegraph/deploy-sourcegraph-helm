@@ -120,17 +120,17 @@ executor:
       name: ""
       # -- A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app`
       selector: ""
-      # -- The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]'
+      # -- Tolerations for Kubernetes Jobs, as a YAML list. e.g. `[{key: foo, operator: Equal, value: bar, effect: NoSchedule}]`. A pre-escaped JSON string is also accepted.
       tolerations: ""
-      # -- The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- Required node affinity match expressions for Kubernetes Jobs, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]`. A pre-escaped JSON string is also accepted.
       requiredAffinityMatchExpressions: ""
-      # -- The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- Required node affinity match fields for Kubernetes Jobs, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]`. A pre-escaped JSON string is also accepted.
       requiredAffinityMatchFields: ""
 
     pod:
-      # -- The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- Pod affinity terms for Kubernetes Jobs, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`. A pre-escaped JSON string is also accepted.
       affinity: ""
-      # -- The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- Pod anti-affinity terms for Kubernetes Jobs, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`. A pre-escaped JSON string is also accepted.
       antiAffinity: ""
 
   debug:
