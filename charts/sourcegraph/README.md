@@ -218,7 +218,7 @@ In addition to the documented values, all services also support the following va
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| indexedSearch.env | object | the chart will add some default environment values | Environment variables for the `zoekt-webserver` container |
+| indexedSearch.env | object | `{}` | Environment variables for the `zoekt-webserver` container |
 | indexedSearch.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `zoekt-webserver` image |
 | indexedSearch.image.name | string | `"indexed-searcher"` | Docker image name for the `zoekt-webserver` image |
 | indexedSearch.name | string | `"indexed-search"` | Name used by resources. Does not affect service names or PVCs. |
@@ -232,7 +232,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multiplied by the number of gitserver shards. |
 | indexedSearch.storageSubPath | string | `""` | Optional subPath for the `indexed-search` primary data volume mount |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| indexedSearchIndexer.env | object | the chart will add some default environment values | Environment variables for the `zoekt-indexserver` container |
+| indexedSearchIndexer.env | object | `{}` | Environment variables for the `zoekt-indexserver` container |
 | indexedSearchIndexer.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
@@ -459,7 +459,7 @@ In addition to the documented values, all services also support the following va
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |
 | syntacticCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | syntectServer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| syntectServer.env | object | the chart will add some default environment values | Environment variables for the `syntect-server` container |
+| syntectServer.env | object | `{}` | Environment variables for the `syntect-server` container |
 | syntectServer.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `syntect-server` image |
 | syntectServer.image.name | string | `"syntax-highlighter"` | Docker image name for the `syntect-server` image |
 | syntectServer.name | string | `"syntect-server"` | Name used by resources. Does not affect service names or PVCs. |
