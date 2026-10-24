@@ -114,7 +114,7 @@ executor:
   image:
     # -- Docker image tag for the `executor` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 6.0.0@sha256:0be94a7c91f8273db10fdf46718c6596340ab2acc570e7b85353806e67a27508
+    defaultTag: 8.1.1335@sha256:cd5de147a9e87fc05304736689470daffd186d0e072e636620e24ea14f348699
     name: "executor"
   replicaCount: 1
   # -- Extra environment variables to set on the executor container.

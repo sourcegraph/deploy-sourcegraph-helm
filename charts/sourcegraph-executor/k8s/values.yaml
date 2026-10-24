@@ -43,7 +43,7 @@ executor:
   image:
     # -- Docker image tag for the `executor-kubernetes` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 6.0.0@sha256:6dc771a0c281a41ef676213f2f84a63d99045cf2e58d43022554a8022070ed65
+    defaultTag: 8.1.1335@sha256:8d1f73aa06dcb3ba6ed903731f3f19c278fdb7d4523ed4366b5002b3e20d70d1
     name: "executor-kubernetes"
   resources:
     limits:
