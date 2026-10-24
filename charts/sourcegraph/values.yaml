@@ -559,10 +559,7 @@ grafana:
 
 indexedSearch:
   # -- Environment variables for the `zoekt-webserver` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `zoekt-webserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
@@ -612,10 +609,7 @@ indexedSearch:
 
 indexedSearchIndexer:
   # -- Environment variables for the `zoekt-indexserver` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `zoekt-indexserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
@@ -1331,10 +1325,7 @@ storageClass:
 
 syntectServer:
   # -- Environment variables for the `syntect-server` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `syntect-server` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release

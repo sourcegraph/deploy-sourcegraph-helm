@@ -27,19 +27,6 @@ tests:
       content:
         name: DEPLOY_TYPE
         value: helm
-- it: should identify both indexed search containers as Helm deployments
-  template: indexed-search/indexed-search.StatefulSet.yaml
-  asserts:
-  - contains:
-      path: spec.template.spec.containers[0].env
-      content:
-        name: DEPLOY_TYPE
-        value: helm
-  - contains:
-      path: spec.template.spec.containers[1].env
-      content:
-        name: DEPLOY_TYPE
-        value: helm
 - it: should identify migrator as a Helm deployment
   template: frontend/sourcegraph-frontend.Deployment.yaml
   asserts:
@@ -68,14 +55,6 @@ tests:
   template: syntactic-code-intel/worker.Deployment.yaml
   set:
     syntacticCodeIntel.enabled: true
-  asserts:
-  - contains:
-      path: spec.template.spec.containers[0].env
-      content:
-        name: DEPLOY_TYPE
-        value: helm
-- it: should identify syntect server as a Helm deployment
-  template: syntect-server/syntect-server.Deployment.yaml
   asserts:
   - contains:
       path: spec.template.spec.containers[0].env
