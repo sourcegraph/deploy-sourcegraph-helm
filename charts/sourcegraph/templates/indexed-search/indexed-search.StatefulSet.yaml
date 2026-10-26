@@ -68,10 +68,10 @@ spec:
             path: /healthz
             port: grpc
             scheme: HTTP
-          initialDelaySeconds: 120
-          timeoutSeconds: 5
-          periodSeconds: 60
-          failureThreshold: 10
+          initialDelaySeconds: {{ .Values.indexedSearch.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.indexedSearch.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.indexedSearch.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.indexedSearch.livenessProbe.failureThreshold }}
         readinessProbe:
           failureThreshold: {{ .Values.indexedSearch.readinessProbe.failureThreshold }}
           httpGet:
