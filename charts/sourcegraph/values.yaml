@@ -582,6 +582,25 @@ indexedSearch:
   replicaCount: 1
   # -- Pod disruption budget for `indexed-search`. Configure either `minAvailable` or `maxUnavailable` to enable it.
   podDisruptionBudget: {}
+  # -- Liveness probe tuning for the `zoekt-webserver` container. Raise
+  # `failureThreshold` or `timeoutSeconds` where memory pressure stalls
+  # `/healthz` for minutes at a time, so the container is not killed while it
+  # is still serving. Keep the window wider than zoekt's in-process watchdog
+  # (`ZOEKT_WATCHDOG_ERRORS` x `ZOEKT_WATCHDOG_TICK`) so the watchdog stays
+  # the first line of defence.
+  livenessProbe:
+    failureThreshold: 10
+    initialDelaySeconds: 120
+    periodSeconds: 60
+    timeoutSeconds: 5
+  # -- Readiness probe tuning for the `zoekt-webserver` container. Raise
+  # `failureThreshold` on instances with large monorepos: loading a many-shard
+  # repo can stall `/healthz` past `timeoutSeconds`, briefly dropping the pod
+  # from the service even though it is healthy.
+  readinessProbe:
+    failureThreshold: 3
+    periodSeconds: 5
+    timeoutSeconds: 5
   # -- Resource requests & limits for the `zoekt-webserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
