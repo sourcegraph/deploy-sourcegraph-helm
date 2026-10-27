@@ -317,8 +317,6 @@ frontend:
   # -- Environment variables for the `frontend` container
   # @default -- the chart will add some default environment values
   env:
-    DEPLOY_TYPE:
-      value: helm
     GRAFANA_SERVER_URL:
       value: http://grafana:30070
     JAEGER_SERVER_URL:
@@ -408,10 +406,7 @@ migrator:
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   # -- Resource requests & limits for the `migrator` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -431,10 +426,7 @@ migrator:
 
 gitserver:
   # -- Environment variables for the `gitserver` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `gitserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
@@ -639,10 +631,7 @@ blobstore:
   # -- Enable `blobstore` (S3 compatible storage)
   enabled: true
   # -- Environment variables for the `blobstore` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `blobstore` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
@@ -900,10 +889,7 @@ postgresExporter:
 syntacticCodeIntel:
   enabled: false
   # -- Environment variables for the `syntactic-code-intel-worker` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
@@ -943,10 +929,7 @@ syntacticCodeIntel:
 
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container
-  # @default -- the chart will add some default environment values
   env:
-    DEPLOY_TYPE:
-      value: helm
     NUM_WORKERS:
       value: "4"
   image:
@@ -1245,10 +1228,7 @@ redisStore:
 
 searcher:
   # -- Environment variables for the `searcher` container
-  # @default -- the chart will add some default environment values
-  env:
-    DEPLOY_TYPE:
-      value: helm
+  env: {}
   image:
     # -- Docker image tag for the `searcher` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
