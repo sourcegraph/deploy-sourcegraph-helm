@@ -47,8 +47,11 @@ steps:
 
       sg release run test --workdir=. --config-from-commit
 
+  # Promote jobs run only for the promote config commit. Creating the promote
+  # branch also builds its first commit, the internal config commit, which
+  # --config-from-commit would otherwise accept, running finalize twice.
   - label: "(promote) Release: test"
-    if: build.branch =~ /^promote\/release-.*/ && build.branch !~ /-update-main$/
+    if: build.branch =~ /^promote\/release-.*/ && build.branch !~ /-update-main$/ && build.message =~ /^promote-release:/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |
@@ -71,7 +74,7 @@ steps:
 
       sg release run internal finalize --workdir=. --config-from-commit
   - label: "(promote) Release: finalize"
-    if: build.branch =~ /^promote\/release-.*/ && build.branch !~ /-update-main$/
+    if: build.branch =~ /^promote\/release-.*/ && build.branch !~ /-update-main$/ && build.message =~ /^promote-release:/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |
