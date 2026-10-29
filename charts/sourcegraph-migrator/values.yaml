@@ -9,7 +9,7 @@ sourcegraph:
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
     # @default -- Sourcegraph's public Docker Hub registry
-    repository: index.docker.io/sourcegraph
+    repository: us-docker.pkg.dev/sourcegraph-images/internal
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
@@ -106,7 +106,7 @@ migrator:
   image:
     # -- Docker image tag for the `migrator` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 6.0.0@sha256:ec295eb0b743da6bf56777ca6524972267a5c442b0288095e2fe12fce38ebacc
+    defaultTag: 8.1.2687@sha256:c5bf0f81f3b07f7769f694525bef0a2d547a554f99113115a33b0925a16ef5ea
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
