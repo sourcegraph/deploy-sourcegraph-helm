@@ -253,3 +253,45 @@ tests:
       path: spec.template.spec.volumes
       count: 2
     template: redis/redis-store.Deployment.yaml
+# The checksum must hash only redis.conf. Hashing the rendered ConfigMap pulls in
+# its chart-version labels and restarts redis on every upgrade.
+- it: should not change the config checksum when only the chart version changes
+  template: redis/redis-cache.Deployment.yaml
+  chart:
+    version: 8.0.0
+    appVersion: 8.0.0
+  set:
+    redisCache.config:
+      enabled: true
+      maxmemory: 1gb
+  asserts:
+  - equal:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+      # sha256 of the vendored redis-cache redis.conf plus "maxmemory 1gb"
+      value: &redisCacheChecksum 57f261f5131adbefd08fe4181b50b898b68f386949f8bbc10f747da37e178f74
+- it: should keep the same config checksum on another chart version
+  template: redis/redis-cache.Deployment.yaml
+  chart:
+    version: 9.9.9
+    appVersion: 9.9.9
+  set:
+    redisCache.config:
+      enabled: true
+      maxmemory: 1gb
+  asserts:
+  - equal:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+      value: *redisCacheChecksum
+- it: should change the config checksum when redis.conf changes
+  template: redis/redis-cache.Deployment.yaml
+  chart:
+    version: 9.9.9
+    appVersion: 9.9.9
+  set:
+    redisCache.config:
+      enabled: true
+      maxmemory: 2gb
+  asserts:
+  - notEqual:
+      path: spec.template.metadata.annotations["checksum/redis-config"]
+      value: *redisCacheChecksum
