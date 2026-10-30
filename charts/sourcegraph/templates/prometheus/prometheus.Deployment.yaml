@@ -47,12 +47,24 @@ spec:
       - name: prometheus
         image: {{ include "sourcegraph.image" (list . "prometheus") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        # Seed the Alertmanager config from the baked-in default on first start
+        # so it works with readOnlyRootFilesystem. prom-wrapper then rewrites this
+        # file in place whenever site config changes (see ALERTMANAGER_CONFIG_PATH).
+        command:
+        - /bin/sh
+        - -c
+        - |
+          cp -n /sg_config_prometheus/alertmanager.yml /alertmanager/alertmanager.yml
+          exec /usr/bin/prom-wrapper "$@"
+        - prom-wrapper
         {{- with .Values.prometheus.args }}
         args:
           {{- toYaml . | nindent 8 }}
         {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
+        - name: ALERTMANAGER_CONFIG_PATH
+          value: /alertmanager/alertmanager.yml
         {{- range $name, $item := .Values.prometheus.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -75,6 +87,9 @@ spec:
           {{- end }}
         - mountPath: /sg_prometheus_add_ons
           name: config
+        - mountPath: /alertmanager
+          name: data
+          subPath: alertmanager
         {{- if .Values.prometheus.extraVolumeMounts }}
         {{- toYaml .Values.prometheus.extraVolumeMounts | nindent 8 }}
         {{- end }}
