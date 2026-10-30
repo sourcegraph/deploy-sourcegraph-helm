@@ -21,11 +21,8 @@ jobs:
 
       - name: Install Checkov
         run: pip install checkov
-        
-      - name: Write skip checks config
-        run: |
-            echo "${{ vars.CHECKOV_SKIP_CHECKS }}" > .checkov.yaml
 
+      # Skip list lives in .checkov.yaml, which checkov picks up automatically.
       - name: Run Checkov scan
         run: |
           checkov -d ./charts --output cli --output sarif --output-file-path console,results.sarif
