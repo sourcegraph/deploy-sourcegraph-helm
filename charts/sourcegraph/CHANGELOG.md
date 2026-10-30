@@ -8,11 +8,19 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
-- Added an `outbound-http-proxy` example, which routes outbound traffic from frontend and worker through an HTTP proxy with `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
+- Added an `outbound-http-proxy` example, which routes outbound traffic from frontend, worker, and migrator through an HTTP proxy with `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
 - Fixed the `codeintel-db` PersistentVolumeClaim being renamed by `codeIntelDB.name`, which left the StatefulSet pointing at a `codeintel-db` claim that no longer existed and stuck the pod in `Pending`. The PVC is now always named `codeintel-db`, matching the other components and the documented behaviour of `*.name`. If you worked around this by creating a `codeintel-db` PVC by hand, label it `app.kubernetes.io/managed-by: Helm` and annotate it with `meta.helm.sh/release-name` and `meta.helm.sh/release-namespace` before upgrading so Helm can adopt it. [#612](https://github.com/sourcegraph/deploy-sourcegraph-helm/issues/612)
+- Added `indexedSearch.readinessProbe` (`failureThreshold`, `periodSeconds`, `timeoutSeconds`) to tune the `zoekt-webserver` readiness probe, which was previously hardcoded. Defaults are unchanged (`3`/`5`/`5`). Raise `failureThreshold` on instances with large monorepos, where loading a many-shard repo can stall `/healthz` past `timeoutSeconds` and drop a healthy pod out of the `indexed-search` service.
+- Added `indexedSearch.livenessProbe` (`failureThreshold`, `initialDelaySeconds`, `periodSeconds`, `timeoutSeconds`) to tune the `zoekt-webserver` liveness probe, which was previously hardcoded. Defaults are unchanged (`10`/`120`/`60`/`5`). Raise `failureThreshold` or `timeoutSeconds` where the index greatly exceeds the container memory limit: page-cache reclaim stalls `/healthz` past `timeoutSeconds`, and consecutive failures restart a container that is still serving. Keep the resulting window wider than zoekt's in-process watchdog (`ZOEKT_WATCHDOG_ERRORS` x `ZOEKT_WATCHDOG_TICK`) so the watchdog remains the first line of defence.
+- `searcher.storageSize` now accepts any Kubernetes quantity (e.g. `150G`, `1Ti`, `1.5Ti`, `500000M`) when deriving `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB`. Previously anything other than `Gi` silently rendered both as `0`, which disables cache eviction and lets the cache volume fill up. Unparseable values, or values below `3M`, now fail the render unless `searcher.autoCacheSize` is enabled. The derived size now matches searcher's own auto-sizing arithmetic (45% of the volume in decimal megabytes), so existing `Gi` deployments see a slightly higher value on upgrade, e.g. the default `26Gi` renders `12562` instead of `11700`.
+
+## 8.1.0
+
 - Added opt-in Redis config management through `redisCache.config.enabled` and `redisStore.config.enabled` (both default to `false`). Default deployments retain their image configs, custom mounts, authentication, and memory settings. When enabled, the chart mounts `/etc/redis/redis.conf` and supports `existingConfig`, `maxmemory`, `maxmemoryRatio`, `maxmemoryPolicy`, and `additionalConfig`. See [Enabling Redis config management](README.md#enabling-redis-config-management) before opting in, especially when using custom images or Secret-mounted configs.
 - With Redis config management enabled, the chart sizes `maxmemory` at 75% of `resources.limits.memory` to leave room for overhead; this reduces, but does not eliminate, OOM risk. Ratios must be greater than 0 and less than 1. Auto-sizing is skipped in local development mode or when the limit is absent or unrecognised. At the default 7Gi limit, opting in lowers the effective cap from 6GiB to 5.25GiB: `redis-cache` evicts earlier, but `redis-store` uses `noeviction`, so its write-error ceiling drops too. Set `redisStore.config.maxmemory: 6gb` to keep the old ceiling if the pod has sufficient memory.
-- `searcher.storageSize` now accepts any Kubernetes quantity (e.g. `150G`, `1Ti`, `1.5Ti`, `500000M`) when deriving `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB`. Previously anything other than `Gi` silently rendered both as `0`, which disables cache eviction and lets the cache volume fill up. Unparseable values, or values below `3M`, now fail the render unless `searcher.autoCacheSize` is enabled. The derived size now matches searcher's own auto-sizing arithmetic (45% of the volume in decimal megabytes), so existing `Gi` deployments see a slightly higher value on upgrade, e.g. the default `26Gi` renders `12562` instead of `11700`.
+
+## 8.0.0
+
 - Added a `network-policy` example, which limits Executor and Executor job pods to the frontend API
 - Corrected the external object storage examples to configure the shared store for frontend, worker, precise code intel, syntactic code intel, gitserver, and searcher, including credentials or workload service accounts as required.
 - Removed the unused application ports from the precise and syntactic code intel worker Deployments and Services; health checks and Prometheus metrics continue to use the debug server on port 6060.
@@ -22,18 +30,39 @@ Use `**BREAKING**:` to denote a breaking change
 - Added optional `syntectServer.podDisruptionBudget` support
 - Added optional `searcher.podDisruptionBudget` support
 - Set `DEPLOY_TYPE=helm` consistently for all Sourcegraph application containers
+
+## 7.7.0
+
 - Fixed the grafana StatefulSet rendering invalid YAML when `grafana.extraContainers` and a service account are both set, by emitting `extraContainers` inside the `containers` list before `serviceAccountName`, matching the other templates
 - Added `searcher.autoCacheSize` (default `false`) to omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` env vars, letting `searcher` auto-size its cache to ~45% of the live cache volume so it tracks PVC expansion instead of staying frozen to the initial `storageSize`
+
+## 7.6.0
+
 - Added support for ordering trace processors via `openTelemetry.gateway.config.traces.tracePipelineProcessors`, falling back to processors ordered by name when unset
 - Removed the unused executor controller `/data` PersistentVolumeClaim from the Kubernetes-native executor chart (`sourcegraph-executor/k8s`), along with the now-orphaned `storageClass` and `executor.storageSize` values and the vestigial `EXECUTOR_KUBERNETES_PERSISTENCE_VOLUME_NAME` env var. Since single-job-pod became the only k8s execution mode, job pods use their own ephemeral `emptyDir` volume and the controller writes nothing to `/data`.
 - Removed the non-functional `executor.replicas` value from the Kubernetes-native executor chart; the controller is a singleton (it pins Job pods to its own node), so `replicas > 1` never worked.
+
+## 7.4.0
+
 - Added support for overriding `replicaCount` per dedicated `worker` replica via `worker.replicas[].replicaCount`, falling back to `worker.replicaCount` when unset
 - Added support for overriding the image repository on a per-service basis via `<serviceName>.image.repository`, falling back to the global `sourcegraph.image.repository` when unset
+
+## 7.2.0
+
 - Added livenessProbe to zoekt-webserver in indexed-search to detect and restart hung pods
-- Fix Pod Disruption Budget for sourcegraph-frontend
-- Added a startup probe to the gitserver statefulset to give it time to run the on-disk migration from repo names to repo IDs
+
+## 6.4.0
+
 - The repo-updater service is no longer needed and has been removed from the chart.
 - The symbols service is no longer needed and has been removed from the chart. Consider merging env vars and resource overrides given to symbols into searcher before upgrading.
+
+## 6.2.0
+
+- Added a startup probe to the gitserver statefulset to give it time to run the on-disk migration from repo names to repo IDs
+
+## 6.1.0
+
+- Fix Pod Disruption Budget for sourcegraph-frontend
 
 ## 5.10.0
 

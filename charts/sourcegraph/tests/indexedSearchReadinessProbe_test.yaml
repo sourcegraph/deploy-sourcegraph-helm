@@ -1,0 +1,47 @@
+suite: indexedSearchReadinessProbe
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- indexed-search/indexed-search.StatefulSet.yaml
+tests:
+- it: should use the default readiness probe tuning
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+      value: 3
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+      value: 5
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+      value: 5
+- it: should allow overriding readiness probe tuning
+  set:
+    indexedSearch:
+      readinessProbe:
+        failureThreshold: 6
+        periodSeconds: 10
+        timeoutSeconds: 8
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.failureThreshold
+      value: 6
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.periodSeconds
+      value: 10
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.timeoutSeconds
+      value: 8
+- it: should leave the liveness probe untouched when readiness is overridden
+  set:
+    indexedSearch:
+      readinessProbe:
+        failureThreshold: 6
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.failureThreshold
+      value: 10
+  - equal:
+      path: spec.template.spec.containers[0].livenessProbe.periodSeconds
+      value: 60

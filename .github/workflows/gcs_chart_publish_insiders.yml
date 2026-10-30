@@ -53,6 +53,11 @@ jobs:
           sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml charts/sourcegraph-executor/*/Chart.yaml
           sed -i '/^version:/ s/"$/-insiders.${{ steps.metadata.outputs.shortSHA }}"/' charts/*/Chart.yaml charts/sourcegraph-executor/*/Chart.yaml
 
+      - name: Render READMEs with exact image versions
+        # Docs only: a failure here must not block publishing the chart
+        continue-on-error: true
+        run: ./scripts/ci/render-published-readmes.sh
+
       - name: Package Sourcegraph helm charts
         run: for i in charts/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
 
