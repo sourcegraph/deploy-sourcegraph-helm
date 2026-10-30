@@ -74,8 +74,7 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.openTelemetry.gateway.resources | nindent 10 }}
-        securityContext:
-          {{- toYaml .Values.openTelemetry.gateway.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "openTelemetry" "gateway" 8) }}
         readinessProbe:
           httpGet:
             path: /
@@ -103,6 +102,7 @@ spec:
             mountPath: /tls
           {{- end }}
       terminationGracePeriodSeconds: 120
+      {{- include "sourcegraph.podSecurityContext" (list . "openTelemetry" "gateway" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "openTelemetry" ) | trim }}{{ . | nindent 6 }}{{- end }}

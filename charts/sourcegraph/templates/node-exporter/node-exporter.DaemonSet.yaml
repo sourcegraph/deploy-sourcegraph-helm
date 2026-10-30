@@ -70,8 +70,7 @@ spec:
         resources:
           {{- toYaml .Values.nodeExporter.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.nodeExporter.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "nodeExporter" 8) }}
         volumeMounts:
         - name: rootfs
           mountPath: /host/root
@@ -116,8 +115,7 @@ spec:
       {{- end }}
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
-      securityContext:
-        {{- toYaml .Values.nodeExporter.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "nodeExporter" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "nodeExporter" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "nodeExporter" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "nodeExporter" ) | trim }}{{ . | nindent 6 }}{{- end }}
