@@ -181,14 +181,12 @@ spec:
         sourcegraph-resource-requires: no-cluster-admin
         app.kubernetes.io/component: executor
     spec:
-      {{- with $r.Values.executor.podSecurityContext }}
-      securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.podSecurityContext" (list $r "executor" 6) }}
       containers:
         - name: executor
           image: {{ include "sourcegraph.image" (list $r "executor") }}
           imagePullPolicy: {{ $r.Values.sourcegraph.image.pullPolicy }}
+          {{- include "sourcegraph.containerSecurityContext" (list $r "executor" 10) }}
           livenessProbe:
             httpGet:
               path: /healthz
@@ -260,12 +258,12 @@ spec:
         - name: dind
           image: "{{ $r.Values.dind.image.registry }}/{{ $r.Values.dind.image.repository }}:{{ $r.Values.dind.image.tag }}"
           imagePullPolicy: {{ $r.Values.sourcegraph.image.pullPolicy }}
+          {{- if $r.Values.dind.gVisor.enabled }}
           securityContext:
-            {{- if $r.Values.dind.gVisor.enabled }}
             {{- toYaml $r.Values.dind.gVisor.securityContext | nindent 12 }}
-            {{- else }}
-            privileged: true
-            {{- end }}
+          {{- else }}
+          {{- include "sourcegraph.containerSecurityContext" (list $r "dind" 10) }}
+          {{- end }}
           command:
             {{- if $r.Values.dind.gVisor.enabled }}
             {{- toYaml $r.Values.dind.gVisor.command | nindent 12 }}

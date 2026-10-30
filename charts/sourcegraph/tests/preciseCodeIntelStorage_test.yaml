@@ -116,11 +116,10 @@ tests:
   - failedTemplate:
       errorMessage: 'preciseCodeIntel.storageType must be one of emptyDir, pvc; got "PVC"'
 
-- it: should leave the pod securityContext untouched on the emptyDir branch
+- it: should not set a pod securityContext on the emptyDir branch
   asserts:
-  - equal:
+  - notExists:
       path: spec.template.spec.securityContext
-      value: {}
 
 - it: should set fsGroup to the container runAsGroup on the pvc branch so /tmp is writable
   set:
@@ -132,6 +131,21 @@ tests:
       path: spec.template.spec.securityContext
       value:
         fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+
+- it: should set fsGroup to the global runAsGroup on the pvc branch
+  set:
+    sourcegraph:
+      containerSecurityContext:
+        runAsGroup: 3000
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value:
+        fsGroup: 3000
         fsGroupChangePolicy: OnRootMismatch
 
 - it: should keep a user-set fsGroup and other podSecurityContext fields on the pvc branch

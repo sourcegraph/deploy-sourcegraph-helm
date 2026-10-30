@@ -54,8 +54,7 @@ spec:
           {{- if .Values.codeIntelDB.storageSubPath }}
           subPath: {{ .Values.codeIntelDB.storageSubPath }}
           {{- end }}
-        securityContext:
-        {{- toYaml .Values.alpine.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "alpine" 8) }}
         {{- if not .Values.sourcegraph.localDevMode }}
         resources:
           {{- toYaml .Values.alpine.resources | nindent 10 }}
@@ -99,8 +98,7 @@ spec:
         resources:
           {{- toYaml .Values.codeIntelDB.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.codeIntelDB.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "codeIntelDB" 8) }}
         volumeMounts:
         - mountPath: /data
           name: disk
@@ -131,15 +129,13 @@ spec:
         resources:
           {{- toYaml .Values.postgresExporter.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.postgresExporter.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "postgresExporter" 8) }}
         terminationMessagePolicy: FallbackToLogsOnError
       {{- if .Values.codeIntelDB.extraContainers }}
         {{- toYaml .Values.codeIntelDB.extraContainers | nindent 6 }}
       {{- end }}
       terminationGracePeriodSeconds: 120
-      securityContext:
-        {{- toYaml .Values.codeIntelDB.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "codeIntelDB" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "codeIntelDB" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "codeIntelDB" ) | trim }}{{ . | nindent 6 }}{{- end }}

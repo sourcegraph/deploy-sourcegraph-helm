@@ -49,6 +49,12 @@ sourcegraph:
   serviceLabels: {}
   # -- Disable the creation of Kubernetes secrets objects
   disableKubernetesSecrets: false
+  # -- Global container security context override applied to all containers
+  # Merges with component defaults; component-specific overrides take precedence
+  containerSecurityContext: {}
+  # -- Global pod security context override applied to all pods
+  # Merges with component defaults; component-specific overrides take precedence
+  podSecurityContext: {}
 
 # Generic application configuration options, used by most applications below
 # app: # Generally matches directory name
@@ -79,7 +85,9 @@ sourcegraph:
 #   # Set resource requests / limits
 #   resources: {}
 #   containerSecurityContext: {}
+#   learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
 #   podSecurityContext: {}
+#   learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
 #   # Add additional volumes and mounts to deployments
 #   extraVolumeMounts: {}
 #   extraVolumes: {}
@@ -101,20 +109,22 @@ sourcegraph:
 #   enabled: true
 
 alpine:
-  # Used in init containers
+  # Used in init containers for database statefulSets
   image:
     # -- Docker image tag for the `alpine` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
     defaultTag: 8.1.2687@sha256:1e113d9625cee4d32b995bb199ca7d6b6f5db1907404acc8ce9b272d39714963
     # -- Docker image name for the `alpine` image
     name: "alpine-3.14"
-  # -- Security context for the `alpine` initContainer,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `alpine` initContainer
+  # Used in init containers for pgsql and codeintel-db statefulSets, not codeinsights-db
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `alpine` initContainer
+  containerSecurityContext: {}
   # -- Resource requests & limits for the `alpine` initContainer,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -150,9 +160,8 @@ cadvisor:
     create: true
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: cadvisor
-  # -- Security context for the `cadvisor` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `cadvisor` container
+  defaultContainerSecurityContext:
     # You may set `privileged` to `false and `cadvisor` will run with reduced privileges.
     # `cadvisor` requires root privileges in order to display provisioning metrics.
     # These metrics provide critical information to help you scale the Sourcegraph deployment.
@@ -162,6 +171,12 @@ cadvisor:
     # You may also run `cadvisor` with reduced privileges by setting
     # `cadvisor.containerSecurityContext.privileged=false` in your override file
     privileged: true
+  # -- Override container security context for the `cadvisor` container
+  containerSecurityContext: {}
+  # -- Default pod security context for `cadvisor`
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for `cadvisor`
+  podSecurityContext: {}
 
 codeInsightsDB:
   # -- Enable `codeinsights-db` PostgreSQL server
@@ -197,21 +212,23 @@ codeInsightsDB:
     defaultTag: 8.1.2687@sha256:b7e2df5a6a63e323987eeaca23fe9f05278d4c97f96f1994b89dac3c60dedcd3
     # -- Docker image name for the `codeinsights-db` image
     name: "postgresql-16-codeinsights"
-  # -- Security context for the `codeinsights-db` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `codeinsights-db` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 70
     runAsGroup: 70
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `codeinsights-db` container
+  containerSecurityContext: {}
   init:
-    # -- Security context for the `alpine` initContainer,
-    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-    containerSecurityContext:
+    # -- Default security context for the `alpine` initContainer
+    defaultContainerSecurityContext:
       allowPrivilegeEscalation: false
       runAsUser: 70
       runAsGroup: 70
       readOnlyRootFilesystem: true
+    # -- Override container security context for the `alpine` initContainer
+    containerSecurityContext: {}
   # -- Configuration for the `pgsql-exporter` sidecar container
   postgresExporter: {}
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -225,12 +242,13 @@ codeInsightsDB:
     requests:
       cpu: "4"
       memory: 2Gi
-  # -- Security context for the `codeinsights-db` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `codeinsights-db` pod
+  defaultPodSecurityContext:
     runAsUser: 70
     fsGroup: 70
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `codeinsights-db` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `codeinsights-db`
     create: false
@@ -275,13 +293,14 @@ codeIntelDB:
     defaultTag: 8.1.2687@sha256:cc810cd21f1df7776aa270f49bdd50a4ec3375623ffae1f0238c20dec054bf03
     # -- Docker image name for the `codeintel-db` image
     name: "postgresql-16"
-  # -- Security context for the `codeintel-db` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `codeintel-db` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `codeintel-db` container
+  containerSecurityContext: {}
   # -- Configuration for the `pgsql-exporter` sidecar container
   postgresExporter: {}
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -295,12 +314,13 @@ codeIntelDB:
     requests:
       cpu: "4"
       memory: 4Gi
-  # -- Security context for the `codeintel-db` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `codeintel-db` pod
+  defaultPodSecurityContext:
     runAsUser: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `codeintel-db` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `codeintel-db`
     create: false
@@ -362,17 +382,19 @@ frontend:
     #       - sourcegraph.example.com
     #     secretName: sourcegraph-tls  # optional
     tls: []
-  # -- Security context for the `frontend` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `frontend` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `frontend` container
+  containerSecurityContext: {}
   # -- Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC
   createRoleBinding: true
-  # -- Security context for the `frontend` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  # -- Default pod security context for the `frontend` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `frontend` pod
   podSecurityContext: {}
   # -- Enable creation of Role and RoleBinding (RBAC). Uses [view](https://kubernetes.io/docs/reference/access-authn-authz/rbac/#user-facing-roles) ClusterRole if set to false
   privileged: true
@@ -421,13 +443,14 @@ migrator:
     requests:
       cpu: 100m
       memory: 50M
-  # -- Security context for the `migrator` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `migrator` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `migrator` container
+  containerSecurityContext: {}
 
 gitserver:
   # -- Environment variables for the `gitserver` container
@@ -445,13 +468,14 @@ gitserver:
   # It usually contains keys, such as `id_rsa` (private key) and `known_hosts`.
   # Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories)
   sshSecret: ""
-  # -- Security context for the `gitserver` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `gitserver` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `gitserver` container
+  containerSecurityContext: {}
   # -- Number of `gitserver` pod
   replicaCount: 1
   # -- Pod disruption budget for `gitserver`. Configure either `minAvailable` or `maxUnavailable` to enable it.
@@ -467,13 +491,14 @@ gitserver:
       memory: 8G
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "gitserver"
-  # -- Security context for the `gitserver` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `gitserver` pod
+  defaultPodSecurityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `gitserver` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `gitserver`
     create: false
@@ -520,13 +545,14 @@ grafana:
     defaultTag: 8.1.2687@sha256:c24d2f1647dc59e499cface18fba62aff1bc0de152ea95036c8d876d35f5da74
     # -- Docker image name for the `grafana` image
     name: "grafana"
-  # -- Security context for the `grafana` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `grafana` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 472
     runAsGroup: 472
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `grafana` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "grafana"
   # -- Resource requests & limits for the `grafana` container,
@@ -538,13 +564,14 @@ grafana:
     requests:
       cpu: 100m
       memory: 512Mi
-  # -- Security context for the `grafana` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `grafana` pod
+  defaultPodSecurityContext:
     runAsUser: 472
     runAsGroup: 472
     fsGroup: 472
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `grafana` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `grafana`
     create: true
@@ -569,13 +596,14 @@ indexedSearch:
     defaultTag: 8.1.2687@sha256:4f9b1d38da5f6168ee91ed5e2d9c42f851148b12e1a71ee5040f566b6d663837
     # -- Docker image name for the `zoekt-webserver` image
     name: "indexed-searcher"
-  # -- Security context for the `zoekt-webserver` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `zoekt-webserver` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `zoekt-webserver` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "indexed-search"
   # -- Number of `indexed-search` pod
@@ -610,11 +638,12 @@ indexedSearch:
     requests:
       cpu: 500m
       memory: 2G
-  # -- Security context for the `indexed-search` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `indexed-search` pod
+  defaultPodSecurityContext:
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `indexed-search` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `indexed-search`
     create: false
@@ -641,13 +670,14 @@ indexedSearchIndexer:
     defaultTag: 8.1.2687@sha256:1a53fc78048963cf2badc8e8b43fc606d62a2323d36bd631eb01e33910dd22cd
     # -- Docker image name for the `zoekt-indexserver` image
     name: "search-indexer"
-  # -- Security context for the `zoekt-indexserver` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `zoekt-indexserver` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `zoekt-indexserver` container
+  containerSecurityContext: {}
   # -- Resource requests & limits for the `zoekt-indexserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   # zoekt-indexserver is CPU bound. The more CPU you allocate to it, the
@@ -674,12 +704,13 @@ blobstore:
     defaultTag: 8.1.2687@sha256:7407a048bdfbd6e635874963b9f075f9e514d5b10ddd26cda76597a0bcd59ab2
     # -- Docker image name for the `blobstore` image
     name: "blobstore"
-  # -- Security context for the `blobstore` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `blobstore` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
+  # -- Override container security context for the `blobstore` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "blobstore"
   # -- Resource requests & limits for the `blobstore` container,
@@ -691,13 +722,14 @@ blobstore:
     requests:
       cpu: "1"
       memory: 500M
-  # -- Security context for the `blobstore` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `blobstore` pod
+  defaultPodSecurityContext:
     runAsUser: 100
     runAsGroup: 101
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `blobstore` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `blobstore`
     create: false
@@ -751,10 +783,17 @@ openTelemetry:
       create: false
       # -- Name of the ServiceAccount to be created or an existing ServiceAccount
       name: ""
-    containerSecurityContext:
+    # -- Default security context for the `otel-collector` container
+    defaultContainerSecurityContext:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Override container security context for the `otel-collector` container
+    containerSecurityContext: {}
+    # -- Default pod security context for the `otel-collector` pod
+    defaultPodSecurityContext: {}
+    # -- Override pod security context for the `otel-collector` pod
+    podSecurityContext: {}
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
@@ -782,10 +821,17 @@ openTelemetry:
       create: false
       # -- Name of the ServiceAccount to be created or an existing ServiceAccount
       name: ""
-    containerSecurityContext:
+    # -- Default security context for the `otel-agent` container
+    defaultContainerSecurityContext:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Override container security context for the `otel-agent` container
+    containerSecurityContext: {}
+    # -- Default pod security context for the `otel-agent` pod
+    defaultPodSecurityContext: {}
+    # -- Override pod security context for the `otel-agent` pod
+    podSecurityContext: {}
 
 nodeExporter:
   # -- Enable `node-exporter`
@@ -818,20 +864,22 @@ nodeExporter:
   extraArgs: []
   #   - --collector.diskstats.ignored-devices=^(ram|loop|fd|(h|s|v)d[a-z]|nvme\\d+n\\d+p)\\d+$
   #   - --collector.textfile.directory=/run/prometheus
-  # -- Security context for the `node-exporter` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `node-exporter` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 65534
     runAsGroup: 65534
     readOnlyRootFilesystem: true
-  # -- Security context for the `node-exporter` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Override container security context for the `node-exporter` container
+  containerSecurityContext: {}
+  # -- Default security context for the `node-exporter` pod
+  defaultPodSecurityContext:
     fsGroup: 65534
     runAsGroup: 65534
     runAsNonRoot: true
     runAsUser: 65534
+  # -- Override pod security context for the `node-exporter` pod
+  podSecurityContext: {}
 
 pgsql:
   # -- Enable `pgsql` PostgreSQL server
@@ -865,13 +913,14 @@ pgsql:
     defaultTag: 8.1.2687@sha256:cc810cd21f1df7776aa270f49bdd50a4ec3375623ffae1f0238c20dec054bf03
     # -- Docker image name for the `pgsql` image
     name: "postgresql-16"
-  # -- Security context for the `pgsql` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `pgsql` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `pgsql` container
+  containerSecurityContext: {}
   # -- Configuration for the `pgsql-exporter` sidecar container
   postgresExporter: {}
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -885,14 +934,15 @@ pgsql:
     requests:
       cpu: "4"
       memory: 4Gi
-  # -- Security context for the `pgsql` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `pgsql` pod
+  defaultPodSecurityContext:
     # Required to prevent escalations to root.
     runAsUser: 999
     runAsGroup: 999
     fsGroup: 999
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `pgsql` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `pgsql`
     create: false
@@ -912,6 +962,11 @@ postgresExporter:
     defaultTag: 8.1.2687@sha256:bd55116d35a5cfad9da760ebdf467166deaac550be44b915e407beace9b0ef3d
     # -- Docker image name for the `pgsql-exporter` image
     name: "postgres_exporter"
+  # -- Default security context for the `pgsql-exporter` sidecar container
+  defaultContainerSecurityContext:
+    allowPrivilegeEscalation: false
+  # -- Override container security context for the `pgsql-exporter` sidecar container
+  containerSecurityContext: {}
   # -- Resource requests & limits for the `pgsql-exporter` sidecar container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -935,17 +990,19 @@ syntacticCodeIntel:
     defaultTag: 8.1.2687@sha256:702609626636fd06c204a8a7e18941eb13df096784cea732d1c036069866cc40
     # -- Docker image name for the `syntactic-code-intel-worker` image
     name: "syntactic-code-intel-worker"
-  # -- Security context for the `syntactic-code-intel-worker` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `syntactic-code-intel-worker` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `syntactic-code-intel-worker` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "syntactic-code-intel-worker"
-  # -- Security context for the `syntactic-code-intel-worker` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  # -- Default pod security context for the `syntactic-code-intel-worker` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `syntactic-code-intel-worker` pod
   podSecurityContext: {}
   # -- Number of `syntactic-code-intel-worker` pod
   replicaCount: 2
@@ -980,17 +1037,19 @@ preciseCodeIntel:
     defaultTag: 8.1.2687@sha256:560ef1edc769959af11f24d220b0dbd5c5c798be1d635e6e4fe06ff560b7835c
     # -- Docker image name for the `precise-code-intel-worker` image
     name: "precise-code-intel-worker"
-  # -- Security context for the `precise-code-intel-worker` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `precise-code-intel-worker` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `precise-code-intel-worker` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "precise-code-intel-worker"
-  # -- Security context for the `precise-code-intel-worker` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  # -- Default pod security context for the `precise-code-intel-worker` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `precise-code-intel-worker` pod
   podSecurityContext: {}
   # -- Number of `precise-code-intel-worker` pod
   replicaCount: 2
@@ -1038,15 +1097,16 @@ prometheus:
     defaultTag: 8.1.2687@sha256:6e52e5c1b47f21b31384a52155553be4d625fa410e07ab45a8f6faed7172a907
     # -- Docker image name for the `prometheus` image
     name: "prometheus"
-  # -- Security context for the `prometheus` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `prometheus` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 100
     # Read-only filesystem not supported for the prometheus container,
     # see [sourcegraph/issues/34012](https://github.com/sourcegraph/sourcegraph/issues/34012) for more information
     readOnlyRootFilesystem: false
+  # -- Override container security context for the `prometheus` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "prometheus"
   # -- Enable RBAC for `prometheus`
@@ -1069,11 +1129,12 @@ prometheus:
     requests:
       cpu: 500m
       memory: 6G
-  # -- Security context for the `prometheus` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `prometheus` pod
+  defaultPodSecurityContext:
     fsGroup: 100
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `prometheus` pod
+  podSecurityContext: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount
     create: true
@@ -1102,13 +1163,14 @@ redisCache:
     existingSecret: ""
     # -- Endpoint to use for redis-cache. Supports either host:port or IANA specification
     endpoint: "redis-cache:6379"
-  # -- Security context for the `redis-cache` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `redis-cache` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `redis-cache` container
+  containerSecurityContext: {}
   # -- Resource requests & limits for the `redis-cache` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1120,11 +1182,12 @@ redisCache:
       memory: 7Gi
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "redis-cache"
-  # -- Security context for the `redis-cache` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `redis-cache` pod
+  defaultPodSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `redis-cache` pod
+  podSecurityContext: {}
   # -- Pod disruption budget for `redis-cache`. Configure either `minAvailable` or `maxUnavailable` to enable it.
   podDisruptionBudget: {}
   serviceAccount:
@@ -1172,13 +1235,14 @@ redisExporter:
     defaultTag: 8.1.2687@sha256:898666a0c7fc28b6b90f1f01893cb35668a97dbcc4f18056ca5f8d2ac89b2292
     # -- Docker image name for the `redis-exporter` image
     name: "redis_exporter"
-  # -- Security context for the `redis-exporter` sidecar container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `redis-exporter` sidecar container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `redis-exporter` sidecar container
+  containerSecurityContext: {}
   # -- Resource requests & limits for the `redis-exporter` sidecar container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1205,13 +1269,14 @@ redisStore:
     defaultTag: 8.1.2687@sha256:b733fceadfa1863671ab11704e354573241217c4aa604aba64533c7bae101127
     # -- Docker image name for the `redis-store` image
     name: "redis-store"
-  # -- Security context for the `redis-store` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `redis-store` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `redis-store` container
+  containerSecurityContext: {}
   # -- Resource requests & limits for the `redis-store` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1223,11 +1288,12 @@ redisStore:
       memory: 7Gi
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "redis-store"
-  # -- Security context for the `redis-store` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Default security context for the `redis-store` pod
+  defaultPodSecurityContext:
     fsGroup: 1000
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `redis-store` pod
+  podSecurityContext: {}
   # -- Pod disruption budget for `redis-store`. Configure either `minAvailable` or `maxUnavailable` to enable it.
   podDisruptionBudget: {}
   serviceAccount:
@@ -1280,19 +1346,21 @@ searcher:
     defaultTag: 8.1.2687@sha256:acfbc9c127ebdbd4053ac835bcf90093f9d8bf4834a6275a549384db4eacd66f
     # -- Docker image name for the `searcher` image
     name: "searcher"
-  # -- Security context for the `searcher` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `searcher` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  # -- Security context for the `searcher` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-  podSecurityContext:
+  # -- Override container security context for the `searcher` container
+  containerSecurityContext: {}
+  # -- Default security context for the `searcher` pod
+  defaultPodSecurityContext:
     runAsUser: 100
     fsGroup: 101
     fsGroupChangePolicy: "OnRootMismatch"
+  # -- Override pod security context for the `searcher` pod
+  podSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "searcher"
   # -- Number of `searcher` pod
@@ -1360,17 +1428,19 @@ syntectServer:
     defaultTag: 8.1.2687@sha256:9bbe53c18c2d864358ba95e4c89d000df60759e5d9fc0814b30d576efde55d95
     # -- Docker image name for the `syntect-server` image
     name: "syntax-highlighter"
-  # -- Security context for the `syntect-server` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `syntect-server` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `syntect-server` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "syntect-server"
-  # -- Security context for the `syntect-server` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  # -- Default pod security context for the `syntect-server` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `syntect-server` pod
   podSecurityContext: {}
   # -- Number of `syntect-server` pod
   replicaCount: 1
@@ -1431,15 +1501,17 @@ jaeger:
     logLevel: info
     # -- Default sampling probability (0.0 to 1.0) returned to services that query Jaeger for sampling config
     samplingDefaultProbability: 1.0
-  # -- Security context for the `jaeger` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `jaeger` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
-  # -- Security context for the `jaeger` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  # -- Override container security context for the `jaeger` container
+  containerSecurityContext: {}
+  # -- Default pod security context for the `jaeger` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `jaeger` pod
   podSecurityContext: {}
   query:
     # -- Name of jaeger `query` service
@@ -1476,13 +1548,14 @@ worker:
     defaultTag: 8.1.2687@sha256:5aa40853fc6a8223c373f291ce940f7258d2e882e8ffca7e31af04ec2f2f7922
     # -- Docker image name for the `worker` image
     name: "worker"
-  # -- Security context for the `worker` container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default security context for the `worker` container
+  defaultContainerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
     readOnlyRootFilesystem: true
+  # -- Override container security context for the `worker` container
+  containerSecurityContext: {}
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "worker"
   # -- Environment variables for the `worker` container
@@ -1490,8 +1563,9 @@ worker:
   env:
     DEPLOY_TYPE:
       value: helm
-  # -- Security context for the `worker` pod,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  # -- Default pod security context for the `worker` pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the `worker` pod
   podSecurityContext: {}
   # -- Number of `worker` pod
   replicaCount: 1

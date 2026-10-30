@@ -30,7 +30,7 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: redis-cache
         {{- if and .Values.redisCache.config.enabled (not .Values.redisCache.config.existingConfig) }}
-        checksum/redis-config: {{ include "sourcegraph.redis.conf" (list . "redisCache") | sha256sum }}
+        checksum/redis-config: {{ include (print $.Template.BasePath "/redis/redis-cache.ConfigMap.yaml") . | sha256sum }}
         {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
@@ -98,8 +98,7 @@ spec:
         resources:
           {{- toYaml .Values.redisCache.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.redisCache.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "redisCache" 8) }}
         volumeMounts:
         - mountPath: /redis-data
           name: redis-data
@@ -131,13 +130,11 @@ spec:
         resources:
           {{- toYaml .Values.redisExporter.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.redisExporter.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "redisExporter" 8) }}
       {{- if .Values.redisCache.extraContainers }}
         {{- toYaml .Values.redisCache.extraContainers | nindent 6 }}
       {{- end }}
-      securityContext:
-        {{- toYaml .Values.redisCache.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "redisCache" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "redisCache" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "redisCache" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "redisCache" ) | trim }}{{ . | nindent 6 }}{{- end }}

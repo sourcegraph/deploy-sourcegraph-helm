@@ -97,8 +97,7 @@ spec:
         resources:
           {{- toYaml .Values.preciseCodeIntel.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.preciseCodeIntel.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "preciseCodeIntel" 8) }}
         volumeMounts:
         - mountPath: /tmp
           name: tmpdir
@@ -108,13 +107,13 @@ spec:
       {{- if .Values.preciseCodeIntel.extraContainers }}
         {{- toYaml .Values.preciseCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
-      {{- $podSecurityContext := deepCopy .Values.preciseCodeIntel.podSecurityContext }}
+      {{- $podSecurityContext := include "sourcegraph.mergedPodSecurityContext" (list . "preciseCodeIntel") | fromYaml }}
       {{- if eq $storageType "pvc" }}
       {{- /* A freshly provisioned volume is root-owned, so the non-root worker needs fsGroup to write /tmp. */}}
-      {{- $podSecurityContext = merge $podSecurityContext (dict "fsGroup" (.Values.preciseCodeIntel.containerSecurityContext.runAsGroup | default 101) "fsGroupChangePolicy" "OnRootMismatch") }}
+      {{- $runAsGroup := (include "sourcegraph.mergedContainerSecurityContext" (list . "preciseCodeIntel") | fromYaml).runAsGroup | default 101 }}
+      {{- $podSecurityContext = merge $podSecurityContext (dict "fsGroup" $runAsGroup "fsGroupChangePolicy" "OnRootMismatch") }}
       {{- end }}
-      securityContext:
-        {{- toYaml $podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.renderSecurityContext" (list $podSecurityContext 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "preciseCodeIntel" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "preciseCodeIntel" ) | trim }}{{ . | nindent 6 }}{{- end }}

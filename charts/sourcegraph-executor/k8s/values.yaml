@@ -35,9 +35,17 @@ sourcegraph:
   podLabels: { }
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Global container security context override applied to all containers.
+  # Merges with component defaults; component-specific overrides take precedence.
+  containerSecurityContext: {}
+  # -- Global pod security context override applied to all pods.
+  # Merges with component defaults; component-specific overrides take precedence.
+  podSecurityContext: {}
 
 
 executor:
+  # -- Whether to deploy the executor
+  enabled: true
   # -- Whether to configure the necessary RBAC resources. Required only once for all executor deployments.
   configureRbac: true
   image:
@@ -158,10 +166,14 @@ executor:
   # -- For local deployments the host is 'host.docker.internal' and this needs to be true
   dockerAddHostGateway: "false"
 
-  # -- Security context for the container,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
-  containerSecurityContext:
+  # -- Default container security context for the executor container
+  defaultContainerSecurityContext:
     privileged: false
-  # -- Security context for the pod,
+  # -- Override container security context for the executor container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext: {}
+  # -- Default pod security context for the executor pod
+  defaultPodSecurityContext: {}
+  # -- Override pod security context for the executor pod,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
   podSecurityContext: {}

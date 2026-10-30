@@ -58,8 +58,7 @@ spec:
         {{- end }}
         resources:
           {{- toYaml .Values.openTelemetry.agent.resources | nindent 10 }}
-        securityContext:
-          {{- toYaml .Values.openTelemetry.agent.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "openTelemetry" "agent" 8) }}
         readinessProbe:
           httpGet:
             path: /
@@ -82,6 +81,7 @@ spec:
           - name: config
             mountPath: /etc/otel-agent
       terminationGracePeriodSeconds: 120
+      {{- include "sourcegraph.podSecurityContext" (list . "openTelemetry" "agent" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "openTelemetry" ) | trim }}{{ . | nindent 6 }}{{- end }}

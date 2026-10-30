@@ -42,6 +42,8 @@ spec:
         deploy: sourcegraph
         app: cadvisor
     spec:
+      {{- /* /dev/kmsg is only readable by a privileged container */}}
+      {{- $privileged := (include "sourcegraph.mergedContainerSecurityContext" (list . "cadvisor") | fromYaml).privileged }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "cadvisor") | trim | nindent 6 }}
       containers:
       - name: cadvisor
@@ -64,8 +66,7 @@ spec:
         resources:
           {{- toYaml .Values.cadvisor.resources | nindent 10 }}
         {{- end }}
-        securityContext:
-          {{- toYaml .Values.cadvisor.containerSecurityContext | nindent 10 }}
+        {{- include "sourcegraph.containerSecurityContext" (list . "cadvisor" 8) }}
         volumeMounts:
         - name: rootfs
           mountPath: /rootfs
@@ -82,7 +83,7 @@ spec:
         - name: disk
           mountPath: /dev/disk
           readOnly: true
-        {{- if .Values.cadvisor.containerSecurityContext.privileged }}
+        {{- if $privileged }}
         - name: kmsg
           mountPath: /dev/kmsg
           readOnly: true
@@ -99,8 +100,7 @@ spec:
       {{- end }}
       automountServiceAccountToken: false
       terminationGracePeriodSeconds: 30
-      securityContext:
-        {{- toYaml .Values.cadvisor.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.podSecurityContext" (list . "cadvisor" 6) }}
       {{- include "sourcegraph.nodeSelector" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "cadvisor" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "cadvisor" ) | trim }}{{ . | nindent 6 }}{{- end }}
@@ -125,7 +125,7 @@ spec:
       - name: disk
         hostPath:
           path: /dev/disk
-      {{- if .Values.cadvisor.containerSecurityContext.privileged }}
+      {{- if $privileged }}
       - name: kmsg
         hostPath:
           path: /dev/kmsg
