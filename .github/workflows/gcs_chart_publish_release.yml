@@ -60,6 +60,11 @@ jobs:
       - name: Set up helm repo
         run: helm repo add sg gs://${{ env.BUCKET_NAME }}/${{ env.BUCKET_PATH }}
 
+      - name: Render READMEs with exact image versions
+        # Docs only: a failure here must not block publishing the chart
+        continue-on-error: true
+        run: ./scripts/ci/render-published-readmes.sh
+
       - name: Package Sourcegraph helm charts
         run: for i in charts/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
         

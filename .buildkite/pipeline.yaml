@@ -26,6 +26,16 @@ steps:
       - "[[ -z $(git status -s) ]]"
     agents: { queue: standard }
 
+  # Releases rewrite image digests and the registry in values.yaml. If a README
+  # renders either, the release branch fails the helm-docs check above.
+  - label: ":book: Verify READMEs do not render release-managed values"
+    command: |
+      if grep -rnE --include=README.md '@sha256:[0-9a-f]{64}|index\.docker\.io/sourcegraph' charts/; then
+        echo "Add a '# @default --' annotation to these values in values.yaml, then run ./scripts/helm-docs.sh"
+        exit 1
+      fi
+    agents: { queue: standard }
+
   - label: "(internal) Release: test"
     if: build.branch =~ /^internal\/release-.*/
     plugins:
@@ -37,8 +47,11 @@ steps:
 
       sg release run test --workdir=. --config-from-commit
 
+  # Promote jobs run only for the promote config commit. Creating the promote
+  # branch also builds its first commit, the internal config commit, which
+  # --config-from-commit would otherwise accept, running finalize twice.
   - label: "(promote) Release: test"
-    if: build.branch =~ /^promote\/release-.*/
+    if: build.branch =~ /^promote\/release-.*/ && build.branch !~ /-update-main$/ && build.message =~ /^promote-release:/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |
@@ -61,7 +74,7 @@ steps:
 
       sg release run internal finalize --workdir=. --config-from-commit
   - label: "(promote) Release: finalize"
-    if: build.branch =~ /^promote\/release-.*/
+    if: build.branch =~ /^promote\/release-.*/ && build.branch !~ /-update-main$/ && build.message =~ /^promote-release:/
     plugins:
       - ssh://git@github.com/sourcegraph/sg-buildkite-plugin.git#main: ~
     command: |

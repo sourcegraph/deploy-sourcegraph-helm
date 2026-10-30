@@ -37,7 +37,7 @@ jobs:
 
       - name: Get metadata
         id: metadata
-        uses: contiamo/git-metadata-action@main
+        uses: contiamo/git-metadata-action@ffa552f54259c47a639463dc60443a24bfd027d5 # main as of 2026-10-30
 
       - name: Install helm-gcs
         run: helm plugin install https://github.com/hayorov/helm-gcs.git --version ${{ env.HELM_GCS_VERSION }}
@@ -52,6 +52,11 @@ jobs:
         run: |
           sed -i 's/appVersion:.*/appVersion: insiders/g' charts/*/Chart.yaml charts/sourcegraph-executor/*/Chart.yaml
           sed -i '/^version:/ s/"$/-insiders.${{ steps.metadata.outputs.shortSHA }}"/' charts/*/Chart.yaml charts/sourcegraph-executor/*/Chart.yaml
+
+      - name: Render READMEs with exact image versions
+        # Docs only: a failure here must not block publishing the chart
+        continue-on-error: true
+        run: ./scripts/ci/render-published-readmes.sh
 
       - name: Package Sourcegraph helm charts
         run: for i in charts/*; do [ -f "$i/Chart.yaml" ] && helm package -u $i; done
