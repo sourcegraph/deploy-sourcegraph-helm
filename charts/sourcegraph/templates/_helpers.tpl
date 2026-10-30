@@ -381,7 +381,11 @@ such as the chart version; otherwise every upgrade restarts redis.
 {{- $top := index . 0 -}}
 {{- $service := index . 1 -}}
 {{- $config := (index $top.Values $service).config -}}
-{{- $body := $top.Files.Get (printf "files/%s/redis.conf" (kebabcase $service)) | trimSuffix "\n" -}}
+{{- $dir := kebabcase $service -}}
+{{- $body := $top.Files.Get (printf "files/%s/redis.conf" $dir) | trimSuffix "\n" -}}
+{{- if not $body -}}
+{{- fail (printf "no vendored redis.conf found at files/%s/redis.conf for service %s" $dir $service) -}}
+{{- end -}}
 {{- $overrides := list -}}
 {{- with include "sourcegraph.redis.maxmemory" (list $top $service) -}}
 {{- $overrides = append $overrides (printf "maxmemory %s" .) -}}
