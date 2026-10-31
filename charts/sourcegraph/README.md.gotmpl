@@ -81,6 +81,8 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.terminationGracePeriodSeconds` - override `sourcegraph.terminationGracePeriodSeconds` for this service
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
+- `<serviceName>.extraInitContainers` - add init containers to the pod, which run before any init containers the chart defines
+- `<serviceName>.extraServicePorts` - add ports to the service's primary Service. The OpenTelemetry and Jaeger values are `openTelemetry.gateway.*`, `openTelemetry.agent.extraInitContainers`, `jaeger.extraInitContainers`, `jaeger.collector.extraServicePorts`, and `jaeger.query.extraServicePorts`
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.

@@ -41,6 +41,10 @@ spec:
         app: indexed-search
         deploy: sourcegraph
     spec:
+      {{- with .Values.indexedSearch.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}

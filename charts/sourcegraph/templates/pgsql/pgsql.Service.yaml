@@ -24,6 +24,9 @@ spec:
   - name: pgsql
     port: 5432
     targetPort: pgsql
+  {{- with .Values.pgsql.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: pgsql

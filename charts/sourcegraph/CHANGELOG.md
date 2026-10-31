@@ -8,6 +8,8 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- Added `<serviceName>.extraInitContainers` to every workload, rendered before any init containers the chart defines, so e.g. a secrets-fetching init container on `frontend` runs before `migrator`. Use `restartPolicy: Always` for a native sidecar that must be started before the main container, such as one that writes a `grafana` datasource credential file read by `datasources.yml`.
+- Added `<serviceName>.extraServicePorts` to append ports to each component's primary Service (`sourcegraph-frontend`, `indexed-search`, and `worker`, not `sourcegraph-frontend-internal`, `indexed-search-indexer`, or `worker-executors`), e.g. to expose a sidecar's port
 - Added an `outbound-http-proxy` example, which routes outbound traffic from frontend, worker, and migrator through an HTTP proxy with `HTTP_PROXY`, `HTTPS_PROXY`, and `NO_PROXY`
 - Fixed the `codeintel-db` PersistentVolumeClaim being renamed by `codeIntelDB.name`, which left the StatefulSet pointing at a `codeintel-db` claim that no longer existed and stuck the pod in `Pending`. The PVC is now always named `codeintel-db`, matching the other components and the documented behaviour of `*.name`. If you worked around this by creating a `codeintel-db` PVC by hand, label it `app.kubernetes.io/managed-by: Helm` and annotate it with `meta.helm.sh/release-name` and `meta.helm.sh/release-namespace` before upgrading so Helm can adopt it. [#612](https://github.com/sourcegraph/deploy-sourcegraph-helm/issues/612)
 - Added `indexedSearch.readinessProbe` (`failureThreshold`, `periodSeconds`, `timeoutSeconds`) to tune the `zoekt-webserver` readiness probe, which was previously hardcoded. Defaults are unchanged (`3`/`5`/`5`). Raise `failureThreshold` on instances with large monorepos, where loading a many-shard repo can stall `/healthz` past `timeoutSeconds` and drop a healthy pod out of the `indexed-search` service.
@@ -25,7 +27,6 @@ Use `**BREAKING**:` to denote a breaking change
 - Added a `network-policy` example, which limits Executor and Executor job pods to the frontend API
 - Corrected the external object storage examples to configure the shared store for frontend, worker, precise code intel, syntactic code intel, gitserver, and searcher, including credentials or workload service accounts as required.
 - Removed the unused application ports from the precise and syntactic code intel worker Deployments and Services; health checks and Prometheus metrics continue to use the debug server on port 6060.
-- Added `grafana.initContainers`, so a native sidecar (`restartPolicy: Always`) can be started before `grafana`, e.g. to write a datasource credential file that `datasources.yml` reads with `$__file{}`
 - Added `gitserver.storageAccessModes` (default `["ReadWriteOnce"]`) to allow `["ReadWriteOncePod"]`, which lets Kubernetes mount the repos volume with `-o context` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) instead of recursively relabeling every file on each pod start. Changing this on an existing deployment requires recreating the StatefulSet and PVC, as both fields are immutable.
 - Added configurable pre-shutdown pauses, graceful-shutdown timeouts, and termination grace periods for application services
 - Added optional `syntectServer.podDisruptionBudget` support

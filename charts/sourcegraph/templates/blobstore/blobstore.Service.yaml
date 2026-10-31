@@ -19,6 +19,9 @@ spec:
   - name: http
     port: 9000
     targetPort: http
+  {{- with .Values.blobstore.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: blobstore
