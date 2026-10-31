@@ -65,6 +65,10 @@ spec:
         {{- end }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list $top "worker") | nindent 6 }}
+      {{- with $top.Values.worker.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: worker
         env:

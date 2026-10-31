@@ -44,6 +44,10 @@ spec:
       {{- if .Values.nodeExporter.serviceAccount.create }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "nodeExporter") | trim | nindent 6 }}
       {{- end }}
+      {{- with .Values.nodeExporter.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: node-exporter
         image: {{ include "sourcegraph.image" (list . "nodeExporter" ) }}

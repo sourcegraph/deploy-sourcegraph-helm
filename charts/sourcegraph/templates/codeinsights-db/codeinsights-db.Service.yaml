@@ -24,6 +24,9 @@ spec:
   - name: codeinsights-db
     port: 5432
     targetPort: codeinsights-db
+  {{- with .Values.codeInsightsDB.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: codeinsights-db

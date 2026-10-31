@@ -24,6 +24,9 @@ spec:
   - name: redis
     port: 6379
     targetPort: redis
+  {{- with .Values.redisStore.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: redis-store

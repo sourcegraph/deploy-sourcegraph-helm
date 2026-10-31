@@ -47,6 +47,10 @@ spec:
         app: syntactic-code-intel-worker
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntacticCodeIntel") | nindent 6 }}
+      {{- with .Values.syntacticCodeIntel.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: syntactic-code-intel-worker
         env:

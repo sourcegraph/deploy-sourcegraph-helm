@@ -43,6 +43,10 @@ spec:
         deploy: sourcegraph
         app: blobstore
     spec:
+      {{- with .Values.blobstore.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: blobstore
         env:

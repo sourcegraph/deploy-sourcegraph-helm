@@ -49,6 +49,10 @@ spec:
         deploy: sourcegraph
         app: redis-store
     spec:
+      {{- with .Values.redisStore.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: redis-store
         image: {{ include "sourcegraph.image" (list . "redisStore") }}

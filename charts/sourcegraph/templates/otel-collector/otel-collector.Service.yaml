@@ -29,6 +29,9 @@ spec:
       port: 4318
       protocol: TCP
       targetPort: http-otlp
+  {{- with .Values.openTelemetry.gateway.extraServicePorts }}
+  {{- toYaml . | nindent 4 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: otel-collector
