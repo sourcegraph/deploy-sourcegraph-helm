@@ -43,6 +43,10 @@ spec:
         app: cadvisor
     spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "cadvisor") | trim | nindent 6 }}
+      {{- with .Values.cadvisor.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: cadvisor
         image: {{ include "sourcegraph.image" (list . "cadvisor" ) }}

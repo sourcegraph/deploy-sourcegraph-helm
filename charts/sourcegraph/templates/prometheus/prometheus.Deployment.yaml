@@ -43,6 +43,10 @@ spec:
         deploy: sourcegraph
         app: prometheus
     spec:
+      {{- with .Values.prometheus.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: prometheus
         image: {{ include "sourcegraph.image" (list . "prometheus") }}

@@ -81,6 +81,8 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.terminationGracePeriodSeconds` - override `sourcegraph.terminationGracePeriodSeconds` for this service
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
+- `<serviceName>.extraInitContainers` - add init containers to the pod, which run before any init containers the chart defines
+- `<serviceName>.extraServicePorts` - add ports to the service's primary Service. The OpenTelemetry and Jaeger values are `openTelemetry.gateway.*`, `openTelemetry.agent.extraInitContainers`, `jaeger.extraInitContainers`, `jaeger.collector.extraServicePorts`, and `jaeger.query.extraServicePorts`
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
@@ -208,7 +210,6 @@ In addition to the documented values, all services also support the following va
 | grafana.existingConfig | string | `""` | Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key. |
 | grafana.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `grafana` image |
 | grafana.image.name | string | `"grafana"` | Docker image name for the `grafana` image |
-| grafana.initContainers | list | `[]` | Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml` |
 | grafana.name | string | `"grafana"` | Name used by resources. Does not affect service names or PVCs. |
 | grafana.podSecurityContext | object | `{"fsGroup":472,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | grafana.resources | object | `{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests & limits for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |

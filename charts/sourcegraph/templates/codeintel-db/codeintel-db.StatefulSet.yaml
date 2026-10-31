@@ -44,6 +44,9 @@ spec:
         group: backend
     spec:
       initContainers:
+      {{- with .Values.codeIntelDB.extraInitContainers }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       - name: correct-data-dir-permissions
         image: {{ include "sourcegraph.image" (list . "alpine") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}

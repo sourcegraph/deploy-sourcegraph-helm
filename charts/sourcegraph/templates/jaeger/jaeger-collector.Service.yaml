@@ -25,6 +25,9 @@ spec:
     port: 4317
     protocol: TCP
     targetPort: grpc-otlp
+  {{- with .Values.jaeger.collector.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/instance: {{ .Release.Name }}

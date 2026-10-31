@@ -44,6 +44,10 @@ spec:
         deploy: sourcegraph
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "gitserver") | nindent 6 }}
+      {{- with .Values.gitserver.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: gitserver
         args: {{- default (list "run") .Values.gitserver.args | toYaml | nindent 8 }}

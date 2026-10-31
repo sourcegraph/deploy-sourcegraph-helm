@@ -42,7 +42,7 @@ spec:
         app: grafana
         deploy: sourcegraph
     spec:
-      {{- with .Values.grafana.initContainers }}
+      {{- with .Values.grafana.extraInitContainers }}
       initContainers:
         {{- toYaml . | nindent 6 }}
       {{- end }}

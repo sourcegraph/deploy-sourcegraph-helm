@@ -49,6 +49,9 @@ spec:
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "frontend") | nindent 6 }}
       initContainers:
+      {{- with .Values.frontend.extraInitContainers }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       {{- if .Values.migrator.enabled }}
       - name: migrator
         image: {{ include "sourcegraph.image" (list . "migrator") }}
