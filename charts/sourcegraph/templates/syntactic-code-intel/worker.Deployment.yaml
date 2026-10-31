@@ -46,6 +46,10 @@ spec:
         deploy: sourcegraph
         app: syntactic-code-intel-worker
     spec:
+      {{- $storageType := .Values.syntacticCodeIntel.storageType | default "emptyDir" }}
+      {{- if not (has $storageType (list "emptyDir" "pvc")) }}
+      {{- fail (printf "syntacticCodeIntel.storageType must be one of emptyDir, pvc; got %q" $storageType) }}
+      {{- end }}
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntacticCodeIntel") | nindent 6 }}
       containers:
       - name: syntactic-code-intel-worker
@@ -105,8 +109,13 @@ spec:
       {{- if .Values.syntacticCodeIntel.extraContainers }}
         {{- toYaml .Values.syntacticCodeIntel.extraContainers | nindent 6 }}
       {{- end }}
+      {{- $podSecurityContext := deepCopy .Values.syntacticCodeIntel.podSecurityContext }}
+      {{- if eq $storageType "pvc" }}
+      {{- /* A freshly provisioned volume is root-owned, so the non-root worker needs fsGroup to write /tmp. */}}
+      {{- $podSecurityContext = merge $podSecurityContext (dict "fsGroup" (.Values.syntacticCodeIntel.containerSecurityContext.runAsGroup | default 101) "fsGroupChangePolicy" "OnRootMismatch") }}
+      {{- end }}
       securityContext:
-        {{- toYaml .Values.syntacticCodeIntel.podSecurityContext | nindent 8 }}
+        {{- toYaml $podSecurityContext | nindent 8 }}
       {{- include "sourcegraph.nodeSelector" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "syntacticCodeIntel" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "syntacticCodeIntel" ) | trim }}{{ . | nindent 6 }}{{- end }}
@@ -118,7 +127,24 @@ spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "syntacticCodeIntel") | trim | nindent 6 }}
       volumes:
       - name: tmpdir
+        {{- if eq $storageType "pvc" }}
+        ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: {{ required "syntacticCodeIntel.storageSize is required when syntacticCodeIntel.storageType is pvc" .Values.syntacticCodeIntel.storageSize }}
+              {{- with .Values.syntacticCodeIntel.storageClassName }}
+              storageClassName: {{ . }}
+              {{- end }}
+        {{- else if .Values.syntacticCodeIntel.storageSize }}
+        emptyDir:
+          sizeLimit: {{ .Values.syntacticCodeIntel.storageSize }}
+        {{- else }}
         emptyDir: {}
+        {{- end }}
       {{- if .Values.syntacticCodeIntel.extraVolumes }}
       {{- toYaml .Values.syntacticCodeIntel.extraVolumes | nindent 6 }}
       {{- end }}
