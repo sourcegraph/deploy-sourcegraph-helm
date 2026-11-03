@@ -30,7 +30,7 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: redis-cache
         {{- if and .Values.redisCache.config.enabled (not .Values.redisCache.config.existingConfig) }}
-        checksum/redis-config: {{ include (print $.Template.BasePath "/redis/redis-cache.ConfigMap.yaml") . | sha256sum }}
+        checksum/redis-config: {{ include "sourcegraph.redis.conf" (list . "redisCache") | sha256sum }}
         {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}

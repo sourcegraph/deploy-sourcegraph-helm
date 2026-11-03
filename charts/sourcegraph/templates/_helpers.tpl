@@ -369,6 +369,40 @@ Resolution order:
 {{- end -}}
 
 {{/*
+Render the effective redis.conf for a service: the vendored file plus the
+chart-managed directives.
+Usage: include "sourcegraph.redis.conf" (list . "redisCache")
+
+The redis Deployments hash this output for their checksum/redis-config
+annotation, so it must depend only on the config, never on release metadata
+such as the chart version; otherwise every upgrade restarts redis.
+*/}}
+{{- define "sourcegraph.redis.conf" -}}
+{{- $top := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $config := (index $top.Values $service).config -}}
+{{- $dir := kebabcase $service -}}
+{{- $body := $top.Files.Get (printf "files/%s/redis.conf" $dir) | trimSuffix "\n" -}}
+{{- if not $body -}}
+{{- fail (printf "no vendored redis.conf found at files/%s/redis.conf for service %s" $dir $service) -}}
+{{- end -}}
+{{- $overrides := list -}}
+{{- with include "sourcegraph.redis.maxmemory" (list $top $service) -}}
+{{- $overrides = append $overrides (printf "maxmemory %s" .) -}}
+{{- end -}}
+{{- with $config.maxmemoryPolicy -}}
+{{- $overrides = append $overrides (printf "maxmemory-policy %s" .) -}}
+{{- end -}}
+{{- with $config.additionalConfig -}}
+{{- $overrides = append $overrides (tpl . $top | trim) -}}
+{{- end -}}
+{{- if $overrides -}}
+{{- $body = printf "%s\n\n# Chart-managed directives. Redis applies the last occurrence of a directive.\n%s" $body (join "\n" $overrides) -}}
+{{- end -}}
+{{- $body -}}
+{{- end -}}
+
+{{/*
 Fail the render when a service's extra volumes or volume mounts collide with the
 chart-managed redis config mount. Without this the collision only surfaces as an
 opaque "must be unique" rejection from the API server.

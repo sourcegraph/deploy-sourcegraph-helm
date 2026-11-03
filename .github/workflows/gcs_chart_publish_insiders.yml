@@ -37,7 +37,7 @@ jobs:
 
       - name: Get metadata
         id: metadata
-        uses: contiamo/git-metadata-action@main
+        uses: contiamo/git-metadata-action@ffa552f54259c47a639463dc60443a24bfd027d5 # main as of 2026-10-30
 
       - name: Install helm-gcs
         run: helm plugin install https://github.com/hayorov/helm-gcs.git --version ${{ env.HELM_GCS_VERSION }}
