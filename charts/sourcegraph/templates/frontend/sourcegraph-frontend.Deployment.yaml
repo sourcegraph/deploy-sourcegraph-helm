@@ -99,12 +99,6 @@ spec:
         {{- end }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
-        {{- if .Values.blobstore.enabled }}
-        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
-          value: blobstore
-        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
-          value: http://blobstore:9000
-        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:
