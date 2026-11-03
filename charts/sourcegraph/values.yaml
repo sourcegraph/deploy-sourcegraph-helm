@@ -965,6 +965,22 @@ syntacticCodeIntel:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Backing store for the `/tmp` scratch volume, used for indexing.
+  # One of: emptyDir, pvc.
+  # emptyDir: node ephemeral storage, i.e. the node boot disk.
+  # pvc: per-pod PVC, discarded with the pod. The pod `fsGroup` defaults to the
+  # container `runAsGroup` so the non-root worker can write to the volume; set
+  # `podSecurityContext.fsGroup` to override it.
+  storageType: emptyDir
+  # -- Size of the `/tmp` scratch volume. Required when storageType is `pvc`.
+  # When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty
+  # for unlimited).
+  storageSize: ""
+  # -- StorageClass for the `/tmp` scratch PVC when storageType is `pvc`.
+  # Empty uses the cluster default class. The claim is per-pod and discarded
+  # with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass`
+  # is `Retain` for stateful data and is not used here.
+  storageClassName: ""
 
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container

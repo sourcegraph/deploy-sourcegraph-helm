@@ -1,0 +1,154 @@
+---
+suite: syntacticCodeIntelStorage
+templates:
+- syntactic-code-intel/worker.Deployment.yaml
+set:
+  syntacticCodeIntel:
+    enabled: true
+tests:
+- it: should back tmpdir with a plain emptyDir by default
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir: {}
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        mountPath: /tmp
+        name: tmpdir
+
+- it: should set sizeLimit when storageSize is set on the emptyDir branch
+  set:
+    syntacticCodeIntel:
+      storageType: emptyDir
+      storageSize: 20Gi
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir:
+          sizeLimit: 20Gi
+
+- it: should back tmpdir with a per-pod PVC when storageType=pvc
+  set:
+    syntacticCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        ephemeral:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 50Gi
+  # /tmp mount is unchanged, so no TMPDIR redirect is needed
+  - contains:
+      path: spec.template.spec.containers[0].volumeMounts
+      content:
+        mountPath: /tmp
+        name: tmpdir
+
+# The per-pod claim needs a Delete-policy class; storageClass is Retain.
+- it: should omit storageClassName by default so the cluster default class is used
+  set:
+    syntacticCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - notExists:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
+
+- it: should not inherit storageClass.name
+  set:
+    storageClass:
+      name: custom-ssd
+    syntacticCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - notExists:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
+
+- it: should use syntacticCodeIntel.storageClassName when set
+  set:
+    storageClass:
+      name: custom-ssd
+    syntacticCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+      storageClassName: premium-rwo
+  asserts:
+  - equal:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
+      value: premium-rwo
+
+- it: should fail when storageSize is omitted on the pvc branch
+  set:
+    syntacticCodeIntel:
+      storageType: pvc
+  asserts:
+  - failedTemplate:
+      errorMessage: syntacticCodeIntel.storageSize is required when syntacticCodeIntel.storageType is pvc
+
+- it: should fall back to emptyDir when storageType is absent
+  set:
+    syntacticCodeIntel:
+      storageType: null
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir: {}
+
+- it: should fail on an unknown storageType
+  set:
+    syntacticCodeIntel:
+      storageType: PVC
+      storageSize: 50Gi
+  asserts:
+  - failedTemplate:
+      errorMessage: 'syntacticCodeIntel.storageType must be one of emptyDir, pvc; got "PVC"'
+
+- it: should leave the pod securityContext untouched on the emptyDir branch
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value: {}
+
+- it: should set fsGroup to the container runAsGroup on the pvc branch so /tmp is writable
+  set:
+    syntacticCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value:
+        fsGroup: 101
+        fsGroupChangePolicy: OnRootMismatch
+
+- it: should keep a user-set fsGroup and other podSecurityContext fields on the pvc branch
+  set:
+    syntacticCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+      podSecurityContext:
+        fsGroup: 2000
+        runAsNonRoot: true
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value:
+        fsGroup: 2000
+        fsGroupChangePolicy: OnRootMismatch
+        runAsNonRoot: true
