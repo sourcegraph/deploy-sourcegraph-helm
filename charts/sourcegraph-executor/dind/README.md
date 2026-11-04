@@ -66,7 +66,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | dind.gVisor.securityContext | object | `{"capabilities":{"add":["NET_ADMIN","SYS_ADMIN","AUDIT_WRITE","CHOWN","DAC_OVERRIDE","FOWNER","FSETID","KILL","MKNOD","NET_BIND_SERVICE","NET_RAW","SETFCAP","SETGID","SETPCAP","SETUID","SYS_CHROOT","SYS_PTRACE"]}}` | securityContext for the dind container when gVisor is enabled. Replaces privileged: true — gVisor intercepts these capabilities in-sandbox and never grants them to the host kernel. |
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
-| dind.image.tag | string | `"29.5.3-dind"` |  |
+| dind.image.tag | string | `"29.9.1-dind"` |  |
 | executor.env | object | `{}` | Extra environment variables to set on the executor container. |
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password. The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value. frontendPassword is ignored if this is set. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured. |
