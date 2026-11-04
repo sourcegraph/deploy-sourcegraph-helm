@@ -72,12 +72,12 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.kubernetesJob.deadline | string | `"1200"` | The number of seconds after which a Kubernetes job will be terminated. |
 | executor.kubernetesJob.fsGroup | string | `"1000"` | The group ID which is set on the job PVC file system. |
 | executor.kubernetesJob.node.name | string | `""` | The name of the Kubernetes Node to create job pods on. If not specified, the pods are created on the first available node. |
-| executor.kubernetesJob.node.requiredAffinityMatchExpressions | string | `""` | The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]' |
-| executor.kubernetesJob.node.requiredAffinityMatchFields | string | `""` | The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]' |
+| executor.kubernetesJob.node.requiredAffinityMatchExpressions | string | `""` | Required node affinity match expressions for Kubernetes Jobs, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]`. A pre-escaped JSON string is also accepted. |
+| executor.kubernetesJob.node.requiredAffinityMatchFields | string | `""` | Required node affinity match fields for Kubernetes Jobs, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]`. A pre-escaped JSON string is also accepted. |
 | executor.kubernetesJob.node.selector | string | `""` | A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app` |
-| executor.kubernetesJob.node.tolerations | string | `""` | The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]' |
-| executor.kubernetesJob.pod.affinity | string | `""` | The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]' |
-| executor.kubernetesJob.pod.antiAffinity | string | `""` | The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]' |
+| executor.kubernetesJob.node.tolerations | string | `""` | Tolerations for Kubernetes Jobs, as a YAML list. e.g. `[{key: foo, operator: Equal, value: bar, effect: NoSchedule}]`. A pre-escaped JSON string is also accepted. |
+| executor.kubernetesJob.pod.affinity | string | `""` | Pod affinity terms for Kubernetes Jobs, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`. A pre-escaped JSON string is also accepted. |
+| executor.kubernetesJob.pod.antiAffinity | string | `""` | Pod anti-affinity terms for Kubernetes Jobs, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`. A pre-escaped JSON string is also accepted. |
 | executor.kubernetesJob.resources.limits.cpu | string | `""` | The maximum CPU for a job. |
 | executor.kubernetesJob.resources.limits.memory | string | `"12Gi"` | The maximum memory for a job. |
 | executor.kubernetesJob.resources.requests.cpu | string | `""` | The requested CPU for a job. |

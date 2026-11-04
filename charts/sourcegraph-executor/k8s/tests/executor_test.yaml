@@ -125,3 +125,81 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should JSON-encode kubernetesJob JSON fields given as YAML lists (issue #349)
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations:
+              - key: foo
+                operator: Equal
+                value: bar
+                effect: NoSchedule
+            requiredAffinityMatchExpressions:
+              - key: foo
+                operator: In
+                values: [bar]
+            requiredAffinityMatchFields:
+              - key: metadata.name
+                operator: In
+                values: [node-1]
+          pod:
+            affinity:
+              - labelSelector:
+                  matchExpressions:
+                    - key: foo
+                      operator: In
+                      values: [bar]
+                topologyKey: kubernetes.io/hostname
+            antiAffinity:
+              - labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values: [executor]
+                topologyKey: kubernetes.io/hostname
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"effect":"NoSchedule","key":"foo","operator":"Equal","value":"bar"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_EXPRESSIONS
+          value: '[{"key":"foo","operator":"In","values":["bar"]}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_FIELDS
+          value: '[{"key":"metadata.name","operator":"In","values":["node-1"]}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_AFFINITY
+          value: '[{"labelSelector":{"matchExpressions":[{"key":"foo","operator":"In","values":["bar"]}]},"topologyKey":"kubernetes.io/hostname"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY
+          value: '[{"labelSelector":{"matchExpressions":[{"key":"app","operator":"In","values":["executor"]}]},"topologyKey":"kubernetes.io/hostname"}]'
+
+  - it: should pass through kubernetesJob JSON fields given as pre-escaped JSON strings
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations: '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]'
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"key":"foo","operator":"Equal","value":"bar","effect":"NoSchedule"}]'
+
+  - it: should render default kubernetesJob JSON fields as empty strings
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: ""
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY
+          value: ""
