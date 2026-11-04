@@ -19,6 +19,9 @@ spec:
   - name: http
     port: 30090
     targetPort: http
+  {{- with .Values.prometheus.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: prometheus

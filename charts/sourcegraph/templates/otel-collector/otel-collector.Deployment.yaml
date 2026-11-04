@@ -41,6 +41,10 @@ spec:
         deploy: sourcegraph
         app: otel-collector
     spec:
+      {{- with .Values.openTelemetry.gateway.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: otel-collector
         image: {{ include "sourcegraph.image" (list . "openTelemetry") }}

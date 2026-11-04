@@ -52,6 +52,10 @@ spec:
         deploy: sourcegraph
         app.kubernetes.io/component: all-in-one
     spec:
+      {{- with .Values.jaeger.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: jaeger
         image: {{ include "sourcegraph.image" (list . "jaeger") }}

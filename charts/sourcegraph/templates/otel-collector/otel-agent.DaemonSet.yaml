@@ -39,6 +39,10 @@ spec:
         deploy: sourcegraph
         app: otel-agent
     spec:
+      {{- with .Values.openTelemetry.agent.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: otel-agent
         image: {{ include "sourcegraph.image" (list . "openTelemetry") }}

@@ -51,6 +51,10 @@ spec:
       {{- fail (printf "syntacticCodeIntel.storageType must be one of emptyDir, pvc; got %q" $storageType) }}
       {{- end }}
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntacticCodeIntel") | nindent 6 }}
+      {{- with .Values.syntacticCodeIntel.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: syntactic-code-intel-worker
         env:

@@ -1,0 +1,169 @@
+suite: extraInitContainers and extraServicePorts
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+set:
+  jaeger:
+    enabled: true
+  syntacticCodeIntel:
+    enabled: true
+tests:
+- it: should render extraInitContainers first on every workload
+  templates:
+  - blobstore/blobstore.Deployment.yaml
+  - cadvisor/cadvisor.DaemonSet.yaml
+  - codeinsights-db/codeinsights-db.StatefulSet.yaml
+  - codeintel-db/codeintel-db.StatefulSet.yaml
+  - frontend/sourcegraph-frontend.Deployment.yaml
+  - gitserver/gitserver.StatefulSet.yaml
+  - grafana/grafana.StatefulSet.yaml
+  - indexed-search/indexed-search.StatefulSet.yaml
+  - jaeger/jaeger.Deployment.yaml
+  - node-exporter/node-exporter.DaemonSet.yaml
+  - otel-collector/otel-agent.DaemonSet.yaml
+  - otel-collector/otel-collector.Deployment.yaml
+  - pgsql/pgsql.StatefulSet.yaml
+  - precise-code-intel/worker.Deployment.yaml
+  - prometheus/prometheus.Deployment.yaml
+  - redis/redis-cache.Deployment.yaml
+  - redis/redis-store.Deployment.yaml
+  - searcher/searcher.StatefulSet.yaml
+  - syntactic-code-intel/worker.Deployment.yaml
+  - syntect-server/syntect-server.Deployment.yaml
+  - worker/worker.Deployment.yaml
+  set:
+    blobstore.extraInitContainers: &initContainers
+    - name: vault-init
+      image: vault-sidecar:0.12.4
+    cadvisor.extraInitContainers: *initContainers
+    codeInsightsDB.extraInitContainers: *initContainers
+    codeIntelDB.extraInitContainers: *initContainers
+    frontend.extraInitContainers: *initContainers
+    gitserver.extraInitContainers: *initContainers
+    grafana.extraInitContainers: *initContainers
+    indexedSearch.extraInitContainers: *initContainers
+    jaeger.extraInitContainers: *initContainers
+    nodeExporter.extraInitContainers: *initContainers
+    openTelemetry.agent.extraInitContainers: *initContainers
+    openTelemetry.gateway.extraInitContainers: *initContainers
+    pgsql.extraInitContainers: *initContainers
+    preciseCodeIntel.extraInitContainers: *initContainers
+    prometheus.extraInitContainers: *initContainers
+    redisCache.extraInitContainers: *initContainers
+    redisStore.extraInitContainers: *initContainers
+    searcher.extraInitContainers: *initContainers
+    syntacticCodeIntel.extraInitContainers: *initContainers
+    syntectServer.extraInitContainers: *initContainers
+    worker.extraInitContainers: *initContainers
+  asserts:
+  - equal:
+      path: spec.template.spec.initContainers[0].name
+      value: vault-init
+  - equal:
+      path: spec.template.spec.initContainers[0].image
+      value: vault-sidecar:0.12.4
+  - equal:
+      path: spec.template.spec.initContainers[1].name
+      value: migrator
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+  - equal:
+      path: spec.template.spec.initContainers[1].name
+      value: correct-data-dir-permissions
+    template: pgsql/pgsql.StatefulSet.yaml
+  - equal:
+      path: spec.template.spec.initContainers[1].name
+      value: correct-data-dir-permissions
+    template: codeintel-db/codeintel-db.StatefulSet.yaml
+  - equal:
+      path: spec.template.spec.initContainers[1].name
+      value: correct-data-dir-permissions
+    template: codeinsights-db/codeinsights-db.StatefulSet.yaml
+
+- it: should not render initContainers by default on workloads without chart-defined init containers
+  templates:
+  - gitserver/gitserver.StatefulSet.yaml
+  - grafana/grafana.StatefulSet.yaml
+  - otel-collector/otel-collector.Deployment.yaml
+  - worker/worker.Deployment.yaml
+  asserts:
+  - notExists:
+      path: spec.template.spec.initContainers
+
+- it: should append extraServicePorts to every primary Service
+  templates:
+  - blobstore/blobstore.Service.yaml
+  - codeinsights-db/codeinsights-db.Service.yaml
+  - codeintel-db/codeintel-db.Service.yaml
+  - frontend/sourcegraph-frontend.Service.yaml
+  - gitserver/gitserver.Service.yaml
+  - grafana/grafana.Service.yaml
+  - indexed-search/indexed-search.Service.yaml
+  - jaeger/jaeger-collector.Service.yaml
+  - jaeger/jaeger-query.Service.yaml
+  - node-exporter/node-exporter.Service.yaml
+  - otel-collector/otel-collector.Service.yaml
+  - pgsql/pgsql.Service.yaml
+  - precise-code-intel/worker.Service.yaml
+  - prometheus/prometheus.Service.yaml
+  - redis/redis-cache.Service.yaml
+  - redis/redis-store.Service.yaml
+  - searcher/searcher.Service.yaml
+  - syntactic-code-intel/worker.Service.yaml
+  - syntect-server/syntect-server.Service.yaml
+  - worker/worker.Service.yaml
+  set:
+    blobstore.extraServicePorts: &servicePorts
+    - name: service-http
+      port: 80
+      targetPort: 8080
+    codeInsightsDB.extraServicePorts: *servicePorts
+    codeIntelDB.extraServicePorts: *servicePorts
+    frontend.extraServicePorts: *servicePorts
+    gitserver.extraServicePorts: *servicePorts
+    grafana.extraServicePorts: *servicePorts
+    indexedSearch.extraServicePorts: *servicePorts
+    jaeger.collector.extraServicePorts: *servicePorts
+    jaeger.query.extraServicePorts: *servicePorts
+    nodeExporter.extraServicePorts: *servicePorts
+    openTelemetry.gateway.extraServicePorts: *servicePorts
+    pgsql.extraServicePorts: *servicePorts
+    preciseCodeIntel.extraServicePorts: *servicePorts
+    prometheus.extraServicePorts: *servicePorts
+    redisCache.extraServicePorts: *servicePorts
+    redisStore.extraServicePorts: *servicePorts
+    searcher.extraServicePorts: *servicePorts
+    syntacticCodeIntel.extraServicePorts: *servicePorts
+    syntectServer.extraServicePorts: *servicePorts
+    worker.extraServicePorts: *servicePorts
+  asserts:
+  - contains:
+      path: spec.ports
+      content:
+        name: service-http
+        port: 80
+        targetPort: 8080
+  - lengthEqual:
+      path: spec.ports
+      count: 3
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - lengthEqual:
+      path: spec.ports
+      count: 4
+    template: otel-collector/otel-collector.Service.yaml
+
+- it: should leave secondary Services unchanged when extraServicePorts is set
+  templates:
+  - frontend/sourcegraph-frontend-internal.Service.yaml
+  - indexed-search/indexed-search.IndexerService.yaml
+  - worker/worker-executors.Service.yaml
+  set:
+    frontend.extraServicePorts: &secondaryPorts
+    - name: service-http
+      port: 80
+      targetPort: 8080
+    indexedSearch.extraServicePorts: *secondaryPorts
+    worker.extraServicePorts: *secondaryPorts
+  asserts:
+  - lengthEqual:
+      path: spec.ports
+      count: 1

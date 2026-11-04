@@ -44,6 +44,10 @@ spec:
         app: searcher
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "searcher") | nindent 6 }}
+      {{- with .Values.searcher.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: searcher
         {{- with .Values.searcher.args }}

@@ -46,6 +46,10 @@ spec:
         app: syntect-server
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntectServer") | nindent 6 }}
+      {{- with .Values.syntectServer.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: syntect-server
         env:

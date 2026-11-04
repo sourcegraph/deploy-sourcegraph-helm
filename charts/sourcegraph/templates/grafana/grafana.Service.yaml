@@ -19,6 +19,9 @@ spec:
   - name: http
     port: 30070
     targetPort: http
+  {{- with .Values.grafana.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
     app: grafana

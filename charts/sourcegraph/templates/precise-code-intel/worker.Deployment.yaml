@@ -50,6 +50,10 @@ spec:
       {{- fail (printf "preciseCodeIntel.storageType must be one of emptyDir, pvc; got %q" $storageType) }}
       {{- end }}
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "preciseCodeIntel") | nindent 6 }}
+      {{- with .Values.preciseCodeIntel.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: precise-code-intel-worker
         env:

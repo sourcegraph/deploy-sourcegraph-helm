@@ -49,6 +49,10 @@ spec:
         deploy: sourcegraph
         app: redis-cache
     spec:
+      {{- with .Values.redisCache.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: redis-cache
         image: {{ include "sourcegraph.image" (list . "redisCache") }}
