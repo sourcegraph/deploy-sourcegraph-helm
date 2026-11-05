@@ -37,6 +37,8 @@ data:
   KUBERNETES_RUN_AS_USER: "{{ .Values.executor.kubernetesJob.runAsUser }}"
   KUBERNETES_RUN_AS_GROUP: "{{ .Values.executor.kubernetesJob.runAsGroup }}"
   KUBERNETES_FS_GROUP: "{{ .Values.executor.kubernetesJob.fsGroup }}"
+  KUBERNETES_JOB_SERVICE_ACCOUNT_NAME: "{{ .Values.executor.kubernetesJob.serviceAccount.name }}"
+  KUBERNETES_JOB_AUTOMOUNT_SERVICE_ACCOUNT_TOKEN: "{{ .Values.executor.kubernetesJob.serviceAccount.automountToken }}"
 
   EXECUTOR_DOCKER_ADD_HOST_GATEWAY: "{{.Values.executor.dockerAddHostGateway }}"
   KUBERNETES_KEEP_JOBS: "{{ .Values.executor.debug.keepJobs }}"
