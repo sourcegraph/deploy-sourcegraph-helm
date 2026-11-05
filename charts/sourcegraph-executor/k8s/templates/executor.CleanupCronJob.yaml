@@ -1,0 +1,72 @@
+{{- if .Values.executor.cleanup.enabled }}
+{{- if lt (int .Values.executor.cleanup.minimumAgeSeconds) (int .Values.executor.kubernetesJob.deadline) }}
+{{- fail "executor.cleanup.minimumAgeSeconds must be greater than executor.kubernetesJob.deadline, so resources of running jobs are never deleted" }}
+{{- end }}
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "executor.name" . }}-cleanup
+  annotations:
+    description: Deletes leftover executor job resources, which the executor could not tear down because it was killed mid-job
+  labels:
+    {{- include "executor.labels" . | nindent 4 }}
+spec:
+  schedule: {{ .Values.executor.cleanup.schedule | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 600
+      template:
+        metadata:
+          labels:
+            {{- include "executor.labels" . | nindent 12 }}
+        spec:
+          serviceAccountName: sg-executor
+          restartPolicy: OnFailure
+          containers:
+            - name: cleanup
+              image: {{ .Values.executor.cleanup.image }}
+              imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+              env:
+                - name: NAMESPACE
+                  value: {{ .Values.executor.namespace | quote }}
+                - name: MINIMUM_AGE_SECONDS
+                  value: {{ .Values.executor.cleanup.minimumAgeSeconds | quote }}
+              command:
+                - /bin/sh
+                - -eu
+                - -c
+                - |
+                  now_seconds=$(date -u +%s)
+                  sweep() {
+                    kind=$1
+                    kubectl get "$kind" --namespace "$NAMESPACE" \
+                      --output 'jsonpath={range .items[*]}{.metadata.name} {.metadata.creationTimestamp}{"\n"}{end}' \
+                    | while read -r name created_at; do
+                        case "$name" in sg-executor-job-*) ;; *) continue ;; esac
+                        created_seconds=$(date -u -D '%Y-%m-%dT%H:%M:%SZ' -d "$created_at" +%s)
+                        if [ $((now_seconds - created_seconds)) -ge "$MINIMUM_AGE_SECONDS" ]; then
+                          echo "deleting $kind/$name, created at $created_at"
+                          kubectl delete "$kind" "$name" --namespace "$NAMESPACE" --ignore-not-found
+                        fi
+                      done
+                  }
+                  sweep jobs
+                  sweep secrets
+                  sweep persistentvolumeclaims
+              {{- if not .Values.sourcegraph.localDevMode }}
+              resources:
+                requests:
+                  cpu: 10m
+                  memory: 32Mi
+                limits:
+                  cpu: 100m
+                  memory: 128Mi
+              {{- end }}
+          {{- with .Values.sourcegraph.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+{{- end }}
