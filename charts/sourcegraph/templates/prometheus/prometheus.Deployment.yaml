@@ -97,6 +97,7 @@ spec:
       {{- include "sourcegraph.nodeSelector" (list . "prometheus" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "prometheus" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "prometheus" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- with include "sourcegraph.runtimeClassName" (list . "prometheus" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "prometheus" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

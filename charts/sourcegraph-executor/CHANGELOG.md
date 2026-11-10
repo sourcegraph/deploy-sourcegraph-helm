@@ -3,6 +3,9 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+* Added `sourcegraph.runtimeClassName` to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, to assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to their pods, with `executor.runtimeClassName` and `privateDockerRegistry.runtimeClassName` overrides. In the `sourcegraph-executor-dind` chart, either one replaces the `gvisor` default of `dind.gVisor.enabled`.
+* Added `executor.kubernetesJob.runtimeClassName` to the `sourcegraph-executor-k8s` chart, to assign a RuntimeClass to job pods (`EXECUTOR_KUBERNETES_RUNTIME_CLASS`), e.g. to run them in a sandbox. Job pods do not inherit `sourcegraph.runtimeClassName`.
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.

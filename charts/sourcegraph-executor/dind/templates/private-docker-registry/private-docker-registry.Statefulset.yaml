@@ -78,6 +78,7 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with include "sourcegraph.priorityClassName" (list . "privateDockerRegistry") | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- with include "sourcegraph.runtimeClassName" (list . "privateDockerRegistry") | trim }}{{ . | nindent 6 }}{{- end }}
       {{- with .Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}

@@ -45,3 +45,41 @@ tests:
           apiVersion: apps/v1
           name: executor-batches
         documentIndex: 1
+
+  - it: should not set runtimeClassName by default
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+    asserts:
+      - notExists:
+          path: spec.template.spec.runtimeClassName
+
+  - it: should default runtimeClassName to gvisor when gVisor is enabled
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+      dind:
+        gVisor:
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: gvisor
+
+  - it: should prefer executor.runtimeClassName over the global one and the gVisor default
+    template: executor/executor.Deployment.yaml
+    set:
+      sourcegraph:
+        runtimeClassName: global-class
+      executor:
+        queueName: batches
+        runtimeClassName: executor-class
+      dind:
+        gVisor:
+          enabled: true
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: executor-class

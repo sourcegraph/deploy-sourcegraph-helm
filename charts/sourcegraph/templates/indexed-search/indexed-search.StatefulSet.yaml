@@ -139,6 +139,7 @@ spec:
       {{- include "sourcegraph.nodeSelector" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "indexedSearch" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- with include "sourcegraph.runtimeClassName" (list . "indexedSearch" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "indexedSearch" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

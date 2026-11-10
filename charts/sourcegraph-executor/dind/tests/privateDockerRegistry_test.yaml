@@ -26,3 +26,13 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should fall back to the global runtimeClassName
+    template: private-docker-registry/private-docker-registry.Statefulset.yaml
+    set:
+      sourcegraph:
+        runtimeClassName: global-class
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: global-class

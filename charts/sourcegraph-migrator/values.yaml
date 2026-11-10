@@ -33,6 +33,9 @@ sourcegraph:
   podLabels: {}
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to all pods, e.g. to run them in a sandbox.
+  # Override it per service with `<serviceName>.runtimeClassName`; set that to `""` to keep a service on the cluster default runtime
+  runtimeClassName: ""
 
 
 # Generic application configuration options, used by most applications below

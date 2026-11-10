@@ -97,6 +97,7 @@ In addition to the documented values, the `migrator` service also supports the f
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
+| sourcegraph.runtimeClassName | string | `""` | Assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to all pods, e.g. to run them in a sandbox. Override it per service with `<serviceName>.runtimeClassName`; set that to `""` to keep a service on the cluster default runtime |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 
 ## Troubleshooting

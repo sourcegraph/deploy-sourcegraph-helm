@@ -36,6 +36,9 @@ sourcegraph:
   podLabels: {}
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to all pods, e.g. to run them in a sandbox.
+  # Override it per service with `<serviceName>.runtimeClassName`; set that to `""` to keep a service on the cluster default runtime
+  runtimeClassName: ""
   # -- Global deployment clean up policy,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy)
   revisionHistoryLimit: 10
@@ -80,6 +83,8 @@ sourcegraph:
 #   resources: {}
 #   containerSecurityContext: {}
 #   podSecurityContext: {}
+#   # Override the global sourcegraph.runtimeClassName; "" keeps the cluster default runtime
+#   runtimeClassName: ""
 #   # Add additional volumes and mounts to deployments
 #   extraVolumeMounts: {}
 #   extraVolumes: {}

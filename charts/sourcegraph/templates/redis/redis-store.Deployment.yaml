@@ -144,6 +144,7 @@ spec:
       {{- include "sourcegraph.nodeSelector" (list . "redisStore" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "redisStore" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "redisStore" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- with include "sourcegraph.runtimeClassName" (list . "redisStore" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "redisStore" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
