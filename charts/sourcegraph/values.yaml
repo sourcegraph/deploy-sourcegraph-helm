@@ -104,22 +104,16 @@ sourcegraph:
 #   # Toggle deployment of applications on/off. Applies to databases and third-party applications
 #   enabled: true
 
+# Used by the `correct-data-dir-permissions` initContainer of `pgsql` and `codeintel-db`, which runs the database's own image
 alpine:
-  # Used in init containers
-  image:
-    # -- Docker image tag for the `alpine` image
-    # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:1e113d9625cee4d32b995bb199ca7d6b6f5db1907404acc8ce9b272d39714963
-    # -- Docker image name for the `alpine` image
-    name: "alpine-3.14"
-  # -- Security context for the `alpine` initContainer,
+  # -- Security context for the `correct-data-dir-permissions` initContainer of `pgsql` and `codeintel-db`,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
-  # -- Resource requests & limits for the `alpine` initContainer,
+  # -- Resource requests & limits for the `correct-data-dir-permissions` initContainer of `pgsql`, `codeintel-db`, and `codeinsights-db`,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
@@ -209,7 +203,7 @@ codeInsightsDB:
     runAsGroup: 70
     readOnlyRootFilesystem: true
   init:
-    # -- Security context for the `alpine` initContainer,
+    # -- Security context for the `correct-data-dir-permissions` initContainer,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
     containerSecurityContext:
       allowPrivilegeEscalation: false
