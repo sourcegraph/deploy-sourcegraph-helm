@@ -9,7 +9,7 @@ sourcegraph:
     pullPolicy: IfNotPresent
     # -- Global docker image registry or prefix
     # @default -- Sourcegraph's public Docker Hub registry
-    repository: index.docker.io/sourcegraph
+    repository: us-docker.pkg.dev/sourcegraph-images/internal
     # -- When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
@@ -43,7 +43,7 @@ executor:
   image:
     # -- Docker image tag for the `executor-kubernetes` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 6.0.0@sha256:6dc771a0c281a41ef676213f2f84a63d99045cf2e58d43022554a8022070ed65
+    defaultTag: 8.1.4873@sha256:d915a363393168f44b0c1860f41cc2a92ba992daf5d8bf6f30698c304f5a313b
     name: "executor-kubernetes"
   resources:
     limits:
