@@ -33,8 +33,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.codeIntelDB) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.codeIntelDB) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.codeIntelDB.podLabels }}
+      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: codeintel-db

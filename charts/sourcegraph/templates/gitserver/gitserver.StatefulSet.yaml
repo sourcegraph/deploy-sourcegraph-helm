@@ -32,8 +32,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.gitserver) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.gitserver) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.gitserver.podLabels }}
+      {{- toYaml .Values.gitserver.podLabels | nindent 8 }}
       {{- end }}
         app: gitserver
         group: backend

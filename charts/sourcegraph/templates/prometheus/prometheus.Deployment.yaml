@@ -34,8 +34,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.prometheus) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.prometheus) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.prometheus.podLabels }}
+      {{- toYaml .Values.prometheus.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: prometheus

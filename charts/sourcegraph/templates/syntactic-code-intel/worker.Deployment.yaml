@@ -37,8 +37,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.syntacticCodeIntel) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.syntacticCodeIntel) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.syntacticCodeIntel.podLabels }}
+      {{- toYaml .Values.syntacticCodeIntel.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: syntactic-code-intel-worker

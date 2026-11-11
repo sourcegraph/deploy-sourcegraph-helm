@@ -40,8 +40,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.redisStore) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.redisStore) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.redisStore.podLabels }}
+      {{- toYaml .Values.redisStore.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: redis-store

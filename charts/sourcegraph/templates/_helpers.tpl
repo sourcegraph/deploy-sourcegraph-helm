@@ -54,33 +54,6 @@ app.kubernetes.io/instance: {{ $top.Release.Name }}
 {{- end }}
 
 {{/*
-The pod labels set in sourcegraph.podLabels and the component's podLabels,
-without the keys the selector labels already set, so a pod template never
-renders a key twice. A different value would stop the workload selector from
-matching its own pods, so the render fails instead.
-
-{{ include "sourcegraph.extraPodLabels" (list . .Values.frontend) }}
-*/}}
-{{- define "sourcegraph.extraPodLabels" -}}
-{{- $selector := include "sourcegraph.selectorLabels" . | fromYaml -}}
-{{- $rendered := list -}}
-{{- range $podLabels := list (index . 0).Values.sourcegraph.podLabels (index . 1).podLabels -}}
-{{- $kept := dict -}}
-{{- range $key, $value := $podLabels -}}
-{{- if not (hasKey $selector $key) -}}
-{{- $_ := set $kept $key $value -}}
-{{- else if ne (toString $value) (toString (get $selector $key)) -}}
-{{- fail (printf "podLabels sets the label %q to %q, but the selector labels set it to %q" $key (toString $value) (toString (get $selector $key))) -}}
-{{- end -}}
-{{- end -}}
-{{- with $kept -}}
-{{- $rendered = append $rendered (toYaml .) -}}
-{{- end -}}
-{{- end -}}
-{{- join "\n" $rendered -}}
-{{- end }}
-
-{{/*
 The selector labels set in values: sourcegraph.selectorLabelsOverride, which
 replaces the default selector labels on every component, merged with the
 component's extraSelectorLabels. Empty by default.

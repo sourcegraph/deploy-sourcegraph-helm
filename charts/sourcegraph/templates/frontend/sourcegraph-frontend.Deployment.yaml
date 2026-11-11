@@ -38,8 +38,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.frontend) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.frontend.podLabels }}
+      {{- toYaml .Values.frontend.podLabels | nindent 8 }}
       {{- end }}
         app: sourcegraph-frontend
         deploy: sourcegraph

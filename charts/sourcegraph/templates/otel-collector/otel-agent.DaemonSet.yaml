@@ -30,8 +30,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.agent) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.openTelemetry.agent) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.openTelemetry.agent.podLabels }}
+      {{- toYaml .Values.openTelemetry.agent.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: otel-agent

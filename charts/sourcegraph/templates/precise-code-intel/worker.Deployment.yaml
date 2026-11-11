@@ -36,8 +36,11 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel) | nindent 8 }}
-      {{- with include "sourcegraph.extraPodLabels" (list . .Values.preciseCodeIntel) }}
-      {{- . | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.preciseCodeIntel.podLabels }}
+      {{- toYaml .Values.preciseCodeIntel.podLabels | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: precise-code-intel-worker

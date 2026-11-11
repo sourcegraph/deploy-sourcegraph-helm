@@ -284,35 +284,6 @@ tests:
         type: gitserver
     template: gitserver/gitserver.Service.yaml
 
-- it: should render a podLabels label that repeats a selector label once
-  template: gitserver/gitserver.StatefulSet.yaml
-  set:
-    sourcegraph.selectorLabelsOverride: *override
-    sourcegraph.podLabels:
-      example.com/project: sourcegraph
-      example.com/team: search
-  asserts:
-  - equal:
-      path: spec.template.metadata.labels
-      value:
-        example.com/installation: production
-        example.com/project: sourcegraph
-        example.com/team: search
-        app: gitserver
-        group: backend
-        type: gitserver
-        deploy: sourcegraph
-
-- it: should fail when podLabels sets a selector label to a different value
-  template: gitserver/gitserver.StatefulSet.yaml
-  set:
-    sourcegraph.selectorLabelsOverride: *override
-    gitserver.podLabels:
-      example.com/project: other
-  asserts:
-  - failedTemplate:
-      errorMessage: podLabels sets the label "example.com/project" to "other", but the selector labels set it to "sourcegraph"
-
 - it: should render an indexed-search storageLabels deploy label that matches the chart's once
   template: indexed-search/indexed-search.StatefulSet.yaml
   set:
