@@ -16,7 +16,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 6 }}
       app: indexed-search
   serviceName: indexed-search
   template:
@@ -31,7 +31,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -156,6 +156,9 @@ spec:
   - metadata:
       labels:
         deploy: sourcegraph
+        {{- with .Values.indexedSearch.storageLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       name: data
       {{- if .Values.indexedSearch.storageAnnotations }}
       annotations:

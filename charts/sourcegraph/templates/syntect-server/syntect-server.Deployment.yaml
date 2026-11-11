@@ -17,7 +17,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 6 }}
       app: syntect-server
   strategy:
     rollingUpdate:
@@ -35,7 +35,7 @@ spec:
       {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

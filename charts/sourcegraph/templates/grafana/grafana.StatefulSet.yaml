@@ -16,6 +16,9 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
+      {{- with include "sourcegraph.customSelectorLabels" (list . .Values.grafana) }}
+      {{- . | nindent 6 }}
+      {{- end }}
       app: grafana
   replicas: 1
   serviceName: grafana
@@ -32,7 +35,7 @@ spec:
       {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.grafana) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -112,6 +115,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: grafana-data
+      {{- with .Values.grafana.storageLabels }}
+      labels:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.grafana.storageAnnotations }}
       annotations:
         {{- toYaml .Values.grafana.storageAnnotations | nindent 8 }}

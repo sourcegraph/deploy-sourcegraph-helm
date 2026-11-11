@@ -28,7 +28,7 @@ spec:
   {{- toYaml . | nindent 2 }}
   {{- end }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.pgsql) | nindent 4 }}
     app: pgsql
   type: {{ .Values.pgsql.serviceType | default "ClusterIP" }}
 {{- end }}

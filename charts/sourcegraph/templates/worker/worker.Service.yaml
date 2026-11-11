@@ -27,6 +27,6 @@ spec:
   {{- toYaml . | nindent 2 }}
   {{- end }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.worker) | nindent 4 }}
     app: worker
   type: {{ .Values.worker.serviceType | default "ClusterIP" }}

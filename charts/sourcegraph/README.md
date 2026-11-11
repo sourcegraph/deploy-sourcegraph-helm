@@ -63,6 +63,49 @@ Chart-managed config changes restart the Redis pod through a checksum
 annotation. Changes to an existing ConfigMap or Secret require a manual pod
 restart because `subPath` mounts do not update in running containers.
 
+## Adopting existing workloads
+
+Kubernetes does not allow changing the `spec.selector` of a Deployment,
+StatefulSet, or DaemonSet, or the `volumeClaimTemplates` of a StatefulSet. To
+move workloads that were created another way, such as with Kustomize, into a
+Helm release without deleting them, make the chart render the same values for
+those fields:
+
+- `sourcegraph.selectorLabelsOverride` replaces the default
+  `app.kubernetes.io/name` and `app.kubernetes.io/instance` selector labels on
+  every component.
+- `<serviceName>.extraSelectorLabels` adds selector labels to one component.
+- `<serviceName>.storageLabels` adds labels to the volume claim template of
+  `gitserver`, `grafana`, `indexedSearch`, or `searcher`. Match the rest of the
+  template with `storageSize` and `storageClass.name`.
+
+```yaml
+sourcegraph:
+  selectorLabelsOverride:
+    example.com/project: sourcegraph
+gitserver:
+  extraSelectorLabels:
+    example.com/service: gitserver
+  storageLabels:
+    example.com/project: sourcegraph
+    example.com/service: gitserver
+```
+
+The same labels are rendered in each workload's selector and pod labels and in
+the Service and PodDisruptionBudget selectors. The chart keeps adding the
+labels it sets itself, such as `app: gitserver`, so the existing workloads must
+already have them; the values above cannot set `app`, `deploy`, `group`,
+`type`, or `worker-replica`.
+
+Set these values on the first install and never change them on an installed
+release: Kubernetes rejects the upgrade. Before installing, compare the
+`helm template` output with `kubectl get -o yaml` for each workload.
+
+Helm only takes over an existing object that has the
+`app.kubernetes.io/managed-by: Helm` label and the `meta.helm.sh/release-name`
+and `meta.helm.sh/release-namespace` annotations, or when installing with
+`--take-ownership` (Helm 3.17 or later).
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.
@@ -83,6 +126,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.env` - consult `values.yaml` file
 - `<serviceName>.extraInitContainers` - add init containers to the pod, which run before any init containers the chart defines
 - `<serviceName>.extraServicePorts` - add ports to the service's primary Service. The OpenTelemetry and Jaeger values are `openTelemetry.gateway.*`, `openTelemetry.agent.extraInitContainers`, `jaeger.extraInitContainers`, `jaeger.collector.extraServicePorts`, and `jaeger.query.extraServicePorts`
+- `<serviceName>.extraSelectorLabels` - add labels to the service's workload selector, pod labels, and Service and PodDisruptionBudget selectors. See [Adopting existing workloads](#adopting-existing-workloads)
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
@@ -194,6 +238,7 @@ In addition to the documented values, all services also support the following va
 | gitserver.sshSecret | string | `""` | Name of existing Secret that contains SSH credentials to clone repositories. It usually contains keys, such as `id_rsa` (private key) and `known_hosts`. Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories) |
 | gitserver.storageAccessModes | list | `["ReadWriteOnce"]` | Access modes for the `gitserver` PVC. Set to `["ReadWriteOncePod"]` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) so Kubernetes mounts the volume with `-o context` instead of recursively relabeling every file on each pod start |
 | gitserver.storageAnnotations | object | `{}` | Optional annotations to add to the `gitserver` PVC |
+| gitserver.storageLabels | object | `{}` | Labels to add to the `repos` volume claim template of the `gitserver` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | gitserver.storageSize | string | `"200Gi"` | PVC Storage Request for `gitserver` data volume |
 | gitserver.storageSubPath | string | `""` | Optional subPath for the `gitserver` primary data volume mount |
 | grafana.auth | object | `{"database":"","existingSecret":"","host":"","password":"","port":"","sslmode":"","user":""}` | NOTE: Create a separate user in the pgsql database with read-only perms on the minimum set of tables |
@@ -215,6 +260,7 @@ In addition to the documented values, all services also support the following va
 | grafana.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `grafana` |
 | grafana.serviceAccount.name | string | `"grafana"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | grafana.storageAnnotations | object | `{}` | Optional annotations to add to the `grafana` PVC |
+| grafana.storageLabels | object | `{}` | Labels to add to the `grafana-data` volume claim template of the `grafana` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -231,6 +277,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-search` |
 | indexedSearch.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | indexedSearch.storageAnnotations | object | `{}` | Optional annotations to add to the `indexed-search` PVC |
+| indexedSearch.storageLabels | object | `{}` | Labels to add to the `data` volume claim template of the `indexed-search` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multiplied by the number of gitserver shards. |
 | indexedSearch.storageSubPath | string | `""` | Optional subPath for the `indexed-search` primary data volume mount |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -421,6 +468,7 @@ In addition to the documented values, all services also support the following va
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | searcher.storageAnnotations | object | `{}` | Optional annotations to add to the `searcher` PVC |
+| searcher.storageLabels | object | `{}` | Labels to add to the `cache` volume claim template of the `searcher` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data. Unless `autoCacheSize` is enabled, this must be a Kubernetes quantity (e.g. `150G`, `100Gi`, `1Ti`) of at least `3M`, so the chart can derive `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` from it |
 | searcher.storageSubPath | string | `""` | Optional subPath for the `searcher` primary data volume mount |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
@@ -441,6 +489,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.preShutdownPause | string | `"5s"` | Time Sourcegraph services continue accepting requests after shutdown begins so Kubernetes endpoint changes can propagate |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
+| sourcegraph.selectorLabelsOverride | object | `{}` | Labels that replace `app.kubernetes.io/name` and `app.kubernetes.io/instance` in every component's workload selector, pod labels, and Service and PodDisruptionBudget selectors. Only for adopting workloads created outside this chart, whose selectors Kubernetes does not allow changing: set it on the first install and never change it afterwards. Use `<serviceName>.extraSelectorLabels` for labels that differ per component. See [Adopting existing workloads](#adopting-existing-workloads) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
 | sourcegraph.terminationGracePeriodSeconds | int | `30` | Time Kubernetes allows Sourcegraph services to shut down before forced termination |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |

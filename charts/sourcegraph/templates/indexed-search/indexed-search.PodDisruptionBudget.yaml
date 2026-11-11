@@ -7,6 +7,6 @@ spec:
   {{- toYaml .Values.indexedSearch.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 6 }}
       app: indexed-search
 {{- end }}
