@@ -6,6 +6,9 @@ metadata:
   name: {{ .Values.openTelemetry.agent.name }}
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.openTelemetry.agent.labels }}
+      {{- toYaml .Values.openTelemetry.agent.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
 data:

@@ -217,6 +217,8 @@ privateDockerRegistry:
     repository: registry
     tag: 3
   storageSize: 10Gi
+  # -- Add extra labels to the `private-docker-registry` Service
+  serviceLabels: {}
   # -- Extra environment variables to set on the registry container.
   # Registry can be configured with environment variables using the pattern
   # REGISTRY_<SECTION>_<KEY> (uppercase). Full reference:
