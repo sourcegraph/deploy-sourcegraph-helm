@@ -2,9 +2,15 @@
 suite: redisConnection
 templates:
 - frontend/sourcegraph-frontend.Deployment.yaml
+- syntactic-code-intel/worker.Deployment.yaml
+set:
+  syntacticCodeIntel:
+    enabled: true
 tests:
 - it: should reference the default secret
   asserts:
+    - exists:
+        path: spec.template.metadata.annotations["checksum/redis"]
     - contains:
         path: spec.template.spec.containers[0].env
         content:
@@ -21,6 +27,31 @@ tests:
             secretKeyRef:
               key: endpoint
               name: redis-store
+- it: should reference existing secrets when .connection.existingSecret is set
+  set:
+    redisCache:
+      connection:
+        existingSecret: external-redis-cache
+    redisStore:
+      connection:
+        existingSecret: external-redis-store
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: external-redis-cache
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: external-redis-store
 - it: should not reference secret when .sourcegraph.disableKubernetesSecrets is true
   set:
     sourcegraph:
@@ -44,6 +75,9 @@ tests:
           value: redis-store-svc
 - it: should fail when .sourcegraph.disableKubernetesSecrets is true but .Values.redisCache.connection.endpoint and .Values.redisStore.connection.endpoint are not set
   set:
+    # Helm stops rendering at the first template that fails, so let only frontend render.
+    syntacticCodeIntel:
+      enabled: false
     sourcegraph:
       disableKubernetesSecrets: true
     redisCache:
@@ -53,5 +87,6 @@ tests:
       connection:
         endpoint: ""
   asserts:
-    - failedTemplate: 
+    - template: frontend/sourcegraph-frontend.Deployment.yaml
+      failedTemplate: 
         errorMessage: .Values.redisCache.connection.endpoint and .Values.redisStore.connection.endpoint must be set when disableKubernetesSecrets is true!
