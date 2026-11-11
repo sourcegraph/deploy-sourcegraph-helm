@@ -164,10 +164,10 @@ data:
         replacement: $1:$2
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the chart's standard labels from the Service to every
-      # metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every Service, or
+      # `sourcegraph.labels`, to every metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
       - action: labeldrop
-        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version|managed_by)
+        regex: {{ include "sourcegraph.prometheus.droppedServiceLabels" . }}
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         # Sourcegraph specific customization. We want a more convenient to type label.
@@ -222,10 +222,10 @@ data:
         target_label: instance
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the chart's standard labels from the Service to every
-      # metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every Service, or
+      # `sourcegraph.labels`, to every metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
       - action: labeldrop
-        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version|managed_by)
+        regex: {{ include "sourcegraph.prometheus.droppedServiceLabels" . }}
       - source_labels: [__meta_kubernetes_service_namespace]
         # Sourcegraph specific customization. We want a more convenient to type label.
         # target_label: kubernetes_namespace

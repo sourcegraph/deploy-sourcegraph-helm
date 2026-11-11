@@ -29,6 +29,29 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Regex of the Service labels that the bundled Prometheus must not copy to the
+metrics it scrapes: the labels this chart adds to every Service and the keys of
+`sourcegraph.labels`, spelled as Prometheus spells them, with `_` for every
+character outside `[a-zA-Z0-9_]`. This keeps the labels of those metrics as
+they were before the chart labelled its Services.
+
+Labels that were already on Services are kept: the ones the chart sets, such as
+`app`, which dashboards and alerts query, and `app.kubernetes.io/managed-by`,
+which Helm adds to every object it installs.
+*/}}
+{{- define "sourcegraph.prometheus.droppedServiceLabels" -}}
+{{- $names := list "helm_sh_chart" "app_kubernetes_io_(name|instance|version)" -}}
+{{- $kept := list "app" "deploy" "type" "app_kubernetes_io_component" "app_kubernetes_io_managed_by" "sourcegraph_resource_requires" -}}
+{{- range $key := keys (.Values.sourcegraph.labels | default dict) | sortAlpha -}}
+{{- $name := regexReplaceAll "[^a-zA-Z0-9_]" $key "_" -}}
+{{- if not (has $name $kept) -}}
+{{- $names = append $names $name -}}
+{{- end -}}
+{{- end -}}
+{{- $names | uniq | join "|" -}}
+{{- end }}
+
+{{/*
 Selector labels, shared by a component's workload selector, pod labels, and
 Service and PodDisruptionBudget selectors, so they cannot drift apart.
 
