@@ -29,19 +29,18 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Regex of the Service labels that the bundled Prometheus must not copy to the
-metrics it scrapes: the labels this chart adds to every Service and the keys of
-`sourcegraph.labels`, spelled as Prometheus spells them, with `_` for every
-character outside `[a-zA-Z0-9_]`. This keeps the labels of those metrics as
-they were before the chart labelled its Services.
+Regex of the Service and pod labels that the bundled Prometheus must not copy to
+the metrics it scrapes: the common labels and the keys of `sourcegraph.labels`,
+spelled as Prometheus spells them, with `_` for every character outside
+`[a-zA-Z0-9_]`. No bundled dashboard or alert queries them, and `helm.sh/chart`
+and `app.kubernetes.io/version` change on every upgrade.
 
-Labels that were already on Services are kept: the ones the chart sets, such as
-`app`, which dashboards and alerts query, and `app.kubernetes.io/managed-by`,
-which Helm adds to every object it installs.
+A key of `sourcegraph.labels` that the chart also sets itself, such as `app`,
+is kept: the chart's value wins on the object, and dashboards and alerts query it.
 */}}
-{{- define "sourcegraph.prometheus.droppedServiceLabels" -}}
-{{- $names := list "helm_sh_chart" "app_kubernetes_io_(name|instance|version)" -}}
-{{- $kept := list "app" "deploy" "type" "app_kubernetes_io_component" "app_kubernetes_io_managed_by" "sourcegraph_resource_requires" -}}
+{{- define "sourcegraph.prometheus.droppedLabels" -}}
+{{- $names := list "helm_sh_chart" "app_kubernetes_io_(name|instance|version|managed_by)" -}}
+{{- $kept := list "app" "deploy" "group" "type" "worker_replica" "app_kubernetes_io_component" "sourcegraph_resource_requires" -}}
 {{- range $key := keys (.Values.sourcegraph.labels | default dict) | sortAlpha -}}
 {{- $name := regexReplaceAll "[^a-zA-Z0-9_]" $key "_" -}}
 {{- if not (has $name $kept) -}}
@@ -81,6 +80,21 @@ app.kubernetes.io/instance: {{ $top.Release.Name }}
 {{- with include "sourcegraph.customSelectorLabels" . }}
 {{ . }}
 {{- end }}
+{{- end }}
+
+{{/*
+Labels of a component's pod template: the common labels, then
+sourcegraph.podLabels, then the component's podLabels, then its selector labels.
+The later one wins when a key is set more than once, so each key is rendered
+once and the selector always matches the pods.
+
+{{ include "sourcegraph.podLabels" (list . .Values.frontend) }}
+*/}}
+{{- define "sourcegraph.podLabels" -}}
+{{- $top := index . 0 -}}
+{{- $component := index . 1 -}}
+{{- $labels := include "sourcegraph.labels" $top | fromYaml -}}
+{{- mergeOverwrite $labels ($top.Values.sourcegraph.podLabels | default dict) ($component.podLabels | default dict) (include "sourcegraph.selectorLabels" . | fromYaml) | toYaml -}}
 {{- end }}
 
 {{/*

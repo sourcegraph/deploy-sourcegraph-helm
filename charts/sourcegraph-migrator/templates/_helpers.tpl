@@ -36,6 +36,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Labels of a pod template: the common labels, then sourcegraph.podLabels, then
+the component's podLabels, then the selector labels. The later one wins when a
+key is set more than once, so each key is rendered once and the selector always
+matches the pods.
+
+{{ include "sourcegraph.podLabels" (list . .Values.migrator) }}
+*/}}
+{{- define "sourcegraph.podLabels" -}}
+{{- $top := index . 0 -}}
+{{- $component := index . 1 -}}
+{{- $labels := include "sourcegraph.labels" $top | fromYaml -}}
+{{- mergeOverwrite $labels ($top.Values.sourcegraph.podLabels | default dict) ($component.podLabels | default dict) (include "sourcegraph.selectorLabels" $top | fromYaml) | toYaml -}}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "sourcegraph.serviceAccountName" -}}

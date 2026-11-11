@@ -32,16 +32,11 @@ spec:
       {{- toYaml .Values.codeInsightsDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.codeInsightsDB) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeInsightsDB.podLabels }}
-      {{- toYaml .Values.codeInsightsDB.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.codeInsightsDB) | nindent 8 }}
         deploy: sourcegraph
         app: codeinsights-db
         group: backend
+        app.kubernetes.io/component: codeinsights-db
     spec:
       initContainers:
       {{- with .Values.codeInsightsDB.extraInitContainers }}
