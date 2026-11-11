@@ -50,6 +50,9 @@ spec:
         image: {{ include "sourcegraph.image" (list . "openTelemetry") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         command:
+          {{- with .Values.openTelemetry.gateway.command }}
+          {{- toYaml . | nindent 10 }}
+          {{- else }}
           - "/bin/otelcol-sourcegraph"
           {{- if and (not .Values.openTelemetry.gateway.config.traces.exporters) (not .Values.jaeger.enabled) }}  # default config: enable logging exporter
           - "--config=/etc/otel-collector/configs/logging.yaml"
@@ -57,6 +60,7 @@ spec:
           - "--config=/etc/otel-collector/configs/jaeger.yaml"
           {{- else }} # use config defined by customer in values.yaml
           - "--config=/etc/otel-collector/config.yaml"
+          {{- end }}
           {{- end -}}
         {{- with .Values.openTelemetry.gateway.args }}
         args:
