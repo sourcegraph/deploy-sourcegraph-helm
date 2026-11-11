@@ -33,15 +33,10 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.searcher) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.searcher.podLabels }}
-      {{- toYaml .Values.searcher.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.searcher) | nindent 8 }}
         deploy: sourcegraph
         app: searcher
+        app.kubernetes.io/component: searcher
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "searcher") | nindent 6 }}
       {{- with .Values.searcher.extraInitContainers }}
