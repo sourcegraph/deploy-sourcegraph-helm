@@ -1,0 +1,25 @@
+# Run the migrator job pod in confidential-sandbox with EKS Nitro Sandboxes.
+# Use it on top of override.yaml:
+#   helm upgrade ... -f override.yaml -f override-confidential.yaml
+#
+# Confidential mode needs a policy for the pod. Generate it from the rendered
+# Job, as described in the sourcegraph chart's
+# examples/aws-eks-nitro-sandboxes/override-confidential.yaml
+#
+# The policy needs one edit. The chart gives the Job a new random name on
+# every render, and the policy pins that name as the pod's hostname, so the
+# pod of the next render is denied. In both admission_policy and
+# runtime_policy, change
+#   context.hostname like "migrator-<5 characters>-*"
+# to
+#   context.hostname like "migrator-*"
+#
+# The policy also pins the migrator's args, so generate it with the args of
+# the migrator command you run
+
+sourcegraph:
+  runtimeClassName: confidential-sandbox
+
+migrator:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the migrator Job>

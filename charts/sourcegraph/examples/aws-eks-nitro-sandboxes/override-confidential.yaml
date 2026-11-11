@@ -1,0 +1,123 @@
+# Run every Sourcegraph pod in confidential-sandbox with EKS Nitro Sandboxes.
+# Use it on top of override.yaml:
+#   helm upgrade ... -f override.yaml -f override-confidential.yaml
+#
+# Confidential mode rejects a pod that has no sandbox.amazonaws.com/policy
+# annotation, and denies whatever the policy does not allow. A policy pins the
+# pod's image digests, commands, env, mounts, users, and groups, so generate
+# one per workload from your own rendered manifests, and again whenever a
+# chart upgrade or a values change alters a pod.
+#
+# Tested with eks-nitro-sandbox-genpolicy 0.1.4274.0, a Linux binary:
+# https://docs.aws.amazon.com/eks/latest/userguide/sandboxing-download-binaries.html
+#
+# 1. Render the chart with `helm template` and your values, and save each
+#    Deployment, StatefulSet, and DaemonSet as its own manifest
+# 2. Pipe each manifest through `kubectl create --dry-run=client -o yaml -f -`.
+#    The generator rejects the chart's octal modes (defaultMode: 0777), and
+#    kubectl prints them as decimals
+# 3. In each StatefulSet, add every volumeClaimTemplate to the pod's volumes,
+#    as a persistentVolumeClaim volume with the same name. The generator
+#    writes no permit to set up a claim template's volume
+# 4. Generate the policy:
+#      eks-nitro-sandbox-genpolicy --profile confidential --allow-additional-env \
+#        --output-file-b64 policy.b64 manifest.yaml
+#    --allow-additional-env allows the Service env vars the kubelet adds.
+#    The generator reads each image from its registry, and Docker Hub's
+#    anonymous limit of 100 requests per hour can run out part way through
+# 5. Edit the policy where it pins a value the sandbox does not present (see
+#    below), then encode it again:
+#      base64 -d policy.b64 | gunzip >envelope.json
+#      # edit the admission_policy and runtime_policy text in envelope.json
+#      eks-nitro-sandbox-genpolicy --encode-envelope envelope.json
+# 6. Set the encoded policy as that service's podAnnotations, as below
+#
+# Edits the generated policies needed, for 15 of the 19 workloads. A pod whose
+# policy pins the wrong value fails to start, with "policy denied" and the
+# name of the denied action, such as SetupSandbox or CreateContainer:
+# - An env value that references another variable, such as $(POD_NAME), is
+#   pinned unexpanded. Remove that env var's name and value pair
+# - A pod with fsGroup and no emptyDir volume (prometheus, grafana,
+#   indexed-search, redis-cache, redis-store) presents fsgroup -1. Change
+#   context.fsgroup to -1
+# - A volume mounted at /dev/shm (pgsql) replaces the default /dev/shm mount,
+#   but the policy pins both. Remove the mount with the source "shm"
+# - The pinned source of a subPath mount (jaeger) does not match. Remove the
+#   pod's context.mounts conditions
+# - A container with runAsUser and no runAsGroup (pgsql-exporter in
+#   codeintel-db and codeinsights-db) runs with group 0, but the policy pins
+#   the group of the image's default user. Change context.run_as_group to 0,
+#   and context.additional_gids to 0 and the pod's fsGroup
+# - A mountPath that ends with "/" (codeinsights-db) keeps the "/" on
+#   context.mount_path and on the mount's source. Remove it from both
+#
+# Also expect:
+# - 512Mi of memory overhead per pod, instead of 256Mi
+# - `kubectl exec` denied by the generated policies; `kubectl logs` works
+# - A policy enforced in isolated-sandbox too: remove these annotations when
+#   moving a pod back, or it is denied
+# - No `helm test`: its pod takes no annotations, so it has no policy
+
+sourcegraph:
+  runtimeClassName: confidential-sandbox
+
+# A service's podAnnotations are added to sourcegraph.podAnnotations.
+# Replace each value with the policy of that workload
+blobstore:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the blobstore Deployment>
+codeInsightsDB:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the codeinsights-db StatefulSet>
+codeIntelDB:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the codeintel-db StatefulSet>
+frontend:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the sourcegraph-frontend Deployment>
+gitserver:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the gitserver StatefulSet>
+grafana:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the grafana StatefulSet>
+indexedSearch:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the indexed-search StatefulSet>
+jaeger:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the jaeger Deployment>
+openTelemetry:
+  agent:
+    podAnnotations:
+      sandbox.amazonaws.com/policy: <policy of the otel-agent DaemonSet>
+  gateway:
+    podAnnotations:
+      sandbox.amazonaws.com/policy: <policy of the otel-collector Deployment>
+pgsql:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the pgsql StatefulSet>
+preciseCodeIntel:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the precise-code-intel-worker Deployment>
+prometheus:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the prometheus Deployment>
+redisCache:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the redis-cache Deployment>
+redisStore:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the redis-store Deployment>
+searcher:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the searcher StatefulSet>
+syntacticCodeIntel:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the syntactic-code-intel-worker Deployment>
+syntectServer:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the syntect-server Deployment>
+worker:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the worker Deployment>
