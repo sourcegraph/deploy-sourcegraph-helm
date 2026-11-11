@@ -1,0 +1,15 @@
+# Run the migrator job pod in its own microVM with EKS Nitro Sandboxes
+# https://docs.aws.amazon.com/eks/latest/userguide/sandboxing.html
+#
+# The migrator ran with the chart's default resources in a sandbox
+
+sourcegraph:
+  runtimeClassName: isolated-sandbox
+
+  # A sandbox defaults to 100 Mbps and 1,500 packets per second each way.
+  # Raise both; the limits are read once, when the pod is created
+  podAnnotations:
+    sandbox.amazonaws.com/ingress-bandwidth: "1G"
+    sandbox.amazonaws.com/egress-bandwidth: "1G"
+    sandbox.amazonaws.com/ingress-packets-per-second: "15000"
+    sandbox.amazonaws.com/egress-packets-per-second: "15000"
