@@ -34,11 +34,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.blobstore) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.blobstore.podLabels }}
-      {{- toYaml .Values.blobstore.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.extraPodLabels" (list . .Values.blobstore) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: blobstore

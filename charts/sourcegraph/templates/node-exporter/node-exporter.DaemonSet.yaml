@@ -32,11 +32,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.nodeExporter) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.nodeExporter.podLabels }}
-      {{- toYaml .Values.nodeExporter.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.extraPodLabels" (list . .Values.nodeExporter) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: node-exporter

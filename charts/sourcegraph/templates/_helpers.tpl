@@ -38,13 +38,46 @@ Pass the root context and the component's values:
 */}}
 {{- define "sourcegraph.selectorLabels" -}}
 {{- $top := index . 0 -}}
-{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
+{{- $custom := include "sourcegraph.customSelectorLabels" . | fromYaml -}}
+{{- if not $custom -}}
 app.kubernetes.io/name: {{ include "sourcegraph.name" $top }}
 app.kubernetes.io/instance: {{ $top.Release.Name }}
+{{- else -}}
+{{- $labels := dict -}}
+{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
+{{- $_ := set $labels "app.kubernetes.io/name" (include "sourcegraph.name" $top) -}}
+{{- $_ := set $labels "app.kubernetes.io/instance" $top.Release.Name -}}
+{{- end -}}
+{{- /* One map, so a custom label that repeats a default one renders once, with the custom value */ -}}
+{{ mergeOverwrite $labels $custom | toYaml }}
+{{- end -}}
 {{- end }}
-{{- with include "sourcegraph.customSelectorLabels" . }}
-{{ . }}
-{{- end }}
+
+{{/*
+The pod labels set in sourcegraph.podLabels and the component's podLabels,
+without the keys the selector labels already set, so a pod template never
+renders a key twice. A different value would stop the workload selector from
+matching its own pods, so the render fails instead.
+
+{{ include "sourcegraph.extraPodLabels" (list . .Values.frontend) }}
+*/}}
+{{- define "sourcegraph.extraPodLabels" -}}
+{{- $selector := include "sourcegraph.selectorLabels" . | fromYaml -}}
+{{- $rendered := list -}}
+{{- range $podLabels := list (index . 0).Values.sourcegraph.podLabels (index . 1).podLabels -}}
+{{- $kept := dict -}}
+{{- range $key, $value := $podLabels -}}
+{{- if not (hasKey $selector $key) -}}
+{{- $_ := set $kept $key $value -}}
+{{- else if ne (toString $value) (toString (get $selector $key)) -}}
+{{- fail (printf "podLabels sets the label %q to %q, but the selector labels set it to %q" $key (toString $value) (toString (get $selector $key))) -}}
+{{- end -}}
+{{- end -}}
+{{- with $kept -}}
+{{- $rendered = append $rendered (toYaml .) -}}
+{{- end -}}
+{{- end -}}
+{{- join "\n" $rendered -}}
 {{- end }}
 
 {{/*

@@ -33,11 +33,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.pgsql) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.pgsql.podLabels }}
-      {{- toYaml .Values.pgsql.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.extraPodLabels" (list . .Values.pgsql) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: pgsql

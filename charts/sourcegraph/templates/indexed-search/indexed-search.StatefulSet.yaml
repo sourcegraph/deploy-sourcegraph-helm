@@ -32,11 +32,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.indexedSearch.podLabels }}
-      {{- toYaml .Values.indexedSearch.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.extraPodLabels" (list . .Values.indexedSearch) }}
+      {{- . | nindent 8 }}
       {{- end }}
         app: indexed-search
         deploy: sourcegraph
@@ -156,7 +153,11 @@ spec:
   - metadata:
       labels:
         deploy: sourcegraph
-        {{- with .Values.indexedSearch.storageLabels }}
+        {{- $storageLabels := .Values.indexedSearch.storageLabels | default dict }}
+        {{- if and (hasKey $storageLabels "deploy") (ne (toString $storageLabels.deploy) "sourcegraph") }}
+        {{- fail "indexedSearch.storageLabels must not set the label \"deploy\", which the chart sets to \"sourcegraph\"" }}
+        {{- end }}
+        {{- with omit $storageLabels "deploy" }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       name: data

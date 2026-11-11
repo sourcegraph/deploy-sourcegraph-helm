@@ -33,11 +33,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.cadvisor) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.cadvisor.podLabels }}
-      {{- toYaml .Values.cadvisor.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.extraPodLabels" (list . .Values.cadvisor) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: cadvisor

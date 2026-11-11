@@ -52,11 +52,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podLabels }}
-      {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podLabels }}
-      {{- toYaml $top.Values.worker.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.extraPodLabels" (list $top $top.Values.worker) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: worker
