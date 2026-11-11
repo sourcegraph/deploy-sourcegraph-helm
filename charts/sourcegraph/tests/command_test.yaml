@@ -56,7 +56,7 @@ tests:
       path: spec.template.spec.initContainers[0].command
       value: ["sh", "-c", "/migrator up"]
 
-- it: should replace the otel-collector command, and keep args, when gateway.command is set
+- it: should replace the otel-collector command, and keep args before the chart's own argument, when gateway.command is set
   template: otel-collector/otel-collector.Deployment.yaml
   set:
     openTelemetry.gateway.command: ["/bin/sh", "-c"]
@@ -70,3 +70,4 @@ tests:
       path: spec.template.spec.containers[0].args
       value:
       - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml
+      - '--config=yaml:service::telemetry::metrics::readers: [{pull: {exporter: {prometheus: {host: "0.0.0.0", port: 8888, without_type_suffix: true, without_units: true}}}}]'
