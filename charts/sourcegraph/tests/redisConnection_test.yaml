@@ -31,10 +31,10 @@ tests:
   set:
     redisCache:
       connection:
-        existingSecret: external-redis-cache
+        existingSecret: ext-cache
     redisStore:
       connection:
-        existingSecret: external-redis-store
+        existingSecret: ext-store
   asserts:
     - contains:
         path: spec.template.spec.containers[0].env
@@ -43,7 +43,7 @@ tests:
           valueFrom:
             secretKeyRef:
               key: endpoint
-              name: external-redis-cache
+              name: ext-cache
     - contains:
         path: spec.template.spec.containers[0].env
         content:
@@ -51,7 +51,7 @@ tests:
           valueFrom:
             secretKeyRef:
               key: endpoint
-              name: external-redis-store
+              name: ext-store
 - it: should not reference secret when .sourcegraph.disableKubernetesSecrets is true
   set:
     sourcegraph:
