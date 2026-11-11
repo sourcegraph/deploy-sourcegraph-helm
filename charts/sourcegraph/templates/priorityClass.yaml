@@ -2,6 +2,8 @@
 apiVersion: scheduling.k8s.io/v1
 kind: PriorityClass
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" $ | nindent 4 }}
   name: {{ $class.name }}
 value: {{ $class.value }}
 preemptionPolicy: {{ $class.preemptionPolicy }}

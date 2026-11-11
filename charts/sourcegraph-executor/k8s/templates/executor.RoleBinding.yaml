@@ -4,6 +4,7 @@ kind: RoleBinding
 metadata:
   name: sg-executor-role-binding
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     category: rbac
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin

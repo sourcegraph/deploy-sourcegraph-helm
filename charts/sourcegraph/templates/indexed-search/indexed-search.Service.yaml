@@ -10,6 +10,7 @@ metadata:
     {{- toYaml .Values.indexedSearch.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app: indexed-search
     deploy: sourcegraph
     app.kubernetes.io/component: indexed-search

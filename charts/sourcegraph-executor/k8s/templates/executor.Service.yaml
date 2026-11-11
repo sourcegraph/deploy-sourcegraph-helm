@@ -6,6 +6,7 @@ metadata:
     {{- toYaml .Values.executor.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
 {{ include "executor.labels" . | indent 4 }}
     {{- if .Values.executor.serviceLabels }}
     {{- toYaml .Values.executor.serviceLabels | nindent 4 }}

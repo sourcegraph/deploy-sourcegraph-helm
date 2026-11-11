@@ -8,6 +8,7 @@ metadata:
     {{- toYaml .Values.searcher.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app: searcher
     deploy: sourcegraph
     app.kubernetes.io/component: searcher

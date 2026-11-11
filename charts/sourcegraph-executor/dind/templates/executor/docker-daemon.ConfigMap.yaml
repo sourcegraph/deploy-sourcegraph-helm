@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app: executor
     deploy: sourcegraph
     app.kubernetes.io/component: executor
