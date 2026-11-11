@@ -19,6 +19,6 @@ spec:
     port: 80
     targetPort: grpc-internal
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 4 }}
     app: sourcegraph-frontend
   type: {{ .Values.frontend.internalServiceType | default "ClusterIP" }}

@@ -47,6 +47,12 @@ sourcegraph:
   terminationGracePeriodSeconds: 30
   # -- Add extra labels to all services
   serviceLabels: {}
+  # -- Labels that replace `app.kubernetes.io/name` and `app.kubernetes.io/instance` in every component's
+  # workload selector, pod labels, and Service and PodDisruptionBudget selectors.
+  # Only for adopting workloads created outside this chart, whose selectors Kubernetes does not allow changing:
+  # set it on the first install and never change it afterwards. Use `<serviceName>.extraSelectorLabels`
+  # for labels that differ per component. See [Adopting existing workloads](#adopting-existing-workloads)
+  selectorLabelsOverride: {}
   # -- Disable the creation of Kubernetes secrets objects
   disableKubernetesSecrets: false
 
@@ -89,6 +95,9 @@ sourcegraph:
 #   extraInitContainers: []
 #   # Add ports to the component's primary Service
 #   extraServicePorts: []
+#   # Add labels to the component's workload selector, pod labels, and Service and PodDisruptionBudget selectors,
+#   # to adopt a workload created outside this chart. Never change it on an installed release
+#   extraSelectorLabels: {}
 #   # Toggle serviceAccount creation
 #   serviceAccount.create: true
 #   # Customize service account name
@@ -498,6 +507,9 @@ gitserver:
   storageSubPath: ""
   # -- Optional annotations to add to the `gitserver` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `repos` volume claim template of the `gitserver` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 grafana:
   # -- Enable `grafana` dashboard (recommended)
@@ -565,6 +577,9 @@ grafana:
   storageSubPath: ""
   # -- Optional annotations to add to the `grafana` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `grafana-data` volume claim template of the `grafana` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 indexedSearch:
   # -- Environment variables for the `zoekt-webserver` container
@@ -637,6 +652,9 @@ indexedSearch:
   storageSubPath: ""
   # -- Optional annotations to add to the `indexed-search` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `data` volume claim template of the `indexed-search` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 indexedSearchIndexer:
   # -- Environment variables for the `zoekt-indexserver` container
@@ -1356,6 +1374,9 @@ searcher:
   storageSubPath: ""
   # -- Optional annotations to add to the `searcher` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `cache` volume claim template of the `searcher` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 storageClass:
   # -- Enable creation of storageClass.

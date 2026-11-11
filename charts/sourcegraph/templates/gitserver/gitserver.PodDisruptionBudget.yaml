@@ -7,6 +7,6 @@ spec:
   {{- toYaml .Values.gitserver.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.gitserver) | nindent 6 }}
       app: gitserver
 {{- end }}

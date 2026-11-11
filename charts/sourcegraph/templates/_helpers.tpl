@@ -17,7 +17,8 @@ Common labels
 */}}
 {{- define "sourcegraph.labels" -}}
 helm.sh/chart: {{ include "sourcegraph.chart" . }}
-{{ include "sourcegraph.selectorLabels" . }}
+app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -28,11 +29,46 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+Selector labels, shared by a component's workload selector, pod labels, and
+Service and PodDisruptionBudget selectors, so they cannot drift apart.
+
+Pass the root context and the component's values:
+
+{{ include "sourcegraph.selectorLabels" (list . .Values.frontend) }}
 */}}
 {{- define "sourcegraph.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- $top := index . 0 -}}
+{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
+app.kubernetes.io/name: {{ include "sourcegraph.name" $top }}
+app.kubernetes.io/instance: {{ $top.Release.Name }}
+{{- end }}
+{{- with include "sourcegraph.customSelectorLabels" . }}
+{{ . }}
+{{- end }}
+{{- end }}
+
+{{/*
+The selector labels set in values: sourcegraph.selectorLabelsOverride, which
+replaces the default selector labels on every component, merged with the
+component's extraSelectorLabels. Empty by default.
+
+These exist to adopt workloads created outside this chart, whose selectors
+are immutable. The chart sets the labels in $chartLabels itself, so
+overriding one would stop a selector from matching its pods.
+*/}}
+{{- define "sourcegraph.customSelectorLabels" -}}
+{{- $top := index . 0 -}}
+{{- $component := index . 1 -}}
+{{- $chartLabels := list "app" "deploy" "group" "type" "worker-replica" -}}
+{{- $labels := mergeOverwrite (dict) ($top.Values.sourcegraph.selectorLabelsOverride | default dict) ($component.extraSelectorLabels | default dict) -}}
+{{- range $chartLabel := $chartLabels -}}
+{{- if hasKey $labels $chartLabel -}}
+{{- fail (printf "sourcegraph.selectorLabelsOverride and <serviceName>.extraSelectorLabels must not set the label %q, which the chart sets itself" $chartLabel) -}}
+{{- end -}}
+{{- end -}}
+{{- with $labels -}}
+{{ toYaml . }}
+{{- end -}}
 {{- end }}
 
 {{/*

@@ -16,7 +16,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.searcher) | nindent 6 }}
       app: searcher
   serviceName: searcher
   updateStrategy:
@@ -33,7 +33,7 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.searcher) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -137,6 +137,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: cache
+      {{- with .Values.searcher.storageLabels }}
+      labels:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.searcher.storageAnnotations }}
       annotations:
         {{- toYaml .Values.searcher.storageAnnotations | nindent 8 }}

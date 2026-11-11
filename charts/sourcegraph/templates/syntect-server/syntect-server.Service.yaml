@@ -27,6 +27,6 @@ spec:
   {{- toYaml . | nindent 2 }}
   {{- end }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 4 }}
     app: syntect-server
   type: {{ .Values.syntectServer.serviceType | default "ClusterIP" }}

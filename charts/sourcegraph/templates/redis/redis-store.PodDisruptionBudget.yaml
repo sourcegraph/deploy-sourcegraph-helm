@@ -7,6 +7,6 @@ spec:
   {{- toYaml .Values.redisStore.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.redisStore) | nindent 6 }}
       app: redis-store
 {{- end }}

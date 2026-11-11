@@ -28,7 +28,7 @@ spec:
   {{- toYaml . | nindent 2 }}
   {{- end }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.redisCache) | nindent 4 }}
     app: redis-cache
   type: {{ .Values.redisCache.serviceType | default "ClusterIP" }}
 {{- end }}
