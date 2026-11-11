@@ -101,6 +101,31 @@ Set these values on the first install and never change them on an installed
 release: Kubernetes rejects the upgrade. Before installing, compare the
 `helm template` output with `kubectl get -o yaml` for each workload.
 
+Labels on other objects can be changed, so they never block an upgrade, but
+Helm only manages the labels the chart renders. To render the labels that the
+existing PersistentVolumeClaims, ServiceAccounts, and RBAC objects have:
+
+- `sourcegraph.labels` adds labels to all of them, on every component.
+- `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of
+  `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`,
+  `redisCache`, or `redisStore`.
+- `<serviceName>.serviceAccount.labels` adds labels to one component's
+  ServiceAccount, and to the Role, RoleBinding, ClusterRole, and
+  ClusterRoleBinding of `frontend` and `prometheus`.
+
+```yaml
+sourcegraph:
+  labels:
+    example.com/project: sourcegraph
+blobstore:
+  storageLabels:
+    example.com/service: blobstore
+frontend:
+  serviceAccount:
+    labels:
+      example.com/service: frontend
+```
+
 Helm only takes over an existing object that has the
 `app.kubernetes.io/managed-by: Helm` label and the `meta.helm.sh/release-name`
 and `meta.helm.sh/release-namespace` annotations, or when installing with
@@ -129,6 +154,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.extraSelectorLabels` - add labels to the service's workload selector, pod labels, and Service and PodDisruptionBudget selectors. See [Adopting existing workloads](#adopting-existing-workloads)
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
+- `<serviceName>.serviceAccount.labels` - Labels for the service-specific service account, and for the Role, RoleBinding, ClusterRole, and ClusterRoleBinding of `frontend` and `prometheus`, in addition to `sourcegraph.labels`
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
 
 | Key | Type | Default | Description |
@@ -146,6 +172,7 @@ In addition to the documented values, all services also support the following va
 | blobstore.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `blobstore` |
 | blobstore.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | blobstore.storageAnnotations | object | `{}` | Optional annotations to add to the `blobstore` PVC |
+| blobstore.storageLabels | object | `{}` | Optional labels to add to the `blobstore` PVC, in addition to `sourcegraph.labels` |
 | blobstore.storageSize | string | `"100Gi"` | PVC Storage Request for `blobstore` data volume |
 | blobstore.storageSubPath | string | `""` | Optional subPath for the `blobstore` primary data volume mount |
 | cadvisor.containerSecurityContext | object | `{"privileged":true}` | Security context for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -178,6 +205,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeinsights-db` |
 | codeInsightsDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeInsightsDB.storageAnnotations | object | `{}` | Optional annotations to add to the `codeinsights-db` PVC |
+| codeInsightsDB.storageLabels | object | `{}` | Optional labels to add to the `codeinsights-db` PVC, in addition to `sourcegraph.labels` |
 | codeInsightsDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeinsights-db` data volume |
 | codeInsightsDB.storageSubPath | string | `""` | Optional subPath for the `codeinsights-db` primary data volume mount |
 | codeIntelDB.additionalConfig | string | `""` | Additional PostgreSQL configuration. This will override or extend our default configuration. Notes: This is expecting a multiline string. Learn more from our [recommended PostgreSQL configuration](https://docs.sourcegraph.com/admin/config/postgres-conf) and [PostgreSQL documentation](https://www.postgresql.org/docs/12/config-setting.html) |
@@ -200,6 +228,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `codeintel-db` |
 | codeIntelDB.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | codeIntelDB.storageAnnotations | object | `{}` | Optional annotations to add to the `codeintel-db` PVC |
+| codeIntelDB.storageLabels | object | `{}` | Optional labels to add to the `codeintel-db` PVC, in addition to `sourcegraph.labels` |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | codeIntelDB.storageSubPath | string | `""` | Optional subPath for the `codeintel-db` primary data volume mount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
@@ -374,6 +403,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `pgsql` |
 | pgsql.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | pgsql.storageAnnotations | object | `{}` | Optional annotations to add to the `pgsql` PVC |
+| pgsql.storageLabels | object | `{}` | Optional labels to add to the `pgsql` PVC, in addition to `sourcegraph.labels` |
 | pgsql.storageSize | string | `"200Gi"` | PVC Storage Request for `pgsql` data volume |
 | pgsql.storageSubPath | string | `""` | Optional subPath for the `pgsql` primary data volume mount |
 | postgresExporter.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `pgsql-exporter` image |
@@ -407,6 +437,7 @@ In addition to the documented values, all services also support the following va
 | prometheus.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount |
 | prometheus.serviceAccount.name | string | `"prometheus"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | prometheus.storageAnnotations | object | `{}` | Optional annotations to add to the `prometheus` PVC |
+| prometheus.storageLabels | object | `{}` | Optional labels to add to the `prometheus` PVC, in addition to `sourcegraph.labels` |
 | prometheus.storageSize | string | `"200Gi"` | PVC Storage Request for `prometheus` data volume |
 | prometheus.storageSubPath | string | `""` | Optional subPath for the `prometheus` primary data volume mount |
 | redisCache.config.additionalConfig | string | `""` | Additional raw redis directives appended to the vendored `redis-cache` config. Notes: This is expecting a multiline string. It renders into a ConfigMap in plaintext, so do not put secrets such as `requirepass` here or in `existingConfig` (also a ConfigMap). For secrets, set `config.enabled: false` and mount a Secret using `extraVolumeMounts`. |
@@ -428,6 +459,7 @@ In addition to the documented values, all services also support the following va
 | redisCache.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `redis-cache` |
 | redisCache.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | redisCache.storageAnnotations | object | `{}` | Optional annotations to add to the `redis-cache` PVC |
+| redisCache.storageLabels | object | `{}` | Optional labels to add to the `redis-cache` PVC, in addition to `sourcegraph.labels` |
 | redisCache.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-cache` data volume |
 | redisCache.storageSubPath | string | `""` | Optional subPath for the `redis-cache` primary data volume mount |
 | redisExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -453,6 +485,7 @@ In addition to the documented values, all services also support the following va
 | redisStore.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `redis-store` |
 | redisStore.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | redisStore.storageAnnotations | object | `{}` | Optional annotations to add to the `redis-store` PVC |
+| redisStore.storageLabels | object | `{}` | Optional labels to add to the `redis-store` PVC, in addition to `sourcegraph.labels` |
 | redisStore.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-store` data volume |
 | redisStore.storageSubPath | string | `""` | Optional subPath for the `redis-store` primary data volume mount |
 | searcher.autoCacheSize | bool | `false` | When enabled, omit the `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` env vars so `searcher` auto-sizes its cache to ~45% of the live cache volume. This tracks PVC expansion automatically, whereas the hardcoded env vars are frozen to the initial `storageSize` and do not follow later disk growth. |

@@ -102,6 +102,8 @@ sourcegraph:
 #   serviceAccount.create: true
 #   # Customize service account name
 #   serviceAccount.name: ""
+#   # Add labels to the service account, and to the component's Role, RoleBinding, ClusterRole, and ClusterRoleBinding
+#   serviceAccount.labels: {}
 #   # Override service type (defaults to ClusterIP)
 #   serviceType: ""
 #   # Set disk size on PVC's for stateful deployments
@@ -249,6 +251,8 @@ codeInsightsDB:
   storageSubPath: ""
   # -- Optional annotations to add to the `codeinsights-db` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `codeinsights-db` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 codeIntelDB:
   # -- Enable `codeintel-db` PostgreSQL server
@@ -319,6 +323,8 @@ codeIntelDB:
   storageSubPath: ""
   # -- Optional annotations to add to the `codeintel-db` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `codeintel-db` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 frontend:
   # -- Command for the `frontend` container, as a list, replacing the image's entrypoint,
@@ -730,6 +736,8 @@ blobstore:
   storageSubPath: ""
   # -- Optional annotations to add to the `blobstore` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `blobstore` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 openTelemetry:
   enabled: true
@@ -930,6 +938,8 @@ pgsql:
   storageSubPath: ""
   # -- Optional annotations to add to the `pgsql` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `pgsql` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 postgresExporter:
   image:
@@ -1127,6 +1137,8 @@ prometheus:
   storageSubPath: ""
   # -- Optional annotations to add to the `prometheus` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `prometheus` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 redisCache:
   # -- Enable `redis-cache` Redis server
@@ -1180,6 +1192,8 @@ redisCache:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-cache` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `redis-cache` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
   config:
     # -- Opt in to a chart-managed Redis config and automatic memory sizing.
     # Disabled by default to preserve image-baked configuration and custom
@@ -1283,6 +1297,8 @@ redisStore:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-store` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `redis-store` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
   config:
     # -- Opt in to a chart-managed Redis config and automatic memory sizing.
     # Disabled by default to preserve image-baked configuration and custom
