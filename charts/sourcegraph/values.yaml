@@ -166,6 +166,7 @@ cadvisor:
     # You may also run `cadvisor` with reduced privileges by setting
     # `cadvisor.containerSecurityContext.privileged=false` in your override file
     privileged: true
+    readOnlyRootFilesystem: true
 
 codeInsightsDB:
   # -- Enable `codeinsights-db` PostgreSQL server
@@ -682,6 +683,7 @@ blobstore:
     allowPrivilegeEscalation: false
     runAsUser: 100
     runAsGroup: 101
+    readOnlyRootFilesystem: true
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "blobstore"
   # -- Resource requests & limits for the `blobstore` container,
@@ -757,6 +759,7 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+      readOnlyRootFilesystem: true
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
@@ -788,6 +791,7 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+      readOnlyRootFilesystem: true
 
 nodeExporter:
   # -- Enable `node-exporter`
@@ -914,6 +918,11 @@ postgresExporter:
     defaultTag: 8.1.2687@sha256:bd55116d35a5cfad9da760ebdf467166deaac550be44b915e407beace9b0ef3d
     # -- Docker image name for the `pgsql-exporter` image
     name: "postgres_exporter"
+  # -- Security context for the `pgsql-exporter` sidecar container, which runs as the user of its database pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
   # -- Resource requests & limits for the `pgsql-exporter` sidecar container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:

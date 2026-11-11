@@ -93,7 +93,7 @@ In addition to the documented values, all services also support the following va
 | alpine.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `alpine` image |
 | alpine.image.name | string | `"alpine-3.14"` | Docker image name for the `alpine` image |
 | alpine.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| blobstore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `blobstore` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| blobstore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `blobstore` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | blobstore.enabled | bool | `true` | Enable `blobstore` (S3 compatible storage) |
 | blobstore.env | object | the chart will add some default environment values | Environment variables for the `blobstore` container |
 | blobstore.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `blobstore` image |
@@ -106,7 +106,7 @@ In addition to the documented values, all services also support the following va
 | blobstore.storageAnnotations | object | `{}` | Optional annotations to add to the `blobstore` PVC |
 | blobstore.storageSize | string | `"100Gi"` | PVC Storage Request for `blobstore` data volume |
 | blobstore.storageSubPath | string | `""` | Optional subPath for the `blobstore` primary data volume mount |
-| cadvisor.containerSecurityContext | object | `{"privileged":true}` | Security context for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| cadvisor.containerSecurityContext | object | `{"privileged":true,"readOnlyRootFilesystem":true}` | Security context for the `cadvisor` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | cadvisor.enabled | bool | `true` | Enable `cadvisor` |
 | cadvisor.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `cadvisor` image |
 | cadvisor.image.name | string | `"cadvisor"` | Docker image name for the `cadvisor` image |
@@ -281,6 +281,7 @@ In addition to the documented values, all services also support the following va
 | nodeExporter.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `node-exporter` |
 | nodeExporter.serviceAccount.name | string | `"node-exporter"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | openTelemetry.agent.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| openTelemetry.agent.containerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
 | openTelemetry.agent.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.agent.containerSecurityContext.runAsUser | int | `100` |  |
 | openTelemetry.agent.hostPorts | object | `{"grpcOtlp":4317,"httpOtlp":4318,"httpZpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -298,6 +299,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
 | openTelemetry.gateway.config.traces.tracePipelineProcessors | list | `[]` | Define the order in which processors are applied in the traces pipeline. When set, this takes precedence over the iteration order of `processors` (which cannot be relied on to preserve insertion order). Must contain exactly the same processor names as the keys of `processors`. |
 | openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
+| openTelemetry.gateway.containerSecurityContext.readOnlyRootFilesystem | bool | `true` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
@@ -328,6 +330,7 @@ In addition to the documented values, all services also support the following va
 | pgsql.storageAnnotations | object | `{}` | Optional annotations to add to the `pgsql` PVC |
 | pgsql.storageSize | string | `"200Gi"` | PVC Storage Request for `pgsql` data volume |
 | pgsql.storageSubPath | string | `""` | Optional subPath for the `pgsql` primary data volume mount |
+| postgresExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true}` | Security context for the `pgsql-exporter` sidecar container, which runs as the user of its database pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | postgresExporter.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `pgsql-exporter` image |
 | postgresExporter.image.name | string | `"postgres_exporter"` | Docker image name for the `pgsql-exporter` image |
 | postgresExporter.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `pgsql-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
