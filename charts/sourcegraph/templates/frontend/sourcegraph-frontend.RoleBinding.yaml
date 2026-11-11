@@ -4,6 +4,9 @@ kind: RoleBinding
 metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- with include "sourcegraph.serviceAccountLabels" (list . "frontend") }}
+    {{- . | nindent 4 }}
+    {{- end }}
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: frontend

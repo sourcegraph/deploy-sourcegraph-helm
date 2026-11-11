@@ -88,6 +88,44 @@ tests:
       path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
       value: premium-rwo
 
+- it: should add storageLabels to the per-pod PVC and no other labels
+  set:
+    sourcegraph:
+      labels:
+        example.com/project: sourcegraph
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+      storageLabels:
+        example.com/service: scratch
+  asserts:
+  - equal:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
+      value:
+        labels:
+          example.com/service: scratch
+
+- it: should render no PVC metadata when storageLabels is empty
+  set:
+    preciseCodeIntel:
+      storageType: pvc
+      storageSize: 50Gi
+  asserts:
+  - notExists:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
+
+- it: should ignore storageLabels on the emptyDir branch
+  set:
+    preciseCodeIntel:
+      storageLabels:
+        example.com/service: scratch
+  asserts:
+  - contains:
+      path: spec.template.spec.volumes
+      content:
+        name: tmpdir
+        emptyDir: {}
+
 - it: should fail when storageSize is omitted on the pvc branch
   set:
     preciseCodeIntel:
