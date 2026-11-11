@@ -1,0 +1,135 @@
+# Golden test for the labels Kubernetes does not allow changing on an installed
+# release (workload selectors and volume claim templates), and for the
+# Service, PodDisruptionBudget, and pod labels that must keep matching them.
+# The snapshots were recorded before selectorLabelsOverride, extraSelectorLabels,
+# and storageLabels existed: a change to them breaks `helm upgrade` of existing
+# releases. Do not update them with `-u` unless that is intended.
+suite: selector labels golden
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+set:
+  jaeger:
+    enabled: true
+  syntacticCodeIntel:
+    enabled: true
+    podDisruptionBudget: &pdb
+      minAvailable: 1
+  frontend:
+    podDisruptionBudget: *pdb
+  gitserver:
+    podDisruptionBudget: *pdb
+  indexedSearch:
+    podDisruptionBudget: *pdb
+  preciseCodeIntel:
+    podDisruptionBudget: *pdb
+  redisCache:
+    podDisruptionBudget: *pdb
+  redisStore:
+    podDisruptionBudget: *pdb
+  searcher:
+    podDisruptionBudget: *pdb
+  syntectServer:
+    podDisruptionBudget: *pdb
+  worker:
+    podDisruptionBudget: *pdb
+    replicas:
+    - jobs: ["codeintel-upload-janitor"]
+    - jobs: ["insights-job"]
+tests:
+- it: should keep every workload selector and pod labels
+  templates: &workloads
+  - blobstore/blobstore.Deployment.yaml
+  - cadvisor/cadvisor.DaemonSet.yaml
+  - codeinsights-db/codeinsights-db.StatefulSet.yaml
+  - codeintel-db/codeintel-db.StatefulSet.yaml
+  - frontend/sourcegraph-frontend.Deployment.yaml
+  - gitserver/gitserver.StatefulSet.yaml
+  - grafana/grafana.StatefulSet.yaml
+  - indexed-search/indexed-search.StatefulSet.yaml
+  - jaeger/jaeger.Deployment.yaml
+  - node-exporter/node-exporter.DaemonSet.yaml
+  - otel-collector/otel-agent.DaemonSet.yaml
+  - otel-collector/otel-collector.Deployment.yaml
+  - pgsql/pgsql.StatefulSet.yaml
+  - precise-code-intel/worker.Deployment.yaml
+  - prometheus/prometheus.Deployment.yaml
+  - redis/redis-cache.Deployment.yaml
+  - redis/redis-store.Deployment.yaml
+  - searcher/searcher.StatefulSet.yaml
+  - syntactic-code-intel/worker.Deployment.yaml
+  - syntect-server/syntect-server.Deployment.yaml
+  - worker/worker.Deployment.yaml
+  asserts:
+  - matchSnapshot:
+      path: spec.selector
+  - matchSnapshot:
+      path: spec.template.metadata.labels
+
+- it: should keep every pod's labels when podLabels are set
+  templates: *workloads
+  set:
+    sourcegraph.podLabels:
+      example.com/team: search
+    frontend.podLabels:
+      example.com/tier: web
+    worker.podLabels:
+      example.com/tier: background
+  asserts:
+  - matchSnapshot:
+      path: spec.template.metadata.labels
+
+- it: should keep every volume claim template
+  templates:
+  - gitserver/gitserver.StatefulSet.yaml
+  - grafana/grafana.StatefulSet.yaml
+  - indexed-search/indexed-search.StatefulSet.yaml
+  - searcher/searcher.StatefulSet.yaml
+  asserts:
+  - matchSnapshot:
+      path: spec.volumeClaimTemplates
+
+- it: should keep every Service selector
+  templates:
+  - blobstore/blobstore.Service.yaml
+  - codeinsights-db/codeinsights-db.Service.yaml
+  - codeintel-db/codeintel-db.Service.yaml
+  - frontend/sourcegraph-frontend-internal.Service.yaml
+  - frontend/sourcegraph-frontend.Service.yaml
+  - gitserver/gitserver.Service.yaml
+  - grafana/grafana.Service.yaml
+  - indexed-search/indexed-search.IndexerService.yaml
+  - indexed-search/indexed-search.Service.yaml
+  - jaeger/jaeger-collector.Service.yaml
+  - jaeger/jaeger-query.Service.yaml
+  - node-exporter/node-exporter.Service.yaml
+  - otel-collector/otel-collector.Service.yaml
+  - pgsql/pgsql.Service.yaml
+  - precise-code-intel/worker.Service.yaml
+  - prometheus/prometheus.Service.yaml
+  - redis/redis-cache.Service.yaml
+  - redis/redis-store.Service.yaml
+  - searcher/searcher.Service.yaml
+  - syntactic-code-intel/worker.Service.yaml
+  - syntect-server/syntect-server.Service.yaml
+  - worker/worker-executors.Service.yaml
+  - worker/worker.Service.yaml
+  asserts:
+  - matchSnapshot:
+      path: spec.selector
+
+- it: should keep every PodDisruptionBudget selector
+  templates:
+  - frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
+  - gitserver/gitserver.PodDisruptionBudget.yaml
+  - indexed-search/indexed-search.PodDisruptionBudget.yaml
+  - precise-code-intel/worker.PodDisruptionBudget.yaml
+  - redis/redis-cache.PodDisruptionBudget.yaml
+  - redis/redis-store.PodDisruptionBudget.yaml
+  - searcher/searcher.PodDisruptionBudget.yaml
+  - syntactic-code-intel/worker.PodDisruptionBudget.yaml
+  - syntect-server/syntect-server.PodDisruptionBudget.yaml
+  - worker/worker.PodDisruptionBudget.yaml
+  asserts:
+  - matchSnapshot:
+      path: spec.selector

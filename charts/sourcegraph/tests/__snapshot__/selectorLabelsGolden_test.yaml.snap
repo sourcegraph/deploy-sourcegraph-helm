@@ -1,0 +1,595 @@
+should keep every PodDisruptionBudget selector:
+  1: |
+    matchLabels:
+      app: sourcegraph-frontend
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  2: |
+    matchLabels:
+      app: gitserver
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  3: |
+    matchLabels:
+      app: indexed-search
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  4: |
+    matchLabels:
+      app: precise-code-intel-worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  5: |
+    matchLabels:
+      app: redis-cache
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  6: |
+    matchLabels:
+      app: redis-store
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  7: |
+    matchLabels:
+      app: searcher
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  8: |
+    matchLabels:
+      app: syntactic-code-intel-worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  9: |
+    matchLabels:
+      app: syntect-server
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  10: |
+    matchExpressions:
+      - key: worker-replica
+        operator: DoesNotExist
+    matchLabels:
+      app: worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  11: |
+    matchLabels:
+      app: worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+      worker-replica: worker-0
+  12: |
+    matchLabels:
+      app: worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+      worker-replica: worker-1
+should keep every Service selector:
+  1: |
+    app: blobstore
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  2: |
+    app: codeinsights-db
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  3: |
+    app: codeintel-db
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  4: |
+    app: sourcegraph-frontend
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  5: |
+    app: sourcegraph-frontend
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  6: |
+    app: gitserver
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    type: gitserver
+  7: |
+    app: grafana
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  8: |
+    app: indexed-search
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  9: |
+    app: indexed-search
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  10: |
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: jaeger
+  11: |
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: jaeger
+  12: |
+    app: node-exporter
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  13: |
+    app: otel-collector
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  14: |
+    app: pgsql
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  15: |
+    app: precise-code-intel-worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  16: |
+    app: prometheus
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  17: |
+    app: redis-cache
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  18: |
+    app: redis-store
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  19: |
+    app: searcher
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  20: |
+    app: syntactic-code-intel-worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  21: |
+    app: syntect-server
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  22: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+  23: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+should keep every pod's labels when podLabels are set:
+  1: |
+    app: blobstore
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  2: |
+    app: cadvisor
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  3: |
+    app: codeinsights-db
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    group: backend
+  4: |
+    app: codeintel-db
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    group: backend
+  5: |
+    app: sourcegraph-frontend
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    example.com/tier: web
+  6: |
+    app: gitserver
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    group: backend
+    type: gitserver
+  7: |
+    app: grafana
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  8: |
+    app: indexed-search
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  9: |
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: jaeger
+    deploy: sourcegraph
+    example.com/team: search
+  10: |
+    app: node-exporter
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  11: |
+    app: otel-agent
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  12: |
+    app: otel-collector
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  13: |
+    app: pgsql
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    group: backend
+  14: |
+    app: precise-code-intel-worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  15: |
+    app: prometheus
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  16: |
+    app: redis-cache
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  17: |
+    app: redis-store
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  18: |
+    app: searcher
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  19: |
+    app: syntactic-code-intel-worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  20: |
+    app: syntect-server
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+  21: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    example.com/tier: background
+  22: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    example.com/tier: background
+    worker-replica: worker-0
+  23: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    example.com/team: search
+    example.com/tier: background
+    worker-replica: worker-1
+should keep every volume claim template:
+  1: |
+    - metadata:
+        name: repos
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+        storageClassName: sourcegraph
+  2: |
+    - metadata:
+        name: grafana-data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+        storageClassName: sourcegraph
+  3: |
+    - metadata:
+        labels:
+          deploy: sourcegraph
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 200Gi
+        storageClassName: sourcegraph
+  4: |
+    - metadata:
+        name: cache
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 26Gi
+        storageClassName: sourcegraph
+should keep every workload selector and pod labels:
+  1: |
+    matchLabels:
+      app: blobstore
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  2: |
+    matchLabels:
+      app: cadvisor
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  3: |
+    matchLabels:
+      app: codeinsights-db
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  4: |
+    matchLabels:
+      app: codeintel-db
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  5: |
+    matchLabels:
+      app: sourcegraph-frontend
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  6: |
+    matchLabels:
+      app: gitserver
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  7: |
+    matchLabels:
+      app: grafana
+  8: |
+    matchLabels:
+      app: indexed-search
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  9: |
+    matchLabels:
+      app: jaeger
+      app.kubernetes.io/component: all-in-one
+      app.kubernetes.io/name: jaeger
+  10: |
+    matchLabels:
+      app: node-exporter
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  11: |
+    matchLabels:
+      app: otel-agent
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  12: |
+    matchLabels:
+      app: otel-collector
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  13: |
+    matchLabels:
+      app: pgsql
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  14: |
+    matchLabels:
+      app: precise-code-intel-worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  15: |
+    matchLabels:
+      app: prometheus
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  16: |
+    matchLabels:
+      app: redis-cache
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  17: |
+    matchLabels:
+      app: redis-store
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  18: |
+    matchLabels:
+      app: searcher
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  19: |
+    matchLabels:
+      app: syntactic-code-intel-worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  20: |
+    matchLabels:
+      app: syntect-server
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  21: |
+    matchLabels:
+      app: worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+  22: |
+    matchLabels:
+      app: worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+      worker-replica: worker-0
+  23: |
+    matchLabels:
+      app: worker
+      app.kubernetes.io/instance: sourcegraph
+      app.kubernetes.io/name: sourcegraph
+      worker-replica: worker-1
+  24: |
+    app: blobstore
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  25: |
+    app: cadvisor
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  26: |
+    app: codeinsights-db
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    group: backend
+  27: |
+    app: codeintel-db
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    group: backend
+  28: |
+    app: sourcegraph-frontend
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  29: |
+    app: gitserver
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    group: backend
+    type: gitserver
+  30: |
+    app: grafana
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  31: |
+    app: indexed-search
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  32: |
+    app: jaeger
+    app.kubernetes.io/component: all-in-one
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: jaeger
+    deploy: sourcegraph
+  33: |
+    app: node-exporter
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  34: |
+    app: otel-agent
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  35: |
+    app: otel-collector
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  36: |
+    app: pgsql
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    group: backend
+  37: |
+    app: precise-code-intel-worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  38: |
+    app: prometheus
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  39: |
+    app: redis-cache
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  40: |
+    app: redis-store
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  41: |
+    app: searcher
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  42: |
+    app: syntactic-code-intel-worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  43: |
+    app: syntect-server
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  44: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+  45: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    worker-replica: worker-0
+  46: |
+    app: worker
+    app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/name: sourcegraph
+    deploy: sourcegraph
+    worker-replica: worker-1
