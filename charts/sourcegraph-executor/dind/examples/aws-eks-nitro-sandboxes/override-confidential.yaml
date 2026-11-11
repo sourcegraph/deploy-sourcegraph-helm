@@ -11,9 +11,10 @@
 #   "emptyDir: {}" in the manifest. With executor.storage.size unset, the
 #   chart renders it with no value, and the generator then expects a pod with
 #   no emptyDir volume
-# - After generating, remove the pod's context.mounts conditions from the
-#   policy. The pod has a subPath mount, whose pinned source did not match in
-#   the sourcegraph chart. This pod was only tested with them removed
+# - After generating, remove the dind container's context.mounts condition
+#   from the policy. Its subPath mount of daemon.json pins a source that does
+#   not match, so the container is denied at CreateContainer. The executor
+#   container's condition can stay
 #
 # The private-docker-registry StatefulSet needs only the volumeClaimTemplates
 # step.
