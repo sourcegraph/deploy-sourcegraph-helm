@@ -9,9 +9,6 @@ tests:
       - matchRegex:
           path: metadata.name
           pattern: "^migrator-[a-z0-9]{5}$"
-      - matchRegex:
-          path: spec.template.spec.containers[0].image
-          pattern: "^index.docker.io/sourcegraph/migrator:"
       - equal:
           path: spec.template.spec.containers[0].args
           value:
@@ -20,6 +17,21 @@ tests:
       - equal:
           path: spec.template.spec.restartPolicy
           value: Never
+
+  # Releases rewrite sourcegraph.image.repository and migrator.image.defaultTag
+  # in values.yaml, so pin both here instead of asserting the chart defaults.
+  - it: should build the image from the global repository and migrator.image
+    set:
+      sourcegraph:
+        image:
+          repository: my.registry.example/sg
+      migrator:
+        image:
+          defaultTag: test
+    asserts:
+      - equal:
+          path: spec.template.spec.containers[0].image
+          value: my.registry.example/sg/migrator:test
 
   - it: should use migrator.name and migrator.args when set
     set:
