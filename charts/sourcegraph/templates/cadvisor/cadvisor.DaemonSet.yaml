@@ -32,15 +32,10 @@ spec:
       {{- toYaml .Values.cadvisor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.cadvisor) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.cadvisor.podLabels }}
-      {{- toYaml .Values.cadvisor.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.cadvisor) | nindent 8 }}
         deploy: sourcegraph
         app: cadvisor
+        app.kubernetes.io/component: cadvisor
     spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "cadvisor") | trim | nindent 6 }}
       {{- with .Values.cadvisor.extraInitContainers }}

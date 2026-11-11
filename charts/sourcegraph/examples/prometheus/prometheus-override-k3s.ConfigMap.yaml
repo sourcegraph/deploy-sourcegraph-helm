@@ -98,12 +98,12 @@ data:
         replacement: $1:$2
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the labels the chart adds to every Service to every
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object to every
       # metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade. If you set
       # `sourcegraph.labels`, append its keys, with `_` for every character that is not a letter, digit, or `_`,
       # e.g. `|example_com_project` for `example.com/project`.
       - action: labeldrop
-        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version)
+        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version|managed_by)
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         target_label: ns
@@ -137,12 +137,12 @@ data:
         target_label: instance
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the labels the chart adds to every Service to every
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object to every
       # metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade. If you set
       # `sourcegraph.labels`, append its keys, with `_` for every character that is not a letter, digit, or `_`,
       # e.g. `|example_com_project` for `example.com/project`.
       - action: labeldrop
-        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version)
+        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version|managed_by)
       - source_labels: [__meta_kubernetes_service_namespace]
         target_label: ns
       - source_labels: [__meta_kubernetes_service_name]
@@ -167,6 +167,12 @@ data:
         target_label: __address__
       - action: labelmap
         regex: __meta_kubernetes_pod_label_(.+)
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object to every
+      # metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade. If you set
+      # `sourcegraph.labels`, append its keys, with `_` for every character that is not a letter, digit, or `_`,
+      # e.g. `|example_com_project` for `example.com/project`.
+      - action: labeldrop
+        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version|managed_by)
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name

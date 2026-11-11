@@ -37,15 +37,10 @@ spec:
       {{- toYaml .Values.syntacticCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.syntacticCodeIntel) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntacticCodeIntel.podLabels }}
-      {{- toYaml .Values.syntacticCodeIntel.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.syntacticCodeIntel) | nindent 8 }}
         deploy: sourcegraph
         app: syntactic-code-intel-worker
+        app.kubernetes.io/component: syntactic-code-intel
     spec:
       {{- $storageType := .Values.syntacticCodeIntel.storageType | default "emptyDir" }}
       {{- if not (has $storageType (list "emptyDir" "pvc")) }}

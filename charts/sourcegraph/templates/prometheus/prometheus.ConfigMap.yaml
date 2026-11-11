@@ -164,10 +164,10 @@ data:
         replacement: $1:$2
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the labels the chart adds to every Service, or
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object, or
       # `sourcegraph.labels`, to every metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
       - action: labeldrop
-        regex: {{ include "sourcegraph.prometheus.droppedServiceLabels" . }}
+        regex: {{ include "sourcegraph.prometheus.droppedLabels" . }}
       - source_labels: [__meta_kubernetes_namespace]
         action: replace
         # Sourcegraph specific customization. We want a more convenient to type label.
@@ -222,10 +222,10 @@ data:
         target_label: instance
       - action: labelmap
         regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the labels the chart adds to every Service, or
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object, or
       # `sourcegraph.labels`, to every metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
       - action: labeldrop
-        regex: {{ include "sourcegraph.prometheus.droppedServiceLabels" . }}
+        regex: {{ include "sourcegraph.prometheus.droppedLabels" . }}
       - source_labels: [__meta_kubernetes_service_namespace]
         # Sourcegraph specific customization. We want a more convenient to type label.
         # target_label: kubernetes_namespace
@@ -261,6 +261,10 @@ data:
         target_label: __address__
       - action: labelmap
         regex: __meta_kubernetes_pod_label_(.+)
+      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object, or
+      # `sourcegraph.labels`, to every metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
+      - action: labeldrop
+        regex: {{ include "sourcegraph.prometheus.droppedLabels" . }}
       - source_labels: [__meta_kubernetes_pod_name]
         action: replace
         target_label: kubernetes_pod_name

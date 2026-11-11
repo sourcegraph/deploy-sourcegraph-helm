@@ -24,15 +24,10 @@ spec:
       {{- toYaml .Values.migrator.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.migrator.podLabels }}
-      {{- toYaml .Values.migrator.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.migrator) | nindent 8 }}
         job: migrator
         deploy: sourcegraph
+        app.kubernetes.io/component: migrator
     spec:
       containers:
       - name: migrator

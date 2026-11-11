@@ -31,15 +31,10 @@ spec:
       {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.gateway) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.gateway.podLabels }}
-      {{- toYaml .Values.openTelemetry.gateway.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.openTelemetry.gateway) | nindent 8 }}
         deploy: sourcegraph
         app: otel-collector
+        app.kubernetes.io/component: otel-collector
     spec:
       {{- with .Values.openTelemetry.gateway.extraInitContainers }}
       initContainers:

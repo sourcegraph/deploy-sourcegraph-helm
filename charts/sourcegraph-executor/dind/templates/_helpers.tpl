@@ -36,6 +36,21 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Labels of a pod template: the common labels, then sourcegraph.podLabels, then
+the component's podLabels, then the selector labels. The later one wins when a
+key is set more than once, so each key is rendered once and the selector always
+matches the pods.
+
+{{ include "sourcegraph.podLabels" (list . .Values.executor) }}
+*/}}
+{{- define "sourcegraph.podLabels" -}}
+{{- $top := index . 0 -}}
+{{- $component := index . 1 -}}
+{{- $labels := include "sourcegraph.labels" $top | fromYaml -}}
+{{- mergeOverwrite $labels ($top.Values.sourcegraph.podLabels | default dict) ($component.podLabels | default dict) (include "sourcegraph.selectorLabels" $top | fromYaml) | toYaml -}}
+{{- end }}
+
+{{/*
 Create the name of the service account to use
 */}}
 {{- define "sourcegraph.serviceAccountName" -}}
@@ -169,13 +184,7 @@ spec:
       {{- toYaml $r.Values.executor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" $r | nindent 8 }}
-      {{- if $r.Values.sourcegraph.podLabels }}
-      {{- toYaml $r.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $r.Values.executor.podLabels }}
-      {{- toYaml $r.Values.executor.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list $r $r.Values.executor) | nindent 8 }}
         app: {{ .name }}
         deploy: sourcegraph
         sourcegraph-resource-requires: no-cluster-admin

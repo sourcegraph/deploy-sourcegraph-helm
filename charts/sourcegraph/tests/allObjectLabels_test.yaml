@@ -346,32 +346,30 @@ tests:
       value: otel-collector
     template: otel-collector/otel-collector.ConfigMap.yaml
 ---
-suite: Service labels that Prometheus does not copy to metrics
+suite: Object labels that Prometheus does not copy to metrics
 templates:
 - prometheus/prometheus.ConfigMap.yaml
 tests:
-# The dashboards and alerts were written for metrics without these labels, and
-# `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
-- it: should not copy the labels the chart adds to every Service to metrics
+# No bundled dashboard or alert queries these labels, and `helm.sh/chart` and
+# `app.kubernetes.io/version` change on every upgrade.
+- it: should not copy the labels the chart adds to every object to metrics
   asserts:
   - matchRegex:
       path: data["prometheus.yml"]
-      # Both jobs that map Service labels to metric labels drop the chart's labels afterwards.
-      # `app.kubernetes.io/managed-by` is not dropped: Helm adds it to every object it installs,
-      # so the metrics already had it.
-      pattern: (?s)(regex. __meta_kubernetes_service_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\)\n.*){2}
+      # All three jobs that map Service or pod labels to metric labels drop the chart's labels afterwards.
+      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\n.*){3}
 
-- it: should not copy sourcegraph.labels from Services to metrics
+- it: should not copy sourcegraph.labels to metrics
   set:
     sourcegraph.labels:
       team: platform
       example.com/project: sourcegraph
       cost-center: "1234"
-      # Labels the chart sets on Services stay on metrics: `job` is derived from `app`.
+      # Labels the chart sets itself stay on metrics: `job` is derived from `app`.
       app: sourcegraph
       type: internal
   asserts:
   - matchRegex:
       path: data["prometheus.yml"]
       # Prometheus replaces every character of a label key outside [a-zA-Z0-9_] with `_`.
-      pattern: (?s)(regex. __meta_kubernetes_service_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\)\|cost_center\|example_com_project\|team\n.*){2}
+      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\|cost_center\|example_com_project\|team\n.*){3}

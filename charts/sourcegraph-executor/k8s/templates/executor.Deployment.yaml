@@ -38,13 +38,7 @@ spec:
       {{- toYaml .Values.executor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.executor.podLabels }}
-      {{- toYaml .Values.executor.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.executor) | nindent 8 }}
         {{- include "executor.labels" . | nindent 8 }}
     spec:
       securityContext:
