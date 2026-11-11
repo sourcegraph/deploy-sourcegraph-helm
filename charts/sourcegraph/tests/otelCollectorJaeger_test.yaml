@@ -4,13 +4,14 @@ tests:
   - it: should use the logging exporter when Jaeger is disabled and no exporter has been set
     template: otel-collector/otel-collector.Deployment.yaml
     asserts:
-      # The second --config serves the collector's own metrics on all interfaces: logging.yaml
-      # leaves them on 127.0.0.1, where Prometheus cannot scrape them.
       - equal:
           path: spec.template.spec.containers[0].command
+          value: [ "/bin/otelcol-sourcegraph", "--config=/etc/otel-collector/configs/logging.yaml" ]
+      # The argument serves the collector's own metrics on all interfaces: logging.yaml
+      # leaves them on 127.0.0.1, where Prometheus cannot scrape them.
+      - equal:
+          path: spec.template.spec.containers[0].args
           value:
-            - "/bin/otelcol-sourcegraph"
-            - "--config=/etc/otel-collector/configs/logging.yaml"
             - '--config=yaml:service::telemetry::metrics::readers: [{pull: {exporter: {prometheus: {host: "0.0.0.0", port: 8888, without_type_suffix: true, without_units: true}}}}]'
       - isEmpty:
           path: spec.template.spec.containers[0].volumeMounts

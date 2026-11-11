@@ -756,13 +756,8 @@ openTelemetry:
     # `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart
     # selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file.
     # `openTelemetry.gateway.args` is still passed as the arguments.
-    # The default command makes the collector serve its own metrics on all interfaces, where Prometheus
-    # scrapes them. A command that runs `/etc/otel-collector/config.yaml`, rendered from
-    # `config.traces.exporters`, or the image's `jaeger.yaml` does too. A command that runs the image's
-    # `logging.yaml` must also pass the second argument of the default command,
-    # `--config=yaml:service::telemetry::metrics::readers: [{pull: {exporter: {prometheus: {host: "0.0.0.0", port: 8888, without_type_suffix: true, without_units: true}}}}]`,
-    # and your own configuration file must set `service.telemetry.metrics.readers` to that list.
-    # Otherwise Prometheus cannot scrape the collector and its "pods available" alert fires.
+    # The chart always passes one argument that makes the collector serve its own metrics on all
+    # interfaces, where Prometheus scrapes them, so a shell wrapper must pass its arguments on (`"$@"`).
     command: []
     # -- Resource requests & limits for the `otel-collector` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
