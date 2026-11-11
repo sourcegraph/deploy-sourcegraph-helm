@@ -41,12 +41,15 @@ the component's podLabels, then the selector labels. The later one wins when a
 key is set more than once, so each key is rendered once and the selector always
 matches the pods.
 
+`helm.sh/chart` and `app.kubernetes.io/version` are left out: they change with
+every chart version, and a changed pod template restarts the pods.
+
 {{ include "sourcegraph.podLabels" (list . .Values.executor) }}
 */}}
 {{- define "sourcegraph.podLabels" -}}
 {{- $top := index . 0 -}}
 {{- $component := index . 1 -}}
-{{- $labels := include "sourcegraph.labels" $top | fromYaml -}}
+{{- $labels := omit (include "sourcegraph.labels" $top | fromYaml) "helm.sh/chart" "app.kubernetes.io/version" -}}
 {{- mergeOverwrite $labels ($top.Values.sourcegraph.podLabels | default dict) ($component.podLabels | default dict) (include "sourcegraph.selectorLabels" $top | fromYaml) | toYaml -}}
 {{- end }}
 

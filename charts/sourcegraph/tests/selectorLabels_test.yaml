@@ -76,9 +76,9 @@ tests:
         deploy: sourcegraph
         example.com/installation: production
         example.com/project: pods
-  - exists:
+  - notExists:
       path: spec.template.metadata.labels["helm.sh/chart"]
-  - exists:
+  - notExists:
       path: spec.template.metadata.labels["app.kubernetes.io/version"]
   - exists:
       path: spec.template.metadata.labels["app.kubernetes.io/component"]
@@ -104,7 +104,7 @@ tests:
         app: jaeger
         deploy: sourcegraph
         example.com/project: sourcegraph
-  - exists:
+  - notExists:
       path: spec.template.metadata.labels["helm.sh/chart"]
 
 - it: should keep the standard labels on object metadata when the selector labels are replaced
