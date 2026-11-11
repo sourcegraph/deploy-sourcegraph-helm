@@ -35,6 +35,9 @@ sourcegraph:
   podLabels: { }
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to all pods, e.g. to run them in a sandbox.
+  # Override it per service with `<serviceName>.runtimeClassName`; set that to `""` to keep a service on the cluster default runtime
+  runtimeClassName: ""
 
 
 executor:
@@ -103,6 +106,8 @@ executor:
     runAsGroup:
     # -- The group ID which is set on the job PVC file system.
     fsGroup: "1000"
+    # -- The RuntimeClass to set on job pods, e.g. `gvisor`. Job pods do not inherit `sourcegraph.runtimeClassName`
+    runtimeClassName: ""
     resources:
       requests:
         # -- The requested CPU for a job.

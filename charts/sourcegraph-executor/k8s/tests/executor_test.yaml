@@ -125,3 +125,36 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should set runtimeClassName on the executor pod and job pods independently
+    set:
+      executor:
+        queueName: "test"
+        runtimeClassName: executor-class
+        kubernetesJob:
+          runtimeClassName: job-class
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: executor-class
+        template: executor.Deployment.yaml
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_RUNTIME_CLASS
+          value: job-class
+        template: executor.ConfigMap.yaml
+
+  - it: should apply the global runtimeClassName to the executor pod, but not to job pods
+    set:
+      executor:
+        queueName: "test"
+      sourcegraph:
+        runtimeClassName: global-class
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: global-class
+        template: executor.Deployment.yaml
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_RUNTIME_CLASS
+          value: ""
+        template: executor.ConfigMap.yaml

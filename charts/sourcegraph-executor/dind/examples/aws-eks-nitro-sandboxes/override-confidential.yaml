@@ -1,0 +1,34 @@
+# Run the executor pod and the private Docker registry in confidential-sandbox
+# with EKS Nitro Sandboxes. Use it on top of override.yaml:
+#   helm upgrade ... -f override.yaml -f override-confidential.yaml
+#
+# Confidential mode needs a policy for both pods. Generate them as described
+# in the sourcegraph chart's
+# examples/aws-eks-nitro-sandboxes/override-confidential.yaml
+#
+# The executor Deployment needs two changes:
+# - Before generating, change the executor-scratch volume from "emptyDir:" to
+#   "emptyDir: {}" in the manifest. With executor.storage.size unset, the
+#   chart renders it with no value, and the generator then expects a pod with
+#   no emptyDir volume
+# - After generating, remove the dind container's context.mounts condition
+#   from the policy. Its subPath mount of daemon.json pins a source that does
+#   not match, so the container is denied at CreateContainer. The executor
+#   container's condition can stay
+#
+# The private-docker-registry StatefulSet needs only the volumeClaimTemplates
+# step.
+#
+# Jobs run as Docker containers inside the executor pod's sandbox, so they
+# need no policy of their own
+
+sourcegraph:
+  runtimeClassName: confidential-sandbox
+
+executor:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the executor Deployment>
+
+privateDockerRegistry:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the private-docker-registry StatefulSet>

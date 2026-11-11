@@ -1,0 +1,93 @@
+# Run every Sourcegraph pod in its own microVM with EKS Nitro Sandboxes
+# https://docs.aws.amazon.com/eks/latest/userguide/sandboxing.html
+#
+# Tested on EKS Auto Mode, with external and with the bundled PostgreSQL,
+# Redis, and object storage.
+
+sourcegraph:
+  # Applies to every pod; a service's own runtimeClassName overrides it
+  runtimeClassName: isolated-sandbox
+
+  # A sandbox defaults to 100 Mbps and 1,500 packets per second each way.
+  # Raise both; the limits are read once, when the pod is created
+  podAnnotations:
+    sandbox.amazonaws.com/ingress-bandwidth: "1G"
+    sandbox.amazonaws.com/egress-bandwidth: "1G"
+    sandbox.amazonaws.com/ingress-packets-per-second: "15000"
+    sandbox.amazonaws.com/egress-packets-per-second: "15000"
+
+# cadvisor and node-exporter measure the node through hostPID and hostPath.
+# In a sandbox, cadvisor fails to start and node-exporter reports its own
+# microVM instead of the node. To run a service on the node instead, set its
+# runtimeClassName to "", which opts it out of the global value
+cadvisor:
+  enabled: false
+nodeExporter:
+  enabled: false
+
+# The init container of the bundled database pods. With its 10m CPU limit, the
+# first database init took over 13 minutes in a sandbox
+alpine:
+  resources:
+    limits:
+      cpu: null
+
+# The pod's requests size its microVM; limits do not:
+# - Memory: the sum of the containers' memory requests
+# - vCPUs: the sum of the containers' CPU requests, rounded up
+#
+# A container is OOM-killed once the pod uses more than its memory requests,
+# so request as much memory as the limit. The services below request less than
+# their limit by default; these are the chart's default limits.
+# To give a service more vCPUs, raise its CPU request; CPU limits add none.
+frontend:
+  resources:
+    requests:
+      memory: 4G
+indexedSearch:
+  resources:
+    requests:
+      memory: 4G
+indexedSearchIndexer:
+  resources:
+    requests:
+      memory: 8G
+jaeger:
+  resources:
+    requests:
+      memory: 1G
+openTelemetry:
+  # The otel-agent DaemonSet needs this selector. The RuntimeClass adds it to
+  # each pod at admission, which is too late for the DaemonSet controller:
+  # without it here, the agent gets a pod that stays Pending on every node
+  # that has no sandbox support
+  nodeSelector:
+    eks.amazonaws.com/nitro-sandbox: "true"
+  agent:
+    resources:
+      requests:
+        memory: 500Mi
+  gateway:
+    resources:
+      requests:
+        memory: 3Gi
+preciseCodeIntel:
+  resources:
+    requests:
+      memory: 4G
+searcher:
+  resources:
+    requests:
+      memory: 2G
+syntacticCodeIntel:
+  resources:
+    requests:
+      memory: 4G
+syntectServer:
+  resources:
+    requests:
+      memory: 6G
+worker:
+  resources:
+    requests:
+      memory: 4G

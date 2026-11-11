@@ -122,6 +122,7 @@ spec:
       {{- include "sourcegraph.nodeSelector" (list . "gitserver" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "gitserver" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "gitserver" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- with include "sourcegraph.runtimeClassName" (list . "gitserver" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "gitserver" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

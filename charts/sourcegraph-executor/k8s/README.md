@@ -84,6 +84,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.kubernetesJob.resources.requests.memory | string | `"1Gi"` | The requested memory for a job. |
 | executor.kubernetesJob.runAsGroup | int | `nil`; accepts [0, 2147483647] | The group ID to run Kubernetes jobs as. |
 | executor.kubernetesJob.runAsUser | int | `nil`; accepts [0, 2147483647] | The user ID to run Kubernetes jobs as. |
+| executor.kubernetesJob.runtimeClassName | string | `""` | The RuntimeClass to set on job pods, e.g. `gvisor`. Job pods do not inherit `sourcegraph.runtimeClassName` |
 | executor.log.format | string | `"condensed"` |  |
 | executor.log.level | string | `"warn"` | Possible values are `dbug`, `info`, `warn`, `eror`, `crit`. |
 | executor.log.trace | string | `"false"` |  |
@@ -117,4 +118,5 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
+| sourcegraph.runtimeClassName | string | `""` | Assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to all pods, e.g. to run them in a sandbox. Override it per service with `<serviceName>.runtimeClassName`; set that to `""` to keep a service on the cluster default runtime |
 | sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |

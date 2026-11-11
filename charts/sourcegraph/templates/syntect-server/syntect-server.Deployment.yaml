@@ -98,6 +98,7 @@ spec:
       {{- include "sourcegraph.nodeSelector" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- with include "sourcegraph.priorityClassName" (list . "syntectServer" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- with include "sourcegraph.runtimeClassName" (list . "syntectServer" ) | trim }}{{ . | nindent 6 }}{{- end }}
       {{- include "sourcegraph.tolerations" (list . "syntectServer" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:

@@ -310,7 +310,10 @@ spec:
               name: docker
             {{- end }}
       enableServiceLinks: false
-      {{- if $r.Values.dind.gVisor.enabled }}
+      {{- $runtimeClassName := include "sourcegraph.runtimeClassName" (list $r "executor") | trim }}
+      {{- if $runtimeClassName }}
+      {{- $runtimeClassName | nindent 6 }}
+      {{- else if $r.Values.dind.gVisor.enabled }}
       runtimeClassName: gvisor
       {{- end }}
       {{- with $r.Values.sourcegraph.nodeSelector }}

@@ -33,6 +33,9 @@ sourcegraph:
   podLabels: {}
   # -- Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets)
   priorityClassName: ""
+  # -- Assign a [RuntimeClass](https://kubernetes.io/docs/concepts/containers/runtime-class/) to all pods, e.g. to run them in a sandbox.
+  # Override it per service with `<serviceName>.runtimeClassName`; set that to `""` to keep a service on the cluster default runtime
+  runtimeClassName: ""
 
 
 storageClass:
@@ -158,7 +161,8 @@ dind:
       - private-docker-registry:5000
   gVisor:
     # -- Enable gVisor sandbox (GKE only). Requires the GKE node pool to have sandbox type set to gvisor.
-    # When enabled, sets runtimeClassName: gvisor on executor pods and replaces privileged: true with
+    # When enabled, sets runtimeClassName: gvisor on executor pods, unless `executor.runtimeClassName` or
+    # `sourcegraph.runtimeClassName` is set, and replaces privileged: true with
     # explicit capabilities — these are intercepted in-sandbox and never granted to the host kernel.
     # See: https://gvisor.dev/docs/tutorials/docker-in-gvisor/
     enabled: false

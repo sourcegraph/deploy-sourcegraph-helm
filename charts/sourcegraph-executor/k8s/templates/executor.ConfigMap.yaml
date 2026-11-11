@@ -37,6 +37,7 @@ data:
   KUBERNETES_RUN_AS_USER: "{{ .Values.executor.kubernetesJob.runAsUser }}"
   KUBERNETES_RUN_AS_GROUP: "{{ .Values.executor.kubernetesJob.runAsGroup }}"
   KUBERNETES_FS_GROUP: "{{ .Values.executor.kubernetesJob.fsGroup }}"
+  EXECUTOR_KUBERNETES_RUNTIME_CLASS: "{{ .Values.executor.kubernetesJob.runtimeClassName }}"
 
   EXECUTOR_DOCKER_ADD_HOST_GATEWAY: "{{.Values.executor.dockerAddHostGateway }}"
   KUBERNETES_KEEP_JOBS: "{{ .Values.executor.debug.keepJobs }}"

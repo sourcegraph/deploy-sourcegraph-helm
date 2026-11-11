@@ -1,0 +1,45 @@
+# Run the executor and each job pod in confidential-sandbox with EKS Nitro
+# Sandboxes. Use it on top of override.yaml:
+#   helm upgrade ... -f override.yaml -f override-confidential.yaml
+#
+# Confidential mode needs a policy for every pod. Generate them as described
+# in the sourcegraph chart's
+# examples/aws-eks-nitro-sandboxes/override-confidential.yaml
+#
+# Make the job pods' policy first: it is part of the executor's env, which the
+# executor's own policy pins. The executor's policy needed no edit.
+#
+# Job pods have no manifest to generate a policy from, and they all get the
+# same annotations, so one policy has to allow every job you run:
+# 1. Run one job of each kind, and save its pod with `kubectl get pod -o yaml`
+#    while it exists. The pod fails to start until its policy allows it, and
+#    that pod is enough. Remove what the API server added: status, the uid,
+#    resourceVersion, and ownerReferences, nodeName, overhead, tolerations,
+#    priority, and the kube-api-access volume with its mounts
+# 2. Generate a policy from each saved pod, with these flags added, because
+#    args, env, and hostname differ on every job:
+#      --no-pin-args --no-pin-env --no-pin-hostname
+# 3. Merge the policies into one. Decode each to its envelope, append the
+#    admission_policy and runtime_policy text of the others to the first, and
+#    encode the result. A pod is allowed when any one permit matches
+#
+# A job policy still pins the container names, image digests, working
+# directories, and mounts. Each number of batch spec steps, each step image,
+# and each indexer needs its own permits: a batch spec with two steps was
+# denied by a policy made from a batch spec with one
+
+sourcegraph:
+  # The executor pod
+  runtimeClassName: confidential-sandbox
+
+executor:
+  podAnnotations:
+    sandbox.amazonaws.com/policy: <policy of the executor Deployment>
+
+  kubernetesJob:
+    runtimeClassName: confidential-sandbox
+
+  # Replaces the list in override.yaml
+  extraEnv:
+    - name: KUBERNETES_JOB_POD_ANNOTATIONS
+      value: '{"sandbox.amazonaws.com/ingress-bandwidth": "1G", "sandbox.amazonaws.com/egress-bandwidth": "1G", "sandbox.amazonaws.com/ingress-packets-per-second": "15000", "sandbox.amazonaws.com/egress-packets-per-second": "15000", "sandbox.amazonaws.com/policy": "<merged policy of the job pods>"}'

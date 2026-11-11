@@ -127,3 +127,33 @@ tests:
     asserts:
       - isNull:
           path: spec.template.spec.priorityClassName
+
+  - it: should prefer migrator.runtimeClassName over the global one
+    set:
+      sourcegraph:
+        runtimeClassName: global-class
+      migrator:
+        runtimeClassName: migrator-class
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: migrator-class
+
+  - it: should fall back to the global runtimeClassName
+    set:
+      sourcegraph:
+        runtimeClassName: global-class
+    asserts:
+      - equal:
+          path: spec.template.spec.runtimeClassName
+          value: global-class
+
+  - it: should opt out of the global runtimeClassName when migrator.runtimeClassName is empty
+    set:
+      sourcegraph:
+        runtimeClassName: global-class
+      migrator:
+        runtimeClassName: ""
+    asserts:
+      - isNull:
+          path: spec.template.spec.runtimeClassName
