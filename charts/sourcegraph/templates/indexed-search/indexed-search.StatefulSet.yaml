@@ -156,11 +156,7 @@ spec:
   - metadata:
       labels:
         deploy: sourcegraph
-        {{- $storageLabels := .Values.indexedSearch.storageLabels | default dict }}
-        {{- if and (hasKey $storageLabels "deploy") (ne (toString $storageLabels.deploy) "sourcegraph") }}
-        {{- fail "indexedSearch.storageLabels must not set the label \"deploy\", which the chart sets to \"sourcegraph\"" }}
-        {{- end }}
-        {{- with omit $storageLabels "deploy" }}
+        {{- with .Values.indexedSearch.storageLabels }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
       name: data

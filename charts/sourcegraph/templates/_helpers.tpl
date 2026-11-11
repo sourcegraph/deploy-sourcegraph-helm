@@ -38,19 +38,13 @@ Pass the root context and the component's values:
 */}}
 {{- define "sourcegraph.selectorLabels" -}}
 {{- $top := index . 0 -}}
-{{- $custom := include "sourcegraph.customSelectorLabels" . | fromYaml -}}
-{{- if not $custom -}}
+{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
 app.kubernetes.io/name: {{ include "sourcegraph.name" $top }}
 app.kubernetes.io/instance: {{ $top.Release.Name }}
-{{- else -}}
-{{- $labels := dict -}}
-{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
-{{- $_ := set $labels "app.kubernetes.io/name" (include "sourcegraph.name" $top) -}}
-{{- $_ := set $labels "app.kubernetes.io/instance" $top.Release.Name -}}
-{{- end -}}
-{{- /* One map, so a custom label that repeats a default one renders once, with the custom value */ -}}
-{{ mergeOverwrite $labels $custom | toYaml }}
-{{- end -}}
+{{- end }}
+{{- with include "sourcegraph.customSelectorLabels" . }}
+{{ . }}
+{{- end }}
 {{- end }}
 
 {{/*
