@@ -1,0 +1,28 @@
+# Run the executor pod, with its Docker daemon and every job container, in one
+# microVM with EKS Nitro Sandboxes, and the private Docker registry in another
+# https://docs.aws.amazon.com/eks/latest/userguide/sandboxing.html
+
+sourcegraph:
+  # The executor pod and the private Docker registry pod
+  runtimeClassName: isolated-sandbox
+
+  # A sandbox defaults to 100 Mbps and 1,500 packets per second each way.
+  # Raise both; the limits are read once, when the pod is created
+  podAnnotations:
+    sandbox.amazonaws.com/ingress-bandwidth: "1G"
+    sandbox.amazonaws.com/egress-bandwidth: "1G"
+    sandbox.amazonaws.com/ingress-packets-per-second: "15000"
+    sandbox.amazonaws.com/egress-packets-per-second: "15000"
+
+executor:
+  # Jobs run as Docker containers inside the executor pod, so its microVM must
+  # hold them too. The chart has no resources value for the dind or
+  # private-docker-registry containers, so size the microVM for the jobs with
+  # the executor container's requests: vCPUs are the CPU request rounded up,
+  # and memory is the memory request
+  resources:
+    requests:
+      cpu: "2"
+      memory: 4G
+    limits:
+      memory: 4G
