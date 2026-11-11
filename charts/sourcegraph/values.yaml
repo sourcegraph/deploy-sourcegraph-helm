@@ -318,6 +318,10 @@ codeIntelDB:
   storageAnnotations: {}
 
 frontend:
+  # -- Command for the `frontend` container, as a list, replacing the image's entrypoint,
+  # e.g. a shell wrapper that exports credentials read from mounted files before starting `frontend`.
+  # `frontend.args` (default `["serve"]`) is still passed as the arguments.
+  command: []
   # -- Environment variables for the `frontend` container
   # @default -- the chart will add some default environment values
   env:
@@ -411,6 +415,9 @@ migrator:
     defaultTag: 8.1.4873@sha256:1683031a37687f672f4d40ba3508099e239881f9eab82e2faeed1e672ea4b60f
     # -- Docker image name for the `migrator` image
     name: "migrator"
+  # -- Command for the `migrator` init container, as a list, replacing the image's entrypoint.
+  # `migrator.args` (default `["up"]`) is still passed as the arguments.
+  command: []
   # -- Environment variables for the `migrator` container
   # @default -- the chart will add some default environment values
   env:
@@ -723,6 +730,11 @@ openTelemetry:
   gateway:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-collector"
+    # -- Command for the `otel-collector` container, as a list, replacing the chart's
+    # `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart
+    # selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file.
+    # `openTelemetry.gateway.args` is still passed as the arguments.
+    command: []
     # -- Resource requests & limits for the `otel-collector` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources:
