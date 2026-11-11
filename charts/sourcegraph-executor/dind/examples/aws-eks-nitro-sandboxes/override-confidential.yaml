@@ -12,7 +12,8 @@
 #   chart renders it with no value, and the generator then expects a pod with
 #   no emptyDir volume
 # - After generating, remove the pod's context.mounts conditions from the
-#   policy, because the pinned source of its subPath mount does not match
+#   policy. The pod has a subPath mount, whose pinned source did not match in
+#   the sourcegraph chart. This pod was only tested with them removed
 #
 # The private-docker-registry StatefulSet needs only the volumeClaimTemplates
 # step.
