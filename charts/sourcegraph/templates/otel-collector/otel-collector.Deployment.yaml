@@ -51,18 +51,20 @@ spec:
           - "/bin/otelcol-sourcegraph"
           {{- if and (not .Values.openTelemetry.gateway.config.traces.exporters) (not .Values.jaeger.enabled) }}  # default config: enable logging exporter
           - "--config=/etc/otel-collector/configs/logging.yaml"
-          # logging.yaml serves the collector's own metrics on 127.0.0.1 only, where Prometheus cannot scrape them.
-          - {{ printf "--config=yaml:service::telemetry::metrics::readers: %s" (include "sourcegraph.otelCollector.metricsReaders" .) | quote }}
           {{- else if .Values.jaeger.enabled }} # use bundled config to connect to bundled jaeger
           - "--config=/etc/otel-collector/configs/jaeger.yaml"
           {{- else }} # use config defined by customer in values.yaml
           - "--config=/etc/otel-collector/config.yaml"
           {{- end }}
-          {{- end -}}
-        {{- with .Values.openTelemetry.gateway.args }}
+          {{- end }}
         args:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
+          {{- with .Values.openTelemetry.gateway.args }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          # The image's logging.yaml serves the collector's own metrics on 127.0.0.1 only, where Prometheus cannot
+          # scrape them. An argument, so that a command set in `openTelemetry.gateway.command` gets it too, and the
+          # last one, so that it is `$0` of a `sh -c` command whose script is the first argument.
+          - {{ printf "--config=yaml:service::telemetry::metrics::readers: %s" (include "sourcegraph.otelCollector.metricsReaders" .) | quote }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- if .Values.jaeger.enabled }}
