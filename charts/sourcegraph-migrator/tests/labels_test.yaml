@@ -14,5 +14,16 @@ tests:
           path: metadata.labels
           content:
             app.kubernetes.io/managed-by: Helm
+            deploy: sourcegraph
             example.com/installation: production
             example.com/project: sourcegraph
+      - exists:
+          path: metadata.labels["helm.sh/chart"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/name"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/instance"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/version"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/component"]

@@ -3,6 +3,7 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+- Every object the charts create now has the `deploy` and `app.kubernetes.io/component` labels: the `sourcegraph-executor-k8s` Secret did not have them. `executor.labels` is now also rendered on the `sourcegraph-executor-k8s` ConfigMap, Secret, ServiceAccount, Role, and RoleBinding, and on the `sourcegraph-executor-dind` `docker-config` ConfigMap, not only on the Deployment. Added `privateDockerRegistry.serviceLabels` to the `sourcegraph-executor-dind` chart to label the `private-docker-registry` Service.
 - `sourcegraph.labels` and the charts' standard labels (`helm.sh/chart`, `app.kubernetes.io/name`, `app.kubernetes.io/instance`, `app.kubernetes.io/version`, `app.kubernetes.io/managed-by`) are now rendered on every object the charts create. The `sourcegraph-executor-k8s` chart rendered them on none of its objects (ConfigMap, Deployment, Role, RoleBinding, Secret, Service, ServiceAccount), and the `sourcegraph-executor-dind` chart did not render them on the `docker-config` ConfigMap and the `private-docker-registry` Service. Existing releases gain these labels on upgrade. Labels on these objects can be changed in place, so nothing is recreated or restarted.
 
 ## 8.0.0

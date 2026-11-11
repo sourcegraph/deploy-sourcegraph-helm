@@ -4,7 +4,10 @@ metadata:
   name: {{ include "executor.name" . }}
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-{{- include "executor.labels" . | nindent 4 }}
+    {{- include "executor.labels" . | nindent 4 }}
+    {{- if .Values.executor.labels }}
+      {{- toYaml .Values.executor.labels | nindent 4 }}
+    {{- end }}
 data:
   EXECUTOR_USE_FIRECRACKER: "false"
   EXECUTOR_FRONTEND_URL: "{{ .Values.executor.frontendUrl }}"

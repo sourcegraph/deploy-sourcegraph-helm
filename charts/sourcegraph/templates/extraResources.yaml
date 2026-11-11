@@ -1,4 +1,5 @@
 {{- $labels := include "sourcegraph.labels" $ | fromYaml }}
+{{- $_ := set $labels "deploy" "sourcegraph" }}
 {{- range .Values.extraResources }}
 {{- $resource := . }}
 {{- if kindIs "map" . }}

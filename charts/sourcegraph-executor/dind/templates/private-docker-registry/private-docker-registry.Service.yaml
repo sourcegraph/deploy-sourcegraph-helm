@@ -11,6 +11,9 @@ metadata:
     app: private-docker-registry
     deploy: sourcegraph
     app.kubernetes.io/component: private-docker-registry
+    {{- if .Values.privateDockerRegistry.serviceLabels }}
+      {{- toYaml .Values.privateDockerRegistry.serviceLabels | nindent 4 }}
+    {{- end }}
   name: private-docker-registry
 spec:
   ports:

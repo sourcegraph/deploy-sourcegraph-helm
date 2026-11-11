@@ -3,6 +3,9 @@ kind: ConfigMap
 metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.executor.labels }}
+      {{- toYaml .Values.executor.labels | nindent 4 }}
+    {{- end }}
     app: executor
     deploy: sourcegraph
     app.kubernetes.io/component: executor

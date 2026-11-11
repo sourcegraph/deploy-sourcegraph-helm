@@ -208,6 +208,7 @@ Jaeger common labels
 {{- define "sourcegraph.jaeger.labels" -}}
 helm.sh/chart: {{ include "sourcegraph.chart" . }}
 {{ include "sourcegraph.jaeger.selectorLabels" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}

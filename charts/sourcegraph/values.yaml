@@ -71,7 +71,8 @@ sourcegraph:
 #     # Override the global sourcegraph.image.repository on a service-specific basis
 #     repository:
 #
-#   # Add additional labels and annotations to various resources
+#   # Add additional labels and annotations to various resources.
+#   # `labels` is added to the component's workload, ConfigMaps, Secrets, and PodDisruptionBudget
 #   labels: {}
 #   podLabels: {}
 #   podAnnotations: {}
@@ -1406,6 +1407,8 @@ storageClass:
   # -- Extra parameters of storageClass,
   # consult your cloud provider persistent storage documentation
   parameters: {}
+  # -- Add extra labels to the storageClass, in addition to `sourcegraph.labels`
+  labels: {}
   # -- Persistent volumes topology configuration,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: []
@@ -1594,8 +1597,9 @@ worker:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-# -- Additional resources to include in the rendered manifest. Templates are supported. `sourcegraph.labels` and the
-# chart's standard labels are added to each resource; labels the resource sets itself take precedence.
+# -- Additional resources to include in the rendered manifest. Templates are supported. `sourcegraph.labels`, the
+# chart's standard labels, and `deploy: sourcegraph` are added to each resource; labels the resource sets itself take
+# precedence.
 extraResources: []
 
 # -- Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class.
@@ -1605,6 +1609,7 @@ extraResources: []
 #   value: 100
 #   preemptionPolicy: Never
 #   description: "gitserver priority class"
+#   labels: {}
 priorityClasses: []
 
 # -- Enable the busybox connection test after deployment

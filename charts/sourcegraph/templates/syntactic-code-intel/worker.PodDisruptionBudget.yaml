@@ -4,6 +4,11 @@ kind: PodDisruptionBudget
 metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.syntacticCodeIntel.labels }}
+      {{- toYaml .Values.syntacticCodeIntel.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: syntactic-code-intel
   name: {{ .Values.syntacticCodeIntel.name }}
 spec:
   {{- toYaml .Values.syntacticCodeIntel.podDisruptionBudget | nindent 2 }}

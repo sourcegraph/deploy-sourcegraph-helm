@@ -4,6 +4,9 @@ kind: ConfigMap
 metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.prometheus.labels }}
+      {{- toYaml .Values.prometheus.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
   name: {{ .Values.prometheus.name }}
