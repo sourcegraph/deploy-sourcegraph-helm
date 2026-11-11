@@ -17,6 +17,8 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
       - isEmpty:
           path: spec.template.spec.volumes
+      - notExists: # no ConfigMap, so nothing to restart for
+          path: spec.template.metadata.annotations["checksum/otel-collector-config"]
       - hasDocuments:
           count: 0 # ConfigMap is not rendered
         template: otel-collector/otel-collector.ConfigMap.yaml
@@ -33,6 +35,8 @@ tests:
           path: spec.template.spec.containers[0].volumeMounts
       - isEmpty:
           path: spec.template.spec.volumes
+      - notExists: # no ConfigMap, so nothing to restart for
+          path: spec.template.metadata.annotations["checksum/otel-collector-config"]
       - hasDocuments:
           count: 0 # ConfigMap is not rendered
         template: otel-collector/otel-collector.ConfigMap.yaml
@@ -67,6 +71,13 @@ tests:
               items:
                 - key: config.yaml
                   path: config.yaml
+      # The collector does not reload a changed ConfigMap, so the pod restarts when the values it is rendered from change.
+      - matchRegex:
+          path: spec.template.metadata.annotations["checksum/otel-collector-config"]
+          pattern: ^[0-9a-f]{64}$
+      - notEqual: # the hash of `null`, which is what a missing value would hash to
+          path: spec.template.metadata.annotations["checksum/otel-collector-config"]
+          value: 74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
       - hasDocuments:
           count: 1 # ConfigMap is rendered
         template: otel-collector/otel-collector.ConfigMap.yaml
