@@ -28,6 +28,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: precise-code-intel-worker
+      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -58,6 +59,7 @@ spec:
       - name: precise-code-intel-worker
         env:
         {{- include "sourcegraph.gracefulShutdownEnv" (list . "preciseCodeIntel") | nindent 8 }}
+        {{- include "sourcegraph.redisConnection" . | nindent 8 }}
         {{- range $name, $item := .Values.preciseCodeIntel.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
