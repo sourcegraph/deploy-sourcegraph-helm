@@ -1,0 +1,34 @@
+# Run the executor and each job pod in its own microVM with EKS Nitro Sandboxes
+# https://docs.aws.amazon.com/eks/latest/userguide/sandboxing.html
+
+sourcegraph:
+  # The executor pod
+  runtimeClassName: isolated-sandbox
+
+  # A sandbox defaults to 100 Mbps and 1,500 packets per second each way.
+  # Raise both; the limits are read once, when the pod is created
+  podAnnotations:
+    sandbox.amazonaws.com/ingress-bandwidth: "1G"
+    sandbox.amazonaws.com/egress-bandwidth: "1G"
+    sandbox.amazonaws.com/ingress-packets-per-second: "15000"
+    sandbox.amazonaws.com/egress-packets-per-second: "15000"
+
+executor:
+  # Job pods do not inherit sourcegraph.runtimeClassName or sourcegraph.podAnnotations
+  kubernetesJob:
+    runtimeClassName: isolated-sandbox
+
+    # The requests size the job's microVM: vCPUs are the CPU request rounded up,
+    # and memory is the memory request. A job is OOM-killed once it uses more
+    # than the memory request, so request as much memory as the limit
+    resources:
+      requests:
+        cpu: "1"
+        memory: 2Gi
+      limits:
+        memory: 2Gi
+
+  # The chart has no value for job pod annotations
+  extraEnv:
+    - name: KUBERNETES_JOB_POD_ANNOTATIONS
+      value: '{"sandbox.amazonaws.com/ingress-bandwidth": "1G", "sandbox.amazonaws.com/egress-bandwidth": "1G", "sandbox.amazonaws.com/ingress-packets-per-second": "15000", "sandbox.amazonaws.com/egress-packets-per-second": "15000"}'
