@@ -296,13 +296,14 @@ tests:
         example.com/release: sourcegraph
         deploy: sourcegraph
 
-- it: should not copy the chart's version labels from Services to metrics
-  template: prometheus/prometheus.ConfigMap.yaml
+# Prometheus derives the `app` and `job` labels of a Service's metrics from its
+# `app` label, and the "pods available" alert queries `up{app=~".*otel-collector"}`.
+- it: should label the otel-collector Service with its app, like every other scraped Service
+  template: otel-collector/otel-collector.Service.yaml
   asserts:
-  - matchRegex:
-      path: data["prometheus.yml"]
-      # Both jobs that map Service labels to metric labels drop the chart's labels afterwards.
-      pattern: (?s)(regex. __meta_kubernetes_service_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\n.*){2}
+  - equal:
+      path: metadata.labels.app
+      value: otel-collector
 ---
 suite: sourcegraph.labels on the objects that replace others
 release:
@@ -344,3 +345,33 @@ tests:
       path: metadata.labels["example.com/service"]
       value: otel-collector
     template: otel-collector/otel-collector.ConfigMap.yaml
+---
+suite: Service labels that Prometheus does not copy to metrics
+templates:
+- prometheus/prometheus.ConfigMap.yaml
+tests:
+# The dashboards and alerts were written for metrics without these labels, and
+# `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade.
+- it: should not copy the labels the chart adds to every Service to metrics
+  asserts:
+  - matchRegex:
+      path: data["prometheus.yml"]
+      # Both jobs that map Service labels to metric labels drop the chart's labels afterwards.
+      # `app.kubernetes.io/managed-by` is not dropped: Helm adds it to every object it installs,
+      # so the metrics already had it.
+      pattern: (?s)(regex. __meta_kubernetes_service_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\)\n.*){2}
+
+- it: should not copy sourcegraph.labels from Services to metrics
+  set:
+    sourcegraph.labels:
+      team: platform
+      example.com/project: sourcegraph
+      cost-center: "1234"
+      # Labels the chart sets on Services stay on metrics: `job` is derived from `app`.
+      app: sourcegraph
+      type: internal
+  asserts:
+  - matchRegex:
+      path: data["prometheus.yml"]
+      # Prometheus replaces every character of a label key outside [a-zA-Z0-9_] with `_`.
+      pattern: (?s)(regex. __meta_kubernetes_service_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\)\|cost_center\|example_com_project\|team\n.*){2}

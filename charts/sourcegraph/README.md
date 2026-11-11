@@ -109,8 +109,7 @@ existing objects have:
   component.
 - `<serviceName>.labels` adds labels to one component's workload, ConfigMaps,
   Secrets, and PodDisruptionBudget.
-- `sourcegraph.serviceLabels` and `<serviceName>.serviceLabels` add labels to
-  every Service, or to one component's Services.
+- `<serviceName>.serviceLabels` adds labels to one component's Services.
 - `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of
   `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`,
   `redisCache`, or `redisStore`.
@@ -518,7 +517,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
-| sourcegraph.labels | object | `{}` | Add extra labels to every object the chart renders, including `extraResources`. Prometheus copies the labels of a Service to the metrics it scrapes from it, so these labels also appear on those metrics. |
+| sourcegraph.labels | object | `{}` | Add extra labels to every object the chart renders, including `extraResources`. The bundled Prometheus does not copy these labels from a Service to the metrics it scrapes from it; use `<serviceName>.serviceLabels` for that. |
 | sourcegraph.localDevMode | bool | `false` | When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources. |
 | sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |

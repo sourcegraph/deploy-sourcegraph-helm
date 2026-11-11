@@ -15,8 +15,8 @@ sourcegraph:
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # -- Add extra labels to every object the chart renders, including `extraResources`. Prometheus copies the labels of
-  # a Service to the metrics it scrapes from it, so these labels also appear on those metrics.
+  # -- Add extra labels to every object the chart renders, including `extraResources`. The bundled Prometheus does not
+  # copy these labels from a Service to the metrics it scrapes from it; use `<serviceName>.serviceLabels` for that.
   labels: {}
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
