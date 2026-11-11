@@ -39,6 +39,11 @@ data:
         endpoint: "localhost:55679"
 
     service:
+      telemetry:
+        metrics:
+          # Serve the collector's own metrics on all interfaces, for Prometheus to scrape.
+          # The collector defaults to 127.0.0.1.
+          readers: {{ include "sourcegraph.otelCollector.metricsReaders" . }}
       extensions:
         - health_check
         - zpages
