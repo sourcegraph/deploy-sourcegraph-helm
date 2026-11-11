@@ -16,14 +16,14 @@ sourcegraph:
     sandbox.amazonaws.com/ingress-packets-per-second: "15000"
     sandbox.amazonaws.com/egress-packets-per-second: "15000"
 
-# cadvisor and node-exporter measure the node through hostPID and hostPath, so
-# keep them on the default runtime; an empty value opts a service out of the
-# global value. In a sandbox, cadvisor fails to start and node-exporter reports
-# its own microVM instead of the node
+# cadvisor and node-exporter measure the node through hostPID and hostPath.
+# In a sandbox, cadvisor fails to start and node-exporter reports its own
+# microVM instead of the node. To run a service on the node instead, set its
+# runtimeClassName to "", which opts it out of the global value
 cadvisor:
-  runtimeClassName: ""
+  enabled: false
 nodeExporter:
-  runtimeClassName: ""
+  enabled: false
 
 # The init container of the bundled database pods. With its 10m CPU limit, the
 # first database init took over 13 minutes in a sandbox

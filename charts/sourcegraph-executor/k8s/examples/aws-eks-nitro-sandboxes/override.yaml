@@ -14,6 +14,13 @@ sourcegraph:
     sandbox.amazonaws.com/egress-packets-per-second: "15000"
 
 executor:
+  # This chart reads the Secret named executor-<queueName>, or
+  # executor-<queueNames joined with "-">, whatever name is set here; setting
+  # it only stops the chart from creating that Secret. Create it under that
+  # name, with the key EXECUTOR_FRONTEND_PASSWORD
+  # frontendExistingSecret: executor-batches-codeintel
+  # queueNames: [batches, codeintel]
+
   # Job pods do not inherit sourcegraph.runtimeClassName or sourcegraph.podAnnotations
   kubernetesJob:
     runtimeClassName: isolated-sandbox
