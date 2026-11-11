@@ -109,7 +109,7 @@ alpine:
   image:
     # -- Docker image tag for the `alpine` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:d5300423f1d854d178b528b5558488965eedef65349df8ca1246b8ccaac625ac
+    defaultTag: 8.1.4873@sha256:8e42f8f9bf080d8d2be0f3ada324950a476d4185839de08f31fd3ce2697be5c4
     # -- Docker image name for the `alpine` image
     name: "alpine-3.14"
   # -- Security context for the `alpine` initContainer,
@@ -135,7 +135,7 @@ cadvisor:
   image:
     # -- Docker image tag for the `cadvisor` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:166d6aaba9ff44dd2e88952c7a35192e156c8608e66cbc820b2fbf59d0c5360b
+    defaultTag: 8.1.4873@sha256:824ef7c657192fad4877e8cc89caf489361b768bcbcebb7b8a1efa469726a7f8
     # -- Docker image name for the `cadvisor` image
     name: "cadvisor"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -198,7 +198,7 @@ codeInsightsDB:
   image:
     # -- Docker image tag for the `codeinsights-db` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:2403f4ec8e89225fd6606af41e442588d944935b4b3bea6346cd9470ea3b0a0e
+    defaultTag: 8.1.4873@sha256:78cf4e3fe7d7a4d4be2106bd679d86e11e2720ec67ec8c003d876a9b61b97c38
     # -- Docker image name for the `codeinsights-db` image
     name: "postgresql-16-codeinsights"
   # -- Security context for the `codeinsights-db` container,
@@ -276,7 +276,7 @@ codeIntelDB:
   image:
     # -- Docker image tag for the `codeintel-db` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:1bd9b7314bdb83d12162c20e1c8da580ca27c43a4f391404a30339faeefa033b
+    defaultTag: 8.1.4873@sha256:39b5520a59e3001d69ac42d71de05ddf112e07452713ddd928ea3357e73b30f9
     # -- Docker image name for the `codeintel-db` image
     name: "postgresql-16"
   # -- Security context for the `codeintel-db` container,
@@ -332,7 +332,7 @@ frontend:
   image:
     # -- Docker image tag for the `frontend` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:f9136bd6f6989e56fe285f8e146d1197bfa2f5e0129af75905edaf19e41f325e
+    defaultTag: 8.1.4873@sha256:82693a243ef6efccfbadcbac9f66cffd8e8685048ecc4234d1e0f9ec7d3c0f92
     # -- Docker image name for the `frontend` image
     name: "frontend"
   ingress:
@@ -408,7 +408,7 @@ migrator:
   image:
     # -- Docker image tag for the `migrator` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:96b1c77bc5036b92a969db6a6e05573803e3dc9ba818f637b8af93009b7b1931
+    defaultTag: 8.1.4873@sha256:1683031a37687f672f4d40ba3508099e239881f9eab82e2faeed1e672ea4b60f
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
@@ -442,7 +442,7 @@ gitserver:
   image:
     # -- Docker image tag for the `gitserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:a8b97c0ad0ea6f4735774a084fa00a645d801a82f3fbe58401a32b5429ade96c
+    defaultTag: 8.1.4873@sha256:f9db37cfc18804e5a6357605a8d6f3c71f20d8d9b93534a0d9f2cae4df445cfa
     # -- Docker image name for the `gitserver` image
     name: "gitserver"
   # -- Name of existing Secret that contains SSH credentials to clone repositories.
@@ -519,7 +519,7 @@ grafana:
   image:
     # -- Docker image tag for the `grafana` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:38ebec5ea67f7d146480bfbccebdaf306c4af3b247f04a01f2f11e5eec886b53
+    defaultTag: 8.1.4873@sha256:1ad5812c5f6887a72383cf6ffca326d49b2eb956a599a07a75556c07fc495c43
     # -- Docker image name for the `grafana` image
     name: "grafana"
   # -- Security context for the `grafana` container,
@@ -568,7 +568,7 @@ indexedSearch:
   image:
     # -- Docker image tag for the `zoekt-webserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:cee213e601c32ffc281f468c8f31c77d0ffa931395e97a19d0a2cb2eb9e2c065
+    defaultTag: 8.1.4873@sha256:29a6e64f66cae061537499972fb821d466f0f3b9618b1ddd04459b6b60e58889
     # -- Docker image name for the `zoekt-webserver` image
     name: "indexed-searcher"
   # -- Security context for the `zoekt-webserver` container,
@@ -640,7 +640,7 @@ indexedSearchIndexer:
   image:
     # -- Docker image tag for the `zoekt-indexserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:1ecd80b08e78f3112e074cb493f64085e89aff7c3254199aec4aec970753df7b
+    defaultTag: 8.1.4873@sha256:106e6d81f4c3d08a496dd0b94ec80ed929335b4ae6913d5e22fbf11cc3be0225
     # -- Docker image name for the `zoekt-indexserver` image
     name: "search-indexer"
   # -- Security context for the `zoekt-indexserver` container,
@@ -673,7 +673,7 @@ blobstore:
   image:
     # -- Docker image tag for the `blobstore` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:59fba8ef0a7dbc53a5d045af8336a7454ec1371ce452ee4ff046cb480dcc56ab
+    defaultTag: 8.1.4873@sha256:3a9cf3eb90e33d589b679da40a02fdae4d46b8475abb68a0fab590f0c5411756
     # -- Docker image name for the `blobstore` image
     name: "blobstore"
   # -- Security context for the `blobstore` container,
@@ -717,7 +717,7 @@ openTelemetry:
   image:
     # -- Docker image tag for the `otel-collector` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:52bbc05485f010948a2e07eab2a367290a918b8a7b0002beaadb4699bd08523f
+    defaultTag: 8.1.4873@sha256:7c81be4ac92b9171f22057be6cbb0b89602387fda86d8392b7e9306b1034ce6a
     # -- Docker image name for the `otel-collector` image
     name: "opentelemetry-collector"
   gateway:
@@ -795,7 +795,7 @@ nodeExporter:
   image:
     # -- Docker image tag for the `node-exporter` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:fa0c4b00363385eadca32fdf982550b2c0115dc202c3fd66206a3412306b6500
+    defaultTag: 8.1.4873@sha256:bc880c82558b9c16d8b8983fdc21cfb984074c7bd46047a7a7fc481422c82b11
     # -- Docker image name for the `node-exporter` image
     name: "node-exporter"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -864,7 +864,7 @@ pgsql:
   image:
     # -- Docker image tag for the `pgsql` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:1bd9b7314bdb83d12162c20e1c8da580ca27c43a4f391404a30339faeefa033b
+    defaultTag: 8.1.4873@sha256:39b5520a59e3001d69ac42d71de05ddf112e07452713ddd928ea3357e73b30f9
     # -- Docker image name for the `pgsql` image
     name: "postgresql-16"
   # -- Security context for the `pgsql` container,
@@ -911,7 +911,7 @@ postgresExporter:
   image:
     # -- Docker image tag for the `pgsql-exporter` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:a1d2d6efb3e4ee74c01502edfc21fc23763ea1f5bb43bf8d161a5057db6e7104
+    defaultTag: 8.1.4873@sha256:d2a80c0c281723ea5929b3bd3efef808e32e35a619bba3b4bf16b182021b1fa6
     # -- Docker image name for the `pgsql-exporter` image
     name: "postgres_exporter"
   # -- Resource requests & limits for the `pgsql-exporter` sidecar container,
@@ -934,7 +934,7 @@ syntacticCodeIntel:
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:e8c11c42c727a8dc121588ea5a93befee1f6471598d65cfdbf965aa8c3c35c71
+    defaultTag: 8.1.4873@sha256:95616233291a9815431cb3f72f7a6f110a8f8e76f5189d85a8505934b38c893d
     # -- Docker image name for the `syntactic-code-intel-worker` image
     name: "syntactic-code-intel-worker"
   # -- Security context for the `syntactic-code-intel-worker` container,
@@ -995,7 +995,7 @@ preciseCodeIntel:
   image:
     # -- Docker image tag for the `precise-code-intel-worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:5b1bdf0987970ed76514f2a568bb5f9aeb8fa61bf0db39c0219315bc3262c6df
+    defaultTag: 8.1.4873@sha256:7b37068e0c1f664c2a3db901e788faf5c233dc9ce3ea292623bd9d3a5bfe7c8f
     # -- Docker image name for the `precise-code-intel-worker` image
     name: "precise-code-intel-worker"
   # -- Security context for the `precise-code-intel-worker` container,
@@ -1053,7 +1053,7 @@ prometheus:
   image:
     # -- Docker image tag for the `prometheus` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:2cda4133ec323587e119e2a242669bd610107a980ef672ad0e3de75481700d82
+    defaultTag: 8.1.4873@sha256:c2cc231f00981aa97ae0aaa01bb5d5771ca69b35320273ee5c619c877929f9a1
     # -- Docker image name for the `prometheus` image
     name: "prometheus"
   # -- Security context for the `prometheus` container,
@@ -1110,7 +1110,7 @@ redisCache:
   image:
     # -- Docker image tag for the `redis-cache` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:da52e54beb9090622fdb06a17d4d191277741b537c88067e50aebd3086d432f2
+    defaultTag: 8.1.4873@sha256:26bf6f70ecc2d92263432181220166b96bdacd77a4979c6621b758e38898fa9c
     # -- Docker image name for the `redis-cache` image
     name: "redis-cache"
   connection:
@@ -1187,7 +1187,7 @@ redisExporter:
   image:
     # -- Docker image tag for the `redis-exporter` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:90e3f009c6462ba6ef92c4803b0e9bad7bcbe1f96bf9ca9e4be40471ba1ee5f5
+    defaultTag: 8.1.4873@sha256:1e2e7374d659dc80fd5bf1780032d476ba2cbbb796dfa8cc29f2d5481580280e
     # -- Docker image name for the `redis-exporter` image
     name: "redis_exporter"
   # -- Security context for the `redis-exporter` sidecar container,
@@ -1220,7 +1220,7 @@ redisStore:
   image:
     # -- Docker image tag for the `redis-store` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:edc02f4327a80a274a50bb6ddd855c73fdeee4529298b65be5b6faa9ae9c1e82
+    defaultTag: 8.1.4873@sha256:84caa5e6285b73efa3cf1f9ff11e094838ccfa07387d05498c4584a7b079b3a7
     # -- Docker image name for the `redis-store` image
     name: "redis-store"
   # -- Security context for the `redis-store` container,
@@ -1295,7 +1295,7 @@ searcher:
   image:
     # -- Docker image tag for the `searcher` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:527e41d7b7cc0c63afcdd31b4b0151111239ca904ca6bdf3786fc59ea7cb08db
+    defaultTag: 8.1.4873@sha256:7213153f679622384f6614d7ab8599009ff55e14fbf82053e1d42c8f5a2b1781
     # -- Docker image name for the `searcher` image
     name: "searcher"
   # -- Security context for the `searcher` container,
@@ -1375,7 +1375,7 @@ syntectServer:
   image:
     # -- Docker image tag for the `syntect-server` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:fa844033613351aa768875c510da0155bcd9093add6ab25b4fcf9a770ca059e4
+    defaultTag: 8.1.4873@sha256:29a2adf0dabd997fa53b34c22c4198e0825deec66b8680ec3e1824eaead18405
     # -- Docker image name for the `syntect-server` image
     name: "syntax-highlighter"
   # -- Security context for the `syntect-server` container,
@@ -1426,7 +1426,7 @@ jaeger:
   image:
     # -- Docker image tag for the `jaeger` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:a42e031d38e484642b8c7c6d5176694a98c530398d450b4c19f20e179fb1a331
+    defaultTag: 8.1.4873@sha256:15ef27c46ee02942d4b639186e72fdf8b46145b061b8c9aaff0d308e6f0b7e0b
     # -- Docker image name for the `jaeger` image
     name: "jaeger-all-in-one"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -1491,7 +1491,7 @@ worker:
   image:
     # -- Docker image tag for the `worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.4690@sha256:ebee488399d33216c30303a18c5199c2385e920e5f8dc756cfec3c8bbeeaa76d
+    defaultTag: 8.1.4873@sha256:6908d34341553b2f308526823c4914e330d4666db9bce689f8488e6654310cc9
     # -- Docker image name for the `worker` image
     name: "worker"
   # -- Security context for the `worker` container,
