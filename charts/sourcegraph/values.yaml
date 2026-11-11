@@ -15,7 +15,8 @@ sourcegraph:
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # -- Add extra labels to all resources
+  # -- Add extra labels to every object the chart renders, including `extraResources`. Prometheus copies the labels of
+  # a Service to the metrics it scrapes from it, so these labels also appear on those metrics.
   labels: {}
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
@@ -1593,7 +1594,8 @@ worker:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-# -- Additional resources to include in the rendered manifest. Templates are supported.
+# -- Additional resources to include in the rendered manifest. Templates are supported. `sourcegraph.labels` and the
+# chart's standard labels are added to each resource; labels the resource sets itself take precedence.
 extraResources: []
 
 # -- Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class.

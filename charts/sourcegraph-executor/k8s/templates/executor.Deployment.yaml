@@ -6,6 +6,7 @@ metadata:
     description: Runs a sourcegraph executor
     kubectl.kubernetes.io/default-container: executor
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     {{- include "executor.labels" . | nindent 4 }}
     {{- if .Values.executor.labels }}
       {{- toYaml .Values.executor.labels | nindent 4 }}

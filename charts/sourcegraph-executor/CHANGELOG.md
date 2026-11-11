@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+- `sourcegraph.labels` and the charts' standard labels (`helm.sh/chart`, `app.kubernetes.io/name`, `app.kubernetes.io/instance`, `app.kubernetes.io/version`, `app.kubernetes.io/managed-by`) are now rendered on every object the charts create. The `sourcegraph-executor-k8s` chart rendered them on none of its objects (ConfigMap, Deployment, Role, RoleBinding, Secret, Service, ServiceAccount), and the `sourcegraph-executor-dind` chart did not render them on the `docker-config` ConfigMap and the `private-docker-registry` Service. Existing releases gain these labels on upgrade. Labels on these objects can be changed in place, so nothing is recreated or restarted.
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.

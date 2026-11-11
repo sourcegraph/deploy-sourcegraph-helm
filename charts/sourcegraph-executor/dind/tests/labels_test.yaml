@@ -1,0 +1,22 @@
+suite: sourcegraph.labels on every object
+# No `templates` list, so every template in the chart is rendered, including
+# ones added later. The test fails with "no manifest found" for a template that
+# renders nothing, so enable a new optional template here.
+tests:
+  - it: should add sourcegraph.labels to every object the chart renders
+    set:
+      sourcegraph:
+        labels:
+          example.com/installation: production
+          example.com/project: sourcegraph
+      executor:
+        queueName: batches
+      privateDockerRegistry:
+        enabled: true
+    asserts:
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/managed-by: Helm
+            example.com/installation: production
+            example.com/project: sourcegraph

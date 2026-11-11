@@ -103,9 +103,12 @@ release: Kubernetes rejects the upgrade. Before installing, compare the
 
 Labels on other objects can be changed, so they never block an upgrade, but
 Helm only manages the labels the chart renders. To render the labels that the
-existing PersistentVolumeClaims, ServiceAccounts, and RBAC objects have:
+existing objects have:
 
-- `sourcegraph.labels` adds labels to all of them, on every component.
+- `sourcegraph.labels` adds labels to every object the chart renders, on every
+  component.
+- `sourcegraph.serviceLabels` and `<serviceName>.serviceLabels` add labels to
+  every Service, or to one component's Services.
 - `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of
   `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`,
   `redisCache`, or `redisStore`.

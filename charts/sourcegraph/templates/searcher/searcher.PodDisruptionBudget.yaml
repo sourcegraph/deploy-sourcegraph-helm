@@ -2,6 +2,8 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
   name: {{ .Values.searcher.name }}
 spec:
   {{- toYaml .Values.searcher.podDisruptionBudget | nindent 2 }}

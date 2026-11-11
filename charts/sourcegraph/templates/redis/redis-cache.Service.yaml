@@ -9,6 +9,7 @@ metadata:
     {{- toYaml .Values.redisCache.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app: redis-cache
     deploy: sourcegraph
     app.kubernetes.io/component: redis

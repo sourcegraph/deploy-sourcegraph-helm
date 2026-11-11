@@ -8,6 +8,8 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" $top | nindent 4 }}
   name: {{ $name }}
 spec:
   {{- toYaml $top.Values.worker.podDisruptionBudget | nindent 2 }}

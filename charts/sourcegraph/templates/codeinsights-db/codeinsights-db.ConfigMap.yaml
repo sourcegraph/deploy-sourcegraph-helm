@@ -8,6 +8,7 @@ metadata:
   annotations:
     description: Configuration for Code Insights
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
   name: {{ .Values.codeInsightsDB.name }}-conf

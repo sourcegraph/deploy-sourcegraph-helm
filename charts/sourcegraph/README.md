@@ -103,9 +103,12 @@ release: Kubernetes rejects the upgrade. Before installing, compare the
 
 Labels on other objects can be changed, so they never block an upgrade, but
 Helm only manages the labels the chart renders. To render the labels that the
-existing PersistentVolumeClaims, ServiceAccounts, and RBAC objects have:
+existing objects have:
 
-- `sourcegraph.labels` adds labels to all of them, on every component.
+- `sourcegraph.labels` adds labels to every object the chart renders, on every
+  component.
+- `sourcegraph.serviceLabels` and `<serviceName>.serviceLabels` add labels to
+  every Service, or to one component's Services.
 - `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of
   `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`,
   `redisCache`, or `redisStore`.
@@ -231,7 +234,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.storageLabels | object | `{}` | Optional labels to add to the `codeintel-db` PVC, in addition to `sourcegraph.labels` |
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | codeIntelDB.storageSubPath | string | `""` | Optional subPath for the `codeintel-db` primary data volume mount |
-| extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
+| extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. `sourcegraph.labels` and the chart's standard labels are added to each resource; labels the resource sets itself take precedence. |
 | frontend.command | list | `[]` | Command for the `frontend` container, as a list, replacing the image's entrypoint, e.g. a shell wrapper that exports credentials read from mounted files before starting `frontend`. `frontend.args` (default `["serve"]`) is still passed as the arguments. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.createRoleBinding | bool | `true` | Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC |
@@ -513,7 +516,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
-| sourcegraph.labels | object | `{}` | Add extra labels to all resources |
+| sourcegraph.labels | object | `{}` | Add extra labels to every object the chart renders, including `extraResources`. Prometheus copies the labels of a Service to the metrics it scrapes from it, so these labels also appear on those metrics. |
 | sourcegraph.localDevMode | bool | `false` | When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources. |
 | sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
