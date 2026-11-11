@@ -18,5 +18,32 @@ tests:
           path: metadata.labels
           content:
             app.kubernetes.io/managed-by: Helm
+            deploy: sourcegraph
             example.com/installation: production
             example.com/project: sourcegraph
+      - exists:
+          path: metadata.labels["helm.sh/chart"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/name"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/instance"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/version"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/component"]
+  - it: should add the labels of a component to every object of it
+    set:
+      executor:
+        queueName: batches
+        labels:
+          example.com/service: component
+      privateDockerRegistry:
+        enabled: true
+        labels:
+          example.com/service: component
+        serviceLabels:
+          example.com/service: component
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/service"]
+          value: component

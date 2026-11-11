@@ -4,6 +4,11 @@ kind: PodDisruptionBudget
 metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.redisCache.labels }}
+      {{- toYaml .Values.redisCache.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: redis
   name: {{ .Values.redisCache.name }}
 spec:
   {{- toYaml .Values.redisCache.podDisruptionBudget | nindent 2 }}

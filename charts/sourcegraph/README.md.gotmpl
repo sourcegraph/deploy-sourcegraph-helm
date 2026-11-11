@@ -109,6 +109,8 @@ existing objects have:
   component. The PersistentVolumeClaims that Kubernetes creates from a
   template are not among them. See
   [PersistentVolumeClaim labels](#persistentvolumeclaim-labels).
+- `<serviceName>.labels` adds labels to one component's workload, ConfigMaps,
+  Secrets, and PodDisruptionBudget.
 - `sourcegraph.serviceLabels` and `<serviceName>.serviceLabels` add labels to
   every Service, or to one component's Services.
 - `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of

@@ -4,6 +4,11 @@ kind: PriorityClass
 metadata:
   labels:
     {{- include "sourcegraph.labels" $ | nindent 4 }}
+    {{- with $class.labels }}
+      {{- toYaml . | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: priority-class
   name: {{ $class.name }}
 value: {{ $class.value }}
 preemptionPolicy: {{ $class.preemptionPolicy }}

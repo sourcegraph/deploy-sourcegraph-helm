@@ -4,6 +4,11 @@ kind: PodDisruptionBudget
 metadata:
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.gitserver.labels }}
+      {{- toYaml .Values.gitserver.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: gitserver
   name: {{ .Values.gitserver.name }}
 spec:
   {{- toYaml .Values.gitserver.podDisruptionBudget | nindent 2 }}
