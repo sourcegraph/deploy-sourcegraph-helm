@@ -24,6 +24,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: otel-collector
+        {{- if .Values.openTelemetry.gateway.config.traces.exporters }}
+        {{- /* The collector does not reload a changed ConfigMap by itself. Its data is rendered from these values only. */}}
+        checksum/otel-collector-config: {{ toJson .Values.openTelemetry.gateway.config.traces | sha256sum }}
+        {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
