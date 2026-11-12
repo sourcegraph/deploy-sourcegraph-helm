@@ -1091,9 +1091,14 @@ prometheus:
     readOnlyRootFilesystem: false
   # -- Name used by resources. Does not affect service names or PVCs.
   name: "prometheus"
-  # -- Enable RBAC for `prometheus`
-  privileged: true
-  # -- Disable the creation of a RoleBinding object, for customers who block all RBAC resource creation
+  # -- Grant `prometheus` cluster-wide read access and scrape the Kubernetes API servers and nodes.
+  # `true` creates a ClusterRole, binds it with a ClusterRoleBinding, and adds the `kubernetes-apiservers` and `kubernetes-nodes` scrape jobs.
+  # `false` creates only a RoleBinding to the built-in `view` ClusterRole in the release namespace,
+  # which is all `prometheus` needs to discover and scrape Sourcegraph's own pods and services
+  privileged: false
+  # -- Create the binding for the `prometheus` ServiceAccount: a RoleBinding, or a ClusterRoleBinding if `privileged` is `true`.
+  # Set to `false` with `privileged: false` to create no RBAC resources for `prometheus`, for clusters that block RBAC resource creation;
+  # then bind the ServiceAccount to a Role that can get, list, and watch `pods`, `services`, and `endpoints` in the release namespace
   createRoleBinding: true
   # -- Resource requests & limits for the `prometheus` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
