@@ -89,6 +89,8 @@ spec:
           {{- end }}
         - name: blobstore
           mountPath: /blobstore
+        - name: tmpdir
+          mountPath: /tmp
         {{- if .Values.blobstore.extraVolumeMounts }}
         {{- toYaml .Values.blobstore.extraVolumeMounts | nindent 8 }}
         {{- end }}
@@ -111,6 +113,8 @@ spec:
         persistentVolumeClaim:
           claimName: blobstore
       - name: blobstore
+        emptyDir: {}
+      - name: tmpdir
         emptyDir: {}
       {{- if .Values.blobstore.extraVolumes }}
       {{- toYaml .Values.blobstore.extraVolumes | nindent 6 }}
