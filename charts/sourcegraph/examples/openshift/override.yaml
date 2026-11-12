@@ -94,6 +94,11 @@ x-serviceAccount: &serviceAccount
 #     false: Binds its ServiceAccount to the built-in "view" ClusterRole (namespace-scoped)
 #            Prometheus discovers and scrapes Sourcegraph's pods and services in the release
 #            namespace in either case
+#
+#     Executor metrics do not depend on this setting, even if Executors are deployed in a
+#     separate namespace (recommended): Executors send their metrics to frontend with each
+#     heartbeat, and Prometheus scrapes them from the worker-executors Service in the
+#     release namespace
 
 # Creation of RBAC resources in sourcegraph-executor/k8s Helm chart
 #

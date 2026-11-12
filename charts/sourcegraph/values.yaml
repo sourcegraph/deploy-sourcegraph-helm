@@ -1094,7 +1094,9 @@ prometheus:
   # -- Grant `prometheus` cluster-wide read access and scrape the Kubernetes API servers and nodes.
   # `true` creates a ClusterRole, binds it with a ClusterRoleBinding, and adds the `kubernetes-apiservers` and `kubernetes-nodes` scrape jobs.
   # `false` creates only a RoleBinding to the built-in `view` ClusterRole in the release namespace,
-  # which is all `prometheus` needs to discover and scrape Sourcegraph's own pods and services
+  # which is all `prometheus` needs to discover and scrape Sourcegraph's own pods and services.
+  # Executor metrics do not need `true`, wherever the executors run: executors send their metrics to `frontend` with each heartbeat,
+  # and `prometheus` scrapes them from the `worker-executors` Service in the release namespace
   privileged: false
   # -- Create the binding for the `prometheus` ServiceAccount: a RoleBinding, or a ClusterRoleBinding if `privileged` is `true`.
   # Set to `false` with `privileged: false` to create no RBAC resources for `prometheus`, for clusters that block RBAC resource creation;
