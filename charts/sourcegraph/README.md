@@ -159,6 +159,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | codeIntelDB.storageSubPath | string | `""` | Optional subPath for the `codeintel-db` primary data volume mount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
+| frontend.command | list | `[]` | Command for the `frontend` container, as a list, replacing the image's entrypoint, e.g. a shell wrapper that exports credentials read from mounted files before starting `frontend`. `frontend.args` (default `["serve"]`) is still passed as the arguments. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.createRoleBinding | bool | `true` | Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
@@ -261,6 +262,7 @@ In addition to the documented values, all services also support the following va
 | jaeger.resources | object | `{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | jaeger.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `jaeger` |
 | jaeger.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| migrator.command | list | `[]` | Command for the `migrator` init container, as a list, replacing the image's entrypoint. `migrator.args` (default `["up"]`) is still passed as the arguments. |
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | migrator.enabled | bool | `true` | Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in `frontend` deployment to perform database migration |
 | migrator.env | object | the chart will add some default environment values | Environment variables for the `migrator` container |
@@ -291,6 +293,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.agent.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-agent` |
 | openTelemetry.agent.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | openTelemetry.enabled | bool | `true` |  |
+| openTelemetry.gateway.command | list | `[]` | Command for the `otel-collector` container, as a list, replacing the chart's `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file. `openTelemetry.gateway.args` is still passed as the arguments. |
 | openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to. Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
 | openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |

@@ -106,7 +106,7 @@ migrator:
   image:
     # -- Docker image tag for the `migrator` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:c5bf0f81f3b07f7769f694525bef0a2d547a554f99113115a33b0925a16ef5ea
+    defaultTag: 8.1.4873@sha256:1683031a37687f672f4d40ba3508099e239881f9eab82e2faeed1e672ea4b60f
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container

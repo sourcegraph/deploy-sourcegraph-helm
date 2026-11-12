@@ -29,24 +29,24 @@ jobs:
     steps:
       - name: Checkout
         if: ${{ inputs.ref == '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
         with:
           fetch-depth: 0
 
       - name: Checkout (break glass)
         if: ${{ inputs.ref != '' }}
-        uses: actions/checkout@v3
+        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
 
       - name: Install Helm
-        uses: azure/setup-helm@v1
+        uses: azure/setup-helm@18bc76811624f360dbd7f18c2d4ecb32c7b87bab # v1
         with:
           version: ${{ env.HELM_VERSION }}
 
       - name: Configure gcloud
-        uses: google-github-actions/auth@v0
+        uses: google-github-actions/auth@09cecabe1f169596b81c2ef22b40faff87acc460 # v0.9.0
         with:
           credentials_json: ${{ secrets.GOOGLE_CLOUD_CREDENTIALS }}
           service_account: 'github-bot@sourcegraph-helm.iam.gserviceaccount.com'
