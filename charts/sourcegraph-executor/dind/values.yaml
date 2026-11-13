@@ -40,24 +40,9 @@ sourcegraph:
 
 
 storageClass:
-  # -- Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class
-  create: false
-  # -- Name of the storageClass.
-  # Use to customize to the existing storage class name
+  # -- Name of an existing StorageClass for the `private-docker-registry` volume.
+  # This chart does not create a StorageClass.
   name: sourcegraph
-  # -- Name of the storageClass provisioner,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
-  # and consult your cloud provider persistent storage documentation
-  provisioner: kubernetes.io/gce-pd
-  # -- Value of `type` key in storageClass `parameters`,
-  # consult your cloud provider persistent storage documentation
-  type: pd-ssd
-  # -- Extra parameters of storageClass,
-  # consult your cloud provider persistent storage documentation
-  parameters: {}
-  # -- Persistent volumes topology configuration,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
-  allowedTopologies: {}
 
 # -- Optional list of queues to deploy as standalone Deployments.
 # When set, the single executor Deployment is not rendered.
