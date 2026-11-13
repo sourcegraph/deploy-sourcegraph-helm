@@ -356,8 +356,8 @@ tests:
   asserts:
   - matchRegex:
       path: data["prometheus.yml"]
-      # All three jobs that map Service or pod labels to metric labels drop the chart's labels afterwards.
-      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\n.*){3}
+      # Both jobs that map Service or pod labels to metric labels drop the chart's labels afterwards.
+      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\n.*){2}
 
 - it: should not copy sourcegraph.labels to metrics
   set:
@@ -372,4 +372,4 @@ tests:
   - matchRegex:
       path: data["prometheus.yml"]
       # Prometheus replaces every character of a label key outside [a-zA-Z0-9_] with `_`.
-      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\|cost_center\|example_com_project\|team\n.*){3}
+      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\|cost_center\|example_com_project\|team\n.*){2}

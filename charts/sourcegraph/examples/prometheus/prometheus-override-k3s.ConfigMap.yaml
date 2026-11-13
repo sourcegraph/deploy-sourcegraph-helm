@@ -119,35 +119,6 @@ data:
         action: replace
         target_label: instance
 
-    - job_name: 'kubernetes-services'
-      metrics_path: /probe
-      params:
-        module: [http_2xx]
-      kubernetes_sd_configs:
-      - role: service
-      relabel_configs:
-      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
-        action: keep
-        regex: true
-      - source_labels: [__address__]
-        target_label: __param_target
-      - target_label: __address__
-        replacement: blackbox
-      - source_labels: [__param_target]
-        target_label: instance
-      - action: labelmap
-        regex: __meta_kubernetes_service_label_(.+)
-      # Sourcegraph specific customization. Do not copy the labels the chart adds to every object to every
-      # metric: `helm.sh/chart` and `app.kubernetes.io/version` change on every upgrade. If you set
-      # `sourcegraph.labels`, append its keys, with `_` for every character that is not a letter, digit, or `_`,
-      # e.g. `|example_com_project` for `example.com/project`.
-      - action: labeldrop
-        regex: helm_sh_chart|app_kubernetes_io_(name|instance|version|managed_by)
-      - source_labels: [__meta_kubernetes_service_namespace]
-        target_label: ns
-      - source_labels: [__meta_kubernetes_service_name]
-        target_label: kubernetes_name
-
     - job_name: 'kubernetes-pods'
       kubernetes_sd_configs:
       - role: pod

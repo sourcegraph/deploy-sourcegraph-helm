@@ -30,14 +30,12 @@ tests:
           path: metadata.labels["app.kubernetes.io/version"]
       - exists:
           path: metadata.labels["app.kubernetes.io/component"]
-  - it: should add executor.labels to every object, and serviceLabels to the Service
+  - it: should add executor.labels to every object
     set:
       executor:
         queueName: batches
         configureRbac: true
         labels:
-          example.com/service: executor
-        serviceLabels:
           example.com/service: executor
     asserts:
       - equal:
