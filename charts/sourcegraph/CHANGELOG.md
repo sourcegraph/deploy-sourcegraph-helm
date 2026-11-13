@@ -8,6 +8,7 @@ Use `**BREAKING**:` to denote a breaking change
 
 ## Unreleased
 
+- The `correct-data-dir-permissions` init containers of `pgsql`, `codeintel-db`, and `codeinsights-db` now run the database's own image instead of `sourcegraph/alpine-3.14`, which was based on an end-of-life Alpine release. The chart no longer pulls `alpine-3.14`, so private registries no longer need to mirror it. `alpine.image` has been removed and is ignored if set; `alpine.containerSecurityContext`, `alpine.resources`, and `codeInsightsDB.init.containerSecurityContext` still apply.
 - Fixed `frontend.command` and `migrator.command` rendering a list as a single element, e.g. `["sh", "-c", "<script>"]` became `[sh -c <script>]`, so the container failed to start. Both are now rendered as YAML lists and documented in `values.yaml`. A string holding a YAML list, the only form that worked before, still renders unchanged.
 - Added `openTelemetry.gateway.command` to replace the `otel-collector` container's command, e.g. with a shell wrapper that exports an exporter API key read from a mounted file
 - Added `<serviceName>.extraInitContainers` to every workload, rendered before any init containers the chart defines, so e.g. a secrets-fetching init container on `frontend` runs before `migrator`. Use `restartPolicy: Always` for a native sidecar that must be started before the main container, such as one that writes a `grafana` datasource credential file read by `datasources.yml`.
