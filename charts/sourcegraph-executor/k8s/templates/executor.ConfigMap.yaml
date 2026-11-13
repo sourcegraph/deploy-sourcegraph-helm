@@ -14,7 +14,6 @@ data:
   
   SRC_LOG_LEVEL: "{{ .Values.executor.log.level }}"
   SRC_LOG_FORMAT: "{{ .Values.executor.log.format }}"
-  SRC_TRACE_LOG: "{{ .Values.executor.log.trace }}"
 
   EXECUTOR_KUBERNETES_NAMESPACE: "{{ .Values.executor.namespace }}"
   EXECUTOR_KUBERNETES_CONFIG_PATH: "{{ .Values.executor.kubeconfigPath }}"
