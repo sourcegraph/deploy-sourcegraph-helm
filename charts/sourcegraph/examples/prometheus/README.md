@@ -14,6 +14,8 @@
 ```yaml
 prometheus:
   existingConfig: prometheus-override-k3s
+  # This config discovers targets in every namespace, and scrapes the nodes and API servers
+  privileged: true
 ```
 - Re-apply your Helm values override file, which may restart the Prometheus pod, but should not restart other services
 
