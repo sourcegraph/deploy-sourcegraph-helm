@@ -11,7 +11,7 @@ metadata:
 data:
   jaeger-config.yaml: |
     service:
-      extensions: [jaeger_storage, jaeger_query, remote_sampling, healthcheckv2]
+      extensions: [jaeger_storage, jaeger_query, healthcheckv2]
       pipelines:
         traces:
           receivers: [otlp]
@@ -36,12 +36,6 @@ data:
         base_path: "/-/debug/jaeger"
         http:
           endpoint: "0.0.0.0:16686"
-      remote_sampling:
-        file:
-          path: /etc/jaeger/sampling_strategies.json
-          default_sampling_probability: {{ .Values.jaeger.config.samplingDefaultProbability | default 1.0 }}
-        http:
-          endpoint: "0.0.0.0:5778"
     receivers:
       otlp:
         protocols:

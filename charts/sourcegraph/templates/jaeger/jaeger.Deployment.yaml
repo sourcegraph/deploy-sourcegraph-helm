@@ -28,8 +28,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: jaeger
-        prometheus.io/port: "16686"
-        sourcegraph.prometheus/scrape: "true"
         {{- if not .Values.jaeger.config.existingConfigMap }}
         checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
         {{- end }}
@@ -67,8 +65,6 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         ports:
-        - containerPort: 5778
-          protocol: TCP
         - containerPort: 16686
           name: http
           protocol: TCP
