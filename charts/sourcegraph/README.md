@@ -316,6 +316,7 @@ In addition to the documented values, all services also support the following va
 | migrator.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
 | migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| nameOverride | string | `""` | Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses. Set it only on a new install: Kubernetes does not allow changing a selector. As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph` in the parent chart to keep the selectors of a standalone install. |
 | nodeExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":65534,"runAsUser":65534}` | Security context for the `node-exporter` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | nodeExporter.enabled | bool | `true` | Enable `node-exporter` |
 | nodeExporter.extraArgs | list | `[]` |  |
@@ -482,7 +483,6 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add extra labels to all resources |
 | sourcegraph.localDevMode | bool | `false` | When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources. |
-| sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |

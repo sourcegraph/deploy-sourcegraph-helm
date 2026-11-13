@@ -18,6 +18,18 @@ tests:
   - notExists:
       path: spec.volumeClaimTemplates[0].metadata.labels
 
+- it: should use the top-level nameOverride documented in values.yaml
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    nameOverride: custom
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels["app.kubernetes.io/name"]
+      value: custom
+  - equal:
+      path: metadata.labels["app.kubernetes.io/name"]
+      value: custom
+
 - it: should replace the default selector labels on every workload
   templates: &workloads
   - blobstore/blobstore.Deployment.yaml

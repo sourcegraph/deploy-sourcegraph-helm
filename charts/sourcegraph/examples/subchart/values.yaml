@@ -5,6 +5,9 @@
 policyName: deny-ingress-from-other-namespaces
 
 sg: # Matches alias name of the dependency in Chart.yaml
+  # The alias replaces the chart name in the app.kubernetes.io/name selector label.
+  # Keep the name of a standalone install, so a release can move between the two.
+  nameOverride: sourcegraph
   sourcegraph: # Shown here to emphasize indentation
     podLabels:
       new-label: "custom" # Added to all pods
