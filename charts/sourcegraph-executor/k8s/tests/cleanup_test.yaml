@@ -1,8 +1,10 @@
 suite: executor cleanup
 templates:
   - executor.CleanupCronJob.yaml
+  - executor.Role.yaml
 tests:
   - it: should not render the CronJob by default
+    template: executor.CleanupCronJob.yaml
     set:
       executor:
         queueName: "test"
@@ -11,6 +13,7 @@ tests:
           count: 0
 
   - it: should render the CronJob when cleanup is enabled
+    template: executor.CleanupCronJob.yaml
     set:
       executor:
         queueName: "test"
@@ -29,6 +32,7 @@ tests:
           value: sg-executor
 
   - it: should fail when minimumAgeSeconds does not exceed the job deadline
+    template: executor.CleanupCronJob.yaml
     set:
       executor:
         queueName: "test"
@@ -38,3 +42,24 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "executor.cleanup.minimumAgeSeconds must be greater than executor.kubernetesJob.deadline, so resources of running jobs are never deleted"
+
+  - it: should let the CronJob's ServiceAccount get and list job resources when cleanup is enabled
+    template: executor.Role.yaml
+    set:
+      executor:
+        queueName: "test"
+        cleanup:
+          enabled: true
+    asserts:
+      - contains:
+          path: rules
+          content:
+            apiGroups: ["batch"]
+            resources: ["jobs"]
+            verbs: ["get", "list"]
+      - contains:
+          path: rules
+          content:
+            apiGroups: [""]
+            resources: ["secrets", "persistentvolumeclaims"]
+            verbs: ["get", "list"]

@@ -49,7 +49,7 @@ spec:
                         created_seconds=$(date -u -D '%Y-%m-%dT%H:%M:%SZ' -d "$created_at" +%s)
                         if [ $((now_seconds - created_seconds)) -ge "$MINIMUM_AGE_SECONDS" ]; then
                           echo "deleting $kind/$name, created at $created_at"
-                          kubectl delete "$kind" "$name" --namespace "$NAMESPACE" --ignore-not-found
+                          kubectl delete "$kind" "$name" --namespace "$NAMESPACE" --ignore-not-found --wait=false
                         fi
                       done
                   }
