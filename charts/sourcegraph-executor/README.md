@@ -11,10 +11,12 @@ This chart deploys executors that interact with the Kubernetes API to handle job
 
 Your cluster will need to allow configuration of the following RBAC rules:
 
-| API Groups | Resources          | Verbs                     | Reason                                                                                    |
-|------------|--------------------|---------------------------|-------------------------------------------------------------------------------------------|
-| `batch`    | `jobs`             | `create`, `delete`        | Executors create Job pods to run processes. Once Jobs are completed, they are cleaned up. |
-|            | `pods`, `pods/log` | `get`, `list`, `watch`    | Executors need to look up and steam logs from the Job Pods.                               |
+| API Groups | Resources                           | Verbs              | Reason                                                                                    |
+|------------|-------------------------------------|--------------------|-------------------------------------------------------------------------------------------|
+| `batch`    | `jobs`                              | `create`, `delete` | Executors create Job pods to run processes. Once Jobs are completed, they are cleaned up. |
+| `""`       | `pods`                              | `watch`            | Executors watch the Job pods to know when each step finishes.                             |
+| `""`       | `pods/log`                          | `get`              | Executors stream logs from the Job pods.                                                  |
+| `""`       | `secrets`, `persistentvolumeclaims` | `create`, `delete` | Executors create a Secret for each job, and a PVC when job volumes use PVCs.              |
 
 ## Docker in Docker (dind)
 
