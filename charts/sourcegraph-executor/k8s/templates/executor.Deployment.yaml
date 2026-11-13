@@ -67,9 +67,6 @@ spec:
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           securityContext:
             {{- toYaml .Values.executor.containerSecurityContext | nindent 12 }}
-          ports:
-            - name: http-debug
-              containerPort: 6060
           envFrom:
             - configMapRef:
                 name: {{ include "executor.name" . }}

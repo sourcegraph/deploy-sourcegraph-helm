@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+* Removed the unused `http-debug` container port (6060) and the `executor-<queueName>` Service from the Kubernetes-native executor chart (`sourcegraph-executor/k8s`). Nothing listens on that port: executors stopped serving it in Sourcegraph 4.1, before this chart existed. Helm deletes the Service on upgrade. The undocumented `executor.serviceAnnotations`, `executor.serviceLabels`, and `executor.serviceType` values no longer have any effect. Executor metrics are unaffected; `worker` serves them through the `worker-executors` Service.
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.
