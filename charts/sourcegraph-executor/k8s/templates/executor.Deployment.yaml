@@ -63,9 +63,6 @@ spec:
           image: {{ include "sourcegraph.image" (list . "executor") }}
           imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
           {{- include "sourcegraph.containerSecurityContext" (list . "executor" 10) }}
-          ports:
-            - name: http-debug
-              containerPort: 6060
           envFrom:
             - configMapRef:
                 name: {{ include "executor.name" . }}
