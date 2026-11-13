@@ -1452,8 +1452,6 @@ jaeger:
     maxTraces: 20000
     # -- Log level for the Jaeger instance (debug, info, warn, error)
     logLevel: info
-    # -- Default sampling probability (0.0 to 1.0) returned to services that query Jaeger for sampling config
-    samplingDefaultProbability: 1.0
   # -- Security context for the `jaeger` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:

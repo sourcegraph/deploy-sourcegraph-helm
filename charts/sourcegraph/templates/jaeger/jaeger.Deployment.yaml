@@ -67,8 +67,6 @@ spec:
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         ports:
-        - containerPort: 5778
-          protocol: TCP
         - containerPort: 16686
           name: http
           protocol: TCP
