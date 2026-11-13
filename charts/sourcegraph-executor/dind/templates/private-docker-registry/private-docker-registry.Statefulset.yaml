@@ -40,6 +40,10 @@ spec:
         deploy: sourcegraph
         app: private-docker-registry
     spec:
+      {{- with .Values.privateDockerRegistry.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
         - name: private-docker-registry
           image: {{ .Values.privateDockerRegistry.image.registry}}/{{ .Values.privateDockerRegistry.image.repository}}:{{ .Values.privateDockerRegistry.image.tag}}
@@ -69,16 +73,16 @@ spec:
           volumeMounts:
             - mountPath: /var/lib/registry
               name: cache
-      {{- with .Values.sourcegraph.nodeSelector }}
+      {{- with .Values.privateDockerRegistry.nodeSelector | default .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
+      {{- with .Values.privateDockerRegistry.affinity | default .Values.sourcegraph.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with include "sourcegraph.priorityClassName" (list . "privateDockerRegistry") | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
+      {{- with .Values.privateDockerRegistry.tolerations | default .Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

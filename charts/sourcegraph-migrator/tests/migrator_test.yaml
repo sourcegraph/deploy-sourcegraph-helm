@@ -139,3 +139,17 @@ tests:
     asserts:
       - isNull:
           path: spec.template.spec.priorityClassName
+
+  - it: should use migrator.nodeSelector instead of sourcegraph.nodeSelector
+    set:
+      sourcegraph:
+        nodeSelector:
+          pool: global
+      migrator:
+        nodeSelector:
+          pool: migrator
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: migrator

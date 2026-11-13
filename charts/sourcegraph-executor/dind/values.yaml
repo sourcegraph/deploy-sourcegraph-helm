@@ -22,13 +22,13 @@ sourcegraph:
   imagePullSecrets: []
   # -- Add a global label to all resources
   labels: {}
-  # -- Affinity,
+  # -- Default affinity for every pod. `executor.affinity`, `privateDockerRegistry.affinity` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
-  # -- NodeSelector,
+  # -- Default nodeSelector for every pod. `executor.nodeSelector`, `privateDockerRegistry.nodeSelector` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: {}
-  # -- Tolerations,
+  # -- Default tolerations for every pod. `executor.tolerations`, `privateDockerRegistry.tolerations` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
   # -- Add extra annotations to attach to all pods
@@ -89,8 +89,9 @@ executor:
   queueName: ""
   # -- The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues).
   queueNames: []
-  # -- The maximum amount of jobs that can be executed concurrently.
-  maximumNumJobs: 10
+  # -- The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container,
+  # so size `resources` and `storage` for this many jobs.
+  maximumNumJobs: 1
   # -- The maximum wall time that can be spent on a single job.
   maximumRuntimePerJob: "30m"
   log:
@@ -125,6 +126,15 @@ executor:
   # when running in Docker mode (dind). Set to {} to disable.
   podSecurityContext:
     fsGroup: 101
+  # -- Node selector for executor pods. Replaces `sourcegraph.nodeSelector` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Affinity for executor pods. Replaces `sourcegraph.affinity` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- Tolerations for executor pods. Replaces `sourcegraph.tolerations` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []
 
 dind:
   image:
@@ -226,3 +236,15 @@ privateDockerRegistry:
   env:
     REGISTRY_PROXY_REMOTEURL:
       value: https://registry-1.docker.io
+  # -- Pod-level security context for the registry pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Node selector for the registry pod. Replaces `sourcegraph.nodeSelector` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Affinity for the registry pod. Replaces `sourcegraph.affinity` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- Tolerations for the registry pod. Replaces `sourcegraph.tolerations` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []

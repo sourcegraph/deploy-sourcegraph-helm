@@ -45,3 +45,34 @@ tests:
           apiVersion: apps/v1
           name: executor-batches
         documentIndex: 1
+
+  - it: should pass maximumNumJobs to every queue's executor
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        maximumNumJobs: 4
+      queues:
+        - name: codeintel
+        - name: batches
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+
+  - it: should use executor.nodeSelector instead of sourcegraph.nodeSelector
+    template: executor/executor.Deployment.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          pool: global
+      executor:
+        queueName: batches
+        nodeSelector:
+          pool: executors
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: executors

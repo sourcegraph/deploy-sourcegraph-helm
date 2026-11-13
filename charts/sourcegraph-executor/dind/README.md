@@ -42,20 +42,6 @@ Manifests rendered using the `helm template` command can be used for direct depl
 
 Reference the table below for available configuration parameters and consult [executor] documentation.
 
-In addition to the documented values, the `executor` and `private-docker-registry` services also supports the following values
-
-- `executor.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `executor.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `executor.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `executor.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `executor.env` - consult `values.yaml`
-
-- `privateDockerRegistry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `privateDockerRegistry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `privateDockerRegistry.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `privateDockerRegistry.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `privateDockerRegistry.env` - consult `values.yaml` file
-
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | dind.command | list | `["dockerd"]` | Command for the dind container. |
@@ -67,6 +53,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | dind.image.registry | string | `"index.docker.io"` |  |
 | dind.image.repository | string | `"docker"` |  |
 | dind.image.tag | string | `"29.5.3-dind"` |  |
+| executor.affinity | object | `{}` | Affinity for executor pods. Replaces `sourcegraph.affinity` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | executor.env | object | `{}` | Extra environment variables to set on the executor container. |
 | executor.frontendExistingSecret | string | `""` | Name of existing k8s Secret to use for frontend password. The k8s Secret must contain the key EXECUTOR_FRONTEND_PASSWORD matching the site config executors.accessToken value. frontendPassword is ignored if this is set. |
 | executor.frontendPassword | string | `""` | The shared secret configured in the Sourcegraph instance site config under executors.accessToken. Required if frontendExistingSecret is not configured. |
@@ -75,8 +62,9 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.image.name | string | `"executor"` |  |
 | executor.log.format | string | `"json"` |  |
 | executor.log.level | string | `"warn"` | Possible values are dbug, info, warn, eror, crit. |
-| executor.maximumNumJobs | int | `10` | The maximum amount of jobs that can be executed concurrently. |
+| executor.maximumNumJobs | int | `1` | The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container, so size `resources` and `storage` for this many jobs. |
 | executor.maximumRuntimePerJob | string | `"30m"` | The maximum wall time that can be spent on a single job. |
+| executor.nodeSelector | object | `{}` | Node selector for executor pods. Replaces `sourcegraph.nodeSelector` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | executor.podSecurityContext | object | `{"fsGroup":101}` | Pod-level security context applied to executor pods. fsGroup: 101 ensures the scratch volume is writable by the sourcegraph user (uid=100, gid=101) when running in Docker mode (dind). Set to {} to disable. |
 | executor.queueName | string | `""` | The name of the queue to pull jobs from. Possible values: batches and codeintel. Either this or queueNames is required (when not using queues). |
 | executor.queueNames | list | `[]` | The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues). |
@@ -85,26 +73,31 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.storage.class | string | `""` | StorageClass for the ephemeral volume. Only used when type is ephemeral. Defaults to the cluster default StorageClass when empty. |
 | executor.storage.size | string | `""` | Size of the scratch volume. emptyDir: sets sizeLimit (optional, leave empty for unlimited). ephemeral: sets the PVC storage request (required). |
 | executor.storage.type | string | `"emptyDir"` | Type of scratch volume for job workspaces. One of: emptyDir, ephemeral. emptyDir: plain emptyDir, no storage class required. ephemeral: per-pod PVC via the cluster default storage class; size is required. |
+| executor.tolerations | list | `[]` | Tolerations for executor pods. Replaces `sourcegraph.tolerations` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | nameOverride | string | `""` | Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses. Set it only on a new install: Kubernetes does not allow changing a selector. As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-executor-dind` in the parent chart to keep the selectors of a standalone install. |
+| privateDockerRegistry.affinity | object | `{}` | Affinity for the registry pod. Replaces `sourcegraph.affinity` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://sourcegraph.com/docs/self-hosted/executors/deploy-executors#using-private-registries |
 | privateDockerRegistry.env | object | `{"REGISTRY_PROXY_REMOTEURL":{"value":"https://registry-1.docker.io"}}` | Extra environment variables to set on the registry container. Registry can be configured with environment variables using the pattern REGISTRY_<SECTION>_<KEY> (uppercase). Full reference: https://distribution.github.io/distribution/about/configuration  To proxy an internal private registry with credentials, override REGISTRY_PROXY_REMOTEURL and supply REGISTRY_PROXY_USERNAME / REGISTRY_PROXY_PASSWORD, e.g.:   env:     REGISTRY_PROXY_REMOTEURL:       value: https://my-internal-registry.example.com     REGISTRY_PROXY_USERNAME:       value: myuser     REGISTRY_PROXY_PASSWORD:       valueFrom:         secretKeyRef:           name: registry-proxy-credentials           key: password |
 | privateDockerRegistry.image.registry | string | `"index.docker.io"` |  |
 | privateDockerRegistry.image.repository | string | `"registry"` |  |
 | privateDockerRegistry.image.tag | int | `3` |  |
+| privateDockerRegistry.nodeSelector | object | `{}` | Node selector for the registry pod. Replaces `sourcegraph.nodeSelector` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
+| privateDockerRegistry.podSecurityContext | object | `{}` | Pod-level security context for the registry pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | privateDockerRegistry.storageSize | string | `"10Gi"` |  |
+| privateDockerRegistry.tolerations | list | `[]` | Tolerations for the registry pod. Replaces `sourcegraph.tolerations` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | queues | list | `[]` | Optional list of queues to deploy as standalone Deployments. When set, the single executor Deployment is not rendered. Each entry supports:   name        (required) — used as the deployment name suffix (executor-<name>)   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set   replicaCount, resources, env (merged with executor.env, queue overrides) |
-| sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.affinity | object | `{}` | Default affinity for every pod. `executor.affinity`, `privateDockerRegistry.affinity` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
-| sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| sourcegraph.nodeSelector | object | `{}` | Default nodeSelector for every pod. `executor.nodeSelector`, `privateDockerRegistry.nodeSelector` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
-| sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| sourcegraph.tolerations | list | `[]` | Default tolerations for every pod. `executor.tolerations`, `privateDockerRegistry.tolerations` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | storageClass.name | string | `"sourcegraph"` | Name of an existing StorageClass for the `private-docker-registry` volume. This chart does not create a StorageClass. |
 
 ## Troubleshooting

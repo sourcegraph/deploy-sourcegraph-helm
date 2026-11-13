@@ -58,18 +58,20 @@ spec:
       {{- if .Values.migrator.extraContainers }}
         {{- toYaml .Values.migrator.extraContainers | nindent 6 }}
       {{- end }}
+      {{- with .Values.migrator.podSecurityContext }}
       securityContext:
-        {{- toYaml .Values.migrator.podSecurityContext | nindent 8 }}
-      {{- with .Values.sourcegraph.nodeSelector }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.migrator.nodeSelector | default .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.sourcegraph.affinity }}
+      {{- with .Values.migrator.affinity | default .Values.sourcegraph.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with include "sourcegraph.priorityClassName" (list . "migrator") | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- with .Values.sourcegraph.tolerations }}
+      {{- with .Values.migrator.tolerations | default .Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

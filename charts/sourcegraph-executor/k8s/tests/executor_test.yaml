@@ -125,3 +125,17 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should fall back to sourcegraph.nodeSelector when executor.nodeSelector is empty
+    template: executor.Deployment.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          pool: global
+      executor:
+        queueName: "test"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: global

@@ -101,16 +101,16 @@ spec:
                 - /usr/local/bin/executor
             periodSeconds: 5
           terminationMessagePolicy: FallbackToLogsOnError
-      {{- with .Values.executor.nodeSelector }}
+      {{- with .Values.executor.nodeSelector | default .Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.executor.affinity }}
+      {{- with .Values.executor.affinity | default .Values.sourcegraph.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with include "sourcegraph.priorityClassName" (list . "executor") | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- with .Values.executor.tolerations }}
+      {{- with .Values.executor.tolerations | default .Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}

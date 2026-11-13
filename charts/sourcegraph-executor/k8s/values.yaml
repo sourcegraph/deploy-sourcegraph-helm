@@ -24,13 +24,13 @@ sourcegraph:
   labels: { }
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
-  # -- Affinity,
+  # -- Default affinity for every pod. `executor.affinity` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
-  # -- NodeSelector,
+  # -- Default nodeSelector for every pod. `executor.nodeSelector` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: { }
-  # -- Tolerations,
+  # -- Default tolerations for every pod. `executor.tolerations` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: [ ]
   # -- Add extra annotations to attach to all pods
@@ -93,8 +93,6 @@ executor:
     runAsGroup:
     # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
     fsGroup:
-    # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
-    privileged: false
 
   kubernetesJob:
     # -- The number of seconds after which a Kubernetes job will be terminated.

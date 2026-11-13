@@ -40,20 +40,6 @@ Manifests rendered using the `helm template` command can be used for direct depl
 
 Reference the table below for available configuration parameters and consult [executor] documentation.
 
-In addition to the documented values, the `executor` and `private-docker-registry` services also supports the following values
-
-- `executor.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `executor.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `executor.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `executor.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `executor.extraEnv` - consult `values.yaml`
-
-- `privateDockerRegistry.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `privateDockerRegistry.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `privateDockerRegistry.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `privateDockerRegistry.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `privateDockerRegistry.env` - consult `values.yaml` file
-
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | executor.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
@@ -98,14 +84,13 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.resources.limits.memory | string | `"4Gi"` |  |
 | executor.resources.requests.cpu | string | `"500m"` |  |
 | executor.resources.requests.memory | string | `"200Mi"` |  |
-| executor.securityContext | object | `{"fsGroup":null,"privileged":false,"runAsGroup":null,"runAsUser":null}` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
+| executor.securityContext | object | `{"fsGroup":null,"runAsGroup":null,"runAsUser":null}` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.securityContext.fsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
-| executor.securityContext.privileged | bool | `false` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.securityContext.runAsGroup | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.securityContext.runAsUser | string | `nil` | DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead. |
 | executor.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | nameOverride | string | `""` | Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses. Set it only on a new install: Kubernetes does not allow changing a selector. As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-executor-k8s` in the parent chart to keep the selectors of a standalone install. |
-| sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.affinity | object | `{}` | Default affinity for every pod. `executor.affinity` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
@@ -113,8 +98,8 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
 | sourcegraph.localDevMode | bool | `false` | When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources. |
-| sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| sourcegraph.nodeSelector | object | `{}` | Default nodeSelector for every pod. `executor.nodeSelector` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
-| sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| sourcegraph.tolerations | list | `[]` | Default tolerations for every pod. `executor.tolerations` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |

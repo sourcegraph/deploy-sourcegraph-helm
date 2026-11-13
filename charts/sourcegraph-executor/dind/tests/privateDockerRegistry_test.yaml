@@ -26,3 +26,23 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should use the registry's own nodeSelector and podSecurityContext
+    template: private-docker-registry/private-docker-registry.Statefulset.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          pool: global
+      privateDockerRegistry:
+        nodeSelector:
+          pool: registry
+        podSecurityContext:
+          fsGroup: 1000
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: registry
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1000

@@ -63,41 +63,44 @@ Manifests rendered using the `helm template` command can be used for direct depl
 
 Reference the table below for available configuration parameters and consult [migrator] documentation.
 
-In addition to the documented values, the `migrator` service also supports the following values
-
-- `migrator.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `migrator.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `migrator.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `migrator.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `migrator.env` - consult `values.yaml` file
-
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | codeInsightsDB.auth.existingSecret | string | `""` | Name of existing secret to use for codeinsights-db credentials This should match the setting in the sourcegraph chart values |
 | codeInsightsDB.name | string | `"codeinsights-db"` |  |
 | codeIntelDB.auth.existingSecret | string | `""` | Name of existing secret to use for codeintel-db credentials This should match the setting in the sourcegraph chart values |
 | codeIntelDB.name | string | `"codeintel-db"` |  |
+| migrator.affinity | object | `{}` | Affinity for the migrator pod. Replaces `sourcegraph.affinity` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | migrator.args | list | `["up","-db=all"]` | Override default `migrator` container args Available commands can be found at https://docs.sourcegraph.com/admin/how-to/manual_database_migrations |
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | migrator.env | object | `{}` | Environment variables for the `migrator` container |
+| migrator.extraContainers | list | `[]` | Extra containers in the migrator pod |
+| migrator.extraVolumeMounts | list | `[]` | Extra volume mounts for the `migrator` container |
+| migrator.extraVolumes | list | `[]` | Extra volumes for the migrator pod |
 | migrator.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `migrator` image |
 | migrator.image.name | string | `"migrator"` | Docker image name for the `migrator` image |
+| migrator.labels | object | `{}` | Labels for the migrator Job |
+| migrator.name | string | `""` | Name prefix of the migrator Job. A random suffix is added to every release's Job. |
+| migrator.nodeSelector | object | `{}` | Node selector for the migrator pod. Replaces `sourcegraph.nodeSelector` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
+| migrator.podAnnotations | object | `{}` | Annotations for the migrator pod |
+| migrator.podLabels | object | `{}` | Labels for the migrator pod |
+| migrator.podSecurityContext | object | `{}` | Pod-level security context for the migrator pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | migrator.resources | object | `{"limits":{"cpu":"500m","memory":"100M"},"requests":{"cpu":"100m","memory":"50M"}}` | Resource requests & limits for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| migrator.tolerations | list | `[]` | Tolerations for the migrator pod. Replaces `sourcegraph.tolerations` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 | nameOverride | string | `""` | Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses. Set it only on a new install: Kubernetes does not allow changing a selector. As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-migrator` in the parent chart to keep the selectors of a standalone install. |
 | pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for pgsql credentials This should match the setting in the sourcegraph chart values |
 | pgsql.name | string | `"pgsql"` |  |
-| sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.affinity | object | `{}` | Default affinity for every pod. `migrator.affinity` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
-| sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| sourcegraph.nodeSelector | object | `{}` | Default nodeSelector for every pod. `migrator.nodeSelector` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
-| sourcegraph.tolerations | list | `[]` | Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| sourcegraph.tolerations | list | `[]` | Default tolerations for every pod. `migrator.tolerations` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 
 ## Troubleshooting
 
