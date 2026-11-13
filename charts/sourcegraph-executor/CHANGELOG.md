@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+* Removed the unused container port 2375 from the `dind` sidecar in the Docker-in-Docker executor chart (`sourcegraph-executor/dind`). `dockerd` listens on `127.0.0.1:2375` only (`dind.daemonConfig.hosts`), the executor reaches it over `localhost`, and no Service targets the port. The executor pod is replaced once on upgrade.
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.

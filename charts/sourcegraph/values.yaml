@@ -777,7 +777,6 @@ openTelemetry:
     hostPorts:
       grpcOtlp: 4317
       httpOtlp: 4318
-      httpZpages: 55679
     resources:
       limits:
         cpu: "500m"

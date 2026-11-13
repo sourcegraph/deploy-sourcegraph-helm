@@ -7,12 +7,6 @@ tests:
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
-            containerPort: 55679
-            hostPort: 55679
-            name: http-zpages
-      - contains:
-          path: spec.template.spec.containers[0].ports
-          content:
             containerPort: 4317
             hostPort: 4317
             name: grpc-otlp
@@ -38,14 +32,7 @@ tests:
           hostPorts:
             grpcOtlp: 4319
             httpOtlp: 4320
-            httpZpages: 55680
     asserts:
-      - contains:
-          path: spec.template.spec.containers[0].ports
-          content:
-            containerPort: 55679
-            hostPort: 55680
-            name: http-zpages
       - contains:
           path: spec.template.spec.containers[0].ports
           content:
@@ -66,7 +53,6 @@ tests:
           hostPorts:
             grpcOtlp: 4319
             httpOtlp: 4320
-            httpZpages: 55680
     asserts:
       - contains:
           path: spec.template.spec.containers[0].env

@@ -79,9 +79,6 @@ spec:
           - name: http-otlp
             containerPort: 4318
             hostPort: {{ toYaml .Values.openTelemetry.agent.hostPorts.httpOtlp }}
-          - name: http-zpages
-            containerPort: 55679
-            hostPort: {{ toYaml .Values.openTelemetry.agent.hostPorts.httpZpages }}
         volumeMounts:
           - name: config
             mountPath: /etc/otel-agent
