@@ -3,9 +3,14 @@ release:
   name: sourcegraph
   namespace: sourcegraph
 tests:
+# Releases rewrite sourcegraph.image.repository in values.yaml, so pin it here
+# instead of asserting the chart default.
 - it: should run the pgsql init container on the pgsql image
   template: pgsql/pgsql.StatefulSet.yaml
   set:
+    sourcegraph:
+      image:
+        repository: my.registry.example/sg
     pgsql:
       image:
         name: custom-postgres
@@ -13,10 +18,13 @@ tests:
   asserts:
     - equal:
         path: spec.template.spec.initContainers[?(@.name == "correct-data-dir-permissions")].image
-        value: index.docker.io/sourcegraph/custom-postgres:test
+        value: my.registry.example/sg/custom-postgres:test
 - it: should run the codeintel-db init container on the codeintel-db image
   template: codeintel-db/codeintel-db.StatefulSet.yaml
   set:
+    sourcegraph:
+      image:
+        repository: my.registry.example/sg
     codeIntelDB:
       image:
         name: custom-postgres
@@ -24,10 +32,13 @@ tests:
   asserts:
     - equal:
         path: spec.template.spec.initContainers[?(@.name == "correct-data-dir-permissions")].image
-        value: index.docker.io/sourcegraph/custom-postgres:test
+        value: my.registry.example/sg/custom-postgres:test
 - it: should run the codeinsights-db init container on the codeinsights-db image
   template: codeinsights-db/codeinsights-db.StatefulSet.yaml
   set:
+    sourcegraph:
+      image:
+        repository: my.registry.example/sg
     codeInsightsDB:
       image:
         name: custom-postgres
@@ -35,4 +46,4 @@ tests:
   asserts:
     - equal:
         path: spec.template.spec.initContainers[?(@.name == "correct-data-dir-permissions")].image
-        value: index.docker.io/sourcegraph/custom-postgres:test
+        value: my.registry.example/sg/custom-postgres:test
