@@ -28,8 +28,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: jaeger
-        prometheus.io/port: "8888"
-        sourcegraph.prometheus/scrape: "true"
         {{- if not .Values.jaeger.config.existingConfigMap }}
         checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
         {{- end }}
@@ -74,9 +72,6 @@ spec:
           protocol: TCP
         - containerPort: 13133
           name: health
-          protocol: TCP
-        - containerPort: 8888
-          name: metrics
           protocol: TCP
         readinessProbe:
           httpGet:

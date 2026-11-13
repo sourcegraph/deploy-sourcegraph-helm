@@ -118,27 +118,3 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: "When 'jaeger.enabled' is set to true, 'openTelemetry.enabled' must be set to true as well."
-  - it: should have Prometheus scrape jaeger on the port where it serves its metrics
-    templates:
-      - jaeger/jaeger.Deployment.yaml
-      - jaeger/jaeger.ConfigMap.yaml
-    set:
-      jaeger:
-        enabled: true
-    asserts:
-      - equal:
-          path: spec.template.metadata.annotations["prometheus.io/port"]
-          value: "8888"
-        template: jaeger/jaeger.Deployment.yaml
-      - contains:
-          path: spec.template.spec.containers[0].ports
-          content:
-            containerPort: 8888
-            name: metrics
-            protocol: TCP
-        template: jaeger/jaeger.Deployment.yaml
-      # On all interfaces: jaeger serves its metrics on localhost only by default.
-      - matchRegex:
-          path: data["jaeger-config.yaml"]
-          pattern: 'prometheus:\n\s+host: "0\.0\.0\.0"\n\s+port: 8888\n'
-        template: jaeger/jaeger.ConfigMap.yaml

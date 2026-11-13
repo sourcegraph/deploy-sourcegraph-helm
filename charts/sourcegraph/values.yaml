@@ -1489,7 +1489,7 @@ jaeger:
     ]
   # -- Jaeger v2 configuration overrides. We only provide a limited number of options, use `existingConfigMap` to provide a full config if you need more control.
   config:
-    # -- Name of an preexisting ConfigMap containing Jaeger configuration. They must contain a `jaeger-config.yaml` key. If set, this will be used instead of the `config` values below. Prometheus scrapes the `jaeger` pod on port 8888, so serve the metrics of Jaeger there on all interfaces, as the `service.telemetry.metrics.readers` setting of the chart's ConfigMap does.
+    # -- Name of an preexisting ConfigMap containing Jaeger configuration. They must contain a `jaeger-config.yaml` key. If set, this will be used instead of the `config` values below.
     # See https://www.jaegertracing.io/docs/2.16/configuration/
     existingConfigMap: ""
     # -- Maximum number of traces stored in memory

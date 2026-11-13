@@ -21,14 +21,6 @@ data:
           processors: [batch]
           exporters: [jaeger_storage_exporter]
       telemetry:
-        # Serve the metrics of jaeger itself to Prometheus. Without this they are served on localhost only.
-        metrics:
-          readers:
-            - pull:
-                exporter:
-                  prometheus:
-                    host: "0.0.0.0"
-                    port: 8888
         logs:
           level: {{ .Values.jaeger.config.logLevel | default "info" }}
     extensions:
