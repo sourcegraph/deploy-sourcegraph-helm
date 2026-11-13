@@ -20,19 +20,20 @@ rules:
       - ""
     resources:
       - pods
+    verbs:
+      - watch
+  - apiGroups:
+      - ""
+    resources:
       - pods/log
     verbs:
       - get
-      - list
-      - watch
   - apiGroups:
       - ""
     resources:
       - secrets
       - persistentvolumeclaims
     verbs:
-      - get
-      - list
       - create
       - delete
 {{- end }}
