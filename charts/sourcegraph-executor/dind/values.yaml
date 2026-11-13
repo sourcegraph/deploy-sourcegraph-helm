@@ -91,7 +91,7 @@ executor:
   queueNames: []
   # -- The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container,
   # so size `resources` and `storage` for this many jobs.
-  maximumNumJobs: 1
+  maximumNumJobs: 10
   # -- The maximum wall time that can be spent on a single job.
   maximumRuntimePerJob: "30m"
   log:

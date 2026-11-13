@@ -62,7 +62,7 @@ Reference the table below for available configuration parameters and consult [ex
 | executor.image.name | string | `"executor"` |  |
 | executor.log.format | string | `"json"` |  |
 | executor.log.level | string | `"warn"` | Possible values are dbug, info, warn, eror, crit. |
-| executor.maximumNumJobs | int | `1` | The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container, so size `resources` and `storage` for this many jobs. |
+| executor.maximumNumJobs | int | `10` | The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container, so size `resources` and `storage` for this many jobs. |
 | executor.maximumRuntimePerJob | string | `"30m"` | The maximum wall time that can be spent on a single job. |
 | executor.nodeSelector | object | `{}` | Node selector for executor pods. Replaces `sourcegraph.nodeSelector` when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) |
 | executor.podSecurityContext | object | `{"fsGroup":101}` | Pod-level security context applied to executor pods. fsGroup: 101 ensures the scratch volume is writable by the sourcegraph user (uid=100, gid=101) when running in Docker mode (dind). Set to {} to disable. |
