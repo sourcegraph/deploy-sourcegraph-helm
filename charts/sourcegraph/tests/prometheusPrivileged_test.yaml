@@ -55,15 +55,12 @@ tests:
       - prometheus/prometheus.ClusterRoleBinding.yaml
       - prometheus/prometheus.RoleBinding.yaml
 
-  - it: should discover pods, services, and endpoints only in the release namespace by default
+  - it: should discover pods and endpoints only in the release namespace by default
     template: prometheus/prometheus.ConfigMap.yaml
     asserts:
       - matchRegex:
           path: data["prometheus.yml"]
           pattern: "- role: pod\n +namespaces:\n +names:\n +- sourcegraph-test\n"
-      - matchRegex:
-          path: data["prometheus.yml"]
-          pattern: "- role: service\n +namespaces:\n +names:\n +- sourcegraph-test\n"
       - matchRegex:
           path: data["prometheus.yml"]
           pattern: "- role: endpoints\n +namespaces:\n +names:\n +- sourcegraph-test\n"
@@ -75,7 +72,7 @@ tests:
           path: data["prometheus.yml"]
           pattern: "job_name: 'kubernetes-(apiservers|nodes)'"
 
-  - it: should keep pods and services scoped to the release namespace when prometheus.privileged=true
+  - it: should keep pods scoped to the release namespace when prometheus.privileged=true
     set:
       prometheus.privileged: true
     template: prometheus/prometheus.ConfigMap.yaml
@@ -83,9 +80,6 @@ tests:
       - matchRegex:
           path: data["prometheus.yml"]
           pattern: "- role: pod\n +namespaces:\n +names:\n +- sourcegraph-test\n"
-      - matchRegex:
-          path: data["prometheus.yml"]
-          pattern: "- role: service\n +namespaces:\n +names:\n +- sourcegraph-test\n"
       - matchRegex:
           path: data["prometheus.yml"]
           pattern: "job_name: 'kubernetes-apiservers'"
