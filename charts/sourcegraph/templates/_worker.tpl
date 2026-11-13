@@ -29,7 +29,7 @@ spec:
   revisionHistoryLimit: {{ $top.Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 6 }}
       app: worker
       {{- if $suffix }}
       worker-replica: {{ $name | quote }}
@@ -51,7 +51,7 @@ spec:
       {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
       {{- if $top.Values.sourcegraph.podLabels }}
       {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}

@@ -7,6 +7,6 @@ spec:
   {{- toYaml .Values.preciseCodeIntel.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel) | nindent 6 }}
       app: precise-code-intel-worker
 {{- end }}

@@ -1,0 +1,256 @@
+suite: selector labels
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+set:
+  syntacticCodeIntel:
+    enabled: true
+tests:
+- it: should keep the default selector labels when nothing is set
+  template: gitserver/gitserver.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels
+      value:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: gitserver
+  - notExists:
+      path: spec.volumeClaimTemplates[0].metadata.labels
+
+- it: should replace the default selector labels on every workload
+  templates: &workloads
+  - blobstore/blobstore.Deployment.yaml
+  - cadvisor/cadvisor.DaemonSet.yaml
+  - codeinsights-db/codeinsights-db.StatefulSet.yaml
+  - codeintel-db/codeintel-db.StatefulSet.yaml
+  - frontend/sourcegraph-frontend.Deployment.yaml
+  - gitserver/gitserver.StatefulSet.yaml
+  - grafana/grafana.StatefulSet.yaml
+  - indexed-search/indexed-search.StatefulSet.yaml
+  - node-exporter/node-exporter.DaemonSet.yaml
+  - otel-collector/otel-agent.DaemonSet.yaml
+  - otel-collector/otel-collector.Deployment.yaml
+  - pgsql/pgsql.StatefulSet.yaml
+  - precise-code-intel/worker.Deployment.yaml
+  - prometheus/prometheus.Deployment.yaml
+  - redis/redis-cache.Deployment.yaml
+  - redis/redis-store.Deployment.yaml
+  - searcher/searcher.StatefulSet.yaml
+  - syntactic-code-intel/worker.Deployment.yaml
+  - syntect-server/syntect-server.Deployment.yaml
+  - worker/worker.Deployment.yaml
+  set:
+    sourcegraph.selectorLabelsOverride: &override
+      example.com/installation: production
+      example.com/project: sourcegraph
+  asserts:
+  - isSubset:
+      path: spec.selector.matchLabels
+      content: *override
+  - notExists:
+      path: spec.selector.matchLabels["app.kubernetes.io/name"]
+  - notExists:
+      path: spec.selector.matchLabels["app.kubernetes.io/instance"]
+  - isSubset:
+      path: spec.template.metadata.labels
+      content: *override
+  - notExists:
+      path: spec.template.metadata.labels["app.kubernetes.io/name"]
+  - notExists:
+      path: spec.template.metadata.labels["app.kubernetes.io/instance"]
+
+- it: should keep the standard labels on object metadata when the selector labels are replaced
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride: *override
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+
+- it: should replace the default selector labels on every Service
+  templates:
+  - blobstore/blobstore.Service.yaml
+  - codeinsights-db/codeinsights-db.Service.yaml
+  - codeintel-db/codeintel-db.Service.yaml
+  - frontend/sourcegraph-frontend-internal.Service.yaml
+  - frontend/sourcegraph-frontend.Service.yaml
+  - gitserver/gitserver.Service.yaml
+  - grafana/grafana.Service.yaml
+  - indexed-search/indexed-search.IndexerService.yaml
+  - indexed-search/indexed-search.Service.yaml
+  - node-exporter/node-exporter.Service.yaml
+  - otel-collector/otel-collector.Service.yaml
+  - pgsql/pgsql.Service.yaml
+  - precise-code-intel/worker.Service.yaml
+  - prometheus/prometheus.Service.yaml
+  - redis/redis-cache.Service.yaml
+  - redis/redis-store.Service.yaml
+  - searcher/searcher.Service.yaml
+  - syntactic-code-intel/worker.Service.yaml
+  - syntect-server/syntect-server.Service.yaml
+  - worker/worker-executors.Service.yaml
+  - worker/worker.Service.yaml
+  set:
+    sourcegraph.selectorLabelsOverride: *override
+  asserts:
+  - isSubset:
+      path: spec.selector
+      content: *override
+  - notExists:
+      path: spec.selector["app.kubernetes.io/name"]
+  - notExists:
+      path: spec.selector["app.kubernetes.io/instance"]
+
+- it: should replace the default selector labels on every PodDisruptionBudget
+  templates:
+  - frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
+  - gitserver/gitserver.PodDisruptionBudget.yaml
+  - indexed-search/indexed-search.PodDisruptionBudget.yaml
+  - precise-code-intel/worker.PodDisruptionBudget.yaml
+  - redis/redis-cache.PodDisruptionBudget.yaml
+  - redis/redis-store.PodDisruptionBudget.yaml
+  - searcher/searcher.PodDisruptionBudget.yaml
+  - syntactic-code-intel/worker.PodDisruptionBudget.yaml
+  - syntect-server/syntect-server.PodDisruptionBudget.yaml
+  - worker/worker.PodDisruptionBudget.yaml
+  set:
+    sourcegraph.selectorLabelsOverride: *override
+    frontend.podDisruptionBudget: &podDisruptionBudget
+      maxUnavailable: 1
+    gitserver.podDisruptionBudget: *podDisruptionBudget
+    indexedSearch.podDisruptionBudget: *podDisruptionBudget
+    preciseCodeIntel.podDisruptionBudget: *podDisruptionBudget
+    redisCache.podDisruptionBudget: *podDisruptionBudget
+    redisStore.podDisruptionBudget: *podDisruptionBudget
+    searcher.podDisruptionBudget: *podDisruptionBudget
+    syntacticCodeIntel.podDisruptionBudget: *podDisruptionBudget
+    syntectServer.podDisruptionBudget: *podDisruptionBudget
+    worker.podDisruptionBudget: *podDisruptionBudget
+  asserts:
+  - isSubset:
+      path: spec.selector.matchLabels
+      content: *override
+  - notExists:
+      path: spec.selector.matchLabels["app.kubernetes.io/name"]
+
+- it: should add extraSelectorLabels to the default selector labels of its own component
+  templates:
+  - redis/redis-store.Deployment.yaml
+  - redis/redis-store.Service.yaml
+  - redis/redis-store.PodDisruptionBudget.yaml
+  set:
+    redisStore.extraSelectorLabels:
+      example.com/service: redis
+    redisStore.podDisruptionBudget: *podDisruptionBudget
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels
+      value: &redisStoreLabels
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        example.com/service: redis
+        app: redis-store
+    template: redis/redis-store.Deployment.yaml
+  - isSubset:
+      path: spec.template.metadata.labels
+      content: *redisStoreLabels
+    template: redis/redis-store.Deployment.yaml
+  - equal:
+      path: spec.selector
+      value: *redisStoreLabels
+    template: redis/redis-store.Service.yaml
+  - equal:
+      path: spec.selector.matchLabels
+      value: *redisStoreLabels
+    template: redis/redis-store.PodDisruptionBudget.yaml
+
+- it: should not add one component's extraSelectorLabels to another component
+  template: redis/redis-cache.Deployment.yaml
+  set:
+    redisStore.extraSelectorLabels:
+      example.com/service: redis
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels
+      value:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app: redis-cache
+
+- it: should let extraSelectorLabels win over selectorLabelsOverride
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride:
+      example.com/installation: production
+      example.com/service: sourcegraph
+    gitserver.extraSelectorLabels:
+      example.com/service: gitserver
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels
+      value:
+        example.com/installation: production
+        example.com/service: gitserver
+        app: gitserver
+
+- it: should add the custom selector labels to the grafana selector
+  template: grafana/grafana.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride: *override
+    grafana.extraSelectorLabels:
+      example.com/service: grafana
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels
+      value:
+        example.com/installation: production
+        example.com/project: sourcegraph
+        example.com/service: grafana
+        app: grafana
+
+- it: should keep the grafana selector unchanged when nothing is set
+  template: grafana/grafana.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: spec.selector.matchLabels
+      value:
+        app: grafana
+
+- it: should add storageLabels to the volume claim templates
+  templates:
+  - gitserver/gitserver.StatefulSet.yaml
+  - grafana/grafana.StatefulSet.yaml
+  - searcher/searcher.StatefulSet.yaml
+  set:
+    gitserver.storageLabels: &storageLabels
+      example.com/project: sourcegraph
+    grafana.storageLabels: *storageLabels
+    searcher.storageLabels: *storageLabels
+  asserts:
+  - equal:
+      path: spec.volumeClaimTemplates[0].metadata.labels
+      value: *storageLabels
+
+- it: should add storageLabels to the indexed-search volume claim template, next to the label the chart sets
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  set:
+    indexedSearch.storageLabels: *storageLabels
+  asserts:
+  - equal:
+      path: spec.volumeClaimTemplates[0].metadata.labels
+      value:
+        deploy: sourcegraph
+        example.com/project: sourcegraph
+
+- it: should fail when a custom selector label is one the chart sets itself
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    gitserver.extraSelectorLabels:
+      type: other
+  asserts:
+  - failedTemplate:
+      errorMessage: sourcegraph.selectorLabelsOverride and <serviceName>.extraSelectorLabels must not set the label "type", which the chart sets itself

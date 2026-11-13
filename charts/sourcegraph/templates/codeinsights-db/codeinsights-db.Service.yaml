@@ -28,7 +28,7 @@ spec:
   {{- toYaml . | nindent 2 }}
   {{- end }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.codeInsightsDB) | nindent 4 }}
     app: codeinsights-db
   type: {{ .Values.codeInsightsDB.serviceType | default "ClusterIP" }}
 {{- end }}
