@@ -155,9 +155,6 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: metadata.name
-          ports:
-            - containerPort: 2375
-              protocol: TCP
           volumeMounts:
             - mountPath: /scratch
               name: executor-scratch
