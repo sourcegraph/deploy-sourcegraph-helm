@@ -15,7 +15,8 @@ sourcegraph:
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # -- Add extra labels to all resources
+  # -- Add extra labels to every object the chart renders, including `extraResources`. The bundled Prometheus does not
+  # copy these labels from a Service to the metrics it scrapes from it; use `<serviceName>.serviceLabels` for that.
   labels: {}
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
@@ -70,7 +71,8 @@ sourcegraph:
 #     # Override the global sourcegraph.image.repository on a service-specific basis
 #     repository:
 #
-#   # Add additional labels and annotations to various resources
+#   # Add additional labels and annotations to various resources.
+#   # `labels` is added to the component's workload, ConfigMaps, Secrets, and PodDisruptionBudget
 #   labels: {}
 #   podLabels: {}
 #   podAnnotations: {}
@@ -102,6 +104,8 @@ sourcegraph:
 #   serviceAccount.create: true
 #   # Customize service account name
 #   serviceAccount.name: ""
+#   # Add labels to the service account, and to the component's Role, RoleBinding, ClusterRole, and ClusterRoleBinding
+#   serviceAccount.labels: {}
 #   # Override service type (defaults to ClusterIP)
 #   serviceType: ""
 #   # Set disk size on PVC's for stateful deployments
@@ -249,6 +253,8 @@ codeInsightsDB:
   storageSubPath: ""
   # -- Optional annotations to add to the `codeinsights-db` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `codeinsights-db` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 codeIntelDB:
   # -- Enable `codeintel-db` PostgreSQL server
@@ -319,6 +325,8 @@ codeIntelDB:
   storageSubPath: ""
   # -- Optional annotations to add to the `codeintel-db` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `codeintel-db` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 frontend:
   # -- Command for the `frontend` container, as a list, replacing the image's entrypoint,
@@ -730,6 +738,8 @@ blobstore:
   storageSubPath: ""
   # -- Optional annotations to add to the `blobstore` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `blobstore` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 openTelemetry:
   enabled: true
@@ -746,6 +756,8 @@ openTelemetry:
     # `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart
     # selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file.
     # `openTelemetry.gateway.args` is still passed as the arguments.
+    # The chart always passes one argument that makes the collector serve its own metrics on all
+    # interfaces, where Prometheus scrapes them, so a shell wrapper must pass its arguments on (`"$@"`).
     command: []
     # -- Resource requests & limits for the `otel-collector` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
@@ -930,6 +942,8 @@ pgsql:
   storageSubPath: ""
   # -- Optional annotations to add to the `pgsql` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `pgsql` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 postgresExporter:
   image:
@@ -1127,6 +1141,8 @@ prometheus:
   storageSubPath: ""
   # -- Optional annotations to add to the `prometheus` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `prometheus` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
 
 redisCache:
   # -- Enable `redis-cache` Redis server
@@ -1180,6 +1196,8 @@ redisCache:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-cache` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `redis-cache` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
   config:
     # -- Opt in to a chart-managed Redis config and automatic memory sizing.
     # Disabled by default to preserve image-baked configuration and custom
@@ -1283,6 +1301,8 @@ redisStore:
   storageSubPath: ""
   # -- Optional annotations to add to the `redis-store` PVC
   storageAnnotations: {}
+  # -- Optional labels to add to the `redis-store` PVC, in addition to `sourcegraph.labels`
+  storageLabels: {}
   config:
     # -- Opt in to a chart-managed Redis config and automatic memory sizing.
     # Disabled by default to preserve image-baked configuration and custom
@@ -1389,6 +1409,8 @@ storageClass:
   # -- Extra parameters of storageClass,
   # consult your cloud provider persistent storage documentation
   parameters: {}
+  # -- Add extra labels to the storageClass, in addition to `sourcegraph.labels`
+  labels: {}
   # -- Persistent volumes topology configuration,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: []
@@ -1577,7 +1599,9 @@ worker:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
 
-# -- Additional resources to include in the rendered manifest. Templates are supported.
+# -- Additional resources to include in the rendered manifest. Templates are supported. `sourcegraph.labels`, the
+# chart's standard labels, and `deploy: sourcegraph` are added to each resource; labels the resource sets itself take
+# precedence.
 extraResources: []
 
 # -- Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class.
@@ -1587,6 +1611,7 @@ extraResources: []
 #   value: 100
 #   preemptionPolicy: Never
 #   description: "gitserver priority class"
+#   labels: {}
 priorityClasses: []
 
 # -- Enable the busybox connection test after deployment

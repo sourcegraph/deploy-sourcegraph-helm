@@ -31,15 +31,10 @@ spec:
       {{- toYaml .Values.nodeExporter.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.nodeExporter) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.nodeExporter.podLabels }}
-      {{- toYaml .Values.nodeExporter.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.nodeExporter) | nindent 8 }}
         deploy: sourcegraph
         app: node-exporter
+        app.kubernetes.io/component: node-exporter
     spec:
       {{- if .Values.nodeExporter.serviceAccount.create }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "nodeExporter") | trim | nindent 6 }}

@@ -35,15 +35,10 @@ spec:
       {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podLabels }}
-      {{- toYaml .Values.syntectServer.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.syntectServer) | nindent 8 }}
         deploy: sourcegraph
         app: syntect-server
+        app.kubernetes.io/component: syntect-server
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntectServer") | nindent 6 }}
       {{- with .Values.syntectServer.extraInitContainers }}

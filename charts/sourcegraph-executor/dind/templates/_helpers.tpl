@@ -13,29 +13,6 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
-*/}}
-{{- define "sourcegraph.labels" -}}
-helm.sh/chart: {{ include "sourcegraph.chart" . }}
-{{ include "sourcegraph.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.sourcegraph.labels }}
-{{ toYaml .Values.sourcegraph.labels }}
-{{- end }}
-{{- end }}
-
-{{/*
-Selector labels
-*/}}
-{{- define "sourcegraph.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
 Create the name of the service account to use
 */}}
 {{- define "sourcegraph.serviceAccountName" -}}
@@ -98,7 +75,6 @@ tolerations:
 {{- end }}
 {{- end }}
 
-
 {{- define "executor.name" -}}
 {{- if .Values.executor.queueName -}}
 executor-{{.Values.executor.queueName}}
@@ -106,13 +82,6 @@ executor-{{.Values.executor.queueName}}
 executor-{{join "-" .Values.executor.queueNames }}
 {{- end }}
 {{- end }}
-
-{{- define "executor.labels" -}}
-app: {{ include "executor.name" . }}
-deploy: sourcegraph
-sourcegraph-resource-requires: no-cluster-admin
-app.kubernetes.io/component: executor
-{{- end}}
 
 {{- define "dind.daemonConfig" -}}
 {{- $config := .Values.dind.daemonConfig | deepCopy }}
@@ -169,13 +138,7 @@ spec:
       {{- toYaml $r.Values.executor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" $r | nindent 8 }}
-      {{- if $r.Values.sourcegraph.podLabels }}
-      {{- toYaml $r.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $r.Values.executor.podLabels }}
-      {{- toYaml $r.Values.executor.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list $r $r.Values.executor) | nindent 8 }}
         app: {{ .name }}
         deploy: sourcegraph
         sourcegraph-resource-requires: no-cluster-admin

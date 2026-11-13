@@ -26,6 +26,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: prometheus
+        {{- if not .Values.prometheus.existingConfig }}
+        {{- /* Prometheus does not reload a changed ConfigMap by itself. The ConfigMap's labels are left out of the hash. */}}
+        checksum/prometheus-config: {{ (include (print $.Template.BasePath "/prometheus/prometheus.ConfigMap.yaml") . | fromYaml).data | toJson | sha256sum }}
+        {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -33,15 +37,10 @@ spec:
       {{- toYaml .Values.prometheus.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.prometheus) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.prometheus.podLabels }}
-      {{- toYaml .Values.prometheus.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.prometheus) | nindent 8 }}
         deploy: sourcegraph
         app: prometheus
+        app.kubernetes.io/component: prometheus
     spec:
       {{- with .Values.prometheus.extraInitContainers }}
       initContainers:

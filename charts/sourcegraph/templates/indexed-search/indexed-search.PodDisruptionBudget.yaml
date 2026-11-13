@@ -2,6 +2,13 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.indexedSearch.labels }}
+      {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: indexed-search
   name: {{ .Values.indexedSearch.name }}
 spec:
   {{- toYaml .Values.indexedSearch.podDisruptionBudget | nindent 2 }}

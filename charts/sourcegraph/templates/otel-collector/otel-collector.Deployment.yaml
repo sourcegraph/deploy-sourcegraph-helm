@@ -24,6 +24,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: otel-collector
+        {{- if .Values.openTelemetry.gateway.config.traces.exporters }}
+        {{- /* The collector does not reload a changed ConfigMap by itself. Its data is rendered from these values only. */}}
+        checksum/otel-collector-config: {{ toJson .Values.openTelemetry.gateway.config.traces | sha256sum }}
+        {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -31,15 +35,10 @@ spec:
       {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.gateway) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.gateway.podLabels }}
-      {{- toYaml .Values.openTelemetry.gateway.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.openTelemetry.gateway) | nindent 8 }}
         deploy: sourcegraph
         app: otel-collector
+        app.kubernetes.io/component: otel-collector
     spec:
       {{- with .Values.openTelemetry.gateway.extraInitContainers }}
       initContainers:
@@ -61,11 +60,15 @@ spec:
           {{- else }} # use config defined by customer in values.yaml
           - "--config=/etc/otel-collector/config.yaml"
           {{- end }}
-          {{- end -}}
-        {{- with .Values.openTelemetry.gateway.args }}
+          {{- end }}
         args:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
+          {{- with .Values.openTelemetry.gateway.args }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+          # The image's logging.yaml serves the collector's own metrics on 127.0.0.1 only, where Prometheus cannot
+          # scrape them. An argument, so that a command set in `openTelemetry.gateway.command` gets it too, and the
+          # last one, so that it is `$0` of a `sh -c` command whose script is the first argument.
+          - {{ printf "--config=yaml:service::telemetry::metrics::readers: %s" (include "sourcegraph.otelCollector.metricsReaders" .) | quote }}
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- if .Values.jaeger.enabled }}

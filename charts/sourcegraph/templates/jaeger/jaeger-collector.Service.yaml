@@ -7,10 +7,10 @@ metadata:
   {{- toYaml .Values.jaeger.collector.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
+    {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger
-    app.kubernetes.io/name: jaeger
     {{- if .Values.jaeger.collector.serviceLabels }}
       {{- toYaml .Values.jaeger.collector.serviceLabels | nindent 4 }}
     {{- end }}

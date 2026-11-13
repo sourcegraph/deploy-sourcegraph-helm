@@ -8,6 +8,7 @@ metadata:
     {{- toYaml .Values.worker.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app: worker
     deploy: sourcegraph
     app.kubernetes.io/component: worker

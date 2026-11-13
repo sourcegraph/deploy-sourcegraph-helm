@@ -1,0 +1,55 @@
+suite: sourcegraph.labels on every object
+# No `templates` list, so every template in the chart is rendered, including
+# ones added later. The test fails with "no manifest found" for a template that
+# renders nothing, so enable a new optional template here.
+tests:
+  - it: should add sourcegraph.labels to every object the chart renders
+    set:
+      sourcegraph:
+        labels:
+          example.com/installation: production
+          example.com/project: sourcegraph
+    asserts:
+      - isSubset:
+          path: metadata.labels
+          content:
+            app.kubernetes.io/managed-by: Helm
+            deploy: sourcegraph
+            example.com/installation: production
+            example.com/project: sourcegraph
+      - exists:
+          path: metadata.labels["helm.sh/chart"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/name"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/instance"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/version"]
+      - exists:
+          path: metadata.labels["app.kubernetes.io/component"]
+  - it: should add sourcegraph.labels and the chart's labels to the pod template, and let the selector labels win
+    template: migrator/sourcegraph-migrator.Job.yaml
+    set:
+      sourcegraph:
+        labels:
+          example.com/project: sourcegraph
+        podLabels:
+          example.com/project: pods
+          # A selector label: a different value would stop the selector from matching the pods.
+          app.kubernetes.io/instance: other
+    asserts:
+      - isSubset:
+          path: spec.template.metadata.labels
+          content:
+            app.kubernetes.io/instance: RELEASE-NAME
+            app.kubernetes.io/managed-by: Helm
+            deploy: sourcegraph
+            example.com/project: pods
+      - notExists:
+          path: spec.template.metadata.labels["helm.sh/chart"]
+      - exists:
+          path: spec.template.metadata.labels["app.kubernetes.io/name"]
+      - notExists:
+          path: spec.template.metadata.labels["app.kubernetes.io/version"]
+      - exists:
+          path: spec.template.metadata.labels["app.kubernetes.io/component"]

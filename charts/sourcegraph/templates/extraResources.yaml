@@ -1,4 +1,18 @@
+{{- $labels := include "sourcegraph.labels" $ | fromYaml }}
+{{- $_ := set $labels "deploy" "sourcegraph" }}
 {{- range .Values.extraResources }}
+{{- $resource := . }}
+{{- if kindIs "map" . }}
+  {{- /* Labels the resource sets itself take precedence over the common labels. */}}
+  {{- $resource = deepCopy . }}
+  {{- $metadata := get $resource "metadata" | default dict }}
+  {{- $resourceLabels := deepCopy $labels }}
+  {{- range $key, $value := get $metadata "labels" | default dict }}
+    {{- $_ := set $resourceLabels $key $value }}
+  {{- end }}
+  {{- $_ := set $metadata "labels" $resourceLabels }}
+  {{- $_ := set $resource "metadata" $metadata }}
+{{- end }}
 ---
-{{ tpl (. | toYaml) $ }}
+{{ tpl ($resource | toYaml) $ }}
 {{- end }}

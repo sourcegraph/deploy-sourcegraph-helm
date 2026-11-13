@@ -28,8 +28,6 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: jaeger
-        prometheus.io/port: "16686"
-        sourcegraph.prometheus/scrape: "true"
         {{- if not .Values.jaeger.config.existingConfigMap }}
         checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
         {{- end }}
@@ -40,14 +38,8 @@ spec:
       {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.jaeger.podLabels }}
-      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
-      {{- end }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- /* As sourcegraph.podLabels, with the jaeger common and selector labels */}}
+        {{- mergeOverwrite (omit (include "sourcegraph.jaeger.labels" . | fromYaml) "helm.sh/chart" "app.kubernetes.io/version") (.Values.sourcegraph.podLabels | default dict) (.Values.jaeger.podLabels | default dict) (include "sourcegraph.jaeger.selectorLabels" . | fromYaml) | toYaml | nindent 8 }}
         app: jaeger
         deploy: sourcegraph
         app.kubernetes.io/component: all-in-one

@@ -32,16 +32,11 @@ spec:
       {{- toYaml .Values.codeIntelDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.codeIntelDB) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeIntelDB.podLabels }}
-      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list . .Values.codeIntelDB) | nindent 8 }}
         deploy: sourcegraph
         app: codeintel-db
         group: backend
+        app.kubernetes.io/component: codeintel-db
     spec:
       initContainers:
       {{- with .Values.codeIntelDB.extraInitContainers }}

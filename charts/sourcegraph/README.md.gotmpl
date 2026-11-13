@@ -101,6 +101,35 @@ Set these values on the first install and never change them on an installed
 release: Kubernetes rejects the upgrade. Before installing, compare the
 `helm template` output with `kubectl get -o yaml` for each workload.
 
+Labels on other objects can be changed, so they never block an upgrade, but
+Helm only manages the labels the chart renders. To render the labels that the
+existing objects have:
+
+- `sourcegraph.labels` adds labels to every object the chart renders, on every
+  component.
+- `<serviceName>.labels` adds labels to one component's workload, ConfigMaps,
+  Secrets, and PodDisruptionBudget.
+- `<serviceName>.serviceLabels` adds labels to one component's Services.
+- `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of
+  `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`,
+  `redisCache`, or `redisStore`.
+- `<serviceName>.serviceAccount.labels` adds labels to one component's
+  ServiceAccount, and to the Role, RoleBinding, ClusterRole, and
+  ClusterRoleBinding of `frontend` and `prometheus`.
+
+```yaml
+sourcegraph:
+  labels:
+    example.com/project: sourcegraph
+blobstore:
+  storageLabels:
+    example.com/service: blobstore
+frontend:
+  serviceAccount:
+    labels:
+      example.com/service: frontend
+```
+
 Helm only takes over an existing object that has the
 `app.kubernetes.io/managed-by: Helm` label and the `meta.helm.sh/release-name`
 and `meta.helm.sh/release-namespace` annotations, or when installing with
@@ -129,6 +158,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.extraSelectorLabels` - add labels to the service's workload selector, pod labels, and Service and PodDisruptionBudget selectors. See [Adopting existing workloads](#adopting-existing-workloads)
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
+- `<serviceName>.serviceAccount.labels` - Labels for the service-specific service account, and for the Role, RoleBinding, ClusterRole, and ClusterRoleBinding of `frontend` and `prometheus`, in addition to `sourcegraph.labels`
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
 
 {{ template "chart.valuesTable" . }}

@@ -51,18 +51,13 @@ spec:
       {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podLabels }}
-      {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podLabels }}
-      {{- toYaml $top.Values.worker.podLabels | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.podLabels" (list $top $top.Values.worker) | nindent 8 }}
         deploy: sourcegraph
         app: worker
         {{- if $suffix }}
         worker-replica: {{ $name | quote }}
         {{- end }}
+        app.kubernetes.io/component: worker
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list $top "worker") | nindent 6 }}
       {{- with $top.Values.worker.extraInitContainers }}

@@ -8,6 +8,13 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" $top | nindent 4 }}
+    {{- if $top.Values.worker.labels }}
+      {{- toYaml $top.Values.worker.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: worker
   name: {{ $name }}
 spec:
   {{- toYaml $top.Values.worker.podDisruptionBudget | nindent 2 }}

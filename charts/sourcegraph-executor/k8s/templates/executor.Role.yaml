@@ -4,6 +4,10 @@ kind: Role
 metadata:
   name: sg-executor-role
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.executor.labels }}
+      {{- toYaml .Values.executor.labels | nindent 4 }}
+    {{- end }}
     category: rbac
     deploy: sourcegraph
     sourcegraph-resource-requires: cluster-admin

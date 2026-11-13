@@ -3,6 +3,10 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- with .Values.codeIntelDB.storageLabels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
   {{- if .Values.codeIntelDB.storageAnnotations }}

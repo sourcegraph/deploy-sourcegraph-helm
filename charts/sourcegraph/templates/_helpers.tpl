@@ -13,62 +13,16 @@ Create chart name and version as used by the chart label.
 {{- end }}
 
 {{/*
-Common labels
+The `service.telemetry.metrics.readers` setting of `otel-collector`, as a YAML
+flow sequence. It serves the collector's own metrics on all interfaces, port
+8888, where Prometheus scrapes them. The collector defaults to 127.0.0.1, which
+other pods cannot reach. Without the type and unit suffixes the metric names are
+the ones the bundled dashboard queries, e.g. `otelcol_receiver_accepted_spans`.
+
+The image's `jaeger.yaml` already has this setting. Its `logging.yaml` does not.
 */}}
-{{- define "sourcegraph.labels" -}}
-helm.sh/chart: {{ include "sourcegraph.chart" . }}
-app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.sourcegraph.labels }}
-{{ toYaml .Values.sourcegraph.labels }}
-{{- end }}
-{{- end }}
-
-{{/*
-Selector labels, shared by a component's workload selector, pod labels, and
-Service and PodDisruptionBudget selectors, so they cannot drift apart.
-
-Pass the root context and the component's values:
-
-{{ include "sourcegraph.selectorLabels" (list . .Values.frontend) }}
-*/}}
-{{- define "sourcegraph.selectorLabels" -}}
-{{- $top := index . 0 -}}
-{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
-app.kubernetes.io/name: {{ include "sourcegraph.name" $top }}
-app.kubernetes.io/instance: {{ $top.Release.Name }}
-{{- end }}
-{{- with include "sourcegraph.customSelectorLabels" . }}
-{{ . }}
-{{- end }}
-{{- end }}
-
-{{/*
-The selector labels set in values: sourcegraph.selectorLabelsOverride, which
-replaces the default selector labels on every component, merged with the
-component's extraSelectorLabels. Empty by default.
-
-These exist to adopt workloads created outside this chart, whose selectors
-are immutable. The chart sets the labels in $chartLabels itself, so
-overriding one would stop a selector from matching its pods.
-*/}}
-{{- define "sourcegraph.customSelectorLabels" -}}
-{{- $top := index . 0 -}}
-{{- $component := index . 1 -}}
-{{- $chartLabels := list "app" "deploy" "group" "type" "worker-replica" -}}
-{{- $labels := mergeOverwrite (dict) ($top.Values.sourcegraph.selectorLabelsOverride | default dict) ($component.extraSelectorLabels | default dict) -}}
-{{- range $chartLabel := $chartLabels -}}
-{{- if hasKey $labels $chartLabel -}}
-{{- fail (printf "sourcegraph.selectorLabelsOverride and <serviceName>.extraSelectorLabels must not set the label %q, which the chart sets itself" $chartLabel) -}}
-{{- end -}}
-{{- end -}}
-{{- with $labels -}}
-{{ toYaml . }}
-{{- end -}}
+{{- define "sourcegraph.otelCollector.metricsReaders" -}}
+[{pull: {exporter: {prometheus: {host: "0.0.0.0", port: 8888, without_type_suffix: true, without_units: true}}}}]
 {{- end }}
 
 {{/*
@@ -182,28 +136,6 @@ tolerations:
 {{- else if $globalTolerations }}
 {{- $globalTolerations | toYaml | trim | nindent 2 }}
 {{- end }}
-{{- end }}
-
-{{/*
-Jaeger common labels
-*/}}
-{{- define "sourcegraph.jaeger.labels" -}}
-helm.sh/chart: {{ include "sourcegraph.chart" . }}
-{{ include "sourcegraph.jaeger.selectorLabels" . }}
-{{- if .Chart.AppVersion }}
-app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
-{{- end }}
-app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.sourcegraph.labels }}
-{{ toYaml .Values.sourcegraph.labels }}
-{{- end }}
-{{- end }}
-
-{{/*
-Jaeger selector labels
-*/}}
-{{- define "sourcegraph.jaeger.selectorLabels" -}}
-app.kubernetes.io/name: jaeger
 {{- end }}
 
 {{- define "sourcegraph.openTelemetryEnv" -}}

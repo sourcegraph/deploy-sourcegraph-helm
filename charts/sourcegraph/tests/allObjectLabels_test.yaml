@@ -1,0 +1,375 @@
+suite: labels on every object
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+# The chart version is part of the helm.sh/chart label and changes on every
+# release, so pin it to compare whole label sets.
+chart:
+  version: 1.2.3
+  appVersion: 1.2.3
+# No `templates` list, so every template in the chart is rendered, including
+# ones added later. The two excluded manifests are not rendered together with
+# the rest and are tested in the second suite of this file.
+excludeTemplates:
+- NOTES.txt
+- otel-collector/otel-collector.ConfigMap.yaml
+- prometheus/prometheus.RoleBinding.yaml
+tests:
+# This test fails with "no manifest found" for a template that renders nothing,
+# so enable a new optional template here.
+- it: should add sourcegraph.labels and the chart's labels to every object the chart renders
+  set:
+    sourcegraph.labels: &globalLabels
+      example.com/installation: production
+      example.com/project: sourcegraph
+    storageClass.create: true
+    sgTestConnection.enabled: true
+    jaeger.enabled: true
+    nodeExporter.enabled: true
+    syntacticCodeIntel.enabled: true
+    frontend.ingress.enabled: true
+    redisCache.config.enabled: true
+    redisStore.config.enabled: true
+    grafana.auth:
+      database: grafana
+      host: pgsql
+      password: password
+      port: "5432"
+      sslmode: disable
+      user: grafana
+    worker.replicas:
+    - jobs: [codeintel-upload-janitor]
+    frontend.podDisruptionBudget: &podDisruptionBudget
+      maxUnavailable: 1
+    gitserver.podDisruptionBudget: *podDisruptionBudget
+    indexedSearch.podDisruptionBudget: *podDisruptionBudget
+    preciseCodeIntel.podDisruptionBudget: *podDisruptionBudget
+    redisCache.podDisruptionBudget: *podDisruptionBudget
+    redisStore.podDisruptionBudget: *podDisruptionBudget
+    searcher.podDisruptionBudget: *podDisruptionBudget
+    syntacticCodeIntel.podDisruptionBudget: *podDisruptionBudget
+    syntectServer.podDisruptionBudget: *podDisruptionBudget
+    worker.podDisruptionBudget: *podDisruptionBudget
+    blobstore.serviceAccount.create: true
+    cadvisor.serviceAccount.create: true
+    codeInsightsDB.serviceAccount.create: true
+    codeIntelDB.serviceAccount.create: true
+    frontend.serviceAccount.create: true
+    gitserver.serviceAccount.create: true
+    grafana.serviceAccount.create: true
+    indexedSearch.serviceAccount.create: true
+    jaeger.serviceAccount.create: true
+    nodeExporter.serviceAccount.create: true
+    openTelemetry.agent.serviceAccount.create: true
+    openTelemetry.gateway.serviceAccount.create: true
+    pgsql.serviceAccount.create: true
+    preciseCodeIntel.serviceAccount.create: true
+    prometheus.serviceAccount.create: true
+    redisCache.serviceAccount.create: true
+    redisStore.serviceAccount.create: true
+    searcher.serviceAccount.create: true
+    syntacticCodeIntel.serviceAccount.create: true
+    syntectServer.serviceAccount.create: true
+    worker.serviceAccount.create: true
+    priorityClasses:
+    - name: gitserver-class
+      value: 1000000
+    extraResources:
+    - apiVersion: networking.k8s.io/v1
+      kind: NetworkPolicy
+      metadata:
+        name: deny-all
+        # The chart cannot know which component an extra resource belongs to.
+        labels:
+          app.kubernetes.io/component: network-policy
+      spec:
+        podSelector: {}
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content: &allLabels
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+  # The values differ per object: jaeger is named `jaeger`, and the StorageClass is `deploy: sourcegraph-storage`.
+  - exists:
+      path: metadata.labels["app.kubernetes.io/name"]
+  - exists:
+      path: metadata.labels.deploy
+  - exists:
+      path: metadata.labels["app.kubernetes.io/component"]
+
+- it: should add a component's labels to its ConfigMaps, Secrets, and PodDisruptionBudget
+  templates:
+  - codeinsights-db/codeinsights-db.ConfigMap.yaml
+  - codeinsights-db/codeinsights-db.Secret.yaml
+  - codeintel-db/codeintel-db.ConfigMap.yaml
+  - codeintel-db/codeintel-db.Secret.yaml
+  - frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
+  - gitserver/gitserver.PodDisruptionBudget.yaml
+  - grafana/grafana.ConfigMap.yaml
+  - grafana/grafana.pgsql.Secret.yaml
+  - indexed-search/indexed-search.PodDisruptionBudget.yaml
+  - jaeger/jaeger.ConfigMap.yaml
+  - otel-collector/otel-agent.ConfigMap.yaml
+  - pgsql/pgsql.ConfigMap.yaml
+  - pgsql/pgsql.Secret.yaml
+  - precise-code-intel/worker.PodDisruptionBudget.yaml
+  - prometheus/prometheus.ConfigMap.yaml
+  - redis/redis-cache.ConfigMap.yaml
+  - redis/redis-cache.PodDisruptionBudget.yaml
+  - redis/redis-cache.Secret.yaml
+  - redis/redis-store.ConfigMap.yaml
+  - redis/redis-store.PodDisruptionBudget.yaml
+  - redis/redis-store.Secret.yaml
+  - searcher/searcher.PodDisruptionBudget.yaml
+  - syntactic-code-intel/worker.PodDisruptionBudget.yaml
+  - syntect-server/syntect-server.PodDisruptionBudget.yaml
+  - worker/worker.PodDisruptionBudget.yaml
+  set:
+    codeInsightsDB.labels: &componentLabels
+      example.com/service: component
+    codeIntelDB.labels: *componentLabels
+    frontend.labels: *componentLabels
+    gitserver.labels: *componentLabels
+    grafana.labels: *componentLabels
+    indexedSearch.labels: *componentLabels
+    jaeger.labels: *componentLabels
+    openTelemetry.agent.labels: *componentLabels
+    pgsql.labels: *componentLabels
+    preciseCodeIntel.labels: *componentLabels
+    prometheus.labels: *componentLabels
+    redisCache.labels: *componentLabels
+    redisStore.labels: *componentLabels
+    searcher.labels: *componentLabels
+    syntacticCodeIntel.labels: *componentLabels
+    syntectServer.labels: *componentLabels
+    worker.labels: *componentLabels
+    jaeger.enabled: true
+    syntacticCodeIntel.enabled: true
+    redisCache.config.enabled: true
+    redisStore.config.enabled: true
+    grafana.auth:
+      database: grafana
+      host: pgsql
+      password: password
+      port: "5432"
+      sslmode: disable
+      user: grafana
+    worker.replicas:
+    - jobs: [codeintel-upload-janitor]
+    frontend.podDisruptionBudget: *podDisruptionBudget
+    gitserver.podDisruptionBudget: *podDisruptionBudget
+    indexedSearch.podDisruptionBudget: *podDisruptionBudget
+    preciseCodeIntel.podDisruptionBudget: *podDisruptionBudget
+    redisCache.podDisruptionBudget: *podDisruptionBudget
+    redisStore.podDisruptionBudget: *podDisruptionBudget
+    searcher.podDisruptionBudget: *podDisruptionBudget
+    syntacticCodeIntel.podDisruptionBudget: *podDisruptionBudget
+    syntectServer.podDisruptionBudget: *podDisruptionBudget
+    worker.podDisruptionBudget: *podDisruptionBudget
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        example.com/service: component
+
+- it: should label a PodDisruptionBudget with the component of its workload
+  templates:
+  - redis/redis-store.Deployment.yaml
+  - redis/redis-store.PodDisruptionBudget.yaml
+  - syntactic-code-intel/worker.Deployment.yaml
+  - syntactic-code-intel/worker.PodDisruptionBudget.yaml
+  set:
+    syntacticCodeIntel.enabled: true
+    redisStore.podDisruptionBudget: *podDisruptionBudget
+    syntacticCodeIntel.podDisruptionBudget: *podDisruptionBudget
+  asserts:
+  - equal:
+      path: metadata.labels["app.kubernetes.io/component"]
+      value: redis
+    template: redis/redis-store.Deployment.yaml
+  - equal:
+      path: metadata.labels["app.kubernetes.io/component"]
+      value: redis
+    template: redis/redis-store.PodDisruptionBudget.yaml
+  - equal:
+      path: metadata.labels["app.kubernetes.io/component"]
+      value: syntactic-code-intel
+    template: syntactic-code-intel/worker.Deployment.yaml
+  - equal:
+      path: metadata.labels["app.kubernetes.io/component"]
+      value: syntactic-code-intel
+    template: syntactic-code-intel/worker.PodDisruptionBudget.yaml
+
+- it: should add the labels of a priority class and of the storage class
+  templates:
+  - priorityClass.yaml
+  - storageclass.yaml
+  set:
+    storageClass.create: true
+    storageClass.labels:
+      example.com/service: storage
+    priorityClasses:
+    - name: gitserver-class
+      value: 1000000
+      labels:
+        example.com/service: gitserver
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: gitserver
+    template: priorityClass.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: storage
+    template: storageclass.yaml
+
+- it: should keep the labels a Service already has
+  templates:
+  - frontend/sourcegraph-frontend.Service.yaml
+  - jaeger/jaeger-query.Service.yaml
+  set:
+    sourcegraph.labels: *globalLabels
+    jaeger.enabled: true
+    frontend.serviceLabels:
+      example.com/service: frontend
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+        example.com/service: frontend
+        app: sourcegraph-frontend
+        deploy: sourcegraph
+        app.kubernetes.io/component: frontend
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: jaeger
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+        app: jaeger
+        deploy: sourcegraph
+        app.kubernetes.io/component: all-in-one
+    template: jaeger/jaeger-query.Service.yaml
+
+- it: should let an extra resource override sourcegraph.labels with its own labels
+  template: extraResources.yaml
+  set:
+    sourcegraph.labels: *globalLabels
+    extraResources:
+    - apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: extra
+        labels:
+          example.com/project: extra
+          example.com/release: "{{ .Release.Name }}"
+      data:
+        maxBytes: "1048576"
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: extra
+        example.com/release: sourcegraph
+        deploy: sourcegraph
+
+# Prometheus derives the `app` and `job` labels of a Service's metrics from its
+# `app` label, and the "pods available" alert queries `up{app=~".*otel-collector"}`.
+- it: should label the otel-collector Service with its app, like every other scraped Service
+  template: otel-collector/otel-collector.Service.yaml
+  asserts:
+  - equal:
+      path: metadata.labels.app
+      value: otel-collector
+---
+suite: sourcegraph.labels on the objects that replace others
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+chart:
+  version: 1.2.3
+  appVersion: 1.2.3
+templates:
+- otel-collector/otel-collector.ConfigMap.yaml
+- prometheus/prometheus.RoleBinding.yaml
+tests:
+- it: should add sourcegraph.labels to the objects that replace others
+  set:
+    sourcegraph.labels:
+      example.com/installation: production
+      example.com/project: sourcegraph
+    prometheus.privileged: false
+    openTelemetry.gateway.config.traces.exporters:
+      otlp:
+        endpoint: collector.example.com:4317
+    openTelemetry.gateway.labels:
+      example.com/service: otel-collector
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+  - exists:
+      path: metadata.labels.deploy
+  - exists:
+      path: metadata.labels["app.kubernetes.io/component"]
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: otel-collector
+    template: otel-collector/otel-collector.ConfigMap.yaml
+---
+suite: Object labels that Prometheus does not copy to metrics
+templates:
+- prometheus/prometheus.ConfigMap.yaml
+tests:
+# No bundled dashboard or alert queries these labels, and `helm.sh/chart` and
+# `app.kubernetes.io/version` change on every upgrade.
+- it: should not copy the labels the chart adds to every object to metrics
+  asserts:
+  - matchRegex:
+      path: data["prometheus.yml"]
+      # Both jobs that map Service or pod labels to metric labels drop the chart's labels afterwards.
+      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\n.*){2}
+
+- it: should not copy sourcegraph.labels to metrics
+  set:
+    sourcegraph.labels:
+      team: platform
+      example.com/project: sourcegraph
+      cost-center: "1234"
+      # Labels the chart sets itself stay on metrics: `job` is derived from `app`.
+      app: sourcegraph
+      type: internal
+  asserts:
+  - matchRegex:
+      path: data["prometheus.yml"]
+      # Prometheus replaces every character of a label key outside [a-zA-Z0-9_] with `_`.
+      pattern: (?s)(regex. __meta_kubernetes_(service|pod)_label_\(\.\+\)\n(\s*#[^\n]*\n)*\s*- action. labeldrop\n\s*regex. helm_sh_chart\|app_kubernetes_io_\(name\|instance\|version\|managed_by\)\|cost_center\|example_com_project\|team\n.*){2}
