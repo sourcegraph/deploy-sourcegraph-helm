@@ -1,10 +1,9 @@
 suite: executor
 templates:
   - executor.Deployment.yaml
-  - executor.Service.yaml
   - executor.ConfigMap.yaml
 tests:
-  - it: should render the Deployment, Service, ConfigMap if executor is enabled
+  - it: should render the Deployment, ConfigMap if executor is enabled
     set:
       executor:
         queueName: "test"
@@ -14,11 +13,6 @@ tests:
           apiVersion: apps/v1
           name: executor-test
         template: executor.Deployment.yaml
-      - containsDocument:
-          kind: Service
-          apiVersion: v1
-          name: executor-test
-        template: executor.Service.yaml
       - containsDocument:
           kind: ConfigMap
           apiVersion: v1
