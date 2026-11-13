@@ -4,6 +4,20 @@ steps:
       - "scripts/ci/helm-unittest.sh"
     agents: { queue: standard }
 
+  # Internal releases point values.yaml at the internal registry and pin new
+  # image tags and chart versions (see release.yaml). Rerun the unit tests with
+  # placeholder values rewritten the same way, so a test that asserts the
+  # defaults fails on its PR instead of on the release branch.
+  - label: ":test_tube: Unit Tests with internal release values"
+    command: |
+      find charts -name values.yaml -exec sed -i -E \
+        -e 's#^([[:space:]]*repository:) index\.docker\.io/sourcegraph$#\1 us-docker.pkg.dev/sourcegraph-images/internal#' \
+        -e 's#^([[:space:]]*defaultTag:) [0-9.]+@sha256:[0-9a-f]{64}$#\1 99.0.0@sha256:0000000000000000000000000000000000000000000000000000000000000000#' {} +
+      find charts -name Chart.yaml -exec sed -i -E 's#^([[:space:]]*(version|appVersion):) "[0-9]+\.[0-9]+\.[0-9]+"$#\1 "99.0.0"#' {} +
+      git diff --stat
+      scripts/ci/helm-unittest.sh
+    agents: { queue: standard }
+
   - label: ":database: Schema Validation"
     commands:
       - "scripts/ci/validate-schema.sh"
