@@ -4,6 +4,8 @@
 ## Unreleased
 
 * Removed the unused container port 2375 from the `dind` sidecar in the Docker-in-Docker executor chart (`sourcegraph-executor/dind`). `dockerd` listens on `127.0.0.1:2375` only (`dind.daemonConfig.hosts`), the executor reaches it over `localhost`, and no Service targets the port. The executor pod is replaced once on upgrade.
+* Narrowed the Kubernetes-native executor's Role (`sg-executor-role`) to the calls the executor makes: `watch` on `pods`, `get` on `pods/log`, and `create` and `delete` on `jobs`, `secrets`, and `persistentvolumeclaims`. It no longer grants `get` and `list` on `pods`, `secrets`, or `persistentvolumeclaims`; executors have not used them since Sourcegraph 5.1, before this chart existed.
+* Removed `SRC_TRACE_LOG` from the Kubernetes-native executor's ConfigMap, and the `executor.log.trace` value that set it. Nothing has read `SRC_TRACE_LOG` since Sourcegraph 5.2.
 
 ## 8.0.0
 
