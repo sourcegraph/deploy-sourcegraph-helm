@@ -29,6 +29,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: syntactic-code-intel-worker
+      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -59,6 +60,7 @@ spec:
       - name: syntactic-code-intel-worker
         env:
         {{- include "sourcegraph.gracefulShutdownEnv" (list . "syntacticCodeIntel") | nindent 8 }}
+        {{- include "sourcegraph.redisConnection" . | nindent 8 }}
         {{- range $name, $item := .Values.syntacticCodeIntel.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}

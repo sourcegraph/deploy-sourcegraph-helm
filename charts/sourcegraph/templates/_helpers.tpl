@@ -269,7 +269,7 @@ so that customers can configure them any of these ways:
 3. Do not create or use Kubernetes secrets, just pass the default values directly as environment variables into the needed pods, by configuring:
 .Values.sourcegraph.disableKubernetesSecrets: true
 
-4. Do not create or use Kubernetes secrets, but provide custom values (ex. external Redis) to have this function pass them into the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods, by configuring:
+4. Do not create or use Kubernetes secrets, but provide custom values (ex. external Redis) to have this function pass them into the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, worker, precise-code-intel-worker, and syntactic-code-intel-worker pods, by configuring:
 .Values.sourcegraph.disableKubernetesSecrets: true
 .Values.redisCache.connection.endpoint: <custom value for REDIS_CACHE_ENDPOINT>
 .Values.redisStore.connection.endpoint: <custom value for REDIS_STORE_ENDPOINT>

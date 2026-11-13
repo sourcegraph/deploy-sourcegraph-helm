@@ -2,9 +2,16 @@
 suite: redisConnection
 templates:
 - frontend/sourcegraph-frontend.Deployment.yaml
+- precise-code-intel/worker.Deployment.yaml
+- syntactic-code-intel/worker.Deployment.yaml
+set:
+  syntacticCodeIntel:
+    enabled: true
 tests:
 - it: should reference the default secret
   asserts:
+    - exists:
+        path: spec.template.metadata.annotations["checksum/redis"]
     - contains:
         path: spec.template.spec.containers[0].env
         content:
@@ -21,6 +28,31 @@ tests:
             secretKeyRef:
               key: endpoint
               name: redis-store
+- it: should reference existing secrets when .connection.existingSecret is set
+  set:
+    redisCache:
+      connection:
+        existingSecret: ext-cache
+    redisStore:
+      connection:
+        existingSecret: ext-store
+  asserts:
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_CACHE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: ext-cache
+    - contains:
+        path: spec.template.spec.containers[0].env
+        content:
+          name: REDIS_STORE_ENDPOINT
+          valueFrom:
+            secretKeyRef:
+              key: endpoint
+              name: ext-store
 - it: should not reference secret when .sourcegraph.disableKubernetesSecrets is true
   set:
     sourcegraph:
@@ -53,5 +85,7 @@ tests:
       connection:
         endpoint: ""
   asserts:
-    - failedTemplate: 
+    # The render stops at the first error, and helm-unittest reports it on the last template in the suite.
+    - template: syntactic-code-intel/worker.Deployment.yaml
+      failedTemplate: 
         errorMessage: .Values.redisCache.connection.endpoint and .Values.redisStore.connection.endpoint must be set when disableKubernetesSecrets is true!
