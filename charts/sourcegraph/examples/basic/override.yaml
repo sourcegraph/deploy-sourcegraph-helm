@@ -1,10 +1,10 @@
 # Simple override file adjusting resources, replica count, and adding environment variables
 
 frontend:
-  replicas: 2
+  replicaCount: 2
 
-gitServer:
-  replicas: 2
+gitserver:
+  replicaCount: 2
   resources:
     limits:
       cpu: "8"
@@ -21,24 +21,24 @@ grafana:
   storageSize: "10Gi"
 
 indexedSearch:
-  replicas: 2
+  replicaCount: 2
   storageSize: "100Gi"
-  webserver:
-    resources:
-      limits:
-        cpu: "2"
-        memory: 16G
-      requests:
-        cpu: "1"
-        memory: 16G
-  indexserver:
-    resources:
-      limits:
-        cpu: "4"
-        memory: 16G
-      requests:
-        cpu: "4"
-        memory: 8G
+  resources:
+    limits:
+      cpu: "2"
+      memory: 16G
+    requests:
+      cpu: "1"
+      memory: 16G
+
+indexedSearchIndexer:
+  resources:
+    limits:
+      cpu: "4"
+      memory: 16G
+    requests:
+      cpu: "4"
+      memory: 8G
 
 blobstore:
   resources:

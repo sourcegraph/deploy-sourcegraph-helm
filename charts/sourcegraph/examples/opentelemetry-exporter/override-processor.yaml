@@ -1,3 +1,5 @@
+# Processors apply only to your own exporters, with jaeger.enabled: false.
+# Use this file together with override.yaml or override-tls.yaml.
 openTelemetry:
   gateway:
     config:

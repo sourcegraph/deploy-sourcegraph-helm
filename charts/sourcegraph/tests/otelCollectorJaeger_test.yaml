@@ -85,7 +85,7 @@ tests:
         enabled: true
     asserts:
       - failedTemplate:
-          errorMessage: "Set 'jaeger.enabled' to false or remove 'openTelemetry.gateway.config.exporters'. The bundled jaeger instance is preconfigured."
+          errorMessage: "Set 'jaeger.enabled' to false or remove 'openTelemetry.gateway.config.traces.exporters'. The bundled jaeger instance is preconfigured."
   - it: should not allow jaeger to be enabled without otelCollector enabled
     template: jaeger/jaeger.Deployment.yaml
     set:

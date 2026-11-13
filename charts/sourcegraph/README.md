@@ -224,6 +224,8 @@ In addition to the documented values, all services also support the following va
 | frontend.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"4G"},"requests":{"cpu":"2","ephemeral-storage":"4Gi","memory":"2G"}}` | Resource requests & limits for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| frontend.serviceAnnotations | object | `{}` | Annotations for the `sourcegraph-frontend` and `sourcegraph-frontend-internal` Services |
+| frontend.serviceType | string | `"ClusterIP"` | Type of the `sourcegraph-frontend` Service |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | gitserver.env | object | the chart will add some default environment values | Environment variables for the `gitserver` container |
 | gitserver.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `gitserver` image |
@@ -344,11 +346,12 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.command | list | `[]` | Command for the `otel-collector` container, as a list, replacing the chart's `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file. `openTelemetry.gateway.args` is still passed as the arguments. |
 | openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to. Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
-| openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
+| openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Used only when `exporters` is set and `jaeger.enabled` is false. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
 | openTelemetry.gateway.config.traces.tracePipelineProcessors | list | `[]` | Define the order in which processors are applied in the traces pipeline. When set, this takes precedence over the iteration order of `processors` (which cannot be relied on to preserve insertion order). Must contain exactly the same processor names as the keys of `processors`. |
 | openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
+| openTelemetry.gateway.env | object | `{}` | Environment variables for the `otel-collector` container, e.g. an exporter endpoint read in `config.traces.exporters` as `${env:NAME}` |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
 | openTelemetry.gateway.resources | object | `{"limits":{"cpu":"3","memory":"3Gi"},"requests":{"cpu":"1","memory":"1Gi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.gateway.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-collector` |
@@ -432,6 +435,7 @@ In addition to the documented values, all services also support the following va
 | redisCache.storageSize | string | `"100Gi"` | PVC Storage Request for `redis-cache` data volume |
 | redisCache.storageSubPath | string | `""` | Optional subPath for the `redis-cache` primary data volume mount |
 | redisExporter.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":1000,"runAsUser":999}` | Security context for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| redisExporter.env | object | `{}` | Environment variables for the `redis-exporter` sidecar container, e.g. `REDIS_PASSWORD` |
 | redisExporter.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `redis-exporter` image |
 | redisExporter.image.name | string | `"redis_exporter"` | Docker image name for the `redis-exporter` image |
 | redisExporter.resources | object | `{"limits":{"cpu":"10m","memory":"100Mi"},"requests":{"cpu":"10m","memory":"100Mi"}}` | Resource requests & limits for the `redis-exporter` sidecar container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
@@ -493,12 +497,15 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
 | sourcegraph.terminationGracePeriodSeconds | int | `30` | Time Kubernetes allows Sourcegraph services to shut down before forced termination |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| storageClass.allowVolumeExpansion | bool | `true` | Allow PersistentVolumeClaims of this StorageClass to be resized |
 | storageClass.allowedTopologies | list | `[]` | Persistent volumes topology configuration, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies) |
 | storageClass.create | bool | `true` | Enable creation of storageClass. Disable if you have your own existing storage class |
 | storageClass.name | string | `"sourcegraph"` | Name of the storageClass. Use to customize to the existing storage class name |
 | storageClass.parameters | object | `{}` | Extra parameters of storageClass, consult your cloud provider persistent storage documentation |
 | storageClass.provisioner | string | `"kubernetes.io/gce-pd"` | Name of the storageClass provisioner, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner) and consult your cloud provider persistent storage documentation |
+| storageClass.reclaimPolicy | string | `"Retain"` | What happens to a PersistentVolume when its claim is deleted, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#reclaim-policy) |
 | storageClass.type | string | `"pd-ssd"` | Value of `type` key in storageClass `parameters`, consult your cloud provider persistent storage documentation |
+| storageClass.volumeBindingMode | string | `"Immediate"` | When volumes are provisioned and bound, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#volume-binding-mode) |
 | syntacticCodeIntel.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | syntacticCodeIntel.enabled | bool | `false` |  |
 | syntacticCodeIntel.env | object | the chart will add some default environment values | Environment variables for the `syntactic-code-intel-worker` container |

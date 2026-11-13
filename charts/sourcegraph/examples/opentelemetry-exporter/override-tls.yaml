@@ -2,13 +2,13 @@ openTelemetry:
   gateway:
     env:
       JAEGER_HOST:
-        value: "http://your.jaeger.endpoint"
+        value: "your.jaeger.endpoint"
     config:
       traces:
         exportersTlsSecretName: otel-collector-exporters-tls
         exporters:
-          jaeger:
-            endpoint: "$JAEGER_HOST:14250"
+          otlp:
+            endpoint: "${env:JAEGER_HOST}:4317"
             tls:
               cert_file: /tls/file.cert
               key_file: /tls/file.key

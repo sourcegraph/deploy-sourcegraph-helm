@@ -406,6 +406,10 @@ frontend:
       cpu: "2"
       ephemeral-storage: 4Gi
       memory: 2G
+  # -- Type of the `sourcegraph-frontend` Service
+  serviceType: ClusterIP
+  # -- Annotations for the `sourcegraph-frontend` and `sourcegraph-frontend-internal` Services
+  serviceAnnotations: {}
   serviceAccount:
     # -- Enable creation of ServiceAccount for `frontend`
     create: true
@@ -762,7 +766,7 @@ openTelemetry:
         memory: 1Gi
     config:
       traces:
-        # -- Define trace processors.
+        # -- Define trace processors. Used only when `exporters` is set and `jaeger.enabled` is false.
         # Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces)
         processors: {}
         # -- Define the order in which processors are applied in the traces pipeline. When set, this
@@ -776,6 +780,9 @@ openTelemetry:
         # -- Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls".
         # Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md)
         exportersTlsSecretName: ""
+    # -- Environment variables for the `otel-collector` container, e.g. an exporter endpoint
+    # read in `config.traces.exporters` as `${env:NAME}`
+    env: {}
     serviceAccount:
       # -- Enable creation of ServiceAccount for `otel-collector`
       create: false
@@ -1225,6 +1232,8 @@ redisExporter:
     runAsUser: 999
     runAsGroup: 1000
     readOnlyRootFilesystem: true
+  # -- Environment variables for the `redis-exporter` sidecar container, e.g. `REDIS_PASSWORD`
+  env: {}
   # -- Resource requests & limits for the `redis-exporter` sidecar container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
@@ -1396,6 +1405,14 @@ storageClass:
   # -- Persistent volumes topology configuration,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
   allowedTopologies: []
+  # -- Allow PersistentVolumeClaims of this StorageClass to be resized
+  allowVolumeExpansion: true
+  # -- What happens to a PersistentVolume when its claim is deleted,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#reclaim-policy)
+  reclaimPolicy: Retain
+  # -- When volumes are provisioned and bound,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#volume-binding-mode)
+  volumeBindingMode: Immediate
 
 syntectServer:
   # -- Environment variables for the `syntect-server` container
