@@ -140,16 +140,94 @@ tests:
       - isNull:
           path: spec.template.spec.priorityClassName
 
-  - it: should use migrator.nodeSelector instead of sourcegraph.nodeSelector
+  - it: should use migrator.nodeSelector, affinity, and tolerations instead of the sourcegraph ones
     set:
       sourcegraph:
         nodeSelector:
-          pool: global
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
       migrator:
         nodeSelector:
           pool: migrator
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - {key: pool, operator: In, values: [migrator]}
+        tolerations:
+          - key: migrator
+            operator: Exists
+            effect: NoSchedule
     asserts:
       - equal:
           path: spec.template.spec.nodeSelector
           value:
             pool: migrator
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - {key: pool, operator: In, values: [migrator]}
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: migrator
+              operator: Exists
+              effect: NoSchedule
+
+  - it: should fall back to sourcegraph.nodeSelector, affinity, and tolerations when migrator sets none
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            global-pool: "true"
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: global
+              operator: Exists
+
+  - it: should not render a pod securityContext by default
+    asserts:
+      - isNull:
+          path: spec.template.spec.securityContext
+
+  - it: should render migrator.podSecurityContext when set
+    set:
+      migrator:
+        podSecurityContext:
+          fsGroup: 101
+          runAsNonRoot: true
+    asserts:
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            fsGroup: 101
+            runAsNonRoot: true
