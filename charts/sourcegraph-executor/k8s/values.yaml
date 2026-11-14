@@ -24,14 +24,18 @@ sourcegraph:
   labels: { }
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
-  # -- Default affinity for every pod. `executor.affinity` replaces it when set,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # -- Default affinity for the executor pod; `executor.affinity` replaces it when set.
+  # Job pods do not use it: set `executor.kubernetesJob.node.requiredAffinityMatchExpressions`,
+  # `executor.kubernetesJob.node.requiredAffinityMatchFields`, or `executor.kubernetesJob.pod.affinity` for them.
+  # Learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
-  # -- Default nodeSelector for every pod. `executor.nodeSelector` replaces it when set,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
+  # -- Default nodeSelector for the executor pod; `executor.nodeSelector` replaces it when set.
+  # Job pods do not use it: set `executor.kubernetesJob.node.selector` for them.
+  # Learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: { }
-  # -- Default tolerations for every pod. `executor.tolerations` replaces it when set,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # -- Default tolerations for the executor pod; `executor.tolerations` replaces it when set.
+  # Job pods do not use it: set `executor.kubernetesJob.node.tolerations` for them.
+  # Learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: [ ]
   # -- Add extra annotations to attach to all pods
   podAnnotations: { }
@@ -140,15 +144,15 @@ executor:
     keepJobs: "false"
     keepWorkspaces: "false"
 
-  # -- Affinity,
+  # -- Affinity for the executor pod, not for job pods,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
 
-  # -- NodeSelector,
+  # -- NodeSelector for the executor pod, not for job pods,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: { }
 
-  # -- Tolerations,
+  # -- Tolerations for the executor pod, not for job pods,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: [ ]
 
