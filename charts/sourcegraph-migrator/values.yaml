@@ -1,9 +1,9 @@
 # These values are derived from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
 
-# -- Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses.
-# Set it only on a new install: Kubernetes does not allow changing a selector.
+# -- Replaces the chart name in the `app.kubernetes.io/name` label of the migrator Job and its pod.
+# The chart has no selector, so it can be changed on an installed release.
 # As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-migrator`
-# in the parent chart to keep the selectors of a standalone install.
+# in the parent chart to keep the label of a standalone install.
 nameOverride: ""
 
 ### Common Configuration ###

@@ -1,6 +1,6 @@
 # These values are derived from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
 
-# -- Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses.
+# -- Replaces the chart name in the `app.kubernetes.io/name` label, which the Deployment and StatefulSet selectors use.
 # Set it only on a new install: Kubernetes does not allow changing a selector.
 # As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-executor-dind`
 # in the parent chart to keep the selectors of a standalone install.

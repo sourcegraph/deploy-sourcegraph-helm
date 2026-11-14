@@ -1,7 +1,8 @@
 # To customize these values, use an override file:
 # https://sourcegraph.com/github.com/sourcegraph/deploy-sourcegraph-helm/-/blob/charts/sourcegraph/README.md#customizations
 
-# -- Replaces the chart name in the `app.kubernetes.io/name` label, which every selector uses.
+# -- Replaces the chart name in the `app.kubernetes.io/name` label, which most selectors use.
+# No selector uses it when `sourcegraph.selectorLabelsOverride` is set.
 # Set it only on a new install: Kubernetes does not allow changing a selector.
 # As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph`
 # in the parent chart to keep the selectors of a standalone install.
