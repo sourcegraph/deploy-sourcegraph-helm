@@ -75,6 +75,29 @@ tests:
             name: EXECUTOR_MAXIMUM_NUM_JOBS
             value: "10"
 
+  - it: should refuse a null executor.maximumNumJobs, which the executor cannot start with
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        maximumNumJobs: null
+    asserts:
+      - failedTemplate:
+          errorMessage: executor.maximumNumJobs is required, for example 10
+
+  - it: should pass a maximumNumJobs of 0, which pauses the executor
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        maximumNumJobs: 0
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "0"
+
   - it: should use executor.nodeSelector, affinity, and tolerations instead of the sourcegraph ones
     template: executor/executor.Deployment.yaml
     set:

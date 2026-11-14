@@ -192,7 +192,7 @@ spec:
             - name: SRC_LOG_FORMAT
               value: {{ $r.Values.executor.log.format | quote }}
             - name: EXECUTOR_MAXIMUM_NUM_JOBS
-              value: {{ $r.Values.executor.maximumNumJobs | quote }}
+              value: {{ required "executor.maximumNumJobs is required, for example 10" $r.Values.executor.maximumNumJobs | quote }}
             - name: EXECUTOR_MAXIMUM_RUNTIME_PER_JOB
               value: {{ $r.Values.executor.maximumRuntimePerJob | quote }}
             - name: EXECUTOR_USE_FIRECRACKER
