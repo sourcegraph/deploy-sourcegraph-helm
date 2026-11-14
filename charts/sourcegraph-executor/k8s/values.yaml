@@ -24,13 +24,13 @@ sourcegraph:
   labels: { }
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false
-  # -- Default affinity for every pod. `executor.affinity` replace it when set,
+  # -- Default affinity for every pod. `executor.affinity` replaces it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: { }
-  # -- Default nodeSelector for every pod. `executor.nodeSelector` replace it when set,
+  # -- Default nodeSelector for every pod. `executor.nodeSelector` replaces it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: { }
-  # -- Default tolerations for every pod. `executor.tolerations` replace it when set,
+  # -- Default tolerations for every pod. `executor.tolerations` replaces it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: [ ]
   # -- Add extra annotations to attach to all pods

@@ -89,18 +89,18 @@ Reference the table below for available configuration parameters and consult [mi
 | nameOverride | string | `""` | Replaces the chart name in the `app.kubernetes.io/name` label of the migrator Job and its pod. The chart has no selector, so it can be changed on an installed release. As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-migrator` in the parent chart to keep the label of a standalone install. |
 | pgsql.auth.existingSecret | string | `""` | Name of existing secret to use for pgsql credentials This should match the setting in the sourcegraph chart values |
 | pgsql.name | string | `"pgsql"` |  |
-| sourcegraph.affinity | object | `{}` | Default affinity for every pod. `migrator.affinity` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
+| sourcegraph.affinity | object | `{}` | Default affinity for every pod. `migrator.affinity` replaces it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |
 | sourcegraph.image.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Global docker image tag |
 | sourcegraph.image.pullPolicy | string | `"IfNotPresent"` | Global docker image pull policy |
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
 | sourcegraph.labels | object | `{}` | Add a global label to all resources |
-| sourcegraph.nodeSelector | object | `{}` | Default nodeSelector for every pod. `migrator.nodeSelector` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
+| sourcegraph.nodeSelector | object | `{}` | Default nodeSelector for every pod. `migrator.nodeSelector` replaces it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |
 | sourcegraph.podLabels | object | `{}` | Add extra labels to attach to all pods |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
-| sourcegraph.tolerations | list | `[]` | Default tolerations for every pod. `migrator.tolerations` replace it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
+| sourcegraph.tolerations | list | `[]` | Default tolerations for every pod. `migrator.tolerations` replaces it when set, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
 
 ## Troubleshooting
 
