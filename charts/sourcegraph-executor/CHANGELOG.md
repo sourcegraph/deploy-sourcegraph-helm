@@ -9,6 +9,8 @@
 - Fixed `sourcegraph.nodeSelector`, `sourcegraph.affinity`, and `sourcegraph.tolerations` being ignored by the `sourcegraph-executor-k8s` chart. They are now used when `executor.nodeSelector`, `executor.affinity`, or `executor.tolerations` is empty, so a release that sets them gets its executor pods rescheduled on upgrade. Job pods are not affected: they are still scheduled only by `executor.kubernetesJob.node` and `executor.kubernetesJob.pod`. Removed `executor.securityContext.privileged`, which the chart never read, and the README's list of `privateDockerRegistry` values, which this chart does not have.
 - Removed `storageClass.create`, `provisioner`, `type`, `parameters`, and `allowedTopologies` from the `sourcegraph-executor-dind` chart's values. The chart has no StorageClass template, so they never had an effect. `storageClass.name` stays: it is the StorageClass of the `private-docker-registry` volume.
 - Fixed the documentation of `nameOverride` in the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts. It was documented as `sourcegraph.nameOverride`, which the charts never read, so setting it had no effect. The charts read the top-level `nameOverride`, which replaces the chart name in the `app.kubernetes.io/name` selector label. Set it only on a new install, because Kubernetes does not allow changing a selector. If you set `sourcegraph.nameOverride`, remove it; moving its value to `nameOverride` changes your selectors.
+
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.
