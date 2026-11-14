@@ -50,11 +50,13 @@ storageClass:
 #   name        (required) — used as the deployment name suffix (executor-<name>)
 #   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted
 #   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set
-#   replicaCount, resources, env (merged with executor.env, queue overrides)
+#   replicaCount, resources, maximumNumJobs — default to the executor.* value of the same name
+#   env         — merged with executor.env, queue overrides
 queues: []
 # - name: codeintel
 #   queueName: codeintel
 #   replicaCount: 2
+#   maximumNumJobs: 4
 #   resources:
 #     requests:
 #       cpu: "2"
@@ -91,6 +93,7 @@ executor:
   queueNames: []
   # -- The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container,
   # so size `resources` and `storage` for this many jobs.
+  # Each queue can override this with its own maximumNumJobs field.
   maximumNumJobs: 10
   # -- The maximum wall time that can be spent on a single job.
   maximumRuntimePerJob: "30m"

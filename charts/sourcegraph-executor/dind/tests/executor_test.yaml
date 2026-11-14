@@ -61,6 +61,68 @@ tests:
             name: EXECUTOR_MAXIMUM_NUM_JOBS
             value: "4"
 
+  - it: should use a queue's own maximumNumJobs, and executor.maximumNumJobs when the queue sets none
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        maximumNumJobs: 4
+      queues:
+        - name: codeintel
+          maximumNumJobs: 2
+        - name: batches
+        - name: paused
+          maximumNumJobs: 0
+        - name: unset
+          maximumNumJobs: null
+        - name: empty
+          maximumNumJobs: ""
+    asserts:
+      - hasDocuments:
+          count: 5
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "2"
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+        documentIndex: 1
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "0"
+        documentIndex: 2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+        documentIndex: 3
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+        documentIndex: 4
+
+  - it: should refuse a queue without maximumNumJobs when executor.maximumNumJobs is null
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        maximumNumJobs: null
+      queues:
+        - name: codeintel
+          maximumNumJobs: 2
+        - name: batches
+    asserts:
+      - failedTemplate:
+          errorMessage: executor.maximumNumJobs is required, for example 10
+
   - it: should default to 10 jobs at once on a single executor
     template: executor/executor.Deployment.yaml
     set:

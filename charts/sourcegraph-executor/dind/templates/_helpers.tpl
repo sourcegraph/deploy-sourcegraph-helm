@@ -85,7 +85,7 @@ app.kubernetes.io/component: executor
 
 {{/*
 Render a single executor Deployment.
-Usage: include "executor.deployment" (dict "root" $ "name" "executor-foo" "queueName" "foo" "queueNames" (list) "replicaCount" 1 "resources" $res "env" $env)
+Usage: include "executor.deployment" (dict "root" $ "name" "executor-foo" "queueName" "foo" "queueNames" (list) "replicaCount" 1 "resources" $res "maximumNumJobs" 10 "env" $env)
 */}}
 {{- define "executor.deployment" -}}
 {{- $r := .root -}}
@@ -192,7 +192,7 @@ spec:
             - name: SRC_LOG_FORMAT
               value: {{ $r.Values.executor.log.format | quote }}
             - name: EXECUTOR_MAXIMUM_NUM_JOBS
-              value: {{ required "executor.maximumNumJobs is required, for example 10" $r.Values.executor.maximumNumJobs | quote }}
+              value: {{ required "executor.maximumNumJobs is required, for example 10" .maximumNumJobs | quote }}
             - name: EXECUTOR_MAXIMUM_RUNTIME_PER_JOB
               value: {{ $r.Values.executor.maximumRuntimePerJob | quote }}
             - name: EXECUTOR_USE_FIRECRACKER
