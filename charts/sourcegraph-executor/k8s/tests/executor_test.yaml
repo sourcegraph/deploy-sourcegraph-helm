@@ -125,3 +125,82 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should fall back to sourcegraph.nodeSelector, affinity, and tolerations when executor sets none
+    template: executor.Deployment.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+      executor:
+        queueName: "test"
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            global-pool: "true"
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: global
+              operator: Exists
+
+  - it: should use executor.nodeSelector, affinity, and tolerations instead of the sourcegraph ones
+    template: executor.Deployment.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+      executor:
+        queueName: "test"
+        nodeSelector:
+          pool: executors
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - {key: pool, operator: In, values: [executors]}
+        tolerations:
+          - key: executors
+            operator: Exists
+            effect: NoSchedule
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: executors
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - {key: pool, operator: In, values: [executors]}
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: executors
+              operator: Exists
+              effect: NoSchedule

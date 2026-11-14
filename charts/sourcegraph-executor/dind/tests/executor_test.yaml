@@ -45,3 +45,232 @@ tests:
           apiVersion: apps/v1
           name: executor-batches
         documentIndex: 1
+
+  - it: should pass maximumNumJobs to every queue's executor
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        maximumNumJobs: 4
+      queues:
+        - name: codeintel
+        - name: batches
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+
+  - it: should use a queue's own maximumNumJobs, and executor.maximumNumJobs when the queue sets none
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        maximumNumJobs: 4
+      queues:
+        - name: codeintel
+          maximumNumJobs: 2
+        - name: batches
+        - name: paused
+          maximumNumJobs: 0
+        - name: unset
+          maximumNumJobs: null
+        - name: empty
+          maximumNumJobs: ""
+    asserts:
+      - hasDocuments:
+          count: 5
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "2"
+        documentIndex: 0
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+        documentIndex: 1
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "0"
+        documentIndex: 2
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+        documentIndex: 3
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "4"
+        documentIndex: 4
+
+  - it: should refuse a queue without maximumNumJobs when executor.maximumNumJobs is null
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        maximumNumJobs: null
+      queues:
+        - name: codeintel
+          maximumNumJobs: 2
+        - name: batches
+    asserts:
+      - failedTemplate:
+          errorMessage: executor.maximumNumJobs is required, for example 10
+
+  - it: should default to 10 jobs at once on a single executor
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+    asserts:
+      - hasDocuments:
+          count: 1
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "10"
+
+  - it: should refuse a null executor.maximumNumJobs, which the executor cannot start with
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        maximumNumJobs: null
+    asserts:
+      - failedTemplate:
+          errorMessage: executor.maximumNumJobs is required, for example 10
+
+  - it: should pass a maximumNumJobs of 0, which pauses the executor
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        maximumNumJobs: 0
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_MAXIMUM_NUM_JOBS
+            value: "0"
+
+  - it: should use executor.nodeSelector, affinity, and tolerations instead of the sourcegraph ones
+    template: executor/executor.Deployment.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+      executor:
+        queueName: batches
+        nodeSelector:
+          pool: executors
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - {key: pool, operator: In, values: [executors]}
+        tolerations:
+          - key: executors
+            operator: Exists
+            effect: NoSchedule
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: executors
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - {key: pool, operator: In, values: [executors]}
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: executors
+              operator: Exists
+              effect: NoSchedule
+
+  - it: should fall back to sourcegraph.nodeSelector, affinity, and tolerations when executor sets none
+    template: executor/executor.Deployment.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+      executor:
+        queueName: batches
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            global-pool: "true"
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: global
+              operator: Exists
+
+  - it: should accept EXECUTOR_DOCKER_ADD_HOST_GATEWAY and EXECUTOR_KEEP_WORKSPACES in executor.env and a queue's env
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        env:
+          EXECUTOR_DOCKER_ADD_HOST_GATEWAY:
+            value: "true"
+      queues:
+        - name: batches
+          env:
+            EXECUTOR_KEEP_WORKSPACES:
+              value: "true"
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_DOCKER_ADD_HOST_GATEWAY
+            value: "true"
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_KEEP_WORKSPACES
+            value: "true"
+
+  - it: should refuse EXECUTOR_MAXIMUM_NUM_JOBS in executor.env, which executor.maximumNumJobs sets
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        env:
+          EXECUTOR_MAXIMUM_NUM_JOBS:
+            value: "2"
+    asserts:
+      - failedTemplate:
+          errorMessage: "executor.env: env must not contain managed variable EXECUTOR_MAXIMUM_NUM_JOBS; use the structured executor fields instead"

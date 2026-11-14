@@ -4,11 +4,11 @@
 # Changes to these settings should only be done if your Kubernetes cluster has specific requirements
 
 pgsql:
-  podSecurityContext:
+  containerSecurityContext:
     readOnlyRootFilesystem: false # Override default setting and allow root file system writes
 
 frontend:
-  podSecurityContext:
+  containerSecurityContext:
     allowPrivilegeEscalation: true
     runAsUser: 1
     runAsGroup: 1

@@ -1,5 +1,4 @@
 storageClass:
-  create: false
   name: standard-rwo
 
 executor:

@@ -217,7 +217,8 @@ alpine:
 ################################################################################
 
 migrator:
-  <<: *securityContext
+  containerSecurityContext: *containerSecurityContext
+  podSecurityContext: *podSecurityContext # Used by the sourcegraph-migrator chart
 
   ### Use the args list to operate migrator commands, if needed
   ### Available commands can be found at
@@ -291,7 +292,7 @@ indexedSearch:
   replicaCount: 1
 
 indexedSearchIndexer:
-  <<: *securityContext
+  containerSecurityContext: *containerSecurityContext
 
 preciseCodeIntel:
   <<: *securityContext

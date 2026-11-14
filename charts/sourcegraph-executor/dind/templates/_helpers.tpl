@@ -59,45 +59,6 @@ useGlobalTagAsDefault configuration
 {{- $top.Values.sourcegraph.image.repository }}/{{ $imageName }}:{{ default $defaultTag (index $top.Values $service "image" "tag") }}
 {{- end }}
 
-{{- define "sourcegraph.nodeSelector" -}}
-{{- $top := index . 0 }}
-{{- $service := index . 1 }}
-{{- $globalNodeSelector := (index $top.Values "sourcegraph" "nodeSelector") }}
-{{- $serviceNodeSelector := (index $top.Values $service "nodeSelector") }}
-nodeSelector:
-{{- if $serviceNodeSelector }}
-{{- $serviceNodeSelector | toYaml | trim | nindent 2 }}
-{{- else if $globalNodeSelector }}
-{{- $globalNodeSelector | toYaml | trim | nindent 2 }}
-{{- end }}
-{{- end }}
-
-{{- define "sourcegraph.affinity" -}}
-{{- $top := index . 0 }}
-{{- $service := index . 1 }}
-{{- $globalAffinity := (index $top.Values "sourcegraph" "affinity") }}
-{{- $serviceAffinity := (index $top.Values $service "affinity") }}
-affinity:
-{{- if $serviceAffinity }}
-{{- tpl ($serviceAffinity | toYaml) $top | trim | nindent 2 }}
-{{- else if $globalAffinity }}
-{{- tpl ($globalAffinity | toYaml) $top | trim | nindent 2 }}
-{{- end }}
-{{- end }}
-
-{{- define "sourcegraph.tolerations" -}}
-{{- $top := index . 0 }}
-{{- $service := index . 1 }}
-{{- $globalTolerations := (index $top.Values "sourcegraph" "tolerations") }}
-{{- $serviceTolerations := (index $top.Values $service "tolerations") }}
-tolerations:
-{{- if $serviceTolerations }}
-{{- $serviceTolerations | toYaml | trim | nindent 2 }}
-{{- else if $globalTolerations }}
-{{- $globalTolerations | toYaml | trim | nindent 2 }}
-{{- end }}
-{{- end }}
-
 
 {{- define "executor.name" -}}
 {{- if .Values.executor.queueName -}}
@@ -124,7 +85,7 @@ app.kubernetes.io/component: executor
 
 {{/*
 Render a single executor Deployment.
-Usage: include "executor.deployment" (dict "root" $ "name" "executor-foo" "queueName" "foo" "queueNames" (list) "replicaCount" 1 "resources" $res "env" $env)
+Usage: include "executor.deployment" (dict "root" $ "name" "executor-foo" "queueName" "foo" "queueNames" (list) "replicaCount" 1 "resources" $res "maximumNumJobs" 10 "env" $env)
 */}}
 {{- define "executor.deployment" -}}
 {{- $r := .root -}}
@@ -230,6 +191,8 @@ spec:
               value: {{ $r.Values.executor.log.level | quote }}
             - name: SRC_LOG_FORMAT
               value: {{ $r.Values.executor.log.format | quote }}
+            - name: EXECUTOR_MAXIMUM_NUM_JOBS
+              value: {{ required "executor.maximumNumJobs is required, for example 10" .maximumNumJobs | quote }}
             - name: EXECUTOR_MAXIMUM_RUNTIME_PER_JOB
               value: {{ $r.Values.executor.maximumRuntimePerJob | quote }}
             - name: EXECUTOR_USE_FIRECRACKER
@@ -313,16 +276,16 @@ spec:
       {{- if $r.Values.dind.gVisor.enabled }}
       runtimeClassName: gvisor
       {{- end }}
-      {{- with $r.Values.sourcegraph.nodeSelector }}
+      {{- with $r.Values.executor.nodeSelector | default $r.Values.sourcegraph.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with $r.Values.sourcegraph.affinity }}
+      {{- with $r.Values.executor.affinity | default $r.Values.sourcegraph.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with include "sourcegraph.priorityClassName" (list $r "executor") | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- with $r.Values.sourcegraph.tolerations }}
+      {{- with $r.Values.executor.tolerations | default $r.Values.sourcegraph.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -374,9 +337,7 @@ Usage: include "executor.validateEnv" (list $envDict "label")
     "SRC_LOG_LEVEL"
     "SRC_LOG_FORMAT"
     "EXECUTOR_MAXIMUM_NUM_JOBS"
-    "EXECUTOR_MAXIMUM_RUNTIME_PER_JOB"
-    "EXECUTOR_DOCKER_ADD_HOST_GATEWAY"
-    "EXECUTOR_KEEP_WORKSPACES" -}}
+    "EXECUTOR_MAXIMUM_RUNTIME_PER_JOB" -}}
 {{- range $managed -}}
 {{- if hasKey $envDict . -}}
 {{- fail (printf "%s: env must not contain managed variable %s; use the structured executor fields instead" $label .) -}}

@@ -2,6 +2,11 @@
 {{- range .Values.queues }}
 {{- include "executor.validateEnv" (list $.Values.executor.env "executor.env") }}
 {{- include "executor.validateEnv" (list (.env | default dict) (printf "queues[%s].env" .name)) }}
+{{- /* A queue's maximumNumJobs of 0 pauses that queue, so only a missing, null, or empty one falls back. */}}
+{{- $maximumNumJobs := .maximumNumJobs }}
+{{- if or (kindIs "invalid" $maximumNumJobs) (eq (toString $maximumNumJobs) "") }}
+{{- $maximumNumJobs = $.Values.executor.maximumNumJobs }}
+{{- end }}
 ---
 {{ include "executor.deployment" (dict
     "root"        $
@@ -10,6 +15,7 @@
     "queueNames"  (.queueNames | default (list))
     "replicaCount" (.replicaCount | default $.Values.executor.replicaCount)
     "resources"   (.resources | default $.Values.executor.resources)
+    "maximumNumJobs" $maximumNumJobs
     "env"         (mergeOverwrite (deepCopy $.Values.executor.env) (.env | default dict))
 ) }}
 {{- end }}
@@ -23,6 +29,7 @@
     "queueNames"  .Values.executor.queueNames
     "replicaCount" .Values.executor.replicaCount
     "resources"   .Values.executor.resources
+    "maximumNumJobs" .Values.executor.maximumNumJobs
     "env"         .Values.executor.env
 ) }}
 {{- end }}

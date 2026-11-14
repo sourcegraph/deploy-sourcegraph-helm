@@ -1,5 +1,11 @@
 # These values are derived from https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/values.yaml
 
+# -- Replaces the chart name in the `app.kubernetes.io/name` label, which the Deployment and StatefulSet selectors use.
+# Set it only on a new install: Kubernetes does not allow changing a selector.
+# As a subchart with an `alias`, the alias replaces the chart name; set `<alias>.nameOverride: sourcegraph-executor-dind`
+# in the parent chart to keep the selectors of a standalone install.
+nameOverride: ""
+
 ### Common Configuration ###
 sourcegraph:
   image:
@@ -16,15 +22,13 @@ sourcegraph:
   imagePullSecrets: []
   # -- Add a global label to all resources
   labels: {}
-  # -- Set a custom name for the app.kubernetes.io/name annotation
-  nameOverride: ""
-  # -- Affinity,
+  # -- Default affinity for every pod. `executor.affinity`, `privateDockerRegistry.affinity` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
   affinity: {}
-  # -- NodeSelector,
+  # -- Default nodeSelector for every pod. `executor.nodeSelector`, `privateDockerRegistry.nodeSelector` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector)
   nodeSelector: {}
-  # -- Tolerations,
+  # -- Default tolerations for every pod. `executor.tolerations`, `privateDockerRegistry.tolerations` replace it when set,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   tolerations: []
   # -- Add extra annotations to attach to all pods
@@ -36,24 +40,9 @@ sourcegraph:
 
 
 storageClass:
-  # -- Enable creation of storageClass. Defaults to Google Cloud Platform. Disable if you have your own existing storage class
-  create: false
-  # -- Name of the storageClass.
-  # Use to customize to the existing storage class name
+  # -- Name of an existing StorageClass for the `private-docker-registry` volume.
+  # This chart does not create a StorageClass.
   name: sourcegraph
-  # -- Name of the storageClass provisioner,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#provisioner)
-  # and consult your cloud provider persistent storage documentation
-  provisioner: kubernetes.io/gce-pd
-  # -- Value of `type` key in storageClass `parameters`,
-  # consult your cloud provider persistent storage documentation
-  type: pd-ssd
-  # -- Extra parameters of storageClass,
-  # consult your cloud provider persistent storage documentation
-  parameters: {}
-  # -- Persistent volumes topology configuration,
-  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/storage-classes/#allowed-topologies)
-  allowedTopologies: {}
 
 # -- Optional list of queues to deploy as standalone Deployments.
 # When set, the single executor Deployment is not rendered.
@@ -61,11 +50,13 @@ storageClass:
 #   name        (required) — used as the deployment name suffix (executor-<name>)
 #   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted
 #   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set
-#   replicaCount, resources, env (merged with executor.env, queue overrides)
+#   replicaCount, resources, maximumNumJobs — default to the executor.* value of the same name
+#   env         — merged with executor.env, queue overrides
 queues: []
 # - name: codeintel
 #   queueName: codeintel
 #   replicaCount: 2
+#   maximumNumJobs: 4
 #   resources:
 #     requests:
 #       cpu: "2"
@@ -100,7 +91,9 @@ executor:
   queueName: ""
   # -- The names of multiple queues to pull jobs from. Possible values: batches and codeintel. Either this or queueName is required (when not using queues).
   queueNames: []
-  # -- The maximum amount of jobs that can be executed concurrently.
+  # -- The maximum number of jobs each executor pod runs at once. Each job runs in the pod's dind container,
+  # so size `resources` and `storage` for this many jobs.
+  # Each queue can override this with its own maximumNumJobs field.
   maximumNumJobs: 10
   # -- The maximum wall time that can be spent on a single job.
   maximumRuntimePerJob: "30m"
@@ -136,6 +129,15 @@ executor:
   # when running in Docker mode (dind). Set to {} to disable.
   podSecurityContext:
     fsGroup: 101
+  # -- Node selector for executor pods. Replaces `sourcegraph.nodeSelector` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Affinity for executor pods. Replaces `sourcegraph.affinity` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- Tolerations for executor pods. Replaces `sourcegraph.tolerations` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []
 
 dind:
   image:
@@ -237,3 +239,15 @@ privateDockerRegistry:
   env:
     REGISTRY_PROXY_REMOTEURL:
       value: https://registry-1.docker.io
+  # -- Pod-level security context for the registry pod,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext: {}
+  # -- Node selector for the registry pod. Replaces `sourcegraph.nodeSelector` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: {}
+  # -- Affinity for the registry pod. Replaces `sourcegraph.affinity` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  affinity: {}
+  # -- Tolerations for the registry pod. Replaces `sourcegraph.tolerations` when set,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  tolerations: []

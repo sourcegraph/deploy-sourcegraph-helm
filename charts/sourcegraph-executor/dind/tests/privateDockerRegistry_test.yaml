@@ -26,3 +26,84 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should use the registry's own nodeSelector, affinity, tolerations, and podSecurityContext
+    template: private-docker-registry/private-docker-registry.Statefulset.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+      privateDockerRegistry:
+        nodeSelector:
+          pool: registry
+        affinity:
+          nodeAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - {key: pool, operator: In, values: [registry]}
+        tolerations:
+          - key: registry
+            operator: Exists
+            effect: NoSchedule
+        podSecurityContext:
+          fsGroup: 1000
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            pool: registry
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                  - matchExpressions:
+                      - {key: pool, operator: In, values: [registry]}
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: registry
+              operator: Exists
+              effect: NoSchedule
+      - equal:
+          path: spec.template.spec.securityContext.fsGroup
+          value: 1000
+
+  - it: should fall back to sourcegraph.nodeSelector, affinity, and tolerations when the registry sets none
+    template: private-docker-registry/private-docker-registry.Statefulset.yaml
+    set:
+      sourcegraph:
+        nodeSelector:
+          global-pool: "true"
+        affinity:
+          podAntiAffinity:
+            requiredDuringSchedulingIgnoredDuringExecution:
+              - topologyKey: kubernetes.io/hostname
+        tolerations:
+          - key: global
+            operator: Exists
+    asserts:
+      - equal:
+          path: spec.template.spec.nodeSelector
+          value:
+            global-pool: "true"
+      - equal:
+          path: spec.template.spec.affinity
+          value:
+            podAntiAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+      - equal:
+          path: spec.template.spec.tolerations
+          value:
+            - key: global
+              operator: Exists

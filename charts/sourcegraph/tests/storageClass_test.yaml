@@ -12,6 +12,15 @@ tests:
   - equal:
       path: parameters.zones
       value: us-central1-f
+- it: should not allow volume expansion when storageClass.allowVolumeExpansion=false
+  set:
+    storageClass:
+      create: true
+      allowVolumeExpansion: false
+  asserts:
+  - equal:
+      path: allowVolumeExpansion
+      value: false
 - it: should not have 'type' when storageClass.type=null
   set:
     storageClass:

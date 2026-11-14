@@ -2,11 +2,11 @@ openTelemetry:
   gateway:
     env:
       JAEGER_HOST:
-        value: "http://your.jaeger.endpoint"
+        value: "your.jaeger.endpoint"
     config:
       traces:
         exporters:
-          jaeger:
-            endpoint: "$JAEGER_HOST:14250"
+          otlp:
+            endpoint: "${env:JAEGER_HOST}:4317"
             tls:
               insecure: true

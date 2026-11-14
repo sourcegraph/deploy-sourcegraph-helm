@@ -63,14 +63,6 @@ Manifests rendered using the `helm template` command can be used for direct depl
 
 Reference the table below for available configuration parameters and consult [migrator] documentation.
 
-In addition to the documented values, the `migrator` service also supports the following values
-
-- `migrator.affinity` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
-- `migrator.nodeSelector` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
-- `migrator.tolerations` - [learn more](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
-- `migrator.podSecurityContext` - [learn more](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
-- `migrator.env` - consult `values.yaml` file
-
 {{ template "chart.valuesTable" . }}
 
 ## Troubleshooting
