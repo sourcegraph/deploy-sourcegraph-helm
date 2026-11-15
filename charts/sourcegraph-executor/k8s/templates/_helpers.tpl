@@ -112,3 +112,18 @@ deploy: sourcegraph
 sourcegraph-resource-requires: no-cluster-admin
 app.kubernetes.io/component: executor
 {{- end}}
+
+{{/*
+Render a value as a quoted JSON string for an executor environment variable.
+Accepts a JSON-encoded string (passed through unchanged) or a YAML list or map
+(encoded as JSON). Empty values render as "".
+*/}}
+{{- define "executor.jsonEnv" -}}
+{{- if kindIs "string" . -}}
+{{- . | quote -}}
+{{- else if . -}}
+{{- toJson . | quote -}}
+{{- else -}}
+""
+{{- end -}}
+{{- end }}

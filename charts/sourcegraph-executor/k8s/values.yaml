@@ -120,17 +120,17 @@ executor:
       name: ""
       # -- A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app`
       selector: ""
-      # -- The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]'
+      # -- The tolerations for Kubernetes Jobs, as a YAML list or a JSON encoded string. e.g. '[{"key":"foo","operator":"Equal","value":"bar","effect":"NoSchedule"}]'
       tolerations: ""
-      # -- The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- The required affinity match expressions for Kubernetes Jobs, as a YAML list or a JSON encoded string. e.g. '[{"key":"foo","operator":"In","values":["bar"]}]'
       requiredAffinityMatchExpressions: ""
-      # -- The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- The required affinity match fields for Kubernetes Jobs, as a YAML list or a JSON encoded string. e.g. '[{"key":"foo","operator":"In","values":["bar"]}]'
       requiredAffinityMatchFields: ""
 
     pod:
-      # -- The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- The pod affinity for Kubernetes Jobs, as a YAML list or a JSON encoded string. e.g. '[{"labelSelector": {"matchExpressions": [{"key": "foo","operator": "In","values": ["bar"]}]},"topologyKey": "kubernetes.io/hostname"}]'
       affinity: ""
-      # -- The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- The pod anti-affinity for Kubernetes Jobs, as a YAML list or a JSON encoded string. e.g. '[{"labelSelector": {"matchExpressions": [{"key": "foo","operator": "In","values": ["bar"]}]},"topologyKey": "kubernetes.io/hostname"}]'
       antiAffinity: ""
 
   debug:

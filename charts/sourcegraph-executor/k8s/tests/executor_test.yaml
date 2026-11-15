@@ -125,3 +125,103 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should render empty Kubernetes job scheduling values as empty strings by default
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: ""
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_EXPRESSIONS
+          value: ""
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_FIELDS
+          value: ""
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_AFFINITY
+          value: ""
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY
+          value: ""
+
+  - it: should pass JSON encoded Kubernetes job scheduling strings through unchanged
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations: '[{"key":"foo","operator":"Equal","value":"bar","effect":"NoSchedule"}]'
+            requiredAffinityMatchExpressions: '[{"key":"foo","operator":"In","values":["bar"]}]'
+            requiredAffinityMatchFields: '[{"key":"metadata.name","operator":"In","values":["node-1"]}]'
+          pod:
+            affinity: '[{"labelSelector":{"matchLabels":{"app":"foo"}},"topologyKey":"kubernetes.io/hostname"}]'
+            antiAffinity: '[{"labelSelector":{"matchLabels":{"app":"bar"}},"topologyKey":"kubernetes.io/hostname"}]'
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"key":"foo","operator":"Equal","value":"bar","effect":"NoSchedule"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_EXPRESSIONS
+          value: '[{"key":"foo","operator":"In","values":["bar"]}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_FIELDS
+          value: '[{"key":"metadata.name","operator":"In","values":["node-1"]}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_AFFINITY
+          value: '[{"labelSelector":{"matchLabels":{"app":"foo"}},"topologyKey":"kubernetes.io/hostname"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY
+          value: '[{"labelSelector":{"matchLabels":{"app":"bar"}},"topologyKey":"kubernetes.io/hostname"}]'
+
+  - it: should encode Kubernetes job scheduling YAML lists as JSON
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations:
+              - key: foo
+                operator: Equal
+                value: bar
+                effect: NoSchedule
+            requiredAffinityMatchExpressions:
+              - key: foo
+                operator: In
+                values: ["bar"]
+            requiredAffinityMatchFields:
+              - key: metadata.name
+                operator: In
+                values: ["node-1"]
+          pod:
+            affinity:
+              - labelSelector:
+                  matchLabels:
+                    app: foo
+                topologyKey: kubernetes.io/hostname
+            antiAffinity:
+              - labelSelector:
+                  matchLabels:
+                    app: bar
+                topologyKey: kubernetes.io/hostname
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"effect":"NoSchedule","key":"foo","operator":"Equal","value":"bar"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_EXPRESSIONS
+          value: '[{"key":"foo","operator":"In","values":["bar"]}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_REQUIRED_AFFINITY_MATCH_FIELDS
+          value: '[{"key":"metadata.name","operator":"In","values":["node-1"]}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_AFFINITY
+          value: '[{"labelSelector":{"matchLabels":{"app":"foo"}},"topologyKey":"kubernetes.io/hostname"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY
+          value: '[{"labelSelector":{"matchLabels":{"app":"bar"}},"topologyKey":"kubernetes.io/hostname"}]'

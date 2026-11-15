@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+- Fixed `executor.kubernetesJob.node.tolerations`, `node.requiredAffinityMatchExpressions`, `node.requiredAffinityMatchFields`, `pod.affinity`, and `pod.antiAffinity` in the `sourcegraph-executor-k8s` chart. A JSON encoded string, the documented form, failed the render with a YAML parse error, and a YAML list rendered as `[map[effect:NoSchedule key:foo ...]]`, so the executor failed to start with `invalid character 'm' looking for beginning of value`. Both forms now render as JSON. The examples in `values.yaml` are now valid JSON when copied as written. [#349](https://github.com/sourcegraph/deploy-sourcegraph-helm/issues/349)
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.
