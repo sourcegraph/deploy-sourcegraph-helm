@@ -129,7 +129,7 @@ migrator:
     readOnlyRootFilesystem: true
   # -- Override default `migrator` container args
   # Available commands can be found at
-  # https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
+  # https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations
   args:
   - up
   - -db=all
