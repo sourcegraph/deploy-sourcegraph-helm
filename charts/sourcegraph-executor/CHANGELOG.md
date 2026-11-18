@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+* Fixed `sourcegraph-executor-k8s` rendering of `executor.kubernetesJob.node.tolerations`, `requiredAffinityMatchExpressions`, `requiredAffinityMatchFields`, `pod.affinity` and `pod.antiAffinity`: YAML lists are now JSON-encoded for the executor instead of rendering as Go `map[...]` strings. Pre-escaped JSON strings keep working. [#349](https://github.com/sourcegraph/deploy-sourcegraph-helm/issues/349)
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.
