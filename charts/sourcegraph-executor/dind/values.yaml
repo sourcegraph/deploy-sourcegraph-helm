@@ -220,6 +220,9 @@ privateDockerRegistry:
     repository: registry
     tag: 3
   storageSize: 10Gi
+  # -- Labels to add to the `cache` volume claim template of the `private-docker-registry` StatefulSet. Kubernetes does
+  # not allow changing them on an installed StatefulSet. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels)
+  storageLabels: {}
   # -- Add extra labels to the `private-docker-registry` Service
   serviceLabels: {}
   # -- Extra environment variables to set on the registry container.
