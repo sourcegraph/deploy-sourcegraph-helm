@@ -45,13 +45,13 @@ Kubernetes creates both of this chart's PersistentVolumeClaims from a template, 
 | PersistentVolumeClaim | Created from | Labels |
 | --- | --- | --- |
 | The registry's `cache` | The `private-docker-registry` StatefulSet's volume claim template | `deploy`, `app.kubernetes.io/component`, and `privateDockerRegistry.storageLabels` |
-| The executor's scratch volume, when `executor.storage.type` is `ephemeral` | The executor pod's ephemeral volume | `executor.storage.labels` |
+| The executor's scratch volume, when `executor.storage.type` is `ephemeral` | The executor pod's ephemeral volume | `sourcegraph.labels`, the chart's standard labels, `deploy`, `app.kubernetes.io/component`, and `executor.storage.labels` |
 
-Neither gets `sourcegraph.labels` or the chart's standard labels.
+The registry's claim gets neither `sourcegraph.labels` nor the chart's standard labels: a chart version that added them would fail the upgrade of existing releases.
 
 Set `privateDockerRegistry.storageLabels` on the first install and never change it on an installed release. Kubernetes rejects any change to a StatefulSet's volume claim templates, so the upgrade fails. Kubernetes also never updates the labels of a claim that exists: label an existing one with `kubectl label pvc`.
 
-Changing `executor.storage.labels` restarts the executor pods. Each pod's claim is deleted and created again with the pod, so it always has the labels the chart renders.
+The scratch volume's claim is deleted and created again with its pod, so it always has the labels the chart renders. Its labels are part of the pod template: changing one restarts the executor pods, and so does every change of the chart version, which is in `helm.sh/chart`.
 
 ## Configuration Options
 

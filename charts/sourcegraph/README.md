@@ -107,7 +107,7 @@ existing objects have:
 
 - `sourcegraph.labels` adds labels to every object the chart renders, on every
   component. The PersistentVolumeClaims that Kubernetes creates from a
-  template are not among them. See
+  StatefulSet's volume claim template are not among them. See
   [PersistentVolumeClaim labels](#persistentvolumeclaim-labels).
 - `<serviceName>.labels` adds labels to one component's workload, ConfigMaps,
   Secrets, and PodDisruptionBudget.
@@ -145,7 +145,7 @@ The values that label a PersistentVolumeClaim depend on what creates it:
 | --- | --- | --- | --- |
 | The chart, as its own object | `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`, `redisCache`, `redisStore` | Yes | Yes |
 | Kubernetes, from a StatefulSet's volume claim template | `gitserver`, `grafana`, `indexedSearch`, `searcher` | Yes, at install only | No |
-| Kubernetes, from a pod's ephemeral volume, when `storageType` is `pvc` | `preciseCodeIntel`, `syntacticCodeIntel` | Yes; changing them restarts the pods | No |
+| Kubernetes, from a pod's ephemeral volume, when `storageType` is `pvc` | `preciseCodeIntel`, `syntacticCodeIntel` | Yes | Yes |
 
 A StatefulSet's volume claim templates get neither `sourcegraph.labels` nor the
 standard labels on purpose. Kubernetes rejects any change to them, so a chart
@@ -155,8 +155,12 @@ and `helm.sh/chart` changes with every chart version.
 Kubernetes copies a template's labels to a PersistentVolumeClaim only when it
 creates the claim, and never updates a claim that exists. Helm does not manage
 these claims either. Label an existing StatefulSet claim with
-`kubectl label pvc`. An ephemeral volume's claim is deleted and created again
-with its pod, so it always has the labels the chart renders.
+`kubectl label pvc`.
+
+An ephemeral volume's claim is deleted and created again with its pod, so it
+always has the labels the chart renders. Its labels are part of the pod
+template: changing one restarts the pods, and so does every change of the chart
+version, which is in `helm.sh/chart`.
 
 ## Configuration Options
 
@@ -450,7 +454,7 @@ In addition to the documented values, all services also support the following va
 | preciseCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `precise-code-intel-worker` |
 | preciseCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | preciseCodeIntel.storageClassName | string | `""` | StorageClass for the `/tmp` scratch PVC when storageType is `pvc`. Empty uses the cluster default class. The claim is per-pod and discarded with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass` is `Retain` for stateful data and is not used here. |
-| preciseCodeIntel.storageLabels | object | `{}` | Labels to add to the `/tmp` scratch PVC when storageType is `pvc`. Changing them restarts the pods. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels) |
+| preciseCodeIntel.storageLabels | object | `{}` | Labels to add to the `/tmp` scratch PVC when storageType is `pvc`, in addition to `sourcegraph.labels`. Changing them restarts the pods. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels) |
 | preciseCodeIntel.storageSize | string | `""` | Size of the `/tmp` scratch volume. Required when storageType is `pvc`. When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty for unlimited). |
 | preciseCodeIntel.storageType | string | `"emptyDir"` | Backing store for the `/tmp` scratch volume, used for large SCIP upload processing. One of: emptyDir, pvc. emptyDir: node ephemeral storage, i.e. the node boot disk. pvc: per-pod PVC, discarded with the pod. The pod `fsGroup` defaults to the container `runAsGroup` so the non-root worker can write to the volume; set `podSecurityContext.fsGroup` to override it. |
 | priorityClasses | list | `[]` | Additional priorityClasses minimize re-scheduling downtime for StatefulSets. Each StatefulSets might use different priority class. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#priorityclass) Sample class definition: - name: gitserver-class   value: 100   preemptionPolicy: Never   description: "gitserver priority class"   labels: {} |
@@ -576,7 +580,7 @@ In addition to the documented values, all services also support the following va
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |
 | syntacticCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | syntacticCodeIntel.storageClassName | string | `""` | StorageClass for the `/tmp` scratch PVC when storageType is `pvc`. Empty uses the cluster default class. The claim is per-pod and discarded with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass` is `Retain` for stateful data and is not used here. |
-| syntacticCodeIntel.storageLabels | object | `{}` | Labels to add to the `/tmp` scratch PVC when storageType is `pvc`. Changing them restarts the pods. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels) |
+| syntacticCodeIntel.storageLabels | object | `{}` | Labels to add to the `/tmp` scratch PVC when storageType is `pvc`, in addition to `sourcegraph.labels`. Changing them restarts the pods. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels) |
 | syntacticCodeIntel.storageSize | string | `""` | Size of the `/tmp` scratch volume. Required when storageType is `pvc`. When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty for unlimited). |
 | syntacticCodeIntel.storageType | string | `"emptyDir"` | Backing store for the `/tmp` scratch volume, used for indexing. One of: emptyDir, pvc. emptyDir: node ephemeral storage, i.e. the node boot disk. pvc: per-pod PVC, discarded with the pod. The pod `fsGroup` defaults to the container `runAsGroup` so the non-root worker can write to the volume; set `podSecurityContext.fsGroup` to override it. |
 | syntectServer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
