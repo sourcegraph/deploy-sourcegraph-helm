@@ -379,6 +379,14 @@ frontend:
     #       - sourcegraph.example.com
     #     secretName: sourcegraph-tls  # optional
     tls: []
+  # -- (object) Annotations for the `sourcegraph-frontend-internal` Service. Unset, it gets `frontend.serviceAnnotations`,
+  # like the `sourcegraph-frontend` Service. Set to `{}` for no annotations
+  # @default -- `frontend.serviceAnnotations`
+  internalServiceAnnotations: null
+  # -- (object) Labels for the `sourcegraph-frontend-internal` Service. Unset, it gets `frontend.serviceLabels`,
+  # like the `sourcegraph-frontend` Service. Set to `{}` for no extra labels
+  # @default -- `frontend.serviceLabels`
+  internalServiceLabels: null
   # -- Security context for the `frontend` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
