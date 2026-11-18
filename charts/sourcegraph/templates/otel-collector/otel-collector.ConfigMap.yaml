@@ -7,6 +7,10 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.openTelemetry.gateway.name }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.openTelemetry.gateway.labels }}
+      {{- toYaml .Values.openTelemetry.gateway.labels | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
 data:
@@ -35,6 +39,11 @@ data:
         endpoint: "localhost:55679"
 
     service:
+      telemetry:
+        metrics:
+          # Serve the collector's own metrics on all interfaces, for Prometheus to scrape.
+          # The collector defaults to 127.0.0.1.
+          readers: {{ include "sourcegraph.otelCollector.metricsReaders" . }}
       extensions:
         - health_check
         - zpages

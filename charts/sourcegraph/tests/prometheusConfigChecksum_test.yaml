@@ -1,0 +1,26 @@
+---
+suite: prometheusConfigChecksum
+# The ConfigMap template is listed so the Deployment's checksum annotation can
+# include it.
+templates:
+- prometheus/prometheus.Deployment.yaml
+- prometheus/prometheus.ConfigMap.yaml
+tests:
+- it: should restart prometheus when the chart's configuration changes
+  template: prometheus/prometheus.Deployment.yaml
+  asserts:
+  - matchRegex:
+      path: spec.template.metadata.annotations["checksum/prometheus-config"]
+      pattern: ^[0-9a-f]{64}$
+  # The hash of `null`, which is what an unreadable ConfigMap would hash to
+  - notEqual:
+      path: spec.template.metadata.annotations["checksum/prometheus-config"]
+      value: 74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b
+- it: should drop the checksum annotation with an existing ConfigMap
+  template: prometheus/prometheus.Deployment.yaml
+  set:
+    prometheus:
+      existingConfig: my-prometheus-config
+  asserts:
+  - notExists:
+      path: spec.template.metadata.annotations["checksum/prometheus-config"]

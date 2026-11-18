@@ -163,40 +163,52 @@ should keep every Service selector:
 should keep every pod's labels when podLabels are set:
   1: |
     app: blobstore
+    app.kubernetes.io/component: blobstore
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   2: |
     app: cadvisor
+    app.kubernetes.io/component: cadvisor
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   3: |
     app: codeinsights-db
+    app.kubernetes.io/component: codeinsights-db
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
     group: backend
   4: |
     app: codeintel-db
+    app.kubernetes.io/component: codeintel-db
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
     group: backend
   5: |
     app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
     example.com/tier: web
   6: |
     app: gitserver
+    app.kubernetes.io/component: gitserver
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
@@ -204,13 +216,17 @@ should keep every pod's labels when podLabels are set:
     type: gitserver
   7: |
     app: grafana
+    app.kubernetes.io/component: grafana
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   8: |
     app: indexed-search
+    app.kubernetes.io/component: indexed-search
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
@@ -218,86 +234,113 @@ should keep every pod's labels when podLabels are set:
     app: jaeger
     app.kubernetes.io/component: all-in-one
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: jaeger
     deploy: sourcegraph
     example.com/team: search
   10: |
     app: node-exporter
+    app.kubernetes.io/component: node-exporter
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   11: |
     app: otel-agent
+    app.kubernetes.io/component: otel-collector
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   12: |
     app: otel-collector
+    app.kubernetes.io/component: otel-collector
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   13: |
     app: pgsql
+    app.kubernetes.io/component: pgsql
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
     group: backend
   14: |
     app: precise-code-intel-worker
+    app.kubernetes.io/component: precise-code-intel
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   15: |
     app: prometheus
+    app.kubernetes.io/component: prometheus
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   16: |
     app: redis-cache
+    app.kubernetes.io/component: redis
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   17: |
     app: redis-store
+    app.kubernetes.io/component: redis
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   18: |
     app: searcher
+    app.kubernetes.io/component: searcher
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   19: |
     app: syntactic-code-intel-worker
+    app.kubernetes.io/component: syntactic-code-intel
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   20: |
     app: syntect-server
+    app.kubernetes.io/component: syntect-server
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
   21: |
     app: worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
     example.com/tier: background
   22: |
     app: worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
@@ -305,7 +348,9 @@ should keep every pod's labels when podLabels are set:
     worker-replica: worker-0
   23: |
     app: worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     example.com/team: search
@@ -472,124 +517,169 @@ should keep every workload selector and pod labels:
       worker-replica: worker-1
   24: |
     app: blobstore
+    app.kubernetes.io/component: blobstore
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   25: |
     app: cadvisor
+    app.kubernetes.io/component: cadvisor
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   26: |
     app: codeinsights-db
+    app.kubernetes.io/component: codeinsights-db
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     group: backend
   27: |
     app: codeintel-db
+    app.kubernetes.io/component: codeintel-db
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     group: backend
   28: |
     app: sourcegraph-frontend
+    app.kubernetes.io/component: frontend
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   29: |
     app: gitserver
+    app.kubernetes.io/component: gitserver
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     group: backend
     type: gitserver
   30: |
     app: grafana
+    app.kubernetes.io/component: grafana
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   31: |
     app: indexed-search
+    app.kubernetes.io/component: indexed-search
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   32: |
     app: jaeger
     app.kubernetes.io/component: all-in-one
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: jaeger
     deploy: sourcegraph
   33: |
     app: node-exporter
+    app.kubernetes.io/component: node-exporter
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   34: |
     app: otel-agent
+    app.kubernetes.io/component: otel-collector
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   35: |
     app: otel-collector
+    app.kubernetes.io/component: otel-collector
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   36: |
     app: pgsql
+    app.kubernetes.io/component: pgsql
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     group: backend
   37: |
     app: precise-code-intel-worker
+    app.kubernetes.io/component: precise-code-intel
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   38: |
     app: prometheus
+    app.kubernetes.io/component: prometheus
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   39: |
     app: redis-cache
+    app.kubernetes.io/component: redis
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   40: |
     app: redis-store
+    app.kubernetes.io/component: redis
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   41: |
     app: searcher
+    app.kubernetes.io/component: searcher
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   42: |
     app: syntactic-code-intel-worker
+    app.kubernetes.io/component: syntactic-code-intel
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   43: |
     app: syntect-server
+    app.kubernetes.io/component: syntect-server
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   44: |
     app: worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
   45: |
     app: worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     worker-replica: worker-0
   46: |
     app: worker
+    app.kubernetes.io/component: worker
     app.kubernetes.io/instance: sourcegraph
+    app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/name: sourcegraph
     deploy: sourcegraph
     worker-replica: worker-1
