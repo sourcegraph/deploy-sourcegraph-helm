@@ -83,6 +83,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.replicaCount | int | `1` |  |
 | executor.resources | object | `{}` | Resource requests and limits for the executor container. Each queue can override this with its own resources field. |
 | executor.storage.class | string | `""` | StorageClass for the ephemeral volume. Only used when type is ephemeral. Defaults to the cluster default StorageClass when empty. |
+| executor.storage.labels | object | `{}` | Optional labels to add to the ephemeral volume's PVC. Only used when type is ephemeral. Changing them restarts the executor pods. |
 | executor.storage.size | string | `""` | Size of the scratch volume. emptyDir: sets sizeLimit (optional, leave empty for unlimited). ephemeral: sets the PVC storage request (required). |
 | executor.storage.type | string | `"emptyDir"` | Type of scratch volume for job workspaces. One of: emptyDir, ephemeral. emptyDir: plain emptyDir, no storage class required. ephemeral: per-pod PVC via the cluster default storage class; size is required. |
 | privateDockerRegistry.enabled | bool | `true` | Whether to deploy the private registry. Only one registry is needed when deploying multiple executors. More information: https://sourcegraph.com/docs/self-hosted/executors/deploy-executors#using-private-registries |

@@ -298,6 +298,11 @@ spec:
           {{- if eq $r.Values.executor.storage.type "ephemeral" }}
           ephemeral:
             volumeClaimTemplate:
+              {{- with $r.Values.executor.storage.labels }}
+              metadata:
+                labels:
+                  {{- toYaml . | nindent 18 }}
+              {{- end }}
               spec:
                 accessModes: ["ReadWriteOnce"]
                 {{- if $r.Values.executor.storage.class }}

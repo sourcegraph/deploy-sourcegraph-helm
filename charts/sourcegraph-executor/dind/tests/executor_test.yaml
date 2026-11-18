@@ -45,3 +45,52 @@ tests:
           apiVersion: apps/v1
           name: executor-batches
         documentIndex: 1
+
+  - it: should add executor.storage.labels to the per-pod PVC
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        storage:
+          type: ephemeral
+          size: 50Gi
+          labels:
+            example.com/project: sourcegraph
+            example.com/service: executor
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
+          value:
+            labels:
+              example.com/project: sourcegraph
+              example.com/service: executor
+      - equal:
+          path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.resources.requests.storage
+          value: 50Gi
+
+  - it: should render no PVC metadata when executor.storage.labels is empty
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        storage:
+          type: ephemeral
+          size: 50Gi
+    asserts:
+      - notExists:
+          path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
+
+  - it: should ignore executor.storage.labels on an emptyDir volume
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        storage:
+          labels:
+            example.com/project: sourcegraph
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: executor-scratch
+      - notExists:
+          path: spec.template.spec.volumes[0].ephemeral
