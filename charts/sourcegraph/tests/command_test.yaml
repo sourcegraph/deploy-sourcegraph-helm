@@ -61,7 +61,7 @@ tests:
   set:
     openTelemetry.gateway.command: ["/bin/sh", "-c"]
     openTelemetry.gateway.args:
-    - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml
+    - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml "$0" "$@"
   asserts:
   - equal:
       path: spec.template.spec.containers[0].command
@@ -69,5 +69,5 @@ tests:
   - equal:
       path: spec.template.spec.containers[0].args
       value:
-      - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml
+      - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml "$0" "$@"
       - '--config=yaml:service::telemetry::metrics::readers: [{pull: {exporter: {prometheus: {host: "0.0.0.0", port: 8888, without_type_suffix: true, without_units: true}}}}]'
