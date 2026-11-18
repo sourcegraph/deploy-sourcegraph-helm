@@ -107,7 +107,7 @@ existing objects have:
 
 - `sourcegraph.labels` adds labels to every object the chart renders, on every
   component. The PersistentVolumeClaims that Kubernetes creates from a
-  template are not among them. See
+  StatefulSet's volume claim template are not among them. See
   [PersistentVolumeClaim labels](#persistentvolumeclaim-labels).
 - `<serviceName>.labels` adds labels to one component's workload, ConfigMaps,
   Secrets, and PodDisruptionBudget.
@@ -145,7 +145,7 @@ The values that label a PersistentVolumeClaim depend on what creates it:
 | --- | --- | --- | --- |
 | The chart, as its own object | `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`, `redisCache`, `redisStore` | Yes | Yes |
 | Kubernetes, from a StatefulSet's volume claim template | `gitserver`, `grafana`, `indexedSearch`, `searcher` | Yes, at install only | No |
-| Kubernetes, from a pod's ephemeral volume, when `storageType` is `pvc` | `preciseCodeIntel`, `syntacticCodeIntel` | Yes; changing them restarts the pods | No |
+| Kubernetes, from a pod's ephemeral volume, when `storageType` is `pvc` | `preciseCodeIntel`, `syntacticCodeIntel` | Yes | Yes |
 
 A StatefulSet's volume claim templates get neither `sourcegraph.labels` nor the
 standard labels on purpose. Kubernetes rejects any change to them, so a chart
@@ -155,8 +155,12 @@ and `helm.sh/chart` changes with every chart version.
 Kubernetes copies a template's labels to a PersistentVolumeClaim only when it
 creates the claim, and never updates a claim that exists. Helm does not manage
 these claims either. Label an existing StatefulSet claim with
-`kubectl label pvc`. An ephemeral volume's claim is deleted and created again
-with its pod, so it always has the labels the chart renders.
+`kubectl label pvc`.
+
+An ephemeral volume's claim is deleted and created again with its pod, so it
+always has the labels the chart renders. Its labels are part of the pod
+template: changing one restarts the pods, and so does every change of the chart
+version, which is in `helm.sh/chart`.
 
 ## Configuration Options
 
