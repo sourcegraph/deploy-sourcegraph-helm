@@ -1,16 +1,28 @@
+{{- /*
+Unset, the internal Service gets the annotations and labels of the
+sourcegraph-frontend Service. Set, even to {}, the internal values replace them.
+*/ -}}
+{{- $annotations := .Values.frontend.serviceAnnotations }}
+{{- if not (kindIs "invalid" .Values.frontend.internalServiceAnnotations) }}
+{{- $annotations = .Values.frontend.internalServiceAnnotations }}
+{{- end }}
+{{- $labels := .Values.frontend.serviceLabels }}
+{{- if not (kindIs "invalid" .Values.frontend.internalServiceLabels) }}
+{{- $labels = .Values.frontend.internalServiceLabels }}
+{{- end -}}
 apiVersion: v1
 kind: Service
 metadata:
-  {{- if .Values.frontend.serviceAnnotations }}
+  {{- with $annotations }}
   annotations:
-    {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-    {{- if .Values.frontend.serviceLabels }}
-      {{- toYaml .Values.frontend.serviceLabels | nindent 4 }}
+    {{- with $labels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   name: sourcegraph-frontend-internal
 spec:

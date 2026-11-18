@@ -1,0 +1,87 @@
+suite: annotations and labels of the sourcegraph-frontend-internal Service
+templates:
+- frontend/sourcegraph-frontend.Service.yaml
+- frontend/sourcegraph-frontend-internal.Service.yaml
+tests:
+- it: should render no annotations on the internal Service by default
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  asserts:
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels.app
+      value: sourcegraph-frontend
+
+- it: should give the internal Service the frontend Service's annotations and labels when its own are unset
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceAnnotations: &serviceAnnotations
+      example.com/load-balancer: external
+    frontend.serviceLabels: &serviceLabels
+      example.com/mesh: enabled
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value: *serviceAnnotations
+  - isSubset:
+      path: metadata.labels
+      content: *serviceLabels
+
+- it: should keep the frontend Service's annotations and labels off the internal Service when its own are empty
+  set:
+    frontend.serviceAnnotations: *serviceAnnotations
+    frontend.serviceLabels: *serviceLabels
+    frontend.internalServiceAnnotations: {}
+    frontend.internalServiceLabels: {}
+  asserts:
+  - notExists:
+      path: metadata.annotations
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - notExists:
+      path: metadata.labels["example.com/mesh"]
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - equal:
+      path: metadata.labels.app
+      value: sourcegraph-frontend
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - isSubset:
+      path: metadata.annotations
+      content: *serviceAnnotations
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - isSubset:
+      path: metadata.labels
+      content: *serviceLabels
+    template: frontend/sourcegraph-frontend.Service.yaml
+
+- it: should replace the frontend Service's annotations and labels with the internal Service's own
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceAnnotations: *serviceAnnotations
+    frontend.serviceLabels: *serviceLabels
+    frontend.internalServiceAnnotations:
+      example.com/internal: "true"
+    frontend.internalServiceLabels:
+      example.com/tier: internal
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value:
+        example.com/internal: "true"
+  - equal:
+      path: metadata.labels["example.com/tier"]
+      value: internal
+  - notExists:
+      path: metadata.labels["example.com/mesh"]
+
+- it: should set only the internal Service's annotations and leave its labels inherited
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceAnnotations: *serviceAnnotations
+    frontend.serviceLabels: *serviceLabels
+    frontend.internalServiceAnnotations: {}
+  asserts:
+  - notExists:
+      path: metadata.annotations
+  - isSubset:
+      path: metadata.labels
+      content: *serviceLabels
