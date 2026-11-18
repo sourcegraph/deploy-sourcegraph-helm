@@ -1,16 +1,131 @@
 suite: prometheusPrivileged
+release:
+  name: sourcegraph
+  namespace: sourcegraph-test
 templates:
-  - NOTES.txt
+  - prometheus/prometheus.ClusterRole.yaml
+  - prometheus/prometheus.ClusterRoleBinding.yaml
+  - prometheus/prometheus.RoleBinding.yaml
+  - prometheus/prometheus.ConfigMap.yaml
 tests:
-  - it: should not have the warning text when prometheus.privileged=true
+  - it: should create only a RoleBinding to the view ClusterRole by default
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: prometheus/prometheus.ClusterRole.yaml
+      - hasDocuments:
+          count: 0
+        template: prometheus/prometheus.ClusterRoleBinding.yaml
+      - containsDocument:
+          kind: RoleBinding
+          apiVersion: rbac.authorization.k8s.io/v1
+          name: prometheus
+        template: prometheus/prometheus.RoleBinding.yaml
+      - equal:
+          path: roleRef
+          value:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: view
+        template: prometheus/prometheus.RoleBinding.yaml
+      - equal:
+          path: subjects
+          value:
+            - kind: ServiceAccount
+              name: prometheus
+              namespace: sourcegraph-test
+        template: prometheus/prometheus.RoleBinding.yaml
+
+  - it: should create a ClusterRole and ClusterRoleBinding instead of a RoleBinding when prometheus.privileged=true
     set:
       prometheus.privileged: true
     asserts:
-      - notMatchRegexRaw:
-          pattern: You have set 'prometheus.privileged' to 'false'
-  - it: should have the warning text when prometheus.privileged=false
+      - containsDocument:
+          kind: ClusterRole
+          apiVersion: rbac.authorization.k8s.io/v1
+          name: prometheus
+        template: prometheus/prometheus.ClusterRole.yaml
+      - containsDocument:
+          kind: ClusterRoleBinding
+          apiVersion: rbac.authorization.k8s.io/v1
+          name: prometheus
+        template: prometheus/prometheus.ClusterRoleBinding.yaml
+      - equal:
+          path: roleRef
+          value:
+            apiGroup: rbac.authorization.k8s.io
+            kind: ClusterRole
+            name: prometheus
+        template: prometheus/prometheus.ClusterRoleBinding.yaml
+      - equal:
+          path: subjects
+          value:
+            - kind: ServiceAccount
+              name: prometheus
+              namespace: sourcegraph-test
+        template: prometheus/prometheus.ClusterRoleBinding.yaml
+      - hasDocuments:
+          count: 0
+        template: prometheus/prometheus.RoleBinding.yaml
+
+  - it: should create no RBAC resources when prometheus.createRoleBinding=false
     set:
-      prometheus.privileged: false
+      prometheus.createRoleBinding: false
     asserts:
-      - matchRegexRaw:
-          pattern: You have set 'prometheus.privileged' to 'false'
+      - hasDocuments:
+          count: 0
+    templates:
+      - prometheus/prometheus.ClusterRole.yaml
+      - prometheus/prometheus.ClusterRoleBinding.yaml
+      - prometheus/prometheus.RoleBinding.yaml
+
+  - it: should create only the ClusterRole when prometheus.privileged=true and prometheus.createRoleBinding=false
+    set:
+      prometheus.privileged: true
+      prometheus.createRoleBinding: false
+    asserts:
+      - hasDocuments:
+          count: 1
+        template: prometheus/prometheus.ClusterRole.yaml
+      - hasDocuments:
+          count: 0
+        template: prometheus/prometheus.ClusterRoleBinding.yaml
+      - hasDocuments:
+          count: 0
+        template: prometheus/prometheus.RoleBinding.yaml
+
+  # The patterns below spell out the indentation: `namespaces` at any other level
+  # is not part of the discovery config, and Prometheus rejects the file
+  - it: should discover pods and endpoints only in the release namespace by default
+    template: prometheus/prometheus.ConfigMap.yaml
+    asserts:
+      - matchRegex:
+          path: data["prometheus.yml"]
+          pattern: "- job_name: 'kubernetes-pods'\n\n  kubernetes_sd_configs:\n  - role: pod\n    namespaces:\n      names:\n       - \"sourcegraph-test\"\n"
+      - matchRegex:
+          path: data["prometheus.yml"]
+          pattern: "- job_name: 'kubernetes-service-endpoints'\n\n  kubernetes_sd_configs:\n  - role: endpoints\n    namespaces:\n      names:\n       - \"sourcegraph-test\"\n"
+      # No service discovery without a namespace list: the view RoleBinding cannot list other namespaces
+      - notMatchRegex:
+          path: data["prometheus.yml"]
+          pattern: "- role: \\w+\n *\n"
+      - notMatchRegex:
+          path: data["prometheus.yml"]
+          pattern: "job_name: 'kubernetes-(apiservers|nodes)'"
+
+  - it: should keep pods scoped to the release namespace when prometheus.privileged=true
+    set:
+      prometheus.privileged: true
+    template: prometheus/prometheus.ConfigMap.yaml
+    asserts:
+      - matchRegex:
+          path: data["prometheus.yml"]
+          pattern: "- job_name: 'kubernetes-pods'\n\n  kubernetes_sd_configs:\n  - role: pod\n    namespaces:\n      names:\n       - \"sourcegraph-test\"\n"
+      # The API servers are endpoints of the `kubernetes` Service in the `default` namespace,
+      # so this job must not be scoped to the release namespace
+      - matchRegex:
+          path: data["prometheus.yml"]
+          pattern: "- job_name: 'kubernetes-apiservers'\n\n  kubernetes_sd_configs:\n  - role: endpoints\n\n"
+      - matchRegex:
+          path: data["prometheus.yml"]
+          pattern: "job_name: 'kubernetes-nodes'"

@@ -83,18 +83,22 @@ x-serviceAccount: &serviceAccount
 #            Only use "false" if cluster policy blocks creation of custom Roles
 #            Sourcegraph functionality is the same in either case
 #
-#   prometheus.privileged (default: true)
+#   prometheus.privileged (default: false)
 #
 #     Sourcegraph Helm values config to control how RBAC is handled for the Prometheus service account
 #
 #     true:  Creates a ClusterRole + ClusterRoleBinding granting cluster-wide read access to
 #            endpoints, nodes, pods, services, and /metrics.
 #            Enables kubernetes-apiservers and kubernetes-nodes scrape jobs in the Prometheus config
-#            If Executors are deployed in a separate namespace (recommended), then this allows
-#            Prometheus to scrape metrics from them
 #
 #     false: Binds its ServiceAccount to the built-in "view" ClusterRole (namespace-scoped)
-#            Only use "false" if cluster policy blocks creation of custom, cluster-wide Roles
+#            Prometheus discovers and scrapes Sourcegraph's pods and services in the release
+#            namespace in either case
+#
+#     Executor metrics do not depend on this setting, even if Executors are deployed in a
+#     separate namespace (recommended): Executors send their metrics to frontend with each
+#     heartbeat, and Prometheus scrapes them from the worker-executors Service in the
+#     release namespace
 
 # Creation of RBAC resources in sourcegraph-executor/k8s Helm chart
 #

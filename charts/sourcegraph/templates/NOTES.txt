@@ -8,17 +8,6 @@ To learn more about supported configuration, check out https://sourcegraph.com/d
 
 {{- "\n" }}
 
-{{- if not .Values.prometheus.privileged }}
-🚧 Warning 🚧
-
-You have set 'prometheus.privileged' to 'false' and Prometheus will run with reduced privileges.
-Our observability stack requires some cluster-wide privileges to display provisioning metrics.
-These metrics provide critical information to help you scale the Sourcegraph deployment.
-Provisioning metrics can be restored by assigning elevated permissions to Service Account '{{ include "sourcegraph.serviceAccountName" (list . "prometheus") }}'.
-Consult https://github.com/sourcegraph/deploy-sourcegraph-helm/blob/main/charts/sourcegraph/templates/prometheus/prometheus.ClusterRole.yaml for the necessary permissions.
-
-{{- end }}
-
 {{- if not .Values.cadvisor.containerSecurityContext.privileged }}
 🚧 Warning 🚧
 
