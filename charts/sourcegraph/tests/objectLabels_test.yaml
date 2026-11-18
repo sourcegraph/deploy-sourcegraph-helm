@@ -1,0 +1,283 @@
+suite: labels on PersistentVolumeClaims, ServiceAccounts, and RBAC objects
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+# The chart version is part of the helm.sh/chart label and changes on every
+# release, so pin it to compare whole label sets.
+chart:
+  version: 1.2.3
+  appVersion: 1.2.3
+tests:
+- it: should add sourcegraph.labels and the component's storageLabels to its PersistentVolumeClaim
+  templates:
+  - blobstore/blobstore.PersistentVolumeClaim.yaml
+  - codeinsights-db/codeinsights-db.PersistentVolumeClaim.yaml
+  - codeintel-db/codeintel-db.PersistentVolumeClaim.yaml
+  - pgsql/pgsql.PersistentVolumeClaim.yaml
+  - prometheus/prometheus.PersistentVolumeClaim.yaml
+  - redis/redis-cache.PersistentVolumeClaim.yaml
+  - redis/redis-store.PersistentVolumeClaim.yaml
+  set:
+    sourcegraph.labels: &globalLabels
+      example.com/installation: production
+      example.com/project: sourcegraph
+    blobstore.storageLabels:
+      example.com/service: blobstore
+    codeInsightsDB.storageLabels:
+      example.com/service: codeinsights-db
+    codeIntelDB.storageLabels:
+      example.com/service: codeintel-db
+    pgsql.storageLabels:
+      example.com/service: pgsql
+    prometheus.storageLabels:
+      example.com/service: prometheus
+    redisCache.storageLabels:
+      example.com/service: redis-cache
+    redisStore.storageLabels:
+      example.com/service: redis-store
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content: *globalLabels
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+        example.com/service: blobstore
+        deploy: sourcegraph
+        app.kubernetes.io/component: blobstore
+    template: blobstore/blobstore.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: codeinsights-db
+    template: codeinsights-db/codeinsights-db.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: codeintel-db
+    template: codeintel-db/codeintel-db.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: pgsql
+    template: pgsql/pgsql.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: prometheus
+    template: prometheus/prometheus.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: redis-cache
+    template: redis/redis-cache.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: redis-store
+    template: redis/redis-store.PersistentVolumeClaim.yaml
+
+- it: should not add storageLabels to a PersistentVolumeClaim when nothing is set
+  template: redis/redis-store.PersistentVolumeClaim.yaml
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        deploy: sourcegraph
+        app.kubernetes.io/component: redis
+
+- it: should add sourcegraph.labels to every ServiceAccount
+  templates:
+  - blobstore/blobstore.ServiceAccount.yaml
+  - cadvisor/cadvisor.ServiceAccount.yaml
+  - codeinsights-db/codeinsights-db.ServiceAccount.yaml
+  - codeintel-db/codeintel-db.ServiceAccount.yaml
+  - frontend/sourcegraph-frontend.ServiceAccount.yaml
+  - gitserver/gitserver.ServiceAccount.yaml
+  - grafana/grafana.ServiceAccount.yaml
+  - indexed-search/indexed-search.ServiceAccount.yaml
+  - jaeger/jaeger.ServiceAccount.yaml
+  - node-exporter/node-exporter.ServiceAccount.yaml
+  - otel-collector/otel-agent.ServiceAccount.yaml
+  - otel-collector/otel-collector.ServiceAccount.yaml
+  - pgsql/pgsql.ServiceAccount.yaml
+  - precise-code-intel/worker.ServiceAccount.yaml
+  - prometheus/prometheus.ServiceAccount.yaml
+  - redis/redis-cache.ServiceAccount.yaml
+  - redis/redis-store.ServiceAccount.yaml
+  - searcher/searcher.ServiceAccount.yaml
+  - syntactic-code-intel/worker.ServiceAccount.yaml
+  - syntect-server/syntect-server.ServiceAccount.yaml
+  - worker/worker.ServiceAccount.yaml
+  set:
+    sourcegraph.labels: *globalLabels
+    jaeger.enabled: true
+    syntacticCodeIntel.enabled: true
+    blobstore.serviceAccount.create: true
+    cadvisor.serviceAccount.create: true
+    codeInsightsDB.serviceAccount.create: true
+    codeIntelDB.serviceAccount.create: true
+    frontend.serviceAccount.create: true
+    gitserver.serviceAccount.create: true
+    grafana.serviceAccount.create: true
+    indexedSearch.serviceAccount.create: true
+    jaeger.serviceAccount.create: true
+    nodeExporter.serviceAccount.create: true
+    openTelemetry.agent.serviceAccount.create: true
+    openTelemetry.gateway.serviceAccount.create: true
+    pgsql.serviceAccount.create: true
+    preciseCodeIntel.serviceAccount.create: true
+    prometheus.serviceAccount.create: true
+    redisCache.serviceAccount.create: true
+    redisStore.serviceAccount.create: true
+    searcher.serviceAccount.create: true
+    syntacticCodeIntel.serviceAccount.create: true
+    syntectServer.serviceAccount.create: true
+    worker.serviceAccount.create: true
+  asserts:
+  - isKind:
+      of: ServiceAccount
+  - isSubset:
+      path: metadata.labels
+      content:
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        example.com/installation: production
+        example.com/project: sourcegraph
+        category: rbac
+        deploy: sourcegraph
+  - notExists:
+      path: metadata.labels["example.com/service"]
+
+- it: should add serviceAccount.labels to the ServiceAccount of its own component
+  templates:
+  - frontend/sourcegraph-frontend.ServiceAccount.yaml
+  - jaeger/jaeger.ServiceAccount.yaml
+  - otel-collector/otel-agent.ServiceAccount.yaml
+  - otel-collector/otel-collector.ServiceAccount.yaml
+  - redis/redis-cache.ServiceAccount.yaml
+  - redis/redis-store.ServiceAccount.yaml
+  set:
+    jaeger.enabled: true
+    frontend.serviceAccount.labels:
+      example.com/service: frontend
+    jaeger.serviceAccount:
+      create: true
+      labels:
+        example.com/service: jaeger
+    openTelemetry.agent.serviceAccount:
+      create: true
+      labels:
+        example.com/service: otel-agent
+    openTelemetry.gateway.serviceAccount:
+      create: true
+      labels:
+        example.com/service: otel-collector
+    redisCache.serviceAccount:
+      create: true
+    redisStore.serviceAccount:
+      create: true
+      labels:
+        example.com/service: redis-store
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/service: frontend
+        category: rbac
+        deploy: sourcegraph
+        app.kubernetes.io/component: frontend
+    template: frontend/sourcegraph-frontend.ServiceAccount.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: jaeger
+    template: jaeger/jaeger.ServiceAccount.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: otel-agent
+    template: otel-collector/otel-agent.ServiceAccount.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: otel-collector
+    template: otel-collector/otel-collector.ServiceAccount.yaml
+  - notExists:
+      path: metadata.labels["example.com/service"]
+    template: redis/redis-cache.ServiceAccount.yaml
+  - equal:
+      path: metadata.labels["example.com/service"]
+      value: redis-store
+    template: redis/redis-store.ServiceAccount.yaml
+
+- it: should add sourcegraph.labels and frontend.serviceAccount.labels to the frontend Role and RoleBinding
+  templates:
+  - frontend/sourcegraph-frontend.Role.yaml
+  - frontend/sourcegraph-frontend.RoleBinding.yaml
+  set:
+    sourcegraph.labels: *globalLabels
+    frontend.serviceAccount.labels:
+      example.com/service: frontend
+    prometheus.serviceAccount.labels:
+      example.com/service: prometheus
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+        example.com/service: frontend
+        category: rbac
+        deploy: sourcegraph
+        app.kubernetes.io/component: frontend
+
+- it: should add sourcegraph.labels and prometheus.serviceAccount.labels to the prometheus ClusterRole and ClusterRoleBinding
+  templates:
+  - prometheus/prometheus.ClusterRole.yaml
+  - prometheus/prometheus.ClusterRoleBinding.yaml
+  set:
+    sourcegraph.labels: *globalLabels
+    frontend.serviceAccount.labels:
+      example.com/service: frontend
+    prometheus.serviceAccount.labels: &prometheusLabels
+      example.com/service: prometheus
+  asserts:
+  - equal:
+      path: metadata.labels
+      value: &prometheusRBACLabels
+        helm.sh/chart: sourcegraph-1.2.3
+        app.kubernetes.io/name: sourcegraph
+        app.kubernetes.io/instance: sourcegraph
+        app.kubernetes.io/version: 1.2.3
+        app.kubernetes.io/managed-by: Helm
+        example.com/installation: production
+        example.com/project: sourcegraph
+        example.com/service: prometheus
+        category: rbac
+        deploy: sourcegraph
+        app.kubernetes.io/component: prometheus
+
+- it: should add sourcegraph.labels and prometheus.serviceAccount.labels to the prometheus RoleBinding
+  template: prometheus/prometheus.RoleBinding.yaml
+  set:
+    sourcegraph.labels: *globalLabels
+    prometheus.privileged: false
+    prometheus.serviceAccount.labels: *prometheusLabels
+  asserts:
+  - equal:
+      path: metadata.labels
+      value: *prometheusRBACLabels

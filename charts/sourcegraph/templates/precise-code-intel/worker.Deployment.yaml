@@ -129,6 +129,11 @@ spec:
         {{- if eq $storageType "pvc" }}
         ephemeral:
           volumeClaimTemplate:
+            {{- with .Values.preciseCodeIntel.storageLabels }}
+            metadata:
+              labels:
+                {{- toYaml . | nindent 16 }}
+            {{- end }}
             spec:
               accessModes:
               - ReadWriteOnce
