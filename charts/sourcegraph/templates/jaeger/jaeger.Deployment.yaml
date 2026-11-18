@@ -40,8 +40,12 @@ spec:
       {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- /* As sourcegraph.podLabels, with the jaeger common and selector labels */}}
-        {{- mergeOverwrite (omit (include "sourcegraph.jaeger.labels" . | fromYaml) "helm.sh/chart" "app.kubernetes.io/version") (.Values.sourcegraph.podLabels | default dict) (.Values.jaeger.podLabels | default dict) (include "sourcegraph.jaeger.selectorLabels" . | fromYaml) | toYaml | nindent 8 }}
+        {{- /*
+        As sourcegraph.podLabels, with the jaeger common and selector labels. The
+        release name goes last: the jaeger Services select on it, so no label
+        value may replace it.
+        */}}
+        {{- mergeOverwrite (omit (include "sourcegraph.jaeger.labels" . | fromYaml) "helm.sh/chart" "app.kubernetes.io/version") (.Values.sourcegraph.podLabels | default dict) (.Values.jaeger.podLabels | default dict) (include "sourcegraph.jaeger.selectorLabels" . | fromYaml) (dict "app.kubernetes.io/instance" .Release.Name) | toYaml | nindent 8 }}
         app: jaeger
         deploy: sourcegraph
         app.kubernetes.io/component: all-in-one
