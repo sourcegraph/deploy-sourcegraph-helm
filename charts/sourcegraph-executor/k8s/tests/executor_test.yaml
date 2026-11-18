@@ -3,6 +3,7 @@ templates:
   - executor.Deployment.yaml
   - executor.Service.yaml
   - executor.ConfigMap.yaml
+  - executor.JobServiceAccount.yaml
 tests:
   - it: should render the Deployment, Service, ConfigMap if executor is enabled
     set:
@@ -125,3 +126,104 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should render the job ServiceAccount without a token mount by default
+    template: executor.JobServiceAccount.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - containsDocument:
+          kind: ServiceAccount
+          apiVersion: v1
+          name: sg-executor-job
+      - equal:
+          path: automountServiceAccountToken
+          value: false
+      - isNull:
+          path: metadata.annotations
+
+  - it: should create the job ServiceAccount in the job namespace
+    template: executor.JobServiceAccount.yaml
+    set:
+      executor:
+        queueName: "test"
+        namespace: sourcegraph-executor-jobs
+    asserts:
+      - equal:
+          path: metadata.namespace
+          value: sourcegraph-executor-jobs
+
+  - it: should pass the job ServiceAccount settings to the executor by default
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - equal:
+          path: data.KUBERNETES_JOB_SERVICE_ACCOUNT_NAME
+          value: sg-executor-job
+      - equal:
+          path: data.KUBERNETES_JOB_AUTOMOUNT_SERVICE_ACCOUNT_TOKEN
+          value: "false"
+
+  - it: should not render the job ServiceAccount when configureRbac is false
+    template: executor.JobServiceAccount.yaml
+    set:
+      executor:
+        queueName: "test"
+        configureRbac: false
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: should not render the job ServiceAccount when create is false but still pass the name
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          serviceAccount:
+            create: false
+            name: my-existing-job-sa
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: executor.JobServiceAccount.yaml
+      - equal:
+          path: data.KUBERNETES_JOB_SERVICE_ACCOUNT_NAME
+          value: my-existing-job-sa
+        template: executor.ConfigMap.yaml
+
+  - it: should fall back to the namespace default ServiceAccount when name is empty
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          serviceAccount:
+            name: ""
+    asserts:
+      - hasDocuments:
+          count: 0
+        template: executor.JobServiceAccount.yaml
+      - equal:
+          path: data.KUBERNETES_JOB_SERVICE_ACCOUNT_NAME
+          value: ""
+        template: executor.ConfigMap.yaml
+
+  - it: should render job ServiceAccount annotations and token mount when set
+    template: executor.JobServiceAccount.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          serviceAccount:
+            automountToken: true
+            annotations:
+              iam.gke.io/gcp-service-account: jobs@example.iam.gserviceaccount.com
+    asserts:
+      - equal:
+          path: metadata.annotations["iam.gke.io/gcp-service-account"]
+          value: jobs@example.iam.gserviceaccount.com
+      - equal:
+          path: automountServiceAccountToken
+          value: true
