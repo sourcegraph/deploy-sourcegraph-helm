@@ -1,0 +1,57 @@
+suite: annotations and labels of the sourcegraph-frontend-internal Service
+templates:
+- frontend/sourcegraph-frontend.Service.yaml
+- frontend/sourcegraph-frontend-internal.Service.yaml
+tests:
+- it: should render no annotations on the internal Service by default
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  asserts:
+  - notExists:
+      path: metadata.annotations
+  - equal:
+      path: metadata.labels.app
+      value: sourcegraph-frontend
+
+- it: should keep the frontend Service's annotations and labels off the internal Service
+  set:
+    frontend.serviceAnnotations: &serviceAnnotations
+      example.com/load-balancer: external
+    frontend.serviceLabels: &serviceLabels
+      example.com/mesh: enabled
+  asserts:
+  - notExists:
+      path: metadata.annotations
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - notExists:
+      path: metadata.labels["example.com/mesh"]
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - isSubset:
+      path: metadata.annotations
+      content: *serviceAnnotations
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - isSubset:
+      path: metadata.labels
+      content: *serviceLabels
+    template: frontend/sourcegraph-frontend.Service.yaml
+
+- it: should render the internal Service's own annotations and labels, and keep them off the frontend Service
+  set:
+    frontend.internalServiceAnnotations: &internalServiceAnnotations
+      example.com/internal: "true"
+    frontend.internalServiceLabels: &internalServiceLabels
+      example.com/tier: internal
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value: *internalServiceAnnotations
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - isSubset:
+      path: metadata.labels
+      content: *internalServiceLabels
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+  - notExists:
+      path: metadata.annotations["example.com/internal"]
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - notExists:
+      path: metadata.labels["example.com/tier"]
+    template: frontend/sourcegraph-frontend.Service.yaml
