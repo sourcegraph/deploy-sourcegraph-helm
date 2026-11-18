@@ -16,6 +16,24 @@ rules:
     verbs:
       - create
       - delete
+  {{- if .Values.executor.cleanup.enabled }}
+  # The cleanup CronJob lists leftover job resources, and kubectl delete gets each one first
+  - apiGroups:
+      - batch
+    resources:
+      - jobs
+    verbs:
+      - get
+      - list
+  - apiGroups:
+      - ""
+    resources:
+      - secrets
+      - persistentvolumeclaims
+    verbs:
+      - get
+      - list
+  {{- end }}
   - apiGroups:
       - ""
     resources:
