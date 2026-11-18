@@ -298,11 +298,14 @@ spec:
           {{- if eq $r.Values.executor.storage.type "ephemeral" }}
           ephemeral:
             volumeClaimTemplate:
-              {{- with $r.Values.executor.storage.labels }}
               metadata:
                 labels:
+                  {{- include "sourcegraph.labels" $r | nindent 18 }}
+                  {{- with $r.Values.executor.storage.labels }}
                   {{- toYaml . | nindent 18 }}
-              {{- end }}
+                  {{- end }}
+                  deploy: sourcegraph
+                  app.kubernetes.io/component: executor
               spec:
                 accessModes: ["ReadWriteOnce"]
                 {{- if $r.Values.executor.storage.class }}

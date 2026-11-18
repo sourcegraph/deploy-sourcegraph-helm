@@ -1025,8 +1025,8 @@ syntacticCodeIntel:
   # with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass`
   # is `Retain` for stateful data and is not used here.
   storageClassName: ""
-  # -- Labels to add to the `/tmp` scratch PVC when storageType is `pvc`. Changing them restarts the pods.
-  # See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels)
+  # -- Labels to add to the `/tmp` scratch PVC when storageType is `pvc`, in addition to `sourcegraph.labels`.
+  # Changing them restarts the pods. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels)
   storageLabels: {}
 
 preciseCodeIntel:
@@ -1089,8 +1089,8 @@ preciseCodeIntel:
   # with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass`
   # is `Retain` for stateful data and is not used here.
   storageClassName: ""
-  # -- Labels to add to the `/tmp` scratch PVC when storageType is `pvc`. Changing them restarts the pods.
-  # See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels)
+  # -- Labels to add to the `/tmp` scratch PVC when storageType is `pvc`, in addition to `sourcegraph.labels`.
+  # Changing them restarts the pods. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels)
   storageLabels: {}
 
 prometheus:

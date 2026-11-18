@@ -46,30 +46,50 @@ tests:
           name: executor-batches
         documentIndex: 1
 
-  - it: should add executor.storage.labels to the per-pod PVC
+  # The chart version is part of the helm.sh/chart label, so pin it to compare whole label sets.
+  - it: should add sourcegraph.labels, the chart's labels, and executor.storage.labels to the per-pod PVC
     template: executor/executor.Deployment.yaml
+    release:
+      name: executor
+    chart:
+      version: 1.2.3
+      appVersion: 1.2.3
     set:
+      sourcegraph:
+        labels:
+          example.com/project: sourcegraph
       executor:
         queueName: batches
         storage:
           type: ephemeral
           size: 50Gi
           labels:
-            example.com/project: sourcegraph
             example.com/service: executor
     asserts:
       - equal:
           path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
           value:
             labels:
+              helm.sh/chart: sourcegraph-executor-dind-1.2.3
+              app.kubernetes.io/name: sourcegraph-executor-dind
+              app.kubernetes.io/instance: executor
+              app.kubernetes.io/version: 1.2.3
+              app.kubernetes.io/managed-by: Helm
               example.com/project: sourcegraph
               example.com/service: executor
+              deploy: sourcegraph
+              app.kubernetes.io/component: executor
       - equal:
           path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.resources.requests.storage
           value: 50Gi
 
-  - it: should render no PVC metadata when executor.storage.labels is empty
+  - it: should add only the chart's own labels to the per-pod PVC when no label value is set
     template: executor/executor.Deployment.yaml
+    release:
+      name: executor
+    chart:
+      version: 1.2.3
+      appVersion: 1.2.3
     set:
       executor:
         queueName: batches
@@ -77,8 +97,17 @@ tests:
           type: ephemeral
           size: 50Gi
     asserts:
-      - notExists:
+      - equal:
           path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
+          value:
+            labels:
+              helm.sh/chart: sourcegraph-executor-dind-1.2.3
+              app.kubernetes.io/name: sourcegraph-executor-dind
+              app.kubernetes.io/instance: executor
+              app.kubernetes.io/version: 1.2.3
+              app.kubernetes.io/managed-by: Helm
+              deploy: sourcegraph
+              app.kubernetes.io/component: executor
 
   - it: should ignore executor.storage.labels on an emptyDir volume
     template: executor/executor.Deployment.yaml

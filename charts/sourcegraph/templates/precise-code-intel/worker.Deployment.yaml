@@ -124,11 +124,14 @@ spec:
         {{- if eq $storageType "pvc" }}
         ephemeral:
           volumeClaimTemplate:
-            {{- with .Values.preciseCodeIntel.storageLabels }}
             metadata:
               labels:
+                {{- include "sourcegraph.labels" . | nindent 16 }}
+                {{- with .Values.preciseCodeIntel.storageLabels }}
                 {{- toYaml . | nindent 16 }}
-            {{- end }}
+                {{- end }}
+                deploy: sourcegraph
+                app.kubernetes.io/component: precise-code-intel
             spec:
               accessModes:
               - ReadWriteOnce
