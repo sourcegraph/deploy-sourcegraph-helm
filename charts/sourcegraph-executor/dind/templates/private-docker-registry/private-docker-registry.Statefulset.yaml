@@ -87,6 +87,9 @@ spec:
         labels:
           deploy: sourcegraph
           app.kubernetes.io/component: private-docker-registry
+          {{- with .Values.privateDockerRegistry.storageLabels }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
       spec:
         accessModes:
           - ReadWriteOnce

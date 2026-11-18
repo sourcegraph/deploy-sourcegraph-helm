@@ -38,6 +38,21 @@ helm repo add sourcegraph https://helm.sourcegraph.com/release
 
 Manifests rendered using the `helm template` command can be used for direct deployment using `kubectl`.
 
+## PersistentVolumeClaim labels
+
+Kubernetes creates both of this chart's PersistentVolumeClaims from a template, so Helm does not manage them:
+
+| PersistentVolumeClaim | Created from | Labels |
+| --- | --- | --- |
+| The registry's `cache` | The `private-docker-registry` StatefulSet's volume claim template | `deploy`, `app.kubernetes.io/component`, and `privateDockerRegistry.storageLabels` |
+| The executor's scratch volume, when `executor.storage.type` is `ephemeral` | The executor pod's ephemeral volume | `executor.storage.labels` |
+
+Neither gets `sourcegraph.labels` or the chart's standard labels.
+
+Set `privateDockerRegistry.storageLabels` on the first install and never change it on an installed release. Kubernetes rejects any change to a StatefulSet's volume claim templates, so the upgrade fails. Kubernetes also never updates the labels of a claim that exists: label an existing one with `kubectl label pvc`.
+
+Changing `executor.storage.labels` restarts the executor pods. Each pod's claim is deleted and created again with the pod, so it always has the labels the chart renders.
+
 ## Configuration Options
 
 Reference the table below for available configuration parameters and consult [executor] documentation.
@@ -92,6 +107,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | privateDockerRegistry.image.repository | string | `"registry"` |  |
 | privateDockerRegistry.image.tag | int | `3` |  |
 | privateDockerRegistry.serviceLabels | object | `{}` | Add extra labels to the `private-docker-registry` Service |
+| privateDockerRegistry.storageLabels | object | `{}` | Labels to add to the `cache` volume claim template of the `private-docker-registry` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [PersistentVolumeClaim labels](#persistentvolumeclaim-labels) |
 | privateDockerRegistry.storageSize | string | `"10Gi"` |  |
 | queues | list | `[]` | Optional list of queues to deploy as standalone Deployments. When set, the single executor Deployment is not rendered. Each entry supports:   name        (required) — used as the deployment name suffix (executor-<name>)   queueName   — sets EXECUTOR_QUEUE_NAME; defaults to name if omitted   queueNames  — sets EXECUTOR_QUEUE_NAMES (comma-joined); takes precedence over queueName when set   replicaCount, resources, env (merged with executor.env, queue overrides) |
 | sourcegraph.affinity | object | `{}` | Affinity, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) |

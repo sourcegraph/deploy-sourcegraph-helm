@@ -26,3 +26,32 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+
+  - it: should label the cache volume claim template with only the chart's own labels by default
+    template: private-docker-registry/private-docker-registry.Statefulset.yaml
+    set:
+      sourcegraph:
+        labels:
+          example.com/project: sourcegraph
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.labels
+          value:
+            deploy: sourcegraph
+            app.kubernetes.io/component: private-docker-registry
+
+  - it: should add privateDockerRegistry.storageLabels to the cache volume claim template
+    template: private-docker-registry/private-docker-registry.Statefulset.yaml
+    set:
+      privateDockerRegistry:
+        storageLabels:
+          example.com/project: sourcegraph
+          example.com/service: registry
+    asserts:
+      - equal:
+          path: spec.volumeClaimTemplates[0].metadata.labels
+          value:
+            deploy: sourcegraph
+            app.kubernetes.io/component: private-docker-registry
+            example.com/project: sourcegraph
+            example.com/service: registry
