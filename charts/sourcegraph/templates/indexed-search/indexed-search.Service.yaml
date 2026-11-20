@@ -4,7 +4,12 @@ metadata:
   annotations:
     description: Headless service that provides a stable network identity for the
       indexed-search stateful set.
+    {{- if .Values.indexedSearch.continuity.enabled }}
+    # Continuity webservers serve metrics on their debug port.
+    prometheus.io/port: "6060"
+    {{- else }}
     prometheus.io/port: "6070"
+    {{- end }}
     sourcegraph.prometheus/scrape: "true"
     {{- if .Values.indexedSearch.serviceAnnotations }}
     {{- toYaml .Values.indexedSearch.serviceAnnotations | nindent 4 }}

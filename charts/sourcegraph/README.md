@@ -264,6 +264,29 @@ In addition to the documented values, all services also support the following va
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| indexedSearch.continuity.activationTolerance | int | `1` | Number of a repository's replicas that may lag when a new generation activates: activation needs the replicas the repository can have now minus this many, and at least one (`SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE`) |
+| indexedSearch.continuity.enabled | bool | `false` | Run indexed search in continuity mode: `indexed-search` pods run only the continuity webserver (no `zoekt-indexserver` container), a separate `indexed-search-indexer` Deployment builds shards and publishes them through object storage, and frontend, worker, and searcher use the continuity search client. |
+| indexedSearch.continuity.env | object | `{}` | Extra environment variables for every continuity participant (webserver, indexer, frontend, worker, searcher), for example `SOURCEGRAPH_UPLOAD_*` object storage settings. By default the shared Sourcegraph object storage settings apply, which use the `blobstore` service. |
+| indexedSearch.continuity.indexer.args | list | `[]` | Arguments for the indexer container |
+| indexedSearch.continuity.indexer.command | list | `[]` | Command for the indexer container, replacing the image's entrypoint |
+| indexedSearch.continuity.indexer.env | object | `{"DEPLOY_TYPE":{"value":"helm"}}` | Environment variables for the `indexed-search-indexer` container |
+| indexedSearch.continuity.indexer.name | string | `"indexed-search-indexer"` | Name used by the indexer Deployment |
+| indexedSearch.continuity.indexer.replicaCount | int | `2` | Number of `indexed-search-indexer` pods |
+| indexedSearch.continuity.indexer.resources | object | `{"limits":{"cpu":"4","memory":"4G"},"requests":{"cpu":"1","memory":"1G"}}` | Resource requests & limits for the `indexed-search-indexer` container |
+| indexedSearch.continuity.indexer.scratchSizeLimit | string | `"20Gi"` | Size limit of the indexer's emptyDir scratch volume |
+| indexedSearch.continuity.indexerImage.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Docker image tag for the continuity indexer image |
+| indexedSearch.continuity.indexerImage.name | string | `"zoekt-continuity-indexer"` | Docker image name for the continuity indexer image |
+| indexedSearch.continuity.indexerImage.repository | string | `""` | Override the global sourcegraph.image.repository for the continuity indexer image |
+| indexedSearch.continuity.indexerImage.tag | string | `""` | Override the tag of the continuity indexer image |
+| indexedSearch.continuity.replicas | int | `2` | Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS`) |
+| indexedSearch.continuity.replicationFactors | string | `""` | Comma-separated `repositoryID=replicas` entries that raise the replicas of individual repositories, such as large monorepos, and with them their slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICATION_FACTORS`) |
+| indexedSearch.continuity.terminationGracePeriodSeconds | int | `60` | Time Kubernetes allows a continuity webserver to drain before forced termination. Must be at least 30. |
+| indexedSearch.continuity.webserverArgs | list | `[]` | Arguments for the continuity webserver container |
+| indexedSearch.continuity.webserverCommand | list | `[]` | Command for the continuity webserver container, replacing the image's entrypoint |
+| indexedSearch.continuity.webserverImage.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Docker image tag for the continuity webserver image |
+| indexedSearch.continuity.webserverImage.name | string | `"zoekt-continuity-webserver"` | Docker image name for the continuity webserver image |
+| indexedSearch.continuity.webserverImage.repository | string | `""` | Override the global sourcegraph.image.repository for the continuity webserver image |
+| indexedSearch.continuity.webserverImage.tag | string | `""` | Override the tag of the continuity webserver image |
 | indexedSearch.env | object | the chart will add some default environment values | Environment variables for the `zoekt-webserver` container |
 | indexedSearch.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `zoekt-webserver` image |
 | indexedSearch.image.name | string | `"indexed-searcher"` | Docker image name for the `zoekt-webserver` image |

@@ -56,6 +56,7 @@ spec:
         env:
         {{- include "sourcegraph.gracefulShutdownEnv" (list . "gitserver") | nindent 8 }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
+        {{- with include "sourcegraph.indexedSearchContinuity.env" . }}{{ . | nindent 8 }}{{- end }}
         {{- range $name, $item := .Values.gitserver.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}

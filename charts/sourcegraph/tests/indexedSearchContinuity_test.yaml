@@ -1,0 +1,180 @@
+suite: indexedSearchContinuity
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- indexed-search/indexed-search.StatefulSet.yaml
+- indexed-search/indexed-search.IndexerService.yaml
+- indexed-search/indexed-search-indexer.Deployment.yaml
+- indexed-search/indexed-search-indexer.Service.yaml
+- indexed-search/indexed-search.Service.yaml
+- frontend/sourcegraph-frontend.Deployment.yaml
+- worker/worker.Deployment.yaml
+- searcher/searcher.StatefulSet.yaml
+tests:
+- it: should keep the default indexed-search layout when continuity is disabled
+  asserts:
+  - lengthEqual:
+      path: spec.template.spec.containers
+      count: 2
+    template: indexed-search/indexed-search.StatefulSet.yaml
+  - notExists:
+      path: spec.podManagementPolicy
+    template: indexed-search/indexed-search.StatefulSet.yaml
+  - hasDocuments:
+      count: 1
+    template: indexed-search/indexed-search.IndexerService.yaml
+  - hasDocuments:
+      count: 0
+    template: indexed-search/indexed-search-indexer.Deployment.yaml
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        value: "true"
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+- it: should run a single continuity webserver container when enabled
+  set:
+    indexedSearch:
+      replicaCount: 3
+      continuity:
+        enabled: true
+        webserverImage:
+          repository: sg-local
+          tag: dev
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  asserts:
+  - lengthEqual:
+      path: spec.template.spec.containers
+      count: 1
+  - equal:
+      path: spec.template.spec.containers[0].image
+      value: sg-local/zoekt-continuity-webserver:dev
+  - equal:
+      path: spec.podManagementPolicy
+      value: OrderedReady
+  - equal:
+      path: spec.updateStrategy.type
+      value: RollingUpdate
+  - equal:
+      path: spec.template.spec.terminationGracePeriodSeconds
+      value: 60
+  - equal:
+      path: spec.template.spec.containers[0].readinessProbe.httpGet.path
+      value: /ready
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: DATA_DIR
+        value: /data/index
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS
+        value: "2"
+- it: should add the indexer and shared continuity env when enabled
+  set:
+    indexedSearch:
+      replicaCount: 3
+      continuity:
+        enabled: true
+  asserts:
+  - hasDocuments:
+      count: 0
+    template: indexed-search/indexed-search.IndexerService.yaml
+  - equal:
+      path: spec.replicas
+      value: 2
+    template: indexed-search/indexed-search-indexer.Deployment.yaml
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        value: "true"
+    template: indexed-search/indexed-search-indexer.Deployment.yaml
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        value: "true"
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        value: "true"
+    template: worker/worker.Deployment.yaml
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE
+        value: "1"
+    template: searcher/searcher.StatefulSet.yaml
+- it: should scrape continuity metrics from the debug port
+  set:
+    indexedSearch:
+      replicaCount: 3
+      continuity:
+        enabled: true
+  asserts:
+  - equal:
+      path: metadata.annotations["prometheus.io/port"]
+      value: "6060"
+    template: indexed-search/indexed-search.Service.yaml
+  - equal:
+      path: metadata.annotations["prometheus.io/port"]
+      value: "6060"
+    template: indexed-search/indexed-search-indexer.Service.yaml
+  - equal:
+      path: metadata.annotations["sourcegraph.prometheus/scrape"]
+      value: "true"
+    template: indexed-search/indexed-search-indexer.Service.yaml
+  - equal:
+      path: spec.selector.app
+      value: indexed-search-indexer
+    template: indexed-search/indexed-search-indexer.Service.yaml
+- it: should keep scraping the zoekt webserver port when continuity is disabled
+  asserts:
+  - equal:
+      path: metadata.annotations["prometheus.io/port"]
+      value: "6070"
+    template: indexed-search/indexed-search.Service.yaml
+  - hasDocuments:
+      count: 0
+    template: indexed-search/indexed-search-indexer.Service.yaml
+- it: should reject more continuity replicas than indexed-search pods
+  set:
+    indexedSearch:
+      replicaCount: 1
+      continuity:
+        enabled: true
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  asserts:
+  - failedTemplate:
+      errorMessage: indexedSearch.continuity.replicas must not exceed indexedSearch.replicaCount
+- it: should pass replication factors to every participant
+  set:
+    indexedSearch:
+      replicaCount: 3
+      continuity:
+        enabled: true
+        replicationFactors: "12345=3"
+  template: worker/worker.Deployment.yaml
+  asserts:
+  - contains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_REPLICATION_FACTORS
+        value: "12345=3"
+- it: should reject an activation tolerance as large as the replicas
+  set:
+    indexedSearch:
+      replicaCount: 3
+      continuity:
+        enabled: true
+        replicas: 2
+        activationTolerance: 2
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  asserts:
+  - failedTemplate:
+      errorMessage: indexedSearch.continuity.activationTolerance must be less than indexedSearch.continuity.replicas
