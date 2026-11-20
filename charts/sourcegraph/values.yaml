@@ -649,6 +649,70 @@ indexedSearch:
   # -- Labels to add to the `data` volume claim template of the `indexed-search` StatefulSet. Kubernetes does not allow
   # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
   storageLabels: {}
+  continuity:
+    # -- Run indexed search in continuity mode: `indexed-search` pods run only the continuity webserver
+    # (no `zoekt-indexserver` container), a separate `indexed-search-indexer` Deployment builds shards
+    # and publishes them through object storage, and frontend, worker, and searcher use the continuity search client.
+    enabled: false
+    # -- Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS`)
+    replicas: 2
+    # -- Number of a repository's replicas that may lag when a new generation activates: activation needs the
+    # replicas the repository can have now minus this many, and at least one (`SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE`)
+    activationTolerance: 1
+    # -- Comma-separated `repositoryID=replicas` entries that raise the replicas of individual repositories, such as
+    # large monorepos, and with them their slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICATION_FACTORS`)
+    replicationFactors: ""
+    # -- Extra environment variables for every continuity participant (webserver, indexer, frontend, worker,
+    # searcher), for example `SOURCEGRAPH_UPLOAD_*` object storage settings. By default the shared
+    # Sourcegraph object storage settings apply, which use the `blobstore` service.
+    env: {}
+    webserverImage:
+      # -- Docker image tag for the continuity webserver image
+      defaultTag: "{{ .Chart.AppVersion }}"
+      # -- Docker image name for the continuity webserver image
+      name: "zoekt-continuity-webserver"
+      # -- Override the global sourcegraph.image.repository for the continuity webserver image
+      repository: ""
+      # -- Override the tag of the continuity webserver image
+      tag: ""
+    # -- Command for the continuity webserver container, replacing the image's entrypoint
+    webserverCommand: []
+    # -- Arguments for the continuity webserver container
+    webserverArgs: []
+    # -- Time Kubernetes allows a continuity webserver to drain before forced termination. Must be at least 30.
+    terminationGracePeriodSeconds: 60
+    indexer:
+      # -- Number of `indexed-search-indexer` pods
+      replicaCount: 2
+      # -- Name used by the indexer Deployment
+      name: "indexed-search-indexer"
+      # -- Environment variables for the `indexed-search-indexer` container
+      env:
+        DEPLOY_TYPE:
+          value: helm
+      # -- Command for the indexer container, replacing the image's entrypoint
+      command: []
+      # -- Arguments for the indexer container
+      args: []
+      # -- Size limit of the indexer's emptyDir scratch volume
+      scratchSizeLimit: 20Gi
+      # -- Resource requests & limits for the `indexed-search-indexer` container
+      resources:
+        limits:
+          cpu: "4"
+          memory: 4G
+        requests:
+          cpu: "1"
+          memory: 1G
+    indexerImage:
+      # -- Docker image tag for the continuity indexer image
+      defaultTag: "{{ .Chart.AppVersion }}"
+      # -- Docker image name for the continuity indexer image
+      name: "zoekt-continuity-indexer"
+      # -- Override the global sourcegraph.image.repository for the continuity indexer image
+      repository: ""
+      # -- Override the tag of the continuity indexer image
+      tag: ""
 
 indexedSearchIndexer:
   # -- Environment variables for the `zoekt-indexserver` container
