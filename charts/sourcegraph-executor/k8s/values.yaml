@@ -113,6 +113,13 @@ executor:
     runAsGroup:
     # -- The group ID which is set on the job PVC file system.
     fsGroup: "1000"
+    # -- Security context for job pods, as YAML.
+    # When set, it replaces `runAsUser`, `runAsGroup`, and `fsGroup`.
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+    podSecurityContext: {}
+    # -- Security context for job containers, as YAML.
+    # e.g. set `allowPrivilegeEscalation: false`, `capabilities: {drop: [ALL]}`, and `seccompProfile: {type: RuntimeDefault}` for Pod Security Admission `restricted` namespaces.
+    containerSecurityContext: {}
     resources:
       requests:
         # -- The requested CPU for a job.
@@ -134,17 +141,17 @@ executor:
       name: ""
       # -- A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app`
       selector: ""
-      # -- The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]'
+      # -- (list) Tolerations for job pods, as a YAML list. e.g. `[{key: foo, operator: Equal, value: bar, effect: NoSchedule}]`
       tolerations: ""
-      # -- The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- (list) Required node affinity match expressions for job pods, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]`
       requiredAffinityMatchExpressions: ""
-      # -- The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- (list) Required node affinity match fields for job pods, as a YAML list. e.g. `[{key: metadata.name, operator: In, values: [node-1]}]`
       requiredAffinityMatchFields: ""
 
     pod:
-      # -- The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- (list) Required pod affinity terms for job pods, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`
       affinity: ""
-      # -- The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- (list) Required pod anti-affinity terms for job pods, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`
       antiAffinity: ""
 
   debug:

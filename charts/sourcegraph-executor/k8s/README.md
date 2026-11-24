@@ -71,15 +71,17 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | executor.kubeconfigPath | string | `""` | The path to the kubeconfig file. If not specified, the in-cluster config is used. |
 | executor.kubernetesClient.burst | int | `100`, the executor's default | The maximum burst of queries from each executor pod to the Kubernetes API, above `qps`. |
 | executor.kubernetesClient.qps | number | `50`, the executor's default | The maximum queries per second from each executor pod to the Kubernetes API, shared by all of its jobs. Each job makes about 10 API calls. |
+| executor.kubernetesJob.containerSecurityContext | object | `{}` | Security context for job containers, as YAML. e.g. set `allowPrivilegeEscalation: false`, `capabilities: {drop: [ALL]}`, and `seccompProfile: {type: RuntimeDefault}` for Pod Security Admission `restricted` namespaces. |
 | executor.kubernetesJob.deadline | string | `"1200"` | The number of seconds after which a Kubernetes job will be terminated. |
 | executor.kubernetesJob.fsGroup | string | `"1000"` | The group ID which is set on the job PVC file system. |
 | executor.kubernetesJob.node.name | string | `""` | The name of the Kubernetes Node to create job pods on. If not specified, the pods are created on the first available node. |
-| executor.kubernetesJob.node.requiredAffinityMatchExpressions | string | `""` | The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]' |
-| executor.kubernetesJob.node.requiredAffinityMatchFields | string | `""` | The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]' |
+| executor.kubernetesJob.node.requiredAffinityMatchExpressions | list | `""` | Required node affinity match expressions for job pods, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]` |
+| executor.kubernetesJob.node.requiredAffinityMatchFields | list | `""` | Required node affinity match fields for job pods, as a YAML list. e.g. `[{key: metadata.name, operator: In, values: [node-1]}]` |
 | executor.kubernetesJob.node.selector | string | `""` | A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app` |
-| executor.kubernetesJob.node.tolerations | string | `""` | The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]' |
-| executor.kubernetesJob.pod.affinity | string | `""` | The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]' |
-| executor.kubernetesJob.pod.antiAffinity | string | `""` | The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]' |
+| executor.kubernetesJob.node.tolerations | list | `""` | Tolerations for job pods, as a YAML list. e.g. `[{key: foo, operator: Equal, value: bar, effect: NoSchedule}]` |
+| executor.kubernetesJob.pod.affinity | list | `""` | Required pod affinity terms for job pods, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]` |
+| executor.kubernetesJob.pod.antiAffinity | list | `""` | Required pod anti-affinity terms for job pods, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]` |
+| executor.kubernetesJob.podSecurityContext | object | `{}` | Security context for job pods, as YAML. When set, it replaces `runAsUser`, `runAsGroup`, and `fsGroup`. learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) |
 | executor.kubernetesJob.resources.limits.cpu | string | `""` | The maximum CPU for a job. |
 | executor.kubernetesJob.resources.limits.ephemeralStorage | string | `""` | The maximum ephemeral storage for a job. |
 | executor.kubernetesJob.resources.limits.memory | string | `"12Gi"` | The maximum memory for a job. |
