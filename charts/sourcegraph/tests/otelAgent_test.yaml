@@ -1,0 +1,74 @@
+---
+suite: otelAgent
+templates:
+  - otel-collector/otel-agent.DaemonSet.yaml
+  - otel-collector/otel-agent.ConfigMap.yaml
+  - searcher/searcher.StatefulSet.yaml
+tests:
+  - it: should not render the agent by default
+    templates:
+      - otel-collector/otel-agent.DaemonSet.yaml
+      - otel-collector/otel-agent.ConfigMap.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should send traces to otel-collector by default
+    template: searcher/searcher.StatefulSet.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://otel-collector:4317"
+      - notContains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_AGENT_HOST
+          any: true
+  - it: should render the agent when agent.enabled is true
+    set:
+      openTelemetry.agent.enabled: true
+    templates:
+      - otel-collector/otel-agent.DaemonSet.yaml
+      - otel-collector/otel-agent.ConfigMap.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+  - it: should render the agent for the deprecated kind DaemonSet
+    set:
+      openTelemetry.agent.kind: DaemonSet
+    templates:
+      - otel-collector/otel-agent.DaemonSet.yaml
+      - otel-collector/otel-agent.ConfigMap.yaml
+    asserts:
+      - hasDocuments:
+          count: 1
+  - it: should send traces to the agent on the node when it is enabled
+    set:
+      openTelemetry.agent.kind: DaemonSet
+    template: searcher/searcher.StatefulSet.yaml
+    asserts:
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://$(OTEL_AGENT_HOST):4317"
+  - it: should not render the agent for the deprecated kind Deployment
+    set:
+      openTelemetry.agent.kind: Deployment
+    templates:
+      - otel-collector/otel-agent.DaemonSet.yaml
+      - otel-collector/otel-agent.ConfigMap.yaml
+    asserts:
+      - hasDocuments:
+          count: 0
+  - it: should not render the agent when openTelemetry is disabled
+    set:
+      openTelemetry.enabled: false
+      openTelemetry.agent.enabled: true
+    templates:
+      - otel-collector/otel-agent.DaemonSet.yaml
+      - otel-collector/otel-agent.ConfigMap.yaml
+    asserts:
+      - hasDocuments:
+          count: 0

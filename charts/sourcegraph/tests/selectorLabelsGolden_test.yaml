@@ -11,6 +11,9 @@ release:
 set:
   jaeger:
     enabled: true
+  openTelemetry:
+    agent:
+      enabled: true
   syntacticCodeIntel:
     enabled: true
     podDisruptionBudget: &pdb

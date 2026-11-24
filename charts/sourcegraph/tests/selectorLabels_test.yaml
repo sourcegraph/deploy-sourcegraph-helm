@@ -5,6 +5,9 @@ release:
 set:
   syntacticCodeIntel:
     enabled: true
+  openTelemetry:
+    agent:
+      enabled: true
 tests:
 - it: should keep the default selector labels when nothing is set
   template: gitserver/gitserver.StatefulSet.yaml

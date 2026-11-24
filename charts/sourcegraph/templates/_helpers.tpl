@@ -206,12 +206,16 @@ Jaeger selector labels
 app.kubernetes.io/name: jaeger
 {{- end }}
 
+{{- /* Renders "true" when the otel-agent DaemonSet is deployed. The deprecated `openTelemetry.agent.kind: DaemonSet` still enables it. */ -}}
+{{- define "sourcegraph.openTelemetryAgentEnabled" -}}
+{{- if and .Values.openTelemetry.enabled (or .Values.openTelemetry.agent.enabled (eq (.Values.openTelemetry.agent.kind | default "") "DaemonSet")) -}}
+true
+{{- end -}}
+{{- end -}}
+
 {{- define "sourcegraph.openTelemetryEnv" -}}
 {{- if .Values.openTelemetry.enabled -}}
-{{- if eq (.Values.openTelemetry.agent.kind | default "DaemonSet") "Deployment" -}}
-- name: OTEL_EXPORTER_OTLP_ENDPOINT
-  value: http://otel-collector:4317
-{{- else -}}
+{{- if include "sourcegraph.openTelemetryAgentEnabled" . -}}
 # OTEL_AGENT_HOST must be defined before OTEL_EXPORTER_OTLP_ENDPOINT to substitute the node IP on which the DaemonSet pod instance runs in the latter variable
 - name: OTEL_AGENT_HOST
   valueFrom:
@@ -219,6 +223,9 @@ app.kubernetes.io/name: jaeger
       fieldPath: status.hostIP
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
   value: http://$(OTEL_AGENT_HOST):{{ toYaml .Values.openTelemetry.agent.hostPorts.grpcOtlp }}
+{{- else -}}
+- name: OTEL_EXPORTER_OTLP_ENDPOINT
+  value: http://otel-collector:4317
 {{- end }}
 {{- end }}
 {{- end }}

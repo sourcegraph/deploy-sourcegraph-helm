@@ -1,4 +1,4 @@
-{{- if and .Values.openTelemetry.enabled (eq (.Values.openTelemetry.agent.kind | default "DaemonSet") "DaemonSet") -}}
+{{- if include "sourcegraph.openTelemetryAgentEnabled" . -}}
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:

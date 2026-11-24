@@ -1,5 +1,9 @@
 ---
 suite: otelAgentHostPort
+set:
+  openTelemetry:
+    agent:
+      enabled: true
 tests:
   - it: should use the default host ports when not defined in values
     template: otel-collector/otel-agent.DaemonSet.yaml
