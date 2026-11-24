@@ -9,6 +9,7 @@ metadata:
     {{- toYaml .Values.pgsql.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app: pgsql
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql

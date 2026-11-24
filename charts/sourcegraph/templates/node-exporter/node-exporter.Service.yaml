@@ -11,6 +11,7 @@ metadata:
     {{- toYaml .Values.nodeExporter.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
     app.kubernetes.io/component: node-exporter
     app: node-exporter
     deploy: sourcegraph

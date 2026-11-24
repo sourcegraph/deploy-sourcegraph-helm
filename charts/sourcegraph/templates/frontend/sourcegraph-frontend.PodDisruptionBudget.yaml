@@ -2,6 +2,13 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.frontend.labels }}
+      {{- toYaml .Values.frontend.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: frontend
   name: sourcegraph-frontend
 spec:
   {{- toYaml .Values.frontend.podDisruptionBudget | nindent 2 }}

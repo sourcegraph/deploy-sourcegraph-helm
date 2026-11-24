@@ -2,6 +2,13 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.preciseCodeIntel.labels }}
+      {{- toYaml .Values.preciseCodeIntel.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: precise-code-intel
   name: {{ .Values.preciseCodeIntel.name }}
 spec:
   {{- toYaml .Values.preciseCodeIntel.podDisruptionBudget | nindent 2 }}

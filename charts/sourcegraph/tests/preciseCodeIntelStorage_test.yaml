@@ -35,18 +35,17 @@ tests:
       storageType: pvc
       storageSize: 50Gi
   asserts:
-  - contains:
-      path: spec.template.spec.volumes
-      content:
-        name: tmpdir
-        ephemeral:
-          volumeClaimTemplate:
-            spec:
-              accessModes:
-              - ReadWriteOnce
-              resources:
-                requests:
-                  storage: 50Gi
+  - equal:
+      path: spec.template.spec.volumes[0].name
+      value: tmpdir
+  - equal:
+      path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec
+      value:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 50Gi
   # /tmp mount is unchanged, so no TMPDIR redirect is needed
   - contains:
       path: spec.template.spec.containers[0].volumeMounts
@@ -88,7 +87,13 @@ tests:
       path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.spec.storageClassName
       value: premium-rwo
 
-- it: should add storageLabels to the per-pod PVC and no other labels
+# The chart version is part of the helm.sh/chart label, so pin it to compare whole label sets.
+- it: should label the per-pod PVC like the chart's other PVCs, with storageLabels added
+  release:
+    name: sourcegraph
+  chart:
+    version: 1.2.3
+    appVersion: 1.2.3
   set:
     sourcegraph:
       labels:
@@ -103,16 +108,38 @@ tests:
       path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
       value:
         labels:
+          helm.sh/chart: sourcegraph-1.2.3
+          app.kubernetes.io/name: sourcegraph
+          app.kubernetes.io/instance: sourcegraph
+          app.kubernetes.io/version: 1.2.3
+          app.kubernetes.io/managed-by: Helm
+          example.com/project: sourcegraph
           example.com/service: scratch
+          deploy: sourcegraph
+          app.kubernetes.io/component: precise-code-intel
 
-- it: should render no PVC metadata when storageLabels is empty
+- it: should add only the chart's own labels to the per-pod PVC when no label value is set
+  release:
+    name: sourcegraph
+  chart:
+    version: 1.2.3
+    appVersion: 1.2.3
   set:
     preciseCodeIntel:
       storageType: pvc
       storageSize: 50Gi
   asserts:
-  - notExists:
+  - equal:
       path: spec.template.spec.volumes[0].ephemeral.volumeClaimTemplate.metadata
+      value:
+        labels:
+          helm.sh/chart: sourcegraph-1.2.3
+          app.kubernetes.io/name: sourcegraph
+          app.kubernetes.io/instance: sourcegraph
+          app.kubernetes.io/version: 1.2.3
+          app.kubernetes.io/managed-by: Helm
+          deploy: sourcegraph
+          app.kubernetes.io/component: precise-code-intel
 
 - it: should ignore storageLabels on the emptyDir branch
   set:
