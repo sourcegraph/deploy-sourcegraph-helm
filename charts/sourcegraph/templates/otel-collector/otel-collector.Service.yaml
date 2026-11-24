@@ -9,7 +9,7 @@ metadata:
     {{- toYaml .Values.openTelemetry.gateway.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    {{- include "sourcegraph.mergedLabels" (list . .Values.openTelemetry.gateway.serviceLabels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "otel-collector")) | nindent 4 }}
+    {{- include "sourcegraph.mergedLabels" (list . (dict "app" "otel-collector") .Values.openTelemetry.gateway.serviceLabels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "otel-collector")) | nindent 4 }}
   name: otel-collector
 spec:
   ports:
