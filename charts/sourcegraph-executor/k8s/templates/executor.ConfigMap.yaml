@@ -18,6 +18,12 @@ data:
 
   EXECUTOR_KUBERNETES_NAMESPACE: "{{ .Values.executor.namespace }}"
   EXECUTOR_KUBERNETES_CONFIG_PATH: "{{ .Values.executor.kubeconfigPath }}"
+  {{- with .Values.executor.kubernetesClient.qps }}
+  EXECUTOR_KUBERNETES_CLIENT_QPS: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.executor.kubernetesClient.burst }}
+  EXECUTOR_KUBERNETES_CLIENT_BURST: {{ . | quote }}
+  {{- end }}
 
   EXECUTOR_KUBERNETES_NODE_NAME: "{{ .Values.executor.kubernetesJob.node.name }}"
   EXECUTOR_KUBERNETES_NODE_SELECTOR: "{{ .Values.executor.kubernetesJob.node.selector }}"
@@ -32,6 +38,12 @@ data:
   EXECUTOR_KUBERNETES_RESOURCE_REQUEST_MEMORY: "{{ .Values.executor.kubernetesJob.resources.requests.memory }}"
   EXECUTOR_KUBERNETES_RESOURCE_LIMIT_CPU: "{{ .Values.executor.kubernetesJob.resources.limits.cpu }}"
   EXECUTOR_KUBERNETES_RESOURCE_LIMIT_MEMORY: "{{ .Values.executor.kubernetesJob.resources.limits.memory }}"
+  {{- with .Values.executor.kubernetesJob.resources.requests.ephemeralStorage }}
+  EXECUTOR_KUBERNETES_RESOURCE_REQUEST_EPHEMERAL_STORAGE: {{ . | quote }}
+  {{- end }}
+  {{- with .Values.executor.kubernetesJob.resources.limits.ephemeralStorage }}
+  EXECUTOR_KUBERNETES_RESOURCE_LIMIT_EPHEMERAL_STORAGE: {{ . | quote }}
+  {{- end }}
 
   KUBERNETES_JOB_DEADLINE: "{{ .Values.executor.kubernetesJob.deadline }}"
   KUBERNETES_RUN_AS_USER: "{{ .Values.executor.kubernetesJob.runAsUser }}"

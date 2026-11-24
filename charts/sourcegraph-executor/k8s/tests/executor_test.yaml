@@ -125,3 +125,57 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should render executor.replicas
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        replicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: should leave Kubernetes client limits and ephemeral storage to the executor's defaults when unset
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_QPS
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_BURST
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_REQUEST_EPHEMERAL_STORAGE
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_LIMIT_EPHEMERAL_STORAGE
+
+  - it: should render Kubernetes client limits and ephemeral storage when set
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesClient:
+          qps: 12.5
+          burst: 25
+        kubernetesJob:
+          resources:
+            requests:
+              ephemeralStorage: 6Gi
+            limits:
+              ephemeralStorage: 8Gi
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_QPS
+          value: "12.5"
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_BURST
+          value: "25"
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_REQUEST_EPHEMERAL_STORAGE
+          value: 6Gi
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_LIMIT_EPHEMERAL_STORAGE
+          value: 8Gi
