@@ -762,6 +762,10 @@ openTelemetry:
     # `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart
     # selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file.
     # `openTelemetry.gateway.args` is still passed as the arguments.
+    # The chart always passes one last argument that makes the collector serve its own metrics on all
+    # interfaces, where Prometheus scrapes them, so a shell wrapper must pass it on: as `"$0" "$@"` when the
+    # script is the first of `openTelemetry.gateway.args` after `command: ["/bin/sh", "-c"]`, or as `"$@"`
+    # when the script is in `command`, followed by a placeholder for `$0`.
     command: []
     # -- Resource requests & limits for the `otel-collector` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)

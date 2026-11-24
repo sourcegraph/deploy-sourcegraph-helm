@@ -323,6 +323,15 @@ tests:
         example.com/project: extra
         example.com/release: sourcegraph
         deploy: sourcegraph
+
+# Prometheus derives the `app` and `job` labels of a Service's metrics from its
+# `app` label, and the "pods available" alert queries `up{app=~".*otel-collector"}`.
+- it: should label the otel-collector Service with its app, like every other scraped Service
+  template: otel-collector/otel-collector.Service.yaml
+  asserts:
+  - equal:
+      path: metadata.labels.app
+      value: otel-collector
 ---
 suite: sourcegraph.labels on the objects that replace others
 release:
