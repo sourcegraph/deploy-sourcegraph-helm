@@ -1,0 +1,58 @@
+# sourcegraph.serviceLabels is documented as labels for all Services. The first
+# test asserts on every Service template, so a new Service that leaves the
+# labels out fails here.
+suite: sourcegraph.serviceLabels on every Service
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- "*/*Service.yaml"
+values:
+- uniqueKeys_everyValue.yaml
+set:
+  sourcegraph:
+    serviceLabels:
+      example.com/exposure: internal
+tests:
+- it: should add the labels to every Service
+  asserts:
+  - isKind:
+      of: Service
+  - equal:
+      path: metadata.labels["example.com/exposure"]
+      value: internal
+---
+suite: sourcegraph.serviceLabels
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+set:
+  sourcegraph:
+    labels:
+      example.com/exposure: unset
+    serviceLabels:
+      example.com/exposure: internal
+  frontend:
+    serviceLabels:
+      example.com/exposure: public
+tests:
+- it: should take precedence over sourcegraph.labels, and a component's serviceLabels over both
+  templates:
+  - frontend/sourcegraph-frontend.Service.yaml
+  - gitserver/gitserver.Service.yaml
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/exposure"]
+      value: public
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - equal:
+      path: metadata.labels["example.com/exposure"]
+      value: internal
+    template: gitserver/gitserver.Service.yaml
+
+- it: should not add the labels to other resources
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/exposure"]
+      value: unset

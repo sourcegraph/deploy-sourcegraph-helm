@@ -1,0 +1,45 @@
+# helm-unittest fails a test when any rendered manifest repeats a key, as
+# Kustomize does.
+suite: unique keys
+tests:
+  - it: should render a key set in several values once
+    set:
+      sourcegraph:
+        labels: &labels
+          example.com/team: platform
+          deploy: from-values
+          helm.sh/chart: from-values
+        podLabels: &podLabels
+          example.com/team: platform
+          deploy: from-values
+          job: from-values
+        podAnnotations: &annotations
+          example.com/owner: platform
+          kubectl.kubernetes.io/default-container: from-values
+      migrator:
+        labels:
+          <<: *labels
+          example.com/team: migrator
+        podLabels:
+          <<: *podLabels
+          example.com/team: migrator
+        podAnnotations:
+          <<: *annotations
+          example.com/owner: migrator
+    template: migrator/sourcegraph-migrator.Job.yaml
+    asserts:
+      - equal:
+          path: metadata.labels["example.com/team"]
+          value: migrator
+      - equal:
+          path: metadata.labels.deploy
+          value: sourcegraph
+      - equal:
+          path: spec.template.metadata.labels["example.com/team"]
+          value: migrator
+      - equal:
+          path: spec.template.metadata.labels.job
+          value: migrator
+      - equal:
+          path: spec.template.metadata.annotations["example.com/owner"]
+          value: migrator

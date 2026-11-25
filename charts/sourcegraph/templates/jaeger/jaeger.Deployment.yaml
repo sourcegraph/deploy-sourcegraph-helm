@@ -6,13 +6,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
-    {{- if .Values.jaeger.labels }}
-      {{- toYaml .Values.jaeger.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: all-in-one
-    app: jaeger
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.jaeger.labels" .)
+      .Values.jaeger.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: all-in-one"
+      "app: jaeger"
+    ) | nindent 4 }}
   name: {{ .Values.jaeger.name }}
 spec:
   replicas: {{ .Values.jaeger.replicaCount }}
@@ -27,30 +27,28 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: jaeger
-        prometheus.io/port: "16686"
-        sourcegraph.prometheus/scrape: "true"
+        {{- $configChecksum := "" }}
         {{- if not .Values.jaeger.config.existingConfigMap }}
-        checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
+        {{- $configChecksum = printf "checksum/jaeger-config: %s" (include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum) }}
         {{- end }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.jaeger.podAnnotations }}
-      {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: jaeger"
+          `prometheus.io/port: "16686"`
+          `sourcegraph.prometheus/scrape: "true"`
+          $configChecksum
+          .Values.sourcegraph.podAnnotations
+          .Values.jaeger.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.jaeger.podLabels }}
-      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
-      {{- end }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
-        app: jaeger
-        deploy: sourcegraph
-        app.kubernetes.io/component: all-in-one
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.jaeger.selectorLabels" .)
+          .Values.sourcegraph.podLabels
+          .Values.jaeger.podLabels
+          (printf "app.kubernetes.io/instance: %s" .Release.Name)
+          "app: jaeger"
+          "deploy: sourcegraph"
+          "app.kubernetes.io/component: all-in-one"
+        ) | nindent 8 }}
     spec:
       {{- with .Values.jaeger.extraInitContainers }}
       initContainers:

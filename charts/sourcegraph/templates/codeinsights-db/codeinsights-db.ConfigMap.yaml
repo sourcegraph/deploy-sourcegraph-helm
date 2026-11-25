@@ -8,8 +8,11 @@ metadata:
   annotations:
     description: Configuration for Code Insights
   labels:
-    app.kubernetes.io/component: codeinsights-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      "app.kubernetes.io/component: codeinsights-db"
+      "deploy: sourcegraph"
+    ) | nindent 4 }}
   name: {{ .Values.codeInsightsDB.name }}-conf
 data:
   postgresql.conf: |

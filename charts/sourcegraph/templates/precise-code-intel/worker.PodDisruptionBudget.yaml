@@ -3,6 +3,10 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ .Values.preciseCodeIntel.name }}
+  {{- with .Values.sourcegraph.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   {{- toYaml .Values.preciseCodeIntel.podDisruptionBudget | nindent 2 }}
   selector:

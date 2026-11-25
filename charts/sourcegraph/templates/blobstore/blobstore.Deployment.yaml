@@ -5,12 +5,12 @@ metadata:
   annotations:
     description: blobstore for storing LSIF uploads.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.blobstore.labels }}
-      {{- toYaml .Values.blobstore.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: blobstore
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.blobstore.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: blobstore"
+    ) | nindent 4 }}
   name: {{ .Values.blobstore.name }}
 spec:
   minReadySeconds: 10
@@ -25,23 +25,19 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: blobstore
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.blobstore.podAnnotations }}
-      {{- toYaml .Values.blobstore.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: blobstore"
+          .Values.sourcegraph.podAnnotations
+          .Values.blobstore.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.blobstore) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.blobstore.podLabels }}
-      {{- toYaml .Values.blobstore.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: blobstore
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.blobstore))
+          .Values.sourcegraph.podLabels
+          .Values.blobstore.podLabels
+          "deploy: sourcegraph"
+          "app: blobstore"
+        ) | nindent 8 }}
     spec:
       {{- with .Values.blobstore.extraInitContainers }}
       initContainers:

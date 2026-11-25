@@ -7,12 +7,14 @@ metadata:
   {{- toYaml .Values.grafana.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
-    app: grafana
-    deploy: sourcegraph
-    app.kubernetes.io/component: grafana
-    {{- if .Values.grafana.serviceLabels }}
-      {{- toYaml .Values.grafana.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
+      "app: grafana"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: grafana"
+      .Values.grafana.serviceLabels
+    ) | nindent 4 }}
   name: grafana
 spec:
   ports:

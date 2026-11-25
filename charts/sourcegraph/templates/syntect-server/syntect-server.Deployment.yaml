@@ -4,12 +4,12 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntectServer.labels }}
-      {{- toYaml .Values.syntectServer.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: syntect-server
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.syntectServer.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: syntect-server"
+    ) | nindent 4 }}
   name: {{ .Values.syntectServer.name }}
 spec:
   minReadySeconds: 10
@@ -27,23 +27,19 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: syntect-server
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podAnnotations }}
-      {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: syntect-server"
+          .Values.sourcegraph.podAnnotations
+          .Values.syntectServer.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podLabels }}
-      {{- toYaml .Values.syntectServer.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: syntect-server
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.syntectServer))
+          .Values.sourcegraph.podLabels
+          .Values.syntectServer.podLabels
+          "deploy: sourcegraph"
+          "app: syntect-server"
+        ) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntectServer") | nindent 6 }}
       {{- with .Values.syntectServer.extraInitContainers }}

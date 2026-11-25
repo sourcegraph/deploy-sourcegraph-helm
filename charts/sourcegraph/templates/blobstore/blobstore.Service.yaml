@@ -7,12 +7,14 @@ metadata:
     {{- toYaml .Values.blobstore.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: blobstore
-    deploy: sourcegraph
-    app.kubernetes.io/component: blobstore
-    {{- if .Values.blobstore.serviceLabels }}
-      {{- toYaml .Values.blobstore.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
+      "app: blobstore"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: blobstore"
+      .Values.blobstore.serviceLabels
+    ) | nindent 4 }}
   name: blobstore
 spec:
   ports:

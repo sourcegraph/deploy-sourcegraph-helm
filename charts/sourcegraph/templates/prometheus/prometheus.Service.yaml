@@ -7,12 +7,14 @@ metadata:
     {{- toYaml .Values.prometheus.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
-    app: prometheus
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
-    {{- if .Values.prometheus.serviceLabels }}
-      {{- toYaml .Values.prometheus.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
+      "app: prometheus"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: prometheus"
+      .Values.prometheus.serviceLabels
+    ) | nindent 4 }}
   name: prometheus
 spec:
   ports:

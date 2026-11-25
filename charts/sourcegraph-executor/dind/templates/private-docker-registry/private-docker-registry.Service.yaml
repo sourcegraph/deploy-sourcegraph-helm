@@ -7,9 +7,12 @@ metadata:
     {{- toYaml .Values.privateDockerRegistry.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
-    app: private-docker-registry
-    deploy: sourcegraph
-    app.kubernetes.io/component: private-docker-registry
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      "app: private-docker-registry"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: private-docker-registry"
+    ) | nindent 4 }}
   name: private-docker-registry
 spec:
   ports:

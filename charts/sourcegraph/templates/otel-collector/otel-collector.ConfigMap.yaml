@@ -7,8 +7,11 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.openTelemetry.gateway.name }}
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: otel-collector
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: otel-collector"
+    ) | nindent 4 }}
 data:
   config.yaml: |
     receivers:

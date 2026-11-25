@@ -14,7 +14,9 @@ sourcegraph:
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # -- Add a global label to all resources
+  # -- Add a global label to every resource the chart creates. The chart does not add it to pod templates
+  # (use `sourcegraph.podLabels`), or to the volume claim template of the `private-docker-registry` StatefulSet,
+  # which Kubernetes does not allow changing
   labels: {}
   # -- Set a custom name for the app.kubernetes.io/name annotation
   nameOverride: ""

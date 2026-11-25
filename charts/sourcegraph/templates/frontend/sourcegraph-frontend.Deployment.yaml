@@ -4,12 +4,12 @@ metadata:
   annotations:
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.frontend.labels }}
-      {{- toYaml .Values.frontend.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: frontend
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.frontend.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: frontend"
+    ) | nindent 4 }}
   name: {{ .Values.frontend.name }}
 spec:
   minReadySeconds: 10
@@ -27,25 +27,21 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: frontend
-        {{- include "sourcegraph.authChecksum" . | nindent 8 }}
-        {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.frontend.podAnnotations }}
-      {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: frontend"
+          (include "sourcegraph.authChecksum" .)
+          (include "sourcegraph.redisChecksum" .)
+          .Values.sourcegraph.podAnnotations
+          .Values.frontend.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.frontend.podLabels }}
-      {{- toYaml .Values.frontend.podLabels | nindent 8 }}
-      {{- end }}
-        app: sourcegraph-frontend
-        deploy: sourcegraph
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.frontend))
+          .Values.sourcegraph.podLabels
+          .Values.frontend.podLabels
+          "app: sourcegraph-frontend"
+          "deploy: sourcegraph"
+        ) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "frontend") | nindent 6 }}
       initContainers:

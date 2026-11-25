@@ -3,8 +3,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: prometheus"
+    ) | nindent 4 }}
   name: {{ .Values.prometheus.name }}
 data:
   prometheus.yml: |

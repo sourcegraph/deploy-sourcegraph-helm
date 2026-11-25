@@ -16,12 +16,12 @@ metadata:
   annotations:
     description: Manages background processes.
   labels:
-    {{- include "sourcegraph.labels" $top | nindent 4 }}
-    {{- if $top.Values.worker.labels }}
-      {{- toYaml $top.Values.worker.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: worker
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" $top)
+      $top.Values.worker.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: worker"
+    ) | nindent 4 }}
   name: {{ $name }}
 spec:
   minReadySeconds: 10
@@ -42,27 +42,25 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: worker
-      {{- include "sourcegraph.redisChecksum" $top | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podAnnotations }}
-      {{- toYaml $top.Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podAnnotations }}
-      {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: worker"
+          (include "sourcegraph.redisChecksum" $top)
+          $top.Values.sourcegraph.podAnnotations
+          $top.Values.worker.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podLabels }}
-      {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podLabels }}
-      {{- toYaml $top.Values.worker.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: worker
+        {{- $replicaLabel := "" }}
         {{- if $suffix }}
-        worker-replica: {{ $name | quote }}
+        {{- $replicaLabel = printf "worker-replica: %s" ($name | quote) }}
         {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list $top $top.Values.worker))
+          $top.Values.sourcegraph.podLabels
+          $top.Values.worker.podLabels
+          "deploy: sourcegraph"
+          "app: worker"
+          $replicaLabel
+        ) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list $top "worker") | nindent 6 }}
       {{- with $top.Values.worker.extraInitContainers }}

@@ -4,12 +4,12 @@ metadata:
   annotations:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.preciseCodeIntel.labels }}
-      {{- toYaml .Values.preciseCodeIntel.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: precise-code-intel
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.preciseCodeIntel.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: precise-code-intel"
+    ) | nindent 4 }}
   name: {{ .Values.preciseCodeIntel.name }}
 spec:
   minReadySeconds: 10
@@ -27,24 +27,20 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: precise-code-intel-worker
-      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.preciseCodeIntel.podAnnotations }}
-      {{- toYaml .Values.preciseCodeIntel.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: precise-code-intel-worker"
+          (include "sourcegraph.redisChecksum" .)
+          .Values.sourcegraph.podAnnotations
+          .Values.preciseCodeIntel.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.preciseCodeIntel.podLabels }}
-      {{- toYaml .Values.preciseCodeIntel.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: precise-code-intel-worker
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel))
+          .Values.sourcegraph.podLabels
+          .Values.preciseCodeIntel.podLabels
+          "deploy: sourcegraph"
+          "app: precise-code-intel-worker"
+        ) | nindent 8 }}
     spec:
       {{- $storageType := .Values.preciseCodeIntel.storageType | default "emptyDir" }}
       {{- if not (has $storageType (list "emptyDir" "pvc")) }}

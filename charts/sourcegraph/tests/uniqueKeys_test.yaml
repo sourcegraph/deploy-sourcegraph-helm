@@ -1,0 +1,115 @@
+# The chart renders each label and annotation key once on an object.
+# helm-unittest fails a test when any rendered manifest repeats a key, as
+# Kustomize does, so every test here checks the whole chart as well as its own
+# assertions.
+suite: unique keys
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render a label set for every component and for one component once, with the component's value
+  set:
+    sourcegraph:
+      labels:
+        example.com/team: platform
+      podLabels:
+        example.com/team: platform
+    frontend:
+      labels:
+        example.com/team: frontend
+      podLabels:
+        example.com/team: frontend
+  templates:
+  - frontend/sourcegraph-frontend.Deployment.yaml
+  - gitserver/gitserver.StatefulSet.yaml
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/team"]
+      value: frontend
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+  - equal:
+      path: spec.template.metadata.labels["example.com/team"]
+      value: frontend
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+  - equal:
+      path: metadata.labels["example.com/team"]
+      value: platform
+    template: gitserver/gitserver.StatefulSet.yaml
+  - equal:
+      path: spec.template.metadata.labels["example.com/team"]
+      value: platform
+    template: gitserver/gitserver.StatefulSet.yaml
+
+- it: should keep the labels the chart sets after the values, as before
+  set:
+    sourcegraph:
+      labels:
+        deploy: from-values
+      podLabels:
+        app: from-values
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.labels.deploy
+      value: sourcegraph
+  - equal:
+      path: spec.template.metadata.labels.app
+      value: sourcegraph-frontend
+
+- it: should keep a value that replaces a label the chart sets before it, as before
+  set:
+    frontend:
+      serviceLabels:
+        app: from-values
+  template: frontend/sourcegraph-frontend.Service.yaml
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        app: from-values
+        deploy: sourcegraph
+        app.kubernetes.io/component: frontend
+
+- it: should render an annotation set for every pod and for one component's pods once, with the component's value
+  set:
+    sourcegraph:
+      podAnnotations:
+        example.com/owner: platform
+        example.com/notes: |
+          Set for every pod.
+          On two lines.
+    frontend:
+      podAnnotations:
+        example.com/owner: frontend
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - equal:
+      path: spec.template.metadata.annotations["example.com/owner"]
+      value: frontend
+  - equal:
+      path: spec.template.metadata.annotations["example.com/notes"]
+      value: |
+        Set for every pod.
+        On two lines.
+
+- it: should keep a value that replaces an annotation the chart sets before it, as before
+  set:
+    frontend:
+      serviceAnnotations:
+        prometheus.io/port: "9999"
+  template: frontend/sourcegraph-frontend.Service.yaml
+  asserts:
+  - equal:
+      path: metadata.annotations
+      value:
+        prometheus.io/port: "9999"
+        sourcegraph.prometheus/scrape: "true"
+
+- it: should render every object when every label and annotation value sets the same keys
+  values:
+  - uniqueKeys_everyValue.yaml
+  template: worker/worker.Deployment.yaml
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/team"]
+      value: platform

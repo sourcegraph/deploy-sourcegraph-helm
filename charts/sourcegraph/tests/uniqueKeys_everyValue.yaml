@@ -1,0 +1,97 @@
+# Every label and annotation value sets the same keys, including keys the chart
+# sets itself, and every optional object is enabled. Used by uniqueKeys_test.yaml.
+sourcegraph:
+  labels: &objectLabels
+    example.com/team: platform
+    deploy: from-values
+    app: from-values
+    app.kubernetes.io/component: from-values
+    app.kubernetes.io/name: from-values
+    helm.sh/chart: from-values
+  podLabels: &podLabels
+    example.com/team: platform
+    deploy: from-values
+    app: from-values
+    app.kubernetes.io/component: from-values
+  serviceLabels: *objectLabels
+  podAnnotations: &annotations
+    example.com/owner: platform
+    kubectl.kubernetes.io/default-container: from-values
+    prometheus.io/port: "9999"
+    sourcegraph.prometheus/scrape: "false"
+
+blobstore: &component
+  labels: *objectLabels
+  podLabels: *podLabels
+  podAnnotations: *annotations
+  serviceLabels: *objectLabels
+  serviceAnnotations: *annotations
+  serviceAccount:
+    create: true
+cadvisor: *component
+codeInsightsDB: *component
+codeIntelDB: *component
+grafana:
+  <<: *component
+  storageLabels: *objectLabels
+nodeExporter: *component
+pgsql: *component
+prometheus: *component
+
+syntectServer: &componentWithBudget
+  <<: *component
+  podDisruptionBudget:
+    minAvailable: 1
+frontend:
+  <<: *componentWithBudget
+  ingress:
+    labels: *objectLabels
+gitserver:
+  <<: *componentWithBudget
+  storageLabels: *objectLabels
+indexedSearch:
+  <<: *componentWithBudget
+  storageLabels: *objectLabels
+searcher:
+  <<: *componentWithBudget
+  storageLabels: *objectLabels
+worker:
+  <<: *componentWithBudget
+  replicas:
+  - jobs: ["codeintel-upload-janitor"]
+  - jobs: ["insights-job"]
+
+redisCache: &redis
+  <<: *componentWithBudget
+  config:
+    enabled: true
+redisStore: *redis
+
+preciseCodeIntel: &codeIntel
+  <<: *componentWithBudget
+  enabled: true
+  storageType: pvc
+  storageSize: 10Gi
+syntacticCodeIntel: *codeIntel
+
+openTelemetry:
+  agent: *component
+  gateway: *component
+
+jaeger:
+  enabled: true
+  labels: *objectLabels
+  podLabels: *podLabels
+  podAnnotations: *annotations
+  collector:
+    serviceLabels: *objectLabels
+    serviceAnnotations: *annotations
+  query:
+    serviceLabels: *objectLabels
+    serviceAnnotations: *annotations
+
+storageClass:
+  create: true
+priorityClasses:
+- name: sourcegraph-high-priority
+  value: 1000

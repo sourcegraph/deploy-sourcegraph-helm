@@ -3,6 +3,10 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: {{ .Values.gitserver.name }}
+  {{- with .Values.sourcegraph.labels }}
+  labels:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   {{- toYaml .Values.gitserver.podDisruptionBudget | nindent 2 }}
   selector:

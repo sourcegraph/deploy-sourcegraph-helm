@@ -136,14 +136,14 @@ metadata:
     description: Runs sourcegraph executors
     kubectl.kubernetes.io/default-container: executor
   labels:
-    {{- include "sourcegraph.labels" $r | nindent 4 }}
-    {{- if $r.Values.executor.labels }}
-      {{- toYaml $r.Values.executor.labels | nindent 4 }}
-    {{- end }}
-    app: {{ .name }}
-    deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: executor
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" $r)
+      $r.Values.executor.labels
+      (printf "app: %s" .name)
+      "deploy: sourcegraph"
+      "sourcegraph-resource-requires: no-cluster-admin"
+      "app.kubernetes.io/component: executor"
+    ) | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -160,26 +160,22 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: executor
-        checksum/docker-config: {{ include "dind.daemonConfig" $r | sha256sum }}
-      {{- if $r.Values.sourcegraph.podAnnotations }}
-      {{- toYaml $r.Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if $r.Values.executor.podAnnotations }}
-      {{- toYaml $r.Values.executor.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: executor"
+          (printf "checksum/docker-config: %s" (include "dind.daemonConfig" $r | sha256sum))
+          $r.Values.sourcegraph.podAnnotations
+          $r.Values.executor.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" $r | nindent 8 }}
-      {{- if $r.Values.sourcegraph.podLabels }}
-      {{- toYaml $r.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $r.Values.executor.podLabels }}
-      {{- toYaml $r.Values.executor.podLabels | nindent 8 }}
-      {{- end }}
-        app: {{ .name }}
-        deploy: sourcegraph
-        sourcegraph-resource-requires: no-cluster-admin
-        app.kubernetes.io/component: executor
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" $r)
+          $r.Values.sourcegraph.podLabels
+          $r.Values.executor.podLabels
+          (printf "app: %s" .name)
+          "deploy: sourcegraph"
+          "sourcegraph-resource-requires: no-cluster-admin"
+          "app.kubernetes.io/component: executor"
+        ) | nindent 8 }}
     spec:
       {{- with $r.Values.executor.podSecurityContext }}
       securityContext:

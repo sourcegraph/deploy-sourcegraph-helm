@@ -4,12 +4,12 @@ metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.gitserver.labels }}
-      {{- toYaml .Values.gitserver.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: gitserver
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.gitserver.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: gitserver"
+    ) | nindent 4 }}
   name: {{ .Values.gitserver.name }}
 spec:
   replicas: {{ .Values.gitserver.replicaCount }}
@@ -22,26 +22,22 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: gitserver
-      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.gitserver.podAnnotations }}
-      {{- toYaml .Values.gitserver.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: gitserver"
+          (include "sourcegraph.redisChecksum" .)
+          .Values.sourcegraph.podAnnotations
+          .Values.gitserver.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.gitserver) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.gitserver.podLabels }}
-      {{- toYaml .Values.gitserver.podLabels | nindent 8 }}
-      {{- end }}
-        app: gitserver
-        group: backend
-        type: gitserver
-        deploy: sourcegraph
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.gitserver))
+          .Values.sourcegraph.podLabels
+          .Values.gitserver.podLabels
+          "app: gitserver"
+          "group: backend"
+          "type: gitserver"
+          "deploy: sourcegraph"
+        ) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "gitserver") | nindent 6 }}
       {{- with .Values.gitserver.extraInitContainers }}

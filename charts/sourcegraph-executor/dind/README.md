@@ -98,7 +98,7 @@ In addition to the documented values, the `executor` and `private-docker-registr
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
-| sourcegraph.labels | object | `{}` | Add a global label to all resources |
+| sourcegraph.labels | object | `{}` | Add a global label to every resource the chart creates. The chart does not add it to pod templates (use `sourcegraph.podLabels`), or to the volume claim template of the `private-docker-registry` StatefulSet, which Kubernetes does not allow changing |
 | sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
 | sourcegraph.nodeSelector | object | `{}` | NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |
 | sourcegraph.podAnnotations | object | `{}` | Add extra annotations to attach to all pods |

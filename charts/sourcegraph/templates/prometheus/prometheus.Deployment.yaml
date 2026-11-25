@@ -5,12 +5,12 @@ metadata:
   annotations:
     description: Collects metrics and aggregates them into graphs.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.prometheus.labels }}
-      {{- toYaml .Values.prometheus.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.prometheus.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: prometheus"
+    ) | nindent 4 }}
   name: {{ .Values.prometheus.name }}
 spec:
   minReadySeconds: 10
@@ -25,23 +25,19 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: prometheus
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.prometheus.podAnnotations }}
-      {{- toYaml .Values.prometheus.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: prometheus"
+          .Values.sourcegraph.podAnnotations
+          .Values.prometheus.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.prometheus) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.prometheus.podLabels }}
-      {{- toYaml .Values.prometheus.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: prometheus
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.prometheus))
+          .Values.sourcegraph.podLabels
+          .Values.prometheus.podLabels
+          "deploy: sourcegraph"
+          "app: prometheus"
+        ) | nindent 8 }}
     spec:
       {{- with .Values.prometheus.extraInitContainers }}
       initContainers:

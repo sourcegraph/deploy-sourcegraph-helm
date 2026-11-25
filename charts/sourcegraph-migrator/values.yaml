@@ -47,12 +47,10 @@ sourcegraph:
 #     # Override the default docker image name
 #     name:
 #
-#   # Add additional labels and annotations to various resources
+#   # Add additional labels and annotations to the Job and its pod
 #   labels: {}
 #   podLabels: {}
 #   podAnnotations: {}
-#   serviceLabels: {}
-#   serviceAnnotations: {}
 #   # Override default service/deployment names
 #   name: ""
 #   # Provide custom environment variables
