@@ -24,6 +24,20 @@ tests:
     asserts:
       - hasDocuments:
           count: 0
+  - it: should render the agent ConfigMap by default
+    template: otel-collector/otel-agent.ConfigMap.yaml
+    asserts:
+      - isKind:
+          of: ConfigMap
+  - it: should not render the agent ConfigMap when kind is Deployment
+    template: otel-collector/otel-agent.ConfigMap.yaml
+    set:
+      openTelemetry:
+        agent:
+          kind: "Deployment"
+    asserts:
+      - hasDocuments:
+          count: 0
   - it: should set OTEL_EXPORTER_OTLP_ENDPOINT to otel-collector when kind is Deployment
     template: searcher/searcher.StatefulSet.yaml
     set:
