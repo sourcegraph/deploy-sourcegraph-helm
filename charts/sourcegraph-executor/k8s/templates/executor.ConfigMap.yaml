@@ -3,7 +3,10 @@ kind: ConfigMap
 metadata:
   name: {{ include "executor.name" . }}
   labels:
-{{- include "executor.labels" . | nindent 4 }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      (include "executor.labels" .)
+    ) | nindent 4 }}
 data:
   EXECUTOR_USE_FIRECRACKER: "false"
   EXECUTOR_FRONTEND_URL: "{{ .Values.executor.frontendUrl }}"

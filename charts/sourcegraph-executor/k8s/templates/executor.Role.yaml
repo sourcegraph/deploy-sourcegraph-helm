@@ -4,10 +4,13 @@ kind: Role
 metadata:
   name: sg-executor-role
   labels:
-    category: rbac
-    deploy: sourcegraph
-    sourcegraph-resource-requires: cluster-admin
-    app.kubernetes.io/component: executor
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      "category: rbac"
+      "deploy: sourcegraph"
+      "sourcegraph-resource-requires: cluster-admin"
+      "app.kubernetes.io/component: executor"
+    ) | nindent 4 }}
 rules:
   - apiGroups:
       - batch
