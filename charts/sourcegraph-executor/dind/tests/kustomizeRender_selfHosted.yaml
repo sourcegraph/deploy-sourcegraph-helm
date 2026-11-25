@@ -1,0 +1,48 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Shaped like common self-hosted deployments: several queues, organization
+# labels, a private registry, and persistent registry storage. All names and
+# endpoints are placeholders.
+
+sourcegraph:
+  image:
+    repository: registry.example.com/sourcegraph
+  imagePullSecrets:
+    - name: registry-credentials
+  labels:
+    example.com/project: sourcegraph
+  podLabels:
+    example.com/project: sourcegraph
+  podAnnotations:
+    metrics.example.com/scrape: "true"
+  nodeSelector:
+    example.com/dedicated: executors
+  tolerations:
+    - key: example.com/dedicated
+      operator: Exists
+      effect: NoSchedule
+
+storageClass:
+  create: true
+  name: sourcegraph-executors
+
+executor:
+  frontendUrl: https://sourcegraph.example.com
+  frontendExistingSecret: executor-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
+  queueNames: [batches, codeintel]
+  labels:
+    example.com/service: executor
+  podLabels:
+    example.com/service: executor
+  env:
+    HTTPS_PROXY:
+      value: http://proxy.example.com:3128
+
+privateDockerRegistry:
+  labels:
+    example.com/service: executor-registry
+  podLabels:
+    example.com/service: executor-registry
+  storageSize: 50Gi

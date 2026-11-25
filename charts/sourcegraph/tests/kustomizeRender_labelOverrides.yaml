@@ -1,0 +1,39 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# The same label and annotation keys at the global and per-component levels,
+# where the per-component value should win. Without deduplication, the chart
+# renders the key twice in one map, which kustomize rejects.
+
+sourcegraph:
+  labels:
+    example.com/team: platform
+  podLabels:
+    example.com/team: platform
+  podAnnotations:
+    metrics.example.com/port: "9090"
+
+frontend:
+  labels:
+    example.com/team: frontend
+  podLabels:
+    example.com/team: frontend
+  podAnnotations:
+    metrics.example.com/port: "6060"
+  serviceLabels:
+    example.com/team: frontend
+
+gitserver:
+  labels:
+    example.com/team: source
+  podLabels:
+    example.com/team: source
+  podAnnotations:
+    metrics.example.com/port: "6060"
+
+indexedSearch:
+  labels:
+    example.com/team: search
+  podLabels:
+    example.com/team: search

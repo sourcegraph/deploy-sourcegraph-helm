@@ -1,0 +1,50 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Shaped like common self-hosted deployments: one queue, organization labels,
+# proxy and CA settings, and non-root job pods. All names and endpoints are
+# placeholders.
+
+sourcegraph:
+  image:
+    repository: registry.example.com/sourcegraph
+  imagePullSecrets:
+    - name: registry-credentials
+  podLabels:
+    example.com/project: sourcegraph
+  podAnnotations:
+    metrics.example.com/scrape: "true"
+
+executor:
+  frontendUrl: https://sourcegraph.example.com
+  frontendPassword: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
+  queueName: batches
+  namespace: sourcegraph-executors
+  labels:
+    example.com/service: executor
+  podLabels:
+    example.com/service: executor
+  podAnnotations:
+    metrics.example.com/port: "6060"
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+    requests:
+      cpu: "1"
+      memory: 1Gi
+  kubernetesJob:
+    runAsUser: "1000"
+    runAsGroup: "1000"
+    fsGroup: "1000"
+  extraEnv:
+    - name: HTTPS_PROXY
+      value: http://proxy.example.com:3128
+    - name: NO_PROXY
+      value: localhost,127.0.0.1,.svc,.cluster.local
+  containerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+  podSecurityContext:
+    runAsNonRoot: true

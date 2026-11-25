@@ -1,0 +1,138 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Sets every value the templates read to a non-default value, to catch
+# templates that break or render invalid manifests when a value is used.
+# kustomizeRender_allValuesAlternate.yaml covers the other side of each
+# either-or choice. All names and endpoints are placeholders.
+
+nameOverride: example-executor
+
+sourcegraph:
+  image:
+    defaultTag: 1.2.3
+    pullPolicy: Always
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  imagePullSecrets:
+    - name: registry-credentials
+  labels:
+    example.com/project: sourcegraph
+  podAnnotations:
+    example.com/pod-annotation: global
+  podLabels:
+    example.com/pod-label: global
+  priorityClassName: example-priority
+  nodeSelector:
+    example.com/dedicated: executors
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: example.com/dedicated
+                operator: In
+                values: [executors]
+  tolerations:
+    - key: example.com/dedicated
+      operator: Exists
+      effect: NoSchedule
+
+storageClass:
+  create: true
+  name: example-storage-class
+  provisioner: pd.csi.storage.gke.io
+  type: pd-ssd
+  parameters:
+    replication-type: regional-pd
+
+executor:
+  priorityClassName: example-executor-priority
+  image:
+    name: example-executor-image
+    tag: 4.5.6
+  frontendUrl: https://sourcegraph.example.com
+  frontendExistingSecret: executor-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
+  log:
+    level: debug
+    format: condensed
+  maximumRuntimePerJob: 1h
+  maximumNumJobs: 4
+  replicaCount: 2
+  resources:
+    limits:
+      cpu: "4"
+      memory: 8Gi
+    requests:
+      cpu: "1"
+      memory: 2Gi
+  env:
+    EXAMPLE_VALUE:
+      value: example
+    EXAMPLE_SECRET:
+      valueFrom:
+        secretKeyRef:
+          name: example-secret
+          key: EXAMPLE_SECRET
+  storage:
+    type: ephemeral
+    size: 100Gi
+    class: example-storage-class
+  podSecurityContext:
+    fsGroup: 101
+    runAsNonRoot: false
+  labels:
+    example.com/service: executor
+  podAnnotations:
+    example.com/pod-annotation-executor: executor
+  podLabels:
+    example.com/pod-label-executor: executor
+
+# One Deployment per queue, each overriding the executor defaults
+queues:
+  - name: batches
+    queueName: batches
+    replicaCount: 3
+    resources:
+      requests:
+        cpu: "2"
+        memory: 4Gi
+    env:
+      EXAMPLE_QUEUE_VALUE:
+        value: batches
+  - name: codeintel
+    queueNames: [codeintel, other]
+
+dind:
+  image:
+    registry: registry.example.com
+    repository: example-docker
+    tag: 1.0.0-dind
+  daemonConfig:
+    mtu: 1400
+    registry-mirrors:
+      - https://mirror.example.com
+  gVisor:
+    enabled: true
+    daemonConfig:
+      storage-driver: overlay2
+
+privateDockerRegistry:
+  enabled: true
+  image:
+    registry: registry.example.com
+    repository: example-registry
+    tag: "3.1"
+  storageSize: 50Gi
+  env:
+    REGISTRY_PROXY_REMOTEURL:
+      value: https://mirror.example.com
+  labels:
+    example.com/service: executor-registry
+  podAnnotations:
+    example.com/pod-annotation-registry: registry
+  podLabels:
+    example.com/pod-label-registry: registry
+  serviceAnnotations:
+    example.com/service-annotation: registry

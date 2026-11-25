@@ -1,0 +1,106 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Sets every value the templates read to a non-default value, to catch
+# templates that break or render invalid manifests when a value is used. All
+# names and endpoints are placeholders.
+
+nameOverride: example-migrator
+
+sourcegraph:
+  image:
+    defaultTag: 1.2.3
+    pullPolicy: Always
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  imagePullSecrets:
+    - name: registry-credentials
+  labels:
+    example.com/project: sourcegraph
+  podAnnotations:
+    example.com/pod-annotation: global
+  podLabels:
+    example.com/pod-label: global
+  priorityClassName: example-priority
+  nodeSelector:
+    example.com/dedicated: sourcegraph
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: example.com/dedicated
+                operator: In
+                values: [sourcegraph]
+  tolerations:
+    - key: example.com/dedicated
+      operator: Equal
+      value: sourcegraph
+      effect: NoSchedule
+
+pgsql:
+  name: example-pgsql
+  auth:
+    existingSecret: pgsql-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
+codeIntelDB:
+  name: example-codeintel-db
+  auth:
+    existingSecret: codeintel-db-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
+codeInsightsDB:
+  name: example-codeinsights-db
+  auth:
+    existingSecret: codeinsights-db-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
+
+migrator:
+  name: example-migrator
+  priorityClassName: example-migrator-priority
+  image:
+    name: example-migrator-image
+    tag: 4.5.6
+  args: [up, -db=frontend]
+  env:
+    EXAMPLE_VALUE:
+      value: example
+    EXAMPLE_SECRET:
+      valueFrom:
+        secretKeyRef:
+          name: example-secret
+          key: EXAMPLE_SECRET
+  labels:
+    example.com/service: migrator
+  podAnnotations:
+    example.com/pod-annotation-migrator: migrator
+  podLabels:
+    example.com/pod-label-migrator: migrator
+  resources:
+    limits:
+      cpu: "1"
+      memory: 200M
+    requests:
+      cpu: 200m
+      memory: 100M
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 101
+  podSecurityContext:
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+  extraVolumes:
+    - name: ca-bundle
+      configMap:
+        name: ca-bundle
+  extraVolumeMounts:
+    - name: ca-bundle
+      mountPath: /etc/ssl/certs/ca-certificates.crt
+      subPath: ca-certificates.crt
+      readOnly: true
+  extraContainers:
+    - name: example-sidecar
+      image: registry.example.com/example-sidecar:1.0.0
