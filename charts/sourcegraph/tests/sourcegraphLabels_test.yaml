@@ -1,0 +1,92 @@
+# sourcegraph.labels is documented as labels for every resource the chart
+# creates. The first test asserts on every template, so a new template that
+# leaves the labels out fails here.
+suite: sourcegraph.labels on every resource
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- "*.yaml"
+- "*/*.yaml"
+excludeTemplates:
+# Rendered as the user wrote them
+- extraResources.yaml
+# Fails to render when enabled, with or without sourcegraph.labels
+- jaeger/jaeger.ServiceAccount.yaml
+# Empty with the values of this suite; the next suite covers them
+- otel-collector/otel-collector.ConfigMap.yaml
+- prometheus/prometheus.RoleBinding.yaml
+values:
+- uniqueKeys_everyValue.yaml
+set:
+  sourcegraph:
+    labels:
+      example.com/cost-center: "1234"
+tests:
+- it: should add the labels to every resource
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/cost-center"]
+      value: "1234"
+
+- it: should not add the labels to pod templates and volume claim templates
+  template: gitserver/gitserver.StatefulSet.yaml
+  asserts:
+  - notExists:
+      path: spec.template.metadata.labels["example.com/cost-center"]
+  - notExists:
+      path: spec.volumeClaimTemplates[0].metadata.labels["example.com/cost-center"]
+---
+suite: sourcegraph.labels
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should add the labels to the resources that replace others
+  set:
+    sourcegraph:
+      labels:
+        example.com/cost-center: "1234"
+    prometheus:
+      privileged: false
+    openTelemetry:
+      gateway:
+        config:
+          traces:
+            exporters:
+              otlp:
+                endpoint: otel.example.com:4317
+  templates:
+  - otel-collector/otel-collector.ConfigMap.yaml
+  - prometheus/prometheus.RoleBinding.yaml
+  asserts:
+  - equal:
+      path: metadata.labels["example.com/cost-center"]
+      value: "1234"
+
+- it: should keep the labels the chart sets
+  set:
+    sourcegraph:
+      labels:
+        example.com/cost-center: "1234"
+        app: from-values
+        deploy: from-values
+  template: frontend/sourcegraph-frontend.Service.yaml
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        example.com/cost-center: "1234"
+        app: sourcegraph-frontend
+        deploy: sourcegraph
+        app.kubernetes.io/component: frontend
+
+- it: should render no labels key on a resource without labels when unset
+  set:
+    gitserver:
+      podDisruptionBudget:
+        minAvailable: 1
+  template: gitserver/gitserver.PodDisruptionBudget.yaml
+  asserts:
+  - notExists:
+      path: metadata.labels

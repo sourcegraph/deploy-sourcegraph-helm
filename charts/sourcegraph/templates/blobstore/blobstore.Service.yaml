@@ -8,6 +8,7 @@ metadata:
     {{- end }}
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
       "app: blobstore"
       "deploy: sourcegraph"
       "app.kubernetes.io/component: blobstore"

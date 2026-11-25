@@ -12,6 +12,7 @@ metadata:
     ) | nindent 4 }}
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
       "app.kubernetes.io/component: node-exporter"
       "app: node-exporter"
       "deploy: sourcegraph"

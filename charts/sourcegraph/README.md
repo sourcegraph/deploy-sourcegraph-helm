@@ -480,7 +480,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.image.repository | string | Sourcegraph's public Docker Hub registry | Global docker image registry or prefix |
 | sourcegraph.image.useGlobalTagAsDefault | bool | `false` | When set to true, sourcegraph.image.defaultTag is used as the default defaultTag for all services, instead of service-specific default defaultTags |
 | sourcegraph.imagePullSecrets | list | `[]` | Mount named secrets containing docker credentials |
-| sourcegraph.labels | object | `{}` | Add extra labels to all resources |
+| sourcegraph.labels | object | `{}` | Add extra labels to every resource the chart creates. The chart does not add them to pod templates (use `sourcegraph.podLabels`), to StatefulSet volume claim templates, which Kubernetes does not allow changing (use `<serviceName>.storageLabels`), or to `extraResources` |
 | sourcegraph.localDevMode | bool | `false` | When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources. |
 | sourcegraph.nameOverride | string | `""` | Set a custom name for the app.kubernetes.io/name annotation |
 | sourcegraph.nodeSelector | object | `{}` | Global NodeSelector, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector) |

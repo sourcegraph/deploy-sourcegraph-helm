@@ -15,7 +15,9 @@ sourcegraph:
     useGlobalTagAsDefault: false
   # -- Mount named secrets containing docker credentials
   imagePullSecrets: []
-  # -- Add extra labels to all resources
+  # -- Add extra labels to every resource the chart creates. The chart does not add them to pod templates
+  # (use `sourcegraph.podLabels`), to StatefulSet volume claim templates, which Kubernetes does not allow changing
+  # (use `<serviceName>.storageLabels`), or to `extraResources`
   labels: {}
   # -- When true, remove all resource stanzas, allowing the scheduler to best-fit pods. Intended for local development with limited resources.
   localDevMode: false

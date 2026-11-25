@@ -9,6 +9,7 @@ metadata:
     ) | nindent 4 }}
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
       "app: searcher"
       "deploy: sourcegraph"
       "app.kubernetes.io/component: searcher"

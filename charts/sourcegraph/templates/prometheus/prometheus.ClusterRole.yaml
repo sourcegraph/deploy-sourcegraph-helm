@@ -3,9 +3,12 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   labels:
-    category: rbac
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
+    {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
+      "category: rbac"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: prometheus"
+    ) | nindent 4 }}
   name: {{ .Values.prometheus.name }}
 rules:
 - apiGroups:

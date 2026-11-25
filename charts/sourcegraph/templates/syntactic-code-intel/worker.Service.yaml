@@ -10,6 +10,7 @@ metadata:
     ) | nindent 4 }}
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
+      .Values.sourcegraph.labels
       "app: syntactic-code-intel-worker"
       "deploy: sourcegraph"
       "app.kubernetes.io/component: syntactic-code-intel"
