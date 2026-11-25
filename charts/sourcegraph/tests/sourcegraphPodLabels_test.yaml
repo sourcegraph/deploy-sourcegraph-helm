@@ -1,0 +1,54 @@
+# sourcegraph.podLabels is documented as labels for all pods. The first test
+# asserts on every workload template, so a new workload that leaves the labels
+# out fails here.
+suite: sourcegraph.podLabels on every pod template
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- "*/*Deployment.yaml"
+- "*/*StatefulSet.yaml"
+- "*/*DaemonSet.yaml"
+excludeTemplates:
+# Reads its ConfigMap template, which this suite does not render; the next suite covers it
+- jaeger/jaeger.Deployment.yaml
+values:
+- uniqueKeys_everyValue.yaml
+set:
+  sourcegraph:
+    podLabels:
+      example.com/mesh: enabled
+tests:
+- it: should add the labels to every pod template
+  asserts:
+  - equal:
+      path: spec.template.metadata.labels["example.com/mesh"]
+      value: enabled
+---
+suite: sourcegraph.podLabels
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+set:
+  sourcegraph:
+    podLabels:
+      example.com/mesh: enabled
+tests:
+- it: should add the labels to the jaeger pod template
+  set:
+    jaeger:
+      enabled: true
+  template: jaeger/jaeger.Deployment.yaml
+  asserts:
+  - equal:
+      path: spec.template.metadata.labels["example.com/mesh"]
+      value: enabled
+
+- it: should add the labels to the helm test pod
+  template: tests/test-connection.yaml
+  asserts:
+  - isKind:
+      of: Pod
+  - equal:
+      path: metadata.labels["example.com/mesh"]
+      value: enabled
