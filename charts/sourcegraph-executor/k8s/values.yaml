@@ -66,7 +66,10 @@ executor:
   queueName: ""
   # -- The names of multiple queues to pull jobs from to. Possible values: batches and codeintel. **Either this or queueName is required.**
   queueNames: [ ]
-  # -- The maximum amount of jobs that can be executed concurrently.
+  # -- Number of executor pods. Each pod dequeues jobs from the same queues and runs up to `maximumNumJobs` of them,
+  # so the most jobs that run at once is `replicas` x `maximumNumJobs`. Each pod has its own Kubernetes API rate limit (`kubernetesClient`).
+  replicas: 1
+  # -- The maximum amount of jobs that each executor pod can execute concurrently.
   maximumNumJobs: 10
   # - The maximum wall time that can be spent on a single job.
   maximumRuntimePerJob: "30m"
@@ -81,6 +84,13 @@ executor:
   namespace: "default"
   # -- The path to the kubeconfig file. If not specified, the in-cluster config is used.
   kubeconfigPath: ""
+  kubernetesClient:
+    # -- (number) The maximum queries per second from each executor pod to the Kubernetes API, shared by all of its jobs. Each job makes about 10 API calls.
+    # @default -- `50`, the executor's default
+    qps:
+    # -- (int) The maximum burst of queries from each executor pod to the Kubernetes API, above `qps`.
+    # @default -- `100`, the executor's default
+    burst:
   # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
   securityContext:
     # -- DEPRECATED: Use `executor.containerSecurityContext` or `executor.podSecurityContext` instead.
@@ -103,34 +113,45 @@ executor:
     runAsGroup:
     # -- The group ID which is set on the job PVC file system.
     fsGroup: "1000"
+    # -- Security context for job pods, as YAML.
+    # When set, it replaces `runAsUser`, `runAsGroup`, and `fsGroup`.
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/)
+    podSecurityContext: {}
+    # -- Security context for job containers, as YAML.
+    # e.g. set `allowPrivilegeEscalation: false`, `capabilities: {drop: [ALL]}`, and `seccompProfile: {type: RuntimeDefault}` for Pod Security Admission `restricted` namespaces.
+    containerSecurityContext: {}
     resources:
       requests:
         # -- The requested CPU for a job.
         cpu: ""
         # -- The requested memory for a job.
         memory: "1Gi"
+        # -- The requested ephemeral storage for a job. With the default `emptyDir` job volume, set this to at least the job volume size (`KUBERNETES_JOB_VOLUME_SIZE`, default `5Gi`), so the scheduler counts the job volume against the node's disk.
+        ephemeralStorage: ""
       limits:
         # -- The maximum CPU for a job.
         cpu: ""
         # -- The maximum memory for a job.
         memory: "12Gi"
+        # -- The maximum ephemeral storage for a job.
+        ephemeralStorage: ""
 
     node:
       # -- The name of the Kubernetes Node to create job pods on. If not specified, the pods are created on the first available node.
       name: ""
       # -- A comma separated list of values to use as a node selector for Kubernetes Jobs. e.g. `foo=bar,app=my-app`
       selector: ""
-      # -- The JSON encoded tolerations for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"Equal\",\"value\":\"bar\",\"effect\":\"NoSchedule\"}]'
+      # -- (list) Tolerations for job pods, as a YAML list. e.g. `[{key: foo, operator: Equal, value: bar, effect: NoSchedule}]`
       tolerations: ""
-      # -- The JSON encoded required affinity match expressions for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- (list) Required node affinity match expressions for job pods, as a YAML list. e.g. `[{key: foo, operator: In, values: [bar]}]`
       requiredAffinityMatchExpressions: ""
-      # -- The JSON encoded required affinity match fields for Kubernetes Jobs. e.g. '[{\"key\":\"foo\",\"operator\":\"In\",\"values\":[\"bar\"]}]'
+      # -- (list) Required node affinity match fields for job pods, as a YAML list. e.g. `[{key: metadata.name, operator: In, values: [node-1]}]`
       requiredAffinityMatchFields: ""
 
     pod:
-      # -- The JSON encoded pod affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- (list) Required pod affinity terms for job pods, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`
       affinity: ""
-      # -- The JSON encoded pod anti-affinity for Kubernetes Jobs. e.g. '[{\"labelSelector\": {\"matchExpressions\": [{\"key\": \"foo\",\"operator\": \"In\",\"values\": [\"bar\"]}]},\"topologyKey\": \"kubernetes.io/hostname\"}]'
+      # -- (list) Required pod anti-affinity terms for job pods, as a YAML list. e.g. `[{labelSelector: {matchExpressions: [{key: foo, operator: In, values: [bar]}]}, topologyKey: kubernetes.io/hostname}]`
       antiAffinity: ""
 
   debug:

@@ -125,3 +125,111 @@ tests:
           path: spec.template.spec.securityContext.runAsUser
       - isNull:
           path: spec.template.spec.securityContext.runAsGroup
+
+  - it: should render executor.replicas
+    template: executor.Deployment.yaml
+    set:
+      executor:
+        queueName: "test"
+        replicas: 3
+    asserts:
+      - equal:
+          path: spec.replicas
+          value: 3
+
+  - it: should leave Kubernetes client limits and ephemeral storage to the executor's defaults when unset
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+    asserts:
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_QPS
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_BURST
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_REQUEST_EPHEMERAL_STORAGE
+      - notExists:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_LIMIT_EPHEMERAL_STORAGE
+
+  - it: should render Kubernetes client limits and ephemeral storage when set
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesClient:
+          qps: 12.5
+          burst: 25
+        kubernetesJob:
+          resources:
+            requests:
+              ephemeralStorage: 6Gi
+            limits:
+              ephemeralStorage: 8Gi
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_QPS
+          value: "12.5"
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_CLIENT_BURST
+          value: "25"
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_REQUEST_EPHEMERAL_STORAGE
+          value: 6Gi
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_RESOURCE_LIMIT_EPHEMERAL_STORAGE
+          value: 8Gi
+
+  - it: should render job scheduling and security contexts given as YAML as JSON
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          podSecurityContext:
+            runAsNonRoot: true
+            fsGroup: 1000
+          containerSecurityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
+          node:
+            tolerations:
+              - key: dedicated
+                operator: Equal
+                value: executor-jobs
+                effect: NoSchedule
+          pod:
+            antiAffinity:
+              - labelSelector:
+                  matchLabels:
+                    app: foo
+                topologyKey: kubernetes.io/hostname
+    asserts:
+      - equal:
+          path: data.KUBERNETES_EXECUTOR_POD_SECURITY_CONTEXT
+          value: '{"fsGroup":1000,"runAsNonRoot":true}'
+      - equal:
+          path: data.KUBERNETES_EXECUTOR_CONTAINER_SECURITY_CONTEXT
+          value: '{"allowPrivilegeEscalation":false,"capabilities":{"drop":["ALL"]}}'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"effect":"NoSchedule","key":"dedicated","operator":"Equal","value":"executor-jobs"}]'
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_POD_ANTI_AFFINITY
+          value: '[{"labelSelector":{"matchLabels":{"app":"foo"}},"topologyKey":"kubernetes.io/hostname"}]'
+
+  - it: should still accept escaped JSON strings for job scheduling values
+    template: executor.ConfigMap.yaml
+    set:
+      executor:
+        queueName: "test"
+        kubernetesJob:
+          node:
+            tolerations: '[{\"key\":\"dedicated\",\"operator\":\"Exists\"}]'
+    asserts:
+      - equal:
+          path: data.EXECUTOR_KUBERNETES_NODE_TOLERATIONS
+          value: '[{"key":"dedicated","operator":"Exists"}]'
+      - notExists:
+          path: data.KUBERNETES_EXECUTOR_POD_SECURITY_CONTEXT

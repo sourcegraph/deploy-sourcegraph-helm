@@ -112,3 +112,15 @@ deploy: sourcegraph
 sourcegraph-resource-requires: no-cluster-admin
 app.kubernetes.io/component: executor
 {{- end}}
+
+{{/*
+Renders a JSON-encoded ConfigMap value. Lists and maps are encoded with toJson.
+Strings are inserted as before, so existing overrides with escaped JSON keep working.
+*/}}
+{{- define "executor.jsonValue" -}}
+{{- if kindIs "string" . -}}
+"{{ . }}"
+{{- else -}}
+{{ toJson . | quote }}
+{{- end -}}
+{{- end }}
