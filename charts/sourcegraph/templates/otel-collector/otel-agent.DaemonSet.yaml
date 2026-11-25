@@ -21,13 +21,11 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: otel-agent
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.agent.podAnnotations }}
-      {{- toYaml .Values.openTelemetry.agent.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: otel-agent"
+          .Values.sourcegraph.podAnnotations
+          .Values.openTelemetry.agent.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.agent))

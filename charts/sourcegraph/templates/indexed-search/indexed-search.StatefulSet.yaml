@@ -23,12 +23,10 @@ spec:
     metadata:
       {{- if or .Values.sourcegraph.podAnnotations .Values.indexedSearch.podAnnotations }}
       annotations:
-        {{- if .Values.sourcegraph.podAnnotations }}
-        {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-        {{- end }}
-        {{- if .Values.indexedSearch.podAnnotations }}
-        {{- toYaml .Values.indexedSearch.podAnnotations | nindent 8 }}
-        {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          .Values.sourcegraph.podAnnotations
+          .Values.indexedSearch.podAnnotations
+        ) | nindent 8 }}
       {{- end }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list

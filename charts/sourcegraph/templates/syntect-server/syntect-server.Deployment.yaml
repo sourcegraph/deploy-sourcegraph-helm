@@ -27,13 +27,11 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: syntect-server
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podAnnotations }}
-      {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: syntect-server"
+          .Values.sourcegraph.podAnnotations
+          .Values.syntectServer.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.syntectServer))

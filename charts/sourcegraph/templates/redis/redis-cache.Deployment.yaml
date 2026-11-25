@@ -28,16 +28,16 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: redis-cache
+        {{- $configChecksum := "" }}
         {{- if and .Values.redisCache.config.enabled (not .Values.redisCache.config.existingConfig) }}
-        checksum/redis-config: {{ include "sourcegraph.redis.conf" (list . "redisCache") | sha256sum }}
+        {{- $configChecksum = printf "checksum/redis-config: %s" (include "sourcegraph.redis.conf" (list . "redisCache") | sha256sum) }}
         {{- end }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.redisCache.podAnnotations }}
-      {{- toYaml .Values.redisCache.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: redis-cache"
+          $configChecksum
+          .Values.sourcegraph.podAnnotations
+          .Values.redisCache.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.redisCache))

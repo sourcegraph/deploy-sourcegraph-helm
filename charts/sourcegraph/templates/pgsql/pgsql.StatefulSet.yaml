@@ -23,14 +23,12 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: pgsql
-        checksum/pgsql.secret: {{ toJson .Values.pgsql.auth | sha256sum }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.pgsql.podAnnotations }}
-      {{- toYaml .Values.pgsql.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: pgsql"
+          (printf "checksum/pgsql.secret: %s" (toJson .Values.pgsql.auth | sha256sum))
+          .Values.sourcegraph.podAnnotations
+          .Values.pgsql.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.pgsql))

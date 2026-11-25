@@ -1,5 +1,5 @@
-# Every label value sets the same keys, including keys the chart sets itself,
-# and every optional object is enabled. Used by uniqueKeys_test.yaml.
+# Every label and annotation value sets the same keys, including keys the chart
+# sets itself, and every optional object is enabled. Used by uniqueKeys_test.yaml.
 sourcegraph:
   labels: &objectLabels
     example.com/team: platform
@@ -13,11 +13,18 @@ sourcegraph:
     deploy: from-values
     app: from-values
     app.kubernetes.io/component: from-values
+  podAnnotations: &annotations
+    example.com/owner: platform
+    kubectl.kubernetes.io/default-container: from-values
+    prometheus.io/port: "9999"
+    sourcegraph.prometheus/scrape: "false"
 
 blobstore: &component
   labels: *objectLabels
   podLabels: *podLabels
+  podAnnotations: *annotations
   serviceLabels: *objectLabels
+  serviceAnnotations: *annotations
   serviceAccount:
     create: true
 cadvisor: *component
@@ -30,10 +37,14 @@ nodeExporter: *component
 pgsql: *component
 prometheus: *component
 
-frontend: &componentWithBudget
+syntectServer: &componentWithBudget
   <<: *component
   podDisruptionBudget:
     minAvailable: 1
+frontend:
+  <<: *componentWithBudget
+  ingress:
+    labels: *objectLabels
 gitserver:
   <<: *componentWithBudget
   storageLabels: *objectLabels
@@ -43,7 +54,6 @@ indexedSearch:
 searcher:
   <<: *componentWithBudget
   storageLabels: *objectLabels
-syntectServer: *componentWithBudget
 worker:
   <<: *componentWithBudget
   replicas:
@@ -71,10 +81,13 @@ jaeger:
   enabled: true
   labels: *objectLabels
   podLabels: *podLabels
+  podAnnotations: *annotations
   collector:
     serviceLabels: *objectLabels
+    serviceAnnotations: *annotations
   query:
     serviceLabels: *objectLabels
+    serviceAnnotations: *annotations
 
 storageClass:
   create: true

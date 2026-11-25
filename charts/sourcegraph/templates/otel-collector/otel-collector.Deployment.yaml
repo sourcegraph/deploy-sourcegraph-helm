@@ -23,13 +23,11 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: otel-collector
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.gateway.podAnnotations }}
-      {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: otel-collector"
+          .Values.sourcegraph.podAnnotations
+          .Values.openTelemetry.gateway.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.gateway))

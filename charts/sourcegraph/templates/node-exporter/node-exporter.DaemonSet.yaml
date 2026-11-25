@@ -22,14 +22,12 @@ spec:
   template:
     metadata:
       annotations:
-        description: Collects and exports machine metrics.
-        kubectl.kubernetes.io/default-container: node-exporter
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.nodeExporter.podAnnotations }}
-      {{- toYaml .Values.nodeExporter.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "description: Collects and exports machine metrics."
+          "kubectl.kubernetes.io/default-container: node-exporter"
+          .Values.sourcegraph.podAnnotations
+          .Values.nodeExporter.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.nodeExporter))

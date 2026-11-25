@@ -2,13 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   annotations:
-    description: Headless service that provides a stable network identity for the
-      gitserver stateful set.
-    prometheus.io/port: "6060"
-    sourcegraph.prometheus/scrape: "true"
-    {{- if .Values.gitserver.serviceAnnotations }}
-    {{- toYaml .Values.gitserver.serviceAnnotations | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "description: Headless service that provides a stable network identity for the\n  gitserver stateful set."
+      `prometheus.io/port: "6060"`
+      `sourcegraph.prometheus/scrape: "true"`
+      .Values.gitserver.serviceAnnotations
+    ) | nindent 4 }}
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       "deploy: sourcegraph"

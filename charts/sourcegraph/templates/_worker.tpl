@@ -42,14 +42,12 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: worker
-      {{- include "sourcegraph.redisChecksum" $top | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podAnnotations }}
-      {{- toYaml $top.Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podAnnotations }}
-      {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: worker"
+          (include "sourcegraph.redisChecksum" $top)
+          $top.Values.sourcegraph.podAnnotations
+          $top.Values.worker.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- $replicaLabel := "" }}
         {{- if $suffix }}

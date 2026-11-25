@@ -22,14 +22,12 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: gitserver
-      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.gitserver.podAnnotations }}
-      {{- toYaml .Values.gitserver.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: gitserver"
+          (include "sourcegraph.redisChecksum" .)
+          .Values.sourcegraph.podAnnotations
+          .Values.gitserver.podAnnotations
+        ) | nindent 8 }}
       labels:
         {{- include "sourcegraph.uniqueKeys" (list
           (include "sourcegraph.selectorLabels" (list . .Values.gitserver))
