@@ -2,6 +2,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  {{- with include "sourcegraph.objectLabels" (list . .Values.redisStore) }}
+  labels:
+    {{- . | nindent 4 }}
+  {{- end }}
   name: {{ .Values.redisStore.name }}
 spec:
   {{- toYaml .Values.redisStore.podDisruptionBudget | nindent 2 }}

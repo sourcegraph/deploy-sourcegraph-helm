@@ -106,6 +106,25 @@ Helm only takes over an existing object that has the
 and `meta.helm.sh/release-namespace` annotations, or when installing with
 `--take-ownership` (Helm 3.17 or later).
 
+### Labels
+
+To carry over labels an existing install has on its other objects, or to add
+your own, set:
+
+| Objects | Values |
+| --- | --- |
+| Workloads, ConfigMaps, Secrets, standalone PersistentVolumeClaims, ServiceAccounts, RBAC objects, PodDisruptionBudgets, and the Ingress of a component | `sourcegraph.labels`, then `<serviceName>.labels` |
+| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels` |
+| Pods | `sourcegraph.podLabels`, then `<serviceName>.podLabels` |
+| Volume claim templates of StatefulSets | `<serviceName>.storageLabels` |
+
+A later value wins, and each key is rendered once. The render fails if they set
+a label the chart sets itself: `app`, `deploy`, `group`, `type`,
+`worker-replica`, `category`, `app.kubernetes.io/component`, or a standard Helm
+label, or if a pod label gives a selector label a different value. Services do not get
+`sourcegraph.labels`, because Prometheus copies a Service's labels onto the
+metrics it scrapes from it.
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.

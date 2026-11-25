@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.preciseCodeIntel.labels }}
-      {{- toYaml .Values.preciseCodeIntel.labels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- with include "sourcegraph.objectLabels" (list . .Values.preciseCodeIntel) }}
+    {{- . | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: precise-code-intel
@@ -37,11 +37,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.preciseCodeIntel.podLabels }}
-      {{- toYaml .Values.preciseCodeIntel.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.podLabels" (list . .Values.preciseCodeIntel) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: precise-code-intel-worker

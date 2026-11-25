@@ -2,6 +2,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  {{- with include "sourcegraph.objectLabels" (list . .Values.syntacticCodeIntel) }}
+  labels:
+    {{- . | nindent 4 }}
+  {{- end }}
   name: {{ .Values.syntacticCodeIntel.name }}
 spec:
   {{- toYaml .Values.syntacticCodeIntel.podDisruptionBudget | nindent 2 }}

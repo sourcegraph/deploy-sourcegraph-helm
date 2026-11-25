@@ -8,6 +8,9 @@ metadata:
   annotations:
     description: Configuration for PostgreSQL
   labels:
+    {{- with include "sourcegraph.objectLabels" (list . .Values.pgsql) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql
   name: {{ .Values.pgsql.name }}-conf

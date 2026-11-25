@@ -4,7 +4,10 @@ apiVersion: storage.k8s.io/v1
 metadata:
   name:  {{ .Values.storageClass.name }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.labels) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph-storage
   {{- if .Values.storageClass.annotations}}
   annotations:

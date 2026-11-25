@@ -3,6 +3,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
+    {{- with include "sourcegraph.objectLabels" (list . .Values.codeInsightsDB) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
   {{- if .Values.codeInsightsDB.storageAnnotations }}

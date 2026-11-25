@@ -8,12 +8,12 @@ metadata:
     {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.frontend) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app: sourcegraph-frontend
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-    {{- if .Values.frontend.serviceLabels }}
-      {{- toYaml .Values.frontend.serviceLabels | nindent 4 }}
-    {{- end }}
   name: sourcegraph-frontend
 spec:
   ports:

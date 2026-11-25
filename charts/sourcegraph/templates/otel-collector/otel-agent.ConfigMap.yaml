@@ -5,6 +5,9 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.openTelemetry.agent.name }}
   labels:
+    {{- with include "sourcegraph.objectLabels" (list . .Values.openTelemetry.agent) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
 data:

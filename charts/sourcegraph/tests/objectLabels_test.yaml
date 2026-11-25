@@ -1,0 +1,89 @@
+suite: object labels
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should add sourcegraph.labels and the component's labels to its other objects
+  templates:
+  - redis/redis-store.PersistentVolumeClaim.yaml
+  - redis/redis-store.ServiceAccount.yaml
+  - redis/redis-store.Secret.yaml
+  set:
+    sourcegraph.labels:
+      example.com/project: sourcegraph
+    redisStore.labels:
+      example.com/service: redis
+    redisStore.serviceAccount.create: true
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        example.com/project: sourcegraph
+        example.com/service: redis
+        deploy: sourcegraph
+
+- it: should add sourcegraph.serviceLabels and serviceLabels to Services, not sourcegraph.labels
+  template: redis/redis-store.Service.yaml
+  set:
+    sourcegraph.labels:
+      example.com/project: sourcegraph
+    sourcegraph.serviceLabels:
+      example.com/mesh: "on"
+    redisStore.serviceLabels:
+      example.com/service: redis
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        app: redis-store
+        app.kubernetes.io/component: redis
+        deploy: sourcegraph
+        example.com/mesh: "on"
+        example.com/service: redis
+
+- it: should render a label set in both sourcegraph.podLabels and the selector labels once
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride:
+      example.com/project: sourcegraph
+    sourcegraph.podLabels:
+      example.com/project: sourcegraph
+    sourcegraph.labels:
+      example.com/project: sourcegraph
+    gitserver.labels:
+      example.com/project: sourcegraph
+  asserts:
+  - isSubset:
+      path: spec.template.metadata.labels
+      content:
+        example.com/project: sourcegraph
+        app: gitserver
+
+- it: should add the labels to a PodDisruptionBudget only when set
+  template: frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
+  set:
+    frontend.podDisruptionBudget:
+      minAvailable: 1
+  asserts:
+  - notExists:
+      path: metadata.labels
+
+- it: should fail when a label value sets a label the chart sets itself
+  template: redis/redis-store.Service.yaml
+  set:
+    redisStore.serviceLabels:
+      app: other
+  asserts:
+  - failedTemplate:
+      errorPattern: must not set the label "app", which the chart sets itself
+
+- it: should fail when a pod label changes a selector label
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride:
+      example.com/project: sourcegraph
+    gitserver.podLabels:
+      example.com/project: other
+  asserts:
+  - failedTemplate:
+      errorPattern: must not change the selector label "example.com/project" from "sourcegraph"

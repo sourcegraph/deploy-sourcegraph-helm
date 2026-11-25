@@ -3,6 +3,9 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   labels:
+    {{- with include "sourcegraph.objectLabels" (list . .Values.prometheus) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     category: rbac
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus

@@ -13,12 +13,12 @@ metadata:
     {{- toYaml .Values.frontend.ingress.annotations | nindent 4 }}
   {{- end }}
   labels:
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.labels .Values.frontend.labels .Values.frontend.ingress.labels) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app: sourcegraph-frontend
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-    {{- if .Values.frontend.ingress.labels}}
-      {{- toYaml .Values.frontend.ingress.labels | nindent 4 }}
-    {{- end }}
   name: {{ .Values.frontend.name }}
 spec:
   {{- if .Values.frontend.ingress.tls }}

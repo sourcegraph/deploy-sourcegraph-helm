@@ -16,6 +16,16 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "sourcegraph.labels" -}}
+{{ include "sourcegraph.helmLabels" . }}
+{{- if .Values.sourcegraph.labels }}
+{{ toYaml .Values.sourcegraph.labels }}
+{{- end }}
+{{- end }}
+
+{{/*
+The standard Helm labels, without sourcegraph.labels.
+*/}}
+{{- define "sourcegraph.helmLabels" -}}
 helm.sh/chart: {{ include "sourcegraph.chart" . }}
 app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
@@ -23,9 +33,68 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.sourcegraph.labels }}
-{{ toYaml .Values.sourcegraph.labels }}
 {{- end }}
+
+{{/*
+The labels a user set in the maps passed, merged in order so a later map wins,
+so each key is rendered once: Kustomize and kubeconform -strict reject a key
+rendered twice. Fails on a key the chart sets itself, which the template
+renders after these labels. Renders nothing when no label is set.
+
+{{ include "sourcegraph.userLabels" (list .Values.sourcegraph.labels .Values.frontend.labels) }}
+*/}}
+{{- define "sourcegraph.userLabels" -}}
+{{- $labels := dict -}}
+{{- range . -}}
+{{- range $key, $value := . -}}
+{{- $_ := set $labels $key $value -}}
+{{- end -}}
+{{- end -}}
+{{- range $key := list "app" "deploy" "group" "type" "worker-replica" "category" "app.kubernetes.io/component" "helm.sh/chart" "app.kubernetes.io/name" "app.kubernetes.io/instance" "app.kubernetes.io/version" "app.kubernetes.io/managed-by" -}}
+{{- if hasKey $labels $key -}}
+{{- fail (printf "sourcegraph.labels, sourcegraph.serviceLabels, sourcegraph.podLabels, and <serviceName>.labels, serviceLabels, and podLabels must not set the label %q, which the chart sets itself" $key) -}}
+{{- end -}}
+{{- end -}}
+{{- with $labels }}{{ toYaml . }}{{ end -}}
+{{- end }}
+
+{{/*
+Labels for a component's objects other than its Services and pods:
+sourcegraph.labels, then <serviceName>.labels.
+
+{{ include "sourcegraph.objectLabels" (list . .Values.frontend) }}
+*/}}
+{{- define "sourcegraph.objectLabels" -}}
+{{- include "sourcegraph.userLabels" (list (index . 0).Values.sourcegraph.labels (index . 1).labels) -}}
+{{- end }}
+
+{{/*
+Labels for a component's Services: sourcegraph.serviceLabels, then
+<serviceName>.serviceLabels.
+
+{{ include "sourcegraph.serviceLabels" (list . .Values.frontend) }}
+*/}}
+{{- define "sourcegraph.serviceLabels" -}}
+{{- include "sourcegraph.userLabels" (list (index . 0).Values.sourcegraph.serviceLabels (index . 1).serviceLabels) -}}
+{{- end }}
+
+{{/*
+Labels for a component's pods: sourcegraph.podLabels, then
+<serviceName>.podLabels, without the selector labels, which the template
+renders before them. Fails on a pod label that would change a selector label,
+so the workload's selector would no longer match its pods.
+
+{{ include "sourcegraph.podLabels" (list . .Values.frontend) }}
+*/}}
+{{- define "sourcegraph.podLabels" -}}
+{{- $labels := include "sourcegraph.userLabels" (list (index . 0).Values.sourcegraph.podLabels (index . 1).podLabels) | fromYaml -}}
+{{- range $key, $value := include "sourcegraph.selectorLabels" . | fromYaml -}}
+{{- if and (hasKey $labels $key) (ne (toString (get $labels $key)) (toString $value)) -}}
+{{- fail (printf "sourcegraph.podLabels and <serviceName>.podLabels must not change the selector label %q from %q" $key (toString $value)) -}}
+{{- end -}}
+{{- $_ := unset $labels $key -}}
+{{- end -}}
+{{- with $labels }}{{ toYaml . }}{{ end -}}
 {{- end }}
 
 {{/*
@@ -194,9 +263,6 @@ helm.sh/chart: {{ include "sourcegraph.chart" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.sourcegraph.labels }}
-{{ toYaml .Values.sourcegraph.labels }}
-{{- end }}
 {{- end }}
 
 {{/*

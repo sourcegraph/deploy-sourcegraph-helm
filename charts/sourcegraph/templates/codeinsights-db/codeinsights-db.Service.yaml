@@ -9,12 +9,12 @@ metadata:
     {{- toYaml .Values.codeInsightsDB.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.codeInsightsDB) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app.kubernetes.io/component: codeinsights-db
     app: codeinsights-db
     deploy: sourcegraph
-    {{- if .Values.codeInsightsDB.serviceLabels }}
-      {{- toYaml .Values.codeInsightsDB.serviceLabels | nindent 4 }}
-    {{- end }}
   name: codeinsights-db
 spec:
   ports:

@@ -5,9 +5,9 @@ metadata:
   annotations:
     description: Collects metrics and aggregates them into graphs.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.prometheus.labels }}
-      {{- toYaml .Values.prometheus.labels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- with include "sourcegraph.objectLabels" (list . .Values.prometheus) }}
+    {{- . | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: prometheus
@@ -34,11 +34,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.prometheus) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.prometheus.podLabels }}
-      {{- toYaml .Values.prometheus.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.podLabels" (list . .Values.prometheus) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: prometheus

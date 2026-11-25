@@ -4,9 +4,9 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntectServer.labels }}
-      {{- toYaml .Values.syntectServer.labels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- with include "sourcegraph.objectLabels" (list . .Values.syntectServer) }}
+    {{- . | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: syntect-server
@@ -36,11 +36,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podLabels }}
-      {{- toYaml .Values.syntectServer.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.podLabels" (list . .Values.syntectServer) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: syntect-server

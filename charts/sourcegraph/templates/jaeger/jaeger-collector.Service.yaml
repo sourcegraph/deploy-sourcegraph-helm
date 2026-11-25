@@ -7,13 +7,13 @@ metadata:
   {{- toYaml .Values.jaeger.collector.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.jaeger.collector) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger
     app.kubernetes.io/name: jaeger
-    {{- if .Values.jaeger.collector.serviceLabels }}
-      {{- toYaml .Values.jaeger.collector.serviceLabels | nindent 4 }}
-    {{- end }}
   name: {{ default "jaeger-collector" .Values.jaeger.collector.name }}
 spec:
   ports:

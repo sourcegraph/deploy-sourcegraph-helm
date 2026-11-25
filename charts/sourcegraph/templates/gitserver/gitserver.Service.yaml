@@ -10,13 +10,13 @@ metadata:
     {{- toYaml .Values.gitserver.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.gitserver) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: gitserver
     type: gitserver
     app: gitserver
-    {{- if .Values.gitserver.serviceLabels }}
-      {{- toYaml .Values.gitserver.serviceLabels | nindent 4 }}
-    {{- end }}
   name: gitserver
 spec:
   clusterIP: None
