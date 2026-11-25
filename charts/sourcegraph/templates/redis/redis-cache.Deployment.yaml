@@ -8,10 +8,7 @@ metadata:
   annotations:
     description: Redis for storing short-lived caches.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.redisCache.labels }}
-      {{- toYaml .Values.redisCache.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.redisCache.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: redis
   name: {{ .Values.redisCache.name }}
@@ -32,20 +29,10 @@ spec:
         {{- if and .Values.redisCache.config.enabled (not .Values.redisCache.config.existingConfig) }}
         checksum/redis-config: {{ include "sourcegraph.redis.conf" (list . "redisCache") | sha256sum }}
         {{- end }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.redisCache.podAnnotations }}
-      {{- toYaml .Values.redisCache.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.redisCache.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.redisCache) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.redisCache.podLabels }}
-      {{- toYaml .Values.redisCache.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.redisCache.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: redis-cache
     spec:

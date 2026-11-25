@@ -6,10 +6,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
-    {{- if .Values.jaeger.labels }}
-      {{- toYaml .Values.jaeger.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.jaeger.labels" . | fromYaml) .Values.jaeger.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger
@@ -33,20 +30,10 @@ spec:
         {{- if not .Values.jaeger.config.existingConfigMap }}
         checksum/jaeger-config: {{ include (print $.Template.BasePath "/jaeger/jaeger.ConfigMap.yaml") . | sha256sum }}
         {{- end }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.jaeger.podAnnotations }}
-      {{- toYaml .Values.jaeger.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.jaeger.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.jaeger.podLabels }}
-      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.jaeger.podLabels) | nindent 8 }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app: jaeger
         deploy: sourcegraph

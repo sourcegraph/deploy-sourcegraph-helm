@@ -9,10 +9,7 @@ metadata:
     {{- toYaml .Values.openTelemetry.gateway.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.openTelemetry.gateway.serviceLabels }}
-      {{- toYaml .Values.openTelemetry.gateway.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.openTelemetry.gateway.serviceLabels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
   name: otel-collector

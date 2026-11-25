@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+- Fixed a label or pod annotation key set both in `sourcegraph.labels`, `sourcegraph.podLabels`, or `sourcegraph.podAnnotations` and in the `executor` or `privateDockerRegistry` equivalent being rendered twice in one map. Helm used the last one, but kustomize rejected the manifest. Each key is now rendered once, with the component's value, so Helm releases render the same objects as before.
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.

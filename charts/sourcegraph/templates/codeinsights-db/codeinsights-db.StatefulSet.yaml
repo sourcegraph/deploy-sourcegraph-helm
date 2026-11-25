@@ -5,10 +5,7 @@ metadata:
   annotations:
     description: Code Insights Postgresql instance.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeInsightsDB.labels }}
-      {{- toYaml .Values.codeInsightsDB.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.codeInsightsDB.labels) | nindent 4 }}
     app.kubernetes.io/component: codeinsights-db
     deploy: sourcegraph
   name: {{ .Values.codeInsightsDB.name }}
@@ -25,20 +22,10 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: codeinsights
         checksum/codeinsights-db.secret: {{ toJson .Values.codeInsightsDB.auth | sha256sum }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeInsightsDB.podAnnotations }}
-      {{- toYaml .Values.codeInsightsDB.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.codeInsightsDB.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.codeInsightsDB) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeInsightsDB.podLabels }}
-      {{- toYaml .Values.codeInsightsDB.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.codeInsightsDB.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: codeinsights-db
         group: backend

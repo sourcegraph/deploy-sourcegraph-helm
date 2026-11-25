@@ -5,10 +5,7 @@ metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.grafana.labels }}
-      {{- toYaml .Values.grafana.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.grafana.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
   name: {{ .Values.grafana.name }}
@@ -28,20 +25,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: grafana
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.grafana.podAnnotations }}
-      {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.grafana.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.grafana) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.grafana.podLabels }}
-      {{- toYaml .Values.grafana.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.grafana.podLabels) | nindent 8 }}
         app: grafana
         deploy: sourcegraph
     spec:

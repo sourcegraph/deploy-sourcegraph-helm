@@ -30,20 +30,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: executor
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.executor.podAnnotations }}
-      {{- toYaml .Values.executor.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.executor.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.executor.podLabels }}
-      {{- toYaml .Values.executor.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.executor.podLabels) | nindent 8 }}
         {{- include "executor.labels" . | nindent 8 }}
     spec:
       securityContext:

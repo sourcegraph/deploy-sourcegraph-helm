@@ -8,10 +8,7 @@ metadata:
   annotations:
     description: Redis for storing semi-persistent data like user sessions.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.redisStore.labels }}
-      {{- toYaml .Values.redisStore.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.redisStore.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: redis
   name: {{ .Values.redisStore.name }}
@@ -32,20 +29,10 @@ spec:
         {{- if and .Values.redisStore.config.enabled (not .Values.redisStore.config.existingConfig) }}
         checksum/redis-config: {{ include "sourcegraph.redis.conf" (list . "redisStore") | sha256sum }}
         {{- end }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.redisStore.podAnnotations }}
-      {{- toYaml .Values.redisStore.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.redisStore.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.redisStore) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.redisStore.podLabels }}
-      {{- toYaml .Values.redisStore.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.redisStore.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: redis-store
     spec:

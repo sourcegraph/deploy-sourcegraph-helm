@@ -28,6 +28,26 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Merges a list of maps, such as the labels or annotations set globally and per
+component, so each key is rendered once. A later map wins when a key is set in
+more than one. Kustomize rejects a key rendered twice in one map. Renders
+nothing when every map is empty.
+
+{{ include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.frontend.podLabels) }}
+*/}}
+{{- define "sourcegraph.mergedMaps" -}}
+{{- $merged := dict -}}
+{{- range . -}}
+{{- range $key, $value := . -}}
+{{- $_ := set $merged $key $value -}}
+{{- end -}}
+{{- end -}}
+{{- with $merged -}}
+{{- toYaml . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "sourcegraph.selectorLabels" -}}
@@ -136,10 +156,7 @@ metadata:
     description: Runs sourcegraph executors
     kubectl.kubernetes.io/default-container: executor
   labels:
-    {{- include "sourcegraph.labels" $r | nindent 4 }}
-    {{- if $r.Values.executor.labels }}
-      {{- toYaml $r.Values.executor.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" $r | fromYaml) $r.Values.executor.labels) | nindent 4 }}
     app: {{ .name }}
     deploy: sourcegraph
     sourcegraph-resource-requires: no-cluster-admin
@@ -162,20 +179,10 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: executor
         checksum/docker-config: {{ include "dind.daemonConfig" $r | sha256sum }}
-      {{- if $r.Values.sourcegraph.podAnnotations }}
-      {{- toYaml $r.Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if $r.Values.executor.podAnnotations }}
-      {{- toYaml $r.Values.executor.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list $r.Values.sourcegraph.podAnnotations $r.Values.executor.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" $r | nindent 8 }}
-      {{- if $r.Values.sourcegraph.podLabels }}
-      {{- toYaml $r.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $r.Values.executor.podLabels }}
-      {{- toYaml $r.Values.executor.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list $r.Values.sourcegraph.podLabels $r.Values.executor.podLabels) | nindent 8 }}
         app: {{ .name }}
         deploy: sourcegraph
         sourcegraph-resource-requires: no-cluster-admin

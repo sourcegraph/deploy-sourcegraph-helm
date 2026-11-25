@@ -5,10 +5,7 @@ metadata:
   annotations:
     description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.openTelemetry.agent.labels }}
-      {{- toYaml .Values.openTelemetry.agent.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.openTelemetry.agent.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
   name: {{ .Values.openTelemetry.agent.name }}
@@ -22,20 +19,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: otel-agent
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.agent.podAnnotations }}
-      {{- toYaml .Values.openTelemetry.agent.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.openTelemetry.agent.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.agent) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.agent.podLabels }}
-      {{- toYaml .Values.openTelemetry.agent.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.openTelemetry.agent.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: otel-agent
     spec:
