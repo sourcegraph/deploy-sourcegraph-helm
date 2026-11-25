@@ -236,6 +236,8 @@ spec:
               value: "false"
             - name: EXECUTOR_USE_KUBERNETES
               value: "false"
+            - name: EXECUTOR_DEPLOY_TYPE
+              value: helm-dind
             - name: EXECUTOR_HEALTH_SERVER_ADDR
               value: ":8080"
             - name: EXECUTOR_JOB_NUM_CPUS

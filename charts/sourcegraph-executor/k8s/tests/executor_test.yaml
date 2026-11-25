@@ -24,6 +24,10 @@ tests:
           apiVersion: v1
           name: executor-test
         template: executor.ConfigMap.yaml
+      - equal:
+          path: data.EXECUTOR_DEPLOY_TYPE
+          value: helm-k8s
+        template: executor.ConfigMap.yaml
 
   - it: should render default containerSecurityContext with privileged false
     template: executor.Deployment.yaml

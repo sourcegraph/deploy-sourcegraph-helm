@@ -24,6 +24,12 @@ tests:
             name: EXECUTOR_QUEUE_NAME
             value: batches
         template: executor/executor.Deployment.yaml
+      - contains:
+          path: spec.template.spec.containers[0].env
+          content:
+            name: EXECUTOR_DEPLOY_TYPE
+            value: helm-dind
+        template: executor/executor.Deployment.yaml
 
   - it: should render one Deployment per entry in queues
     template: executor/executor.Deployment.yaml

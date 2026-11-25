@@ -6,6 +6,7 @@ metadata:
 {{- include "executor.labels" . | nindent 4 }}
 data:
   EXECUTOR_USE_FIRECRACKER: "false"
+  EXECUTOR_DEPLOY_TYPE: "helm-k8s"
   EXECUTOR_FRONTEND_URL: "{{ .Values.executor.frontendUrl }}"
   EXECUTOR_MAXIMUM_NUM_JOBS: "{{ .Values.executor.maximumNumJobs }}"
   EXECUTOR_MAXIMUM_RUNTIME_PER_JOB: "{{ .Values.executor.maximumRuntimePerJob }}"
