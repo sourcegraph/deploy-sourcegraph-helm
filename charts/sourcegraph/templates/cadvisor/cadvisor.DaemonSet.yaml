@@ -16,7 +16,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.cadvisor) | nindent 6 }}
       app: cadvisor
   template:
     metadata:
@@ -32,7 +32,7 @@ spec:
       {{- toYaml .Values.cadvisor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.cadvisor) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -43,6 +43,10 @@ spec:
         app: cadvisor
     spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "cadvisor") | trim | nindent 6 }}
+      {{- with .Values.cadvisor.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: cadvisor
         image: {{ include "sourcegraph.image" (list . "cadvisor" ) }}

@@ -21,6 +21,9 @@ spec:
     port: 16686
     protocol: TCP
     targetPort: http
+  {{- with .Values.jaeger.query.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
     {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/instance: {{ .Release.Name }}

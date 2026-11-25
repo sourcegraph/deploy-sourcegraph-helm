@@ -10,21 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
         with:
           fetch-depth: 0
 
       - name: Set up Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@5119fcb9089d432beecbf79bb2c7915207344b78 # v3
         with:
           version: v3.9.1
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version: '3.13'
-      - uses: azure/setup-kubectl@v2.0
+      - uses: azure/setup-kubectl@7ad2aa66bb42774adf65a0c580fbc96b2dadd747 # v2.0
         id: install
       - name: Set up chart-testing
-        uses: helm/chart-testing-action@v2.2.1
+        uses: helm/chart-testing-action@dae259e86a35ff09145c0805e2d7dd3f7207064a # v2.2.1
 
       - name: Run chart-testing (list-changed)
         id: list-changed
@@ -39,7 +39,7 @@ jobs:
           echo $changed | xargs helm lint
         if: steps.list-changed.outputs.changed == 'true'
       - name: Create kind cluster
-        uses: helm/kind-action@v1.3.0
+        uses: helm/kind-action@d08cf6ff1575077dee99962540d77ce91c62387d # v1.3.0
         if: steps.list-changed.outputs.changed == 'true'
       - name: Install Helm charts
         run: helm install --debug -f ./ci/override.yaml test-sg ./charts/sourcegraph/

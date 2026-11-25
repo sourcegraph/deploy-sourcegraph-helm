@@ -17,7 +17,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 6 }}
       app: sourcegraph-frontend
   strategy:
     rollingUpdate:
@@ -37,7 +37,7 @@ spec:
       {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -49,12 +49,15 @@ spec:
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "frontend") | nindent 6 }}
       initContainers:
+      {{- with .Values.frontend.extraInitContainers }}
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       {{- if .Values.migrator.enabled }}
       - name: migrator
         image: {{ include "sourcegraph.image" (list . "migrator") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        {{- if .Values.migrator.command }}
-        command: {{ .Values.migrator.command }}
+        {{- with .Values.migrator.command }}
+        command: {{- if kindIs "string" . }} {{ . }}{{ else }}{{ toYaml . | nindent 8 }}{{ end }}
         {{- end }}
         args: {{- default (list "up") .Values.migrator.args | toYaml | nindent 8 }}
         env:
@@ -82,8 +85,8 @@ spec:
       - name: frontend
         image: {{ include "sourcegraph.image" (list . "frontend") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        {{- if .Values.frontend.command }}
-        command: {{ .Values.frontend.command }}
+        {{- with .Values.frontend.command }}
+        command: {{- if kindIs "string" . }} {{ . }}{{ else }}{{ toYaml . | nindent 8 }}{{ end }}
         {{- end }}
         args: {{- default (list "serve") .Values.frontend.args | toYaml | nindent 8 }}
         env:
@@ -99,12 +102,6 @@ spec:
         {{- end }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
-        {{- if .Values.blobstore.enabled }}
-        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
-          value: blobstore
-        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
-          value: http://blobstore:9000
-        {{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

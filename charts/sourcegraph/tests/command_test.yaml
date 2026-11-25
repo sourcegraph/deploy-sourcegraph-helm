@@ -1,0 +1,72 @@
+suite: command
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should render no command for frontend and migrator by default
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  asserts:
+  - notExists:
+      path: spec.template.spec.containers[0].command
+  - notExists:
+      path: spec.template.spec.initContainers[0].command
+
+- it: should render each item of a frontend command list as its own element
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend.command:
+    - sh
+    - -c
+    - |
+      export PGPASSWORD=$(cat /secrets/password);
+      /frontend serve
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].command
+      value:
+      - sh
+      - -c
+      - |
+        export PGPASSWORD=$(cat /secrets/password);
+        /frontend serve
+  - notExists:
+      path: spec.template.spec.initContainers[0].command
+
+- it: should render each item of a migrator command list as its own element
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    migrator.command: ["sh", "-c", "/migrator up"]
+  asserts:
+  - equal:
+      path: spec.template.spec.initContainers[0].command
+      value: ["sh", "-c", "/migrator up"]
+  - notExists:
+      path: spec.template.spec.containers[0].command
+
+- it: should still accept a command given as a string holding a YAML list
+  template: frontend/sourcegraph-frontend.Deployment.yaml
+  set:
+    frontend.command: '["sh", "-c", "/frontend serve"]'
+    migrator.command: '["sh", "-c", "/migrator up"]'
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].command
+      value: ["sh", "-c", "/frontend serve"]
+  - equal:
+      path: spec.template.spec.initContainers[0].command
+      value: ["sh", "-c", "/migrator up"]
+
+- it: should replace the otel-collector command, and keep args, when gateway.command is set
+  template: otel-collector/otel-collector.Deployment.yaml
+  set:
+    openTelemetry.gateway.command: ["/bin/sh", "-c"]
+    openTelemetry.gateway.args:
+    - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml
+  asserts:
+  - equal:
+      path: spec.template.spec.containers[0].command
+      value: ["/bin/sh", "-c"]
+  - equal:
+      path: spec.template.spec.containers[0].args
+      value:
+      - API_KEY=$(cat /secrets/api-key) /bin/otelcol-sourcegraph --config=/etc/otel-collector/config.yaml

@@ -13,7 +13,7 @@ spec:
   {{- toYaml $top.Values.worker.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 6 }}
       app: worker
       {{- if $suffix }}
       worker-replica: {{ $name | quote }}

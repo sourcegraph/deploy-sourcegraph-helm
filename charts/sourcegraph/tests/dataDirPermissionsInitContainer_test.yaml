@@ -1,0 +1,38 @@
+suite: dataDirPermissionsInitContainer
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should run the pgsql init container on the pgsql image
+  template: pgsql/pgsql.StatefulSet.yaml
+  set:
+    pgsql:
+      image:
+        name: custom-postgres
+        defaultTag: test
+  asserts:
+    - equal:
+        path: spec.template.spec.initContainers[?(@.name == "correct-data-dir-permissions")].image
+        value: index.docker.io/sourcegraph/custom-postgres:test
+- it: should run the codeintel-db init container on the codeintel-db image
+  template: codeintel-db/codeintel-db.StatefulSet.yaml
+  set:
+    codeIntelDB:
+      image:
+        name: custom-postgres
+        defaultTag: test
+  asserts:
+    - equal:
+        path: spec.template.spec.initContainers[?(@.name == "correct-data-dir-permissions")].image
+        value: index.docker.io/sourcegraph/custom-postgres:test
+- it: should run the codeinsights-db init container on the codeinsights-db image
+  template: codeinsights-db/codeinsights-db.StatefulSet.yaml
+  set:
+    codeInsightsDB:
+      image:
+        name: custom-postgres
+        defaultTag: test
+  asserts:
+    - equal:
+        path: spec.template.spec.initContainers[?(@.name == "correct-data-dir-permissions")].image
+        value: index.docker.io/sourcegraph/custom-postgres:test

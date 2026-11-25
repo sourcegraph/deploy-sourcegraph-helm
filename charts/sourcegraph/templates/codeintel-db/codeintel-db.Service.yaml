@@ -24,8 +24,11 @@ spec:
   - name: pgsql
     port: 5432
     targetPort: pgsql
+  {{- with .Values.codeIntelDB.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
   selector:
-    {{- include "sourcegraph.selectorLabels" . | nindent 4 }}
+    {{- include "sourcegraph.selectorLabels" (list . .Values.codeIntelDB) | nindent 4 }}
     app: codeintel-db
   type: {{ .Values.codeIntelDB.serviceType | default "ClusterIP" }}
 {{- end }}

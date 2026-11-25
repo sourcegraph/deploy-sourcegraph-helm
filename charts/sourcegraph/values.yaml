@@ -47,6 +47,12 @@ sourcegraph:
   terminationGracePeriodSeconds: 30
   # -- Add extra labels to all services
   serviceLabels: {}
+  # -- Labels that replace `app.kubernetes.io/name` and `app.kubernetes.io/instance` in every component's
+  # workload selector, pod labels, and Service and PodDisruptionBudget selectors.
+  # Only for adopting workloads created outside this chart, whose selectors Kubernetes does not allow changing:
+  # set it on the first install and never change it afterwards. Use `<serviceName>.extraSelectorLabels`
+  # for labels that differ per component. See [Adopting existing workloads](#adopting-existing-workloads)
+  selectorLabelsOverride: {}
   # -- Disable the creation of Kubernetes secrets objects
   disableKubernetesSecrets: false
 
@@ -85,6 +91,13 @@ sourcegraph:
 #   extraVolumes: {}
 #   # Add sidecars
 #   extraContainers: {}
+#   # Add init containers, which run before any init containers the chart defines
+#   extraInitContainers: []
+#   # Add ports to the component's primary Service
+#   extraServicePorts: []
+#   # Add labels to the component's workload selector, pod labels, and Service and PodDisruptionBudget selectors,
+#   # to adopt a workload created outside this chart. Never change it on an installed release
+#   extraSelectorLabels: {}
 #   # Toggle serviceAccount creation
 #   serviceAccount.create: true
 #   # Customize service account name
@@ -100,22 +113,16 @@ sourcegraph:
 #   # Toggle deployment of applications on/off. Applies to databases and third-party applications
 #   enabled: true
 
+# Used by the `correct-data-dir-permissions` initContainer of `pgsql` and `codeintel-db`, which runs the database's own image
 alpine:
-  # Used in init containers
-  image:
-    # -- Docker image tag for the `alpine` image
-    # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:1e113d9625cee4d32b995bb199ca7d6b6f5db1907404acc8ce9b272d39714963
-    # -- Docker image name for the `alpine` image
-    name: "alpine-3.14"
-  # -- Security context for the `alpine` initContainer,
+  # -- Security context for the `correct-data-dir-permissions` initContainer of `pgsql` and `codeintel-db`,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
     allowPrivilegeEscalation: false
     runAsUser: 999
     runAsGroup: 999
     readOnlyRootFilesystem: true
-  # -- Resource requests & limits for the `alpine` initContainer,
+  # -- Resource requests & limits for the `correct-data-dir-permissions` initContainer of `pgsql`, `codeintel-db`, and `codeinsights-db`,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
   resources:
     limits:
@@ -131,7 +138,7 @@ cadvisor:
   image:
     # -- Docker image tag for the `cadvisor` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:a3fb6767d9640fe79af99540bd826fe631913696f9ade91ff750a34268b24921
+    defaultTag: 8.2.1283@sha256:cb99124ee10d19985d21bdc1c12d83fa6c6faa140ba25b9768bf7679a12005bd
     # -- Docker image name for the `cadvisor` image
     name: "cadvisor"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -194,7 +201,7 @@ codeInsightsDB:
   image:
     # -- Docker image tag for the `codeinsights-db` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:b7e2df5a6a63e323987eeaca23fe9f05278d4c97f96f1994b89dac3c60dedcd3
+    defaultTag: 8.2.1283@sha256:da1ec1107c50c6a7cd60c4ee03e97d3be5507b39a93e4487566358600c26bd7e
     # -- Docker image name for the `codeinsights-db` image
     name: "postgresql-16-codeinsights"
   # -- Security context for the `codeinsights-db` container,
@@ -205,7 +212,7 @@ codeInsightsDB:
     runAsGroup: 70
     readOnlyRootFilesystem: true
   init:
-    # -- Security context for the `alpine` initContainer,
+    # -- Security context for the `correct-data-dir-permissions` initContainer,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
     containerSecurityContext:
       allowPrivilegeEscalation: false
@@ -272,7 +279,7 @@ codeIntelDB:
   image:
     # -- Docker image tag for the `codeintel-db` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:cc810cd21f1df7776aa270f49bdd50a4ec3375623ffae1f0238c20dec054bf03
+    defaultTag: 8.2.1283@sha256:16f1cef9d269e744e6c3a6079934eef3ad0405a0fc5790e2859550093834bce5
     # -- Docker image name for the `codeintel-db` image
     name: "postgresql-16"
   # -- Security context for the `codeintel-db` container,
@@ -314,6 +321,10 @@ codeIntelDB:
   storageAnnotations: {}
 
 frontend:
+  # -- Command for the `frontend` container, as a list, replacing the image's entrypoint,
+  # e.g. a shell wrapper that exports credentials read from mounted files before starting `frontend`.
+  # `frontend.args` (default `["serve"]`) is still passed as the arguments.
+  command: []
   # -- Environment variables for the `frontend` container
   # @default -- the chart will add some default environment values
   env:
@@ -328,7 +339,7 @@ frontend:
   image:
     # -- Docker image tag for the `frontend` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:192083e614e002fc18d3a80372c6b8d706d8a389086566510ba6fbced651a2eb
+    defaultTag: 8.2.1283@sha256:dbadaa0ed070c5df352b8c090eec69ed0af69c6c4611a07dcdc06112fc21f535
     # -- Docker image name for the `frontend` image
     name: "frontend"
   ingress:
@@ -404,9 +415,12 @@ migrator:
   image:
     # -- Docker image tag for the `migrator` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:c5bf0f81f3b07f7769f694525bef0a2d547a554f99113115a33b0925a16ef5ea
+    defaultTag: 8.2.1283@sha256:6c018ac97fafe980dc71f98c6ac9a336c32c49d67d42e0476130472b7545496a
     # -- Docker image name for the `migrator` image
     name: "migrator"
+  # -- Command for the `migrator` init container, as a list, replacing the image's entrypoint.
+  # `migrator.args` (default `["up"]`) is still passed as the arguments.
+  command: []
   # -- Environment variables for the `migrator` container
   # @default -- the chart will add some default environment values
   env:
@@ -438,7 +452,7 @@ gitserver:
   image:
     # -- Docker image tag for the `gitserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:03c984acc6e69ed015ecf01402cf22f7b8b90582a0791a48adf695df8b97bd39
+    defaultTag: 8.2.1283@sha256:36c980410cf816f7ecb086207db96841812b72328684a6fdd6004574ccd190fa
     # -- Docker image name for the `gitserver` image
     name: "gitserver"
   # -- Name of existing Secret that contains SSH credentials to clone repositories.
@@ -487,6 +501,9 @@ gitserver:
   storageSubPath: ""
   # -- Optional annotations to add to the `gitserver` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `repos` volume claim template of the `gitserver` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 grafana:
   # -- Enable `grafana` dashboard (recommended)
@@ -512,12 +529,10 @@ grafana:
     sslmode: ""
   # -- Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key.
   existingConfig: "" # Name of an existing configmap
-  # -- Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml`
-  initContainers: []
   image:
     # -- Docker image tag for the `grafana` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:c24d2f1647dc59e499cface18fba62aff1bc0de152ea95036c8d876d35f5da74
+    defaultTag: 8.2.1283@sha256:4a67f0e253b179701ac0844e62e34a14dbcf46f0f278c52626ac9423c3126c02
     # -- Docker image name for the `grafana` image
     name: "grafana"
   # -- Security context for the `grafana` container,
@@ -556,6 +571,9 @@ grafana:
   storageSubPath: ""
   # -- Optional annotations to add to the `grafana` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `grafana-data` volume claim template of the `grafana` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 indexedSearch:
   # -- Environment variables for the `zoekt-webserver` container
@@ -566,7 +584,7 @@ indexedSearch:
   image:
     # -- Docker image tag for the `zoekt-webserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:4f9b1d38da5f6168ee91ed5e2d9c42f851148b12e1a71ee5040f566b6d663837
+    defaultTag: 8.2.1283@sha256:e15e3a4dc3790692d2502bd20c92f0e1126acdbec3370dbe7ea6e9af366ec338
     # -- Docker image name for the `zoekt-webserver` image
     name: "indexed-searcher"
   # -- Security context for the `zoekt-webserver` container,
@@ -628,6 +646,9 @@ indexedSearch:
   storageSubPath: ""
   # -- Optional annotations to add to the `indexed-search` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `data` volume claim template of the `indexed-search` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 indexedSearchIndexer:
   # -- Environment variables for the `zoekt-indexserver` container
@@ -638,7 +659,7 @@ indexedSearchIndexer:
   image:
     # -- Docker image tag for the `zoekt-indexserver` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:1a53fc78048963cf2badc8e8b43fc606d62a2323d36bd631eb01e33910dd22cd
+    defaultTag: 8.2.1283@sha256:ef9ea2ee37af28f998dacf4c123ff2074d30fcc9237dbf2e2d8269c45243a655
     # -- Docker image name for the `zoekt-indexserver` image
     name: "search-indexer"
   # -- Security context for the `zoekt-indexserver` container,
@@ -671,7 +692,7 @@ blobstore:
   image:
     # -- Docker image tag for the `blobstore` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:7407a048bdfbd6e635874963b9f075f9e514d5b10ddd26cda76597a0bcd59ab2
+    defaultTag: 8.2.1283@sha256:241f87cf7ed543cf30fd469f6c82c7f4000139f1602c8ec1ba0de24690697012
     # -- Docker image name for the `blobstore` image
     name: "blobstore"
   # -- Security context for the `blobstore` container,
@@ -715,12 +736,17 @@ openTelemetry:
   image:
     # -- Docker image tag for the `otel-collector` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:beb7d1bb58a7fda06952975f1f7c9351bffded72de358db50e810e3c13260d40
+    defaultTag: 8.2.1283@sha256:43b1275bab951ab21a4a9767aa90de504d16eff12d42888dfe123c4b7159eb90
     # -- Docker image name for the `otel-collector` image
     name: "opentelemetry-collector"
   gateway:
     # -- Name used by resources. Does not affect service names or PVCs.
     name: "otel-collector"
+    # -- Command for the `otel-collector` container, as a list, replacing the chart's
+    # `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart
+    # selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file.
+    # `openTelemetry.gateway.args` is still passed as the arguments.
+    command: []
     # -- Resource requests & limits for the `otel-collector` container,
     # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
     resources:
@@ -793,7 +819,7 @@ nodeExporter:
   image:
     # -- Docker image tag for the `node-exporter` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:acddf959e6545a8b1952aa4272a3c4e2bea8090038c59c9aa9bb03e68419afeb
+    defaultTag: 8.2.1283@sha256:6dce052663e1db05c2093dfb3ba781f68bff2b61eca8b5924625711942194398
     # -- Docker image name for the `node-exporter` image
     name: "node-exporter"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -862,7 +888,7 @@ pgsql:
   image:
     # -- Docker image tag for the `pgsql` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:cc810cd21f1df7776aa270f49bdd50a4ec3375623ffae1f0238c20dec054bf03
+    defaultTag: 8.2.1283@sha256:16f1cef9d269e744e6c3a6079934eef3ad0405a0fc5790e2859550093834bce5
     # -- Docker image name for the `pgsql` image
     name: "postgresql-16"
   # -- Security context for the `pgsql` container,
@@ -909,7 +935,7 @@ postgresExporter:
   image:
     # -- Docker image tag for the `pgsql-exporter` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:bd55116d35a5cfad9da760ebdf467166deaac550be44b915e407beace9b0ef3d
+    defaultTag: 8.2.1283@sha256:e33127fe70175856a2419f5f92a1779c75b9d0476d20c5a6aab3969711e70358
     # -- Docker image name for the `pgsql-exporter` image
     name: "postgres_exporter"
   # -- Resource requests & limits for the `pgsql-exporter` sidecar container,
@@ -932,7 +958,7 @@ syntacticCodeIntel:
   image:
     # -- Docker image tag for the `syntactic-code-intel-worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:702609626636fd06c204a8a7e18941eb13df096784cea732d1c036069866cc40
+    defaultTag: 8.2.1283@sha256:de78b096687257d2facaa5ce85d6a2f3affcd1e3e7a668db204d0e52092c040c
     # -- Docker image name for the `syntactic-code-intel-worker` image
     name: "syntactic-code-intel-worker"
   # -- Security context for the `syntactic-code-intel-worker` container,
@@ -965,6 +991,22 @@ syntacticCodeIntel:
     create: false
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: ""
+  # -- Backing store for the `/tmp` scratch volume, used for indexing.
+  # One of: emptyDir, pvc.
+  # emptyDir: node ephemeral storage, i.e. the node boot disk.
+  # pvc: per-pod PVC, discarded with the pod. The pod `fsGroup` defaults to the
+  # container `runAsGroup` so the non-root worker can write to the volume; set
+  # `podSecurityContext.fsGroup` to override it.
+  storageType: emptyDir
+  # -- Size of the `/tmp` scratch volume. Required when storageType is `pvc`.
+  # When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty
+  # for unlimited).
+  storageSize: ""
+  # -- StorageClass for the `/tmp` scratch PVC when storageType is `pvc`.
+  # Empty uses the cluster default class. The claim is per-pod and discarded
+  # with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass`
+  # is `Retain` for stateful data and is not used here.
+  storageClassName: ""
 
 preciseCodeIntel:
   # -- Environment variables for the `precise-code-intel-worker` container
@@ -977,7 +1019,7 @@ preciseCodeIntel:
   image:
     # -- Docker image tag for the `precise-code-intel-worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:560ef1edc769959af11f24d220b0dbd5c5c798be1d635e6e4fe06ff560b7835c
+    defaultTag: 8.2.1283@sha256:c05b23ce15a1eb8e9e9d2679874fd20147c89bdf12be018bc6efb1b8307edf03
     # -- Docker image name for the `precise-code-intel-worker` image
     name: "precise-code-intel-worker"
   # -- Security context for the `precise-code-intel-worker` container,
@@ -1035,7 +1077,7 @@ prometheus:
   image:
     # -- Docker image tag for the `prometheus` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:6e52e5c1b47f21b31384a52155553be4d625fa410e07ab45a8f6faed7172a907
+    defaultTag: 8.2.1283@sha256:c55c85603a5f86673e0f545f2b2a375d9ebff7d29a3e03c08a4bbd1c4a9f7edb
     # -- Docker image name for the `prometheus` image
     name: "prometheus"
   # -- Security context for the `prometheus` container,
@@ -1092,7 +1134,7 @@ redisCache:
   image:
     # -- Docker image tag for the `redis-cache` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:41035baa91623dff4275a5d496eb916c46bee260301d9991bbd1914c09c217f8
+    defaultTag: 8.2.1283@sha256:9900b06cd1fbbc46233454820896e4254a4d54b620d5f4a593420263a1e8d547
     # -- Docker image name for the `redis-cache` image
     name: "redis-cache"
   connection:
@@ -1169,7 +1211,7 @@ redisExporter:
   image:
     # -- Docker image tag for the `redis-exporter` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:898666a0c7fc28b6b90f1f01893cb35668a97dbcc4f18056ca5f8d2ac89b2292
+    defaultTag: 8.2.1283@sha256:8e37dda4f91eadb003c796d7ce7378eda761dd55856bdb09a8fd3b069095aecb
     # -- Docker image name for the `redis-exporter` image
     name: "redis_exporter"
   # -- Security context for the `redis-exporter` sidecar container,
@@ -1202,7 +1244,7 @@ redisStore:
   image:
     # -- Docker image tag for the `redis-store` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:b733fceadfa1863671ab11704e354573241217c4aa604aba64533c7bae101127
+    defaultTag: 8.2.1283@sha256:69d485cf983536befa0fc32e6b815a4d155b6afb3840811338da46b433e881e9
     # -- Docker image name for the `redis-store` image
     name: "redis-store"
   # -- Security context for the `redis-store` container,
@@ -1277,7 +1319,7 @@ searcher:
   image:
     # -- Docker image tag for the `searcher` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:acfbc9c127ebdbd4053ac835bcf90093f9d8bf4834a6275a549384db4eacd66f
+    defaultTag: 8.2.1283@sha256:334c46cde6084436690efc5d3bd719bfc0ae841f58757672e4aa864354e8c13b
     # -- Docker image name for the `searcher` image
     name: "searcher"
   # -- Security context for the `searcher` container,
@@ -1326,6 +1368,9 @@ searcher:
   storageSubPath: ""
   # -- Optional annotations to add to the `searcher` PVC
   storageAnnotations: {}
+  # -- Labels to add to the `cache` volume claim template of the `searcher` StatefulSet. Kubernetes does not allow
+  # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
+  storageLabels: {}
 
 storageClass:
   # -- Enable creation of storageClass.
@@ -1357,7 +1402,7 @@ syntectServer:
   image:
     # -- Docker image tag for the `syntect-server` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:9bbe53c18c2d864358ba95e4c89d000df60759e5d9fc0814b30d576efde55d95
+    defaultTag: 8.2.1283@sha256:f0728e8c2e1884c2e9381dc954e6c9f2ebaad06e5471e2aea4bf694d3f0b3bb2
     # -- Docker image name for the `syntect-server` image
     name: "syntax-highlighter"
   # -- Security context for the `syntect-server` container,
@@ -1408,7 +1453,7 @@ jaeger:
   image:
     # -- Docker image tag for the `jaeger` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:8e4ee70cfbb3e0c765536531b3002ff3eab32bf277f2507a1c81524ea96127c9
+    defaultTag: 8.2.1283@sha256:5359719cf8bbe042ff80dae807fe8b1c13812a258b79e88d82ef33d5a03a2b3d
     # -- Docker image name for the `jaeger` image
     name: "jaeger-all-in-one"
   # -- Name used by resources. Does not affect service names or PVCs.
@@ -1473,7 +1518,7 @@ worker:
   image:
     # -- Docker image tag for the `worker` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:5aa40853fc6a8223c373f291ce940f7258d2e882e8ffca7e31af04ec2f2f7922
+    defaultTag: 8.2.1283@sha256:ff667f437b65cfc1dceff7dbe98b766d41c09a6fe67f80a1fb1ac3faa9a34760
     # -- Docker image name for the `worker` image
     name: "worker"
   # -- Security context for the `worker` container,

@@ -17,7 +17,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel) | nindent 6 }}
       app: precise-code-intel-worker
   strategy:
     rollingUpdate:
@@ -28,6 +28,7 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: precise-code-intel-worker
+      {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
@@ -35,7 +36,7 @@ spec:
       {{- toYaml .Values.preciseCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.preciseCodeIntel) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -50,10 +51,15 @@ spec:
       {{- fail (printf "preciseCodeIntel.storageType must be one of emptyDir, pvc; got %q" $storageType) }}
       {{- end }}
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "preciseCodeIntel") | nindent 6 }}
+      {{- with .Values.preciseCodeIntel.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: precise-code-intel-worker
         env:
         {{- include "sourcegraph.gracefulShutdownEnv" (list . "preciseCodeIntel") | nindent 8 }}
+        {{- include "sourcegraph.redisConnection" . | nindent 8 }}
         {{- range $name, $item := .Values.preciseCodeIntel.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
@@ -62,12 +68,6 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        {{- if .Values.blobstore.enabled }}
-        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
-          value: blobstore
-        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
-          value: http://blobstore:9000
-        {{- end }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         image: {{ include "sourcegraph.image" (list . "preciseCodeIntel") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}

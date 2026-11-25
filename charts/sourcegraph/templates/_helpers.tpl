@@ -17,7 +17,8 @@ Common labels
 */}}
 {{- define "sourcegraph.labels" -}}
 helm.sh/chart: {{ include "sourcegraph.chart" . }}
-{{ include "sourcegraph.selectorLabels" . }}
+app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -28,11 +29,46 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+Selector labels, shared by a component's workload selector, pod labels, and
+Service and PodDisruptionBudget selectors, so they cannot drift apart.
+
+Pass the root context and the component's values:
+
+{{ include "sourcegraph.selectorLabels" (list . .Values.frontend) }}
 */}}
 {{- define "sourcegraph.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "sourcegraph.name" . }}
-app.kubernetes.io/instance: {{ .Release.Name }}
+{{- $top := index . 0 -}}
+{{- if not $top.Values.sourcegraph.selectorLabelsOverride -}}
+app.kubernetes.io/name: {{ include "sourcegraph.name" $top }}
+app.kubernetes.io/instance: {{ $top.Release.Name }}
+{{- end }}
+{{- with include "sourcegraph.customSelectorLabels" . }}
+{{ . }}
+{{- end }}
+{{- end }}
+
+{{/*
+The selector labels set in values: sourcegraph.selectorLabelsOverride, which
+replaces the default selector labels on every component, merged with the
+component's extraSelectorLabels. Empty by default.
+
+These exist to adopt workloads created outside this chart, whose selectors
+are immutable. The chart sets the labels in $chartLabels itself, so
+overriding one would stop a selector from matching its pods.
+*/}}
+{{- define "sourcegraph.customSelectorLabels" -}}
+{{- $top := index . 0 -}}
+{{- $component := index . 1 -}}
+{{- $chartLabels := list "app" "deploy" "group" "type" "worker-replica" -}}
+{{- $labels := mergeOverwrite (dict) ($top.Values.sourcegraph.selectorLabelsOverride | default dict) ($component.extraSelectorLabels | default dict) -}}
+{{- range $chartLabel := $chartLabels -}}
+{{- if hasKey $labels $chartLabel -}}
+{{- fail (printf "sourcegraph.selectorLabelsOverride and <serviceName>.extraSelectorLabels must not set the label %q, which the chart sets itself" $chartLabel) -}}
+{{- end -}}
+{{- end -}}
+{{- with $labels -}}
+{{ toYaml . }}
+{{- end -}}
 {{- end }}
 
 {{/*
@@ -269,7 +305,7 @@ so that customers can configure them any of these ways:
 3. Do not create or use Kubernetes secrets, just pass the default values directly as environment variables into the needed pods, by configuring:
 .Values.sourcegraph.disableKubernetesSecrets: true
 
-4. Do not create or use Kubernetes secrets, but provide custom values (ex. external Redis) to have this function pass them into the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, and worker pods, by configuring:
+4. Do not create or use Kubernetes secrets, but provide custom values (ex. external Redis) to have this function pass them into the REDIS_CACHE_ENDPOINT and REDIS_STORE_ENDPOINT env vars on frontend, gitserver, searcher, worker, precise-code-intel-worker, and syntactic-code-intel-worker pods, by configuring:
 .Values.sourcegraph.disableKubernetesSecrets: true
 .Values.redisCache.connection.endpoint: <custom value for REDIS_CACHE_ENDPOINT>
 .Values.redisStore.connection.endpoint: <custom value for REDIS_STORE_ENDPOINT>
@@ -366,6 +402,40 @@ Resolution order:
 {{- end -}}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Render the effective redis.conf for a service: the vendored file plus the
+chart-managed directives.
+Usage: include "sourcegraph.redis.conf" (list . "redisCache")
+
+The redis Deployments hash this output for their checksum/redis-config
+annotation, so it must depend only on the config, never on release metadata
+such as the chart version; otherwise every upgrade restarts redis.
+*/}}
+{{- define "sourcegraph.redis.conf" -}}
+{{- $top := index . 0 -}}
+{{- $service := index . 1 -}}
+{{- $config := (index $top.Values $service).config -}}
+{{- $dir := kebabcase $service -}}
+{{- $body := $top.Files.Get (printf "files/%s/redis.conf" $dir) | trimSuffix "\n" -}}
+{{- if not $body -}}
+{{- fail (printf "no vendored redis.conf found at files/%s/redis.conf for service %s" $dir $service) -}}
+{{- end -}}
+{{- $overrides := list -}}
+{{- with include "sourcegraph.redis.maxmemory" (list $top $service) -}}
+{{- $overrides = append $overrides (printf "maxmemory %s" .) -}}
+{{- end -}}
+{{- with $config.maxmemoryPolicy -}}
+{{- $overrides = append $overrides (printf "maxmemory-policy %s" .) -}}
+{{- end -}}
+{{- with $config.additionalConfig -}}
+{{- $overrides = append $overrides (tpl . $top | trim) -}}
+{{- end -}}
+{{- if $overrides -}}
+{{- $body = printf "%s\n\n# Chart-managed directives. Redis applies the last occurrence of a directive.\n%s" $body (join "\n" $overrides) -}}
+{{- end -}}
+{{- $body -}}
 {{- end -}}
 
 {{/*

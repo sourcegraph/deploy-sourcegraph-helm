@@ -7,6 +7,6 @@ spec:
   {{- toYaml .Values.syntectServer.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 6 }}
       app: syntect-server
 {{- end }}

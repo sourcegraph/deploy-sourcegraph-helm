@@ -106,7 +106,7 @@ migrator:
   image:
     # -- Docker image tag for the `migrator` image
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
-    defaultTag: 8.1.2687@sha256:c5bf0f81f3b07f7769f694525bef0a2d547a554f99113115a33b0925a16ef5ea
+    defaultTag: 8.2.1283@sha256:6c018ac97fafe980dc71f98c6ac9a336c32c49d67d42e0476130472b7545496a
     # -- Docker image name for the `migrator` image
     name: "migrator"
   # -- Environment variables for the `migrator` container
@@ -129,7 +129,7 @@ migrator:
     readOnlyRootFilesystem: true
   # -- Override default `migrator` container args
   # Available commands can be found at
-  # https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
+  # https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations
   args:
   - up
   - -db=all

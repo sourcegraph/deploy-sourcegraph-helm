@@ -63,6 +63,49 @@ Chart-managed config changes restart the Redis pod through a checksum
 annotation. Changes to an existing ConfigMap or Secret require a manual pod
 restart because `subPath` mounts do not update in running containers.
 
+## Adopting existing workloads
+
+Kubernetes does not allow changing the `spec.selector` of a Deployment,
+StatefulSet, or DaemonSet, or the `volumeClaimTemplates` of a StatefulSet. To
+move workloads that were created another way, such as with Kustomize, into a
+Helm release without deleting them, make the chart render the same values for
+those fields:
+
+- `sourcegraph.selectorLabelsOverride` replaces the default
+  `app.kubernetes.io/name` and `app.kubernetes.io/instance` selector labels on
+  every component.
+- `<serviceName>.extraSelectorLabels` adds selector labels to one component.
+- `<serviceName>.storageLabels` adds labels to the volume claim template of
+  `gitserver`, `grafana`, `indexedSearch`, or `searcher`. Match the rest of the
+  template with `storageSize` and `storageClass.name`.
+
+```yaml
+sourcegraph:
+  selectorLabelsOverride:
+    example.com/project: sourcegraph
+gitserver:
+  extraSelectorLabels:
+    example.com/service: gitserver
+  storageLabels:
+    example.com/project: sourcegraph
+    example.com/service: gitserver
+```
+
+The same labels are rendered in each workload's selector and pod labels and in
+the Service and PodDisruptionBudget selectors. The chart keeps adding the
+labels it sets itself, such as `app: gitserver`, so the existing workloads must
+already have them; the values above cannot set `app`, `deploy`, `group`,
+`type`, or `worker-replica`.
+
+Set these values on the first install and never change them on an installed
+release: Kubernetes rejects the upgrade. Before installing, compare the
+`helm template` output with `kubectl get -o yaml` for each workload.
+
+Helm only takes over an existing object that has the
+`app.kubernetes.io/managed-by: Helm` label and the `meta.helm.sh/release-name`
+and `meta.helm.sh/release-namespace` annotations, or when installing with
+`--take-ownership` (Helm 3.17 or later).
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.
@@ -81,16 +124,17 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.terminationGracePeriodSeconds` - override `sourcegraph.terminationGracePeriodSeconds` for this service
 - `<serviceName>.args` - override default container args
 - `<serviceName>.env` - consult `values.yaml` file
+- `<serviceName>.extraInitContainers` - add init containers to the pod, which run before any init containers the chart defines
+- `<serviceName>.extraServicePorts` - add ports to the service's primary Service. The OpenTelemetry and Jaeger values are `openTelemetry.gateway.*`, `openTelemetry.agent.extraInitContainers`, `jaeger.extraInitContainers`, `jaeger.collector.extraServicePorts`, and `jaeger.query.extraServicePorts`
+- `<serviceName>.extraSelectorLabels` - add labels to the service's workload selector, pod labels, and Service and PodDisruptionBudget selectors. See [Adopting existing workloads](#adopting-existing-workloads)
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| alpine.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| alpine.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `alpine` image |
-| alpine.image.name | string | `"alpine-3.14"` | Docker image name for the `alpine` image |
-| alpine.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| alpine.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":999,"runAsUser":999}` | Security context for the `correct-data-dir-permissions` initContainer of `pgsql` and `codeintel-db`, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| alpine.resources | object | `{"limits":{"cpu":"10m","memory":"50Mi"},"requests":{"cpu":"10m","memory":"50Mi"}}` | Resource requests & limits for the `correct-data-dir-permissions` initContainer of `pgsql`, `codeintel-db`, and `codeinsights-db`, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | blobstore.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"runAsGroup":101,"runAsUser":100}` | Security context for the `blobstore` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | blobstore.enabled | bool | `true` | Enable `blobstore` (S3 compatible storage) |
 | blobstore.env | object | the chart will add some default environment values | Environment variables for the `blobstore` container |
@@ -126,7 +170,7 @@ In addition to the documented values, all services also support the following va
 | codeInsightsDB.existingConfig | string | `""` | Name of existing ConfigMap for `codeinsights-db`. It must contain a `postgresql.conf` key. |
 | codeInsightsDB.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `codeinsights-db` image |
 | codeInsightsDB.image.name | string | `"postgresql-16-codeinsights"` | Docker image name for the `codeinsights-db` image |
-| codeInsightsDB.init.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `alpine` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| codeInsightsDB.init.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":70,"runAsUser":70}` | Security context for the `correct-data-dir-permissions` initContainer, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | codeInsightsDB.name | string | `"codeinsights-db"` | Name used by resources. Does not affect service names or PVCs. |
 | codeInsightsDB.podSecurityContext | object | `{"fsGroup":70,"fsGroupChangePolicy":"OnRootMismatch","runAsUser":70}` | Security context for the `codeinsights-db` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | codeInsightsDB.postgresExporter | object | `{}` | Configuration for the `pgsql-exporter` sidecar container |
@@ -159,6 +203,7 @@ In addition to the documented values, all services also support the following va
 | codeIntelDB.storageSize | string | `"200Gi"` | PVC Storage Request for `codeintel-db` data volume |
 | codeIntelDB.storageSubPath | string | `""` | Optional subPath for the `codeintel-db` primary data volume mount |
 | extraResources | list | `[]` | Additional resources to include in the rendered manifest. Templates are supported. |
+| frontend.command | list | `[]` | Command for the `frontend` container, as a list, replacing the image's entrypoint, e.g. a shell wrapper that exports credentials read from mounted files before starting `frontend`. `frontend.args` (default `["serve"]`) is still passed as the arguments. |
 | frontend.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | frontend.createRoleBinding | bool | `true` | Disable the roleBinding resource for deployment environments blocking RBAC, ex. OpenShift's default "secure" SCC |
 | frontend.env | object | the chart will add some default environment values | Environment variables for the `frontend` container |
@@ -193,6 +238,7 @@ In addition to the documented values, all services also support the following va
 | gitserver.sshSecret | string | `""` | Name of existing Secret that contains SSH credentials to clone repositories. It usually contains keys, such as `id_rsa` (private key) and `known_hosts`. Learn more from [documentation](https://docs.sourcegraph.com/admin/install/kubernetes/helm#using-ssh-to-clone-repositories) |
 | gitserver.storageAccessModes | list | `["ReadWriteOnce"]` | Access modes for the `gitserver` PVC. Set to `["ReadWriteOncePod"]` on SELinux-enforcing nodes (e.g. Bottlerocket / EKS Auto Mode) so Kubernetes mounts the volume with `-o context` instead of recursively relabeling every file on each pod start |
 | gitserver.storageAnnotations | object | `{}` | Optional annotations to add to the `gitserver` PVC |
+| gitserver.storageLabels | object | `{}` | Labels to add to the `repos` volume claim template of the `gitserver` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | gitserver.storageSize | string | `"200Gi"` | PVC Storage Request for `gitserver` data volume |
 | gitserver.storageSubPath | string | `""` | Optional subPath for the `gitserver` primary data volume mount |
 | grafana.auth | object | `{"database":"","existingSecret":"","host":"","password":"","port":"","sslmode":"","user":""}` | NOTE: Create a separate user in the pgsql database with read-only perms on the minimum set of tables |
@@ -208,13 +254,13 @@ In addition to the documented values, all services also support the following va
 | grafana.existingConfig | string | `""` | Name of existing ConfigMap for `grafana`. It must contain a `datasources.yml` key. |
 | grafana.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `grafana` image |
 | grafana.image.name | string | `"grafana"` | Docker image name for the `grafana` image |
-| grafana.initContainers | list | `[]` | Init containers for the `grafana` pod. Use `restartPolicy: Always` for a native sidecar that must be started before `grafana`, such as one that writes a datasource credential file read by `datasources.yml` |
 | grafana.name | string | `"grafana"` | Name used by resources. Does not affect service names or PVCs. |
 | grafana.podSecurityContext | object | `{"fsGroup":472,"fsGroupChangePolicy":"OnRootMismatch","runAsGroup":472,"runAsUser":472}` | Security context for the `grafana` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | grafana.resources | object | `{"limits":{"cpu":"1","memory":"512Mi"},"requests":{"cpu":"100m","memory":"512Mi"}}` | Resource requests & limits for the `grafana` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | grafana.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `grafana` |
 | grafana.serviceAccount.name | string | `"grafana"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | grafana.storageAnnotations | object | `{}` | Optional annotations to add to the `grafana` PVC |
+| grafana.storageLabels | object | `{}` | Labels to add to the `grafana-data` volume claim template of the `grafana` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -231,6 +277,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-search` |
 | indexedSearch.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | indexedSearch.storageAnnotations | object | `{}` | Optional annotations to add to the `indexed-search` PVC |
+| indexedSearch.storageLabels | object | `{}` | Labels to add to the `data` volume claim template of the `indexed-search` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | indexedSearch.storageSize | string | `"200Gi"` | PVC Storage Request for `indexed-search` data volume The size of disk to used for search indexes. This should typically be gitserver disk size multiplied by the number of gitserver shards. |
 | indexedSearch.storageSubPath | string | `""` | Optional subPath for the `indexed-search` primary data volume mount |
 | indexedSearchIndexer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
@@ -262,6 +309,7 @@ In addition to the documented values, all services also support the following va
 | jaeger.resources | object | `{"limits":{"cpu":"1","memory":"1G"},"requests":{"cpu":"500m","memory":"500M"}}` | Resource requests & limits for the `jaeger` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | jaeger.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `jaeger` |
 | jaeger.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| migrator.command | list | `[]` | Command for the `migrator` init container, as a list, replacing the image's entrypoint. `migrator.args` (default `["up"]`) is still passed as the arguments. |
 | migrator.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `migrator` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | migrator.enabled | bool | `true` | Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in `frontend` deployment to perform database migration |
 | migrator.env | object | the chart will add some default environment values | Environment variables for the `migrator` container |
@@ -292,6 +340,7 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.agent.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-agent` |
 | openTelemetry.agent.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | openTelemetry.enabled | bool | `true` |  |
+| openTelemetry.gateway.command | list | `[]` | Command for the `otel-collector` container, as a list, replacing the chart's `/bin/otelcol-sourcegraph --config=<file>` command, including the `--config` flag the chart selects, e.g. a shell wrapper that exports an exporter API key read from a mounted file. `openTelemetry.gateway.args` is still passed as the arguments. |
 | openTelemetry.gateway.config.traces.exporters | object | `{}` | Define where traces should be exported to. Read how to configure different backends in the [OpenTelemetry documentation](https://opentelemetry.io/docs/collector/configuration/#exporters) |
 | openTelemetry.gateway.config.traces.exportersTlsSecretName | string | `""` | Define the name of a preexisting secret containing TLS certificates for exporters, which will be mounted under "/tls". Read more about TLS configuration of exporters in the [OpenTelemetry Collector documentation](https://github.com/open-telemetry/opentelemetry-collector/blob/main/config/configtls/README.md) |
 | openTelemetry.gateway.config.traces.processors | object | `{}` | Define trace processors. Read how to configure sampling in the [OpenTelemetry documentation](https://docs.sourcegraph.com/admin/observability/opentelemetry#sampling-traces) |
@@ -419,6 +468,7 @@ In addition to the documented values, all services also support the following va
 | searcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `searcher` |
 | searcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | searcher.storageAnnotations | object | `{}` | Optional annotations to add to the `searcher` PVC |
+| searcher.storageLabels | object | `{}` | Labels to add to the `cache` volume claim template of the `searcher` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads) |
 | searcher.storageSize | string | `"26Gi"` | Size of the PVC for searcher pods to store cache data. Unless `autoCacheSize` is enabled, this must be a Kubernetes quantity (e.g. `150G`, `100Gi`, `1Ti`) of at least `3M`, so the chart can derive `SEARCHER_CACHE_SIZE_MB` and `SYMBOLS_CACHE_SIZE_MB` from it |
 | searcher.storageSubPath | string | `""` | Optional subPath for the `searcher` primary data volume mount |
 | sgTestConnection | object | `{"enabled":true}` | Enable the busybox connection test after deployment |
@@ -439,6 +489,7 @@ In addition to the documented values, all services also support the following va
 | sourcegraph.preShutdownPause | string | `"5s"` | Time Sourcegraph services continue accepting requests after shutdown begins so Kubernetes endpoint changes can propagate |
 | sourcegraph.priorityClassName | string | `""` | Assign a priorityClass to all pods (daemonSets, deployments, and statefulSets) |
 | sourcegraph.revisionHistoryLimit | int | `10` | Global deployment clean up policy, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#clean-up-policy) |
+| sourcegraph.selectorLabelsOverride | object | `{}` | Labels that replace `app.kubernetes.io/name` and `app.kubernetes.io/instance` in every component's workload selector, pod labels, and Service and PodDisruptionBudget selectors. Only for adopting workloads created outside this chart, whose selectors Kubernetes does not allow changing: set it on the first install and never change it afterwards. Use `<serviceName>.extraSelectorLabels` for labels that differ per component. See [Adopting existing workloads](#adopting-existing-workloads) |
 | sourcegraph.serviceLabels | object | `{}` | Add extra labels to all services |
 | sourcegraph.terminationGracePeriodSeconds | int | `30` | Time Kubernetes allows Sourcegraph services to shut down before forced termination |
 | sourcegraph.tolerations | list | `[]` | Global Tolerations, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) |
@@ -460,6 +511,9 @@ In addition to the documented values, all services also support the following va
 | syntacticCodeIntel.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `syntactic-code-intel-worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | syntacticCodeIntel.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `syntactic-code-intel-worker` |
 | syntacticCodeIntel.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| syntacticCodeIntel.storageClassName | string | `""` | StorageClass for the `/tmp` scratch PVC when storageType is `pvc`. Empty uses the cluster default class. The claim is per-pod and discarded with the pod, so this class must use `reclaimPolicy: Delete`; `storageClass` is `Retain` for stateful data and is not used here. |
+| syntacticCodeIntel.storageSize | string | `""` | Size of the `/tmp` scratch volume. Required when storageType is `pvc`. When storageType is `emptyDir` this sets `sizeLimit` (optional, leave empty for unlimited). |
+| syntacticCodeIntel.storageType | string | `"emptyDir"` | Backing store for the `/tmp` scratch volume, used for indexing. One of: emptyDir, pvc. emptyDir: node ephemeral storage, i.e. the node boot disk. pvc: per-pod PVC, discarded with the pod. The pod `fsGroup` defaults to the container `runAsGroup` so the non-root worker can write to the volume; set `podSecurityContext.fsGroup` to override it. |
 | syntectServer.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `syntect-server` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | syntectServer.env | object | the chart will add some default environment values | Environment variables for the `syntect-server` container |
 | syntectServer.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `syntect-server` image |

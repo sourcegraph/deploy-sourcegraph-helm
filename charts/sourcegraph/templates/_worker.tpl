@@ -29,7 +29,7 @@ spec:
   revisionHistoryLimit: {{ $top.Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 6 }}
       app: worker
       {{- if $suffix }}
       worker-replica: {{ $name | quote }}
@@ -51,7 +51,7 @@ spec:
       {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" $top | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
       {{- if $top.Values.sourcegraph.podLabels }}
       {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -65,6 +65,10 @@ spec:
         {{- end }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list $top "worker") | nindent 6 }}
+      {{- with $top.Values.worker.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: worker
         env:
@@ -81,12 +85,6 @@ spec:
         {{- range $name, $item := $top.Values.worker.env}}
         - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
-        {{- end }}
-        {{- if $top.Values.blobstore.enabled }}
-        - name: PRECISE_CODE_INTEL_UPLOAD_BACKEND
-          value: blobstore
-        - name: PRECISE_CODE_INTEL_UPLOAD_AWS_ENDPOINT
-          value: http://blobstore:9000
         {{- end }}
         - name: POD_NAME
           valueFrom:

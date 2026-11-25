@@ -7,6 +7,6 @@ spec:
   {{- toYaml .Values.redisCache.podDisruptionBudget | nindent 2 }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.redisCache) | nindent 6 }}
       app: redis-cache
 {{- end }}

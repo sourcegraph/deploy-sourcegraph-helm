@@ -36,7 +36,7 @@ You should consult the list of available [migrator commands]. Below is some exam
 
 ### Run database migration
 
-[`migrator up`](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#up)
+[`migrator up`](https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations#up)
 
 - Perform database migrations prior to upgrading the Sourcegraph deployment
 - Perform initial migrations against external PostgreSQL databases prior to the Sourcegraph deployment
@@ -47,7 +47,7 @@ helm upgrade --install -f <your-override-file.yaml> --version <chart-version> sg
 
 ### Add a migration log entry
 
-[`migrator add-log -db=frontend -version=1528395834`](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log)
+[`migrator add-log -db=frontend -version=1528395834`](https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations#add-log)
 
 Add an entry to the migration log after a site administrator has explicitly applied the contents of a migration file, learn more about troubleshooting a [dirty database].
 
@@ -90,8 +90,8 @@ kubectl logs -l job=migrator -c migrator
 [sourcegraph/sourcegraph]: ../sourcegraph/
 [sourcegraph/sourcegraph-migrator]: ./
 [dirty database]: https://docs.sourcegraph.com/admin/how-to/dirty_database
-[migrator]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations
-[migrator commands]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#commands
+[migrator]: https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations
+[migrator commands]: https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations#commands
 [job]: https://kubernetes.io/docs/concepts/workloads/controllers/job/
-[add-log]: https://docs.sourcegraph.com/admin/how-to/manual_database_migrations#add-log
+[add-log]: https://sourcegraph.com/docs/self-hosted/updates/migrator/migrator-operations#add-log
 [using your own postgresql server]: https://docs.sourcegraph.com/admin/external_services/postgres#instructions

@@ -2,12 +2,6 @@
 
 set -euf -o pipefail
 
-### Install kubeval
-wget https://github.com/yannh/kubeconform/releases/download/v0.4.12/kubeconform-linux-amd64.tar.gz
-tar xf kubeconform-linux-amd64.tar.gz
-chmod +x kubeconform
-sudo cp kubeconform /usr/local/bin
-
 function validate_schema() {
   echo "Validating schema for $1"
   echo "Generating template output..."

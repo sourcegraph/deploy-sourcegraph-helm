@@ -21,7 +21,7 @@ spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 6 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.redisStore) | nindent 6 }}
       app: redis-store
   strategy:
     type: Recreate
@@ -30,7 +30,7 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: redis-store
         {{- if and .Values.redisStore.config.enabled (not .Values.redisStore.config.existingConfig) }}
-        checksum/redis-config: {{ include (print $.Template.BasePath "/redis/redis-store.ConfigMap.yaml") . | sha256sum }}
+        checksum/redis-config: {{ include "sourcegraph.redis.conf" (list . "redisStore") | sha256sum }}
         {{- end }}
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
@@ -39,7 +39,7 @@ spec:
       {{- toYaml .Values.redisStore.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.redisStore) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
@@ -49,6 +49,10 @@ spec:
         deploy: sourcegraph
         app: redis-store
     spec:
+      {{- with .Values.redisStore.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
       containers:
       - name: redis-store
         image: {{ include "sourcegraph.image" (list . "redisStore") }}
