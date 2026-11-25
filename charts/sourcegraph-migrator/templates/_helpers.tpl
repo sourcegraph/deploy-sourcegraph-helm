@@ -28,6 +28,26 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- end }}
 
 {{/*
+Merges a list of maps, such as the labels or annotations set globally and per
+component, so each key is rendered once. A later map wins when a key is set in
+more than one. Kustomize rejects a key rendered twice in one map. Renders
+nothing when every map is empty.
+
+{{ include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.frontend.podLabels) }}
+*/}}
+{{- define "sourcegraph.mergedMaps" -}}
+{{- $merged := dict -}}
+{{- range . -}}
+{{- range $key, $value := . -}}
+{{- $_ := set $merged $key $value -}}
+{{- end -}}
+{{- end -}}
+{{- with $merged -}}
+{{- toYaml . -}}
+{{- end -}}
+{{- end }}
+
+{{/*
 Selector labels
 */}}
 {{- define "sourcegraph.selectorLabels" -}}

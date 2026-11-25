@@ -4,10 +4,7 @@ metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.gitserver.labels }}
-      {{- toYaml .Values.gitserver.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.gitserver.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: gitserver
   name: {{ .Values.gitserver.name }}
@@ -24,20 +21,10 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: gitserver
       {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.gitserver.podAnnotations }}
-      {{- toYaml .Values.gitserver.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.gitserver.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.gitserver) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.gitserver.podLabels }}
-      {{- toYaml .Values.gitserver.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.gitserver.podLabels) | nindent 8 }}
         app: gitserver
         group: backend
         type: gitserver

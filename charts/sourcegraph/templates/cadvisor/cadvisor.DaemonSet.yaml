@@ -6,10 +6,7 @@ metadata:
     description: DaemonSet to ensure all nodes run a cAdvisor pod.
     seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.cadvisor.labels }}
-      {{- toYaml .Values.cadvisor.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.cadvisor.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: cadvisor
   name: {{ .Values.cadvisor.name }}
@@ -25,20 +22,10 @@ spec:
         kubectl.kubernetes.io/default-container: cadvisor
         prometheus.io/port: "48080"
         sourcegraph.prometheus/scrape: "true"
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.cadvisor.podAnnotations }}
-      {{- toYaml .Values.cadvisor.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.cadvisor.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.cadvisor) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.cadvisor.podLabels }}
-      {{- toYaml .Values.cadvisor.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.cadvisor.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: cadvisor
     spec:

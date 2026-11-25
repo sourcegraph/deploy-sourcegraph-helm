@@ -16,10 +16,7 @@ metadata:
   annotations:
     description: Manages background processes.
   labels:
-    {{- include "sourcegraph.labels" $top | nindent 4 }}
-    {{- if $top.Values.worker.labels }}
-      {{- toYaml $top.Values.worker.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" $top | fromYaml) $top.Values.worker.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: worker
   name: {{ $name }}
@@ -44,20 +41,10 @@ spec:
       annotations:
         kubectl.kubernetes.io/default-container: worker
       {{- include "sourcegraph.redisChecksum" $top | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podAnnotations }}
-      {{- toYaml $top.Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podAnnotations }}
-      {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list $top.Values.sourcegraph.podAnnotations $top.Values.worker.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podLabels }}
-      {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podLabels }}
-      {{- toYaml $top.Values.worker.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list $top.Values.sourcegraph.podLabels $top.Values.worker.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: worker
         {{- if $suffix }}

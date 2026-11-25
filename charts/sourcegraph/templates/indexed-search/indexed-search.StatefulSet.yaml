@@ -6,10 +6,7 @@ metadata:
   labels:
     deploy: sourcegraph
     app.kubernetes.io/component: indexed-search
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.indexedSearch.labels }}
-      {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.indexedSearch.labels) | nindent 4 }}
   name: {{ .Values.indexedSearch.name }}
 spec:
   replicas: {{ .Values.indexedSearch.replicaCount }}
@@ -23,21 +20,11 @@ spec:
     metadata:
       {{- if or .Values.sourcegraph.podAnnotations .Values.indexedSearch.podAnnotations }}
       annotations:
-        {{- if .Values.sourcegraph.podAnnotations }}
-        {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-        {{- end }}
-        {{- if .Values.indexedSearch.podAnnotations }}
-        {{- toYaml .Values.indexedSearch.podAnnotations | nindent 8 }}
-        {{- end }}
+        {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.indexedSearch.podAnnotations) | nindent 8 }}
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.indexedSearch.podLabels }}
-      {{- toYaml .Values.indexedSearch.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.indexedSearch.podLabels) | nindent 8 }}
         app: indexed-search
         deploy: sourcegraph
     spec:

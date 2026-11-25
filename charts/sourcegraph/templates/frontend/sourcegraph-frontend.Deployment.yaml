@@ -4,10 +4,7 @@ metadata:
   annotations:
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.frontend.labels }}
-      {{- toYaml .Values.frontend.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.frontend.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
   name: {{ .Values.frontend.name }}
@@ -30,20 +27,10 @@ spec:
         kubectl.kubernetes.io/default-container: frontend
         {{- include "sourcegraph.authChecksum" . | nindent 8 }}
         {{- include "sourcegraph.redisChecksum" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.frontend.podAnnotations }}
-      {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.frontend.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.frontend.podLabels }}
-      {{- toYaml .Values.frontend.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.frontend.podLabels) | nindent 8 }}
         app: sourcegraph-frontend
         deploy: sourcegraph
     spec:

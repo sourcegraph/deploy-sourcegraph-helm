@@ -4,10 +4,7 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntectServer.labels }}
-      {{- toYaml .Values.syntectServer.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedMaps" (list (include "sourcegraph.labels" . | fromYaml) .Values.syntectServer.labels) | nindent 4 }}
     deploy: sourcegraph
     app.kubernetes.io/component: syntect-server
   name: {{ .Values.syntectServer.name }}
@@ -28,20 +25,10 @@ spec:
     metadata:
       annotations:
         kubectl.kubernetes.io/default-container: syntect-server
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podAnnotations }}
-      {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podAnnotations .Values.syntectServer.podAnnotations) | nindent 8 }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.syntectServer) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntectServer.podLabels }}
-      {{- toYaml .Values.syntectServer.podLabels | nindent 8 }}
-      {{- end }}
+      {{- include "sourcegraph.mergedMaps" (list .Values.sourcegraph.podLabels .Values.syntectServer.podLabels) | nindent 8 }}
         deploy: sourcegraph
         app: syntect-server
     spec:
