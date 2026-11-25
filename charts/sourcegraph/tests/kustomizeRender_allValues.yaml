@@ -1,0 +1,663 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Sets every value the templates read, for every component, to a non-default
+# value, to catch templates that break or render invalid manifests when a value
+# is used. Label and annotation keys differ at each level, so a duplicate key
+# here is a template bug. kustomizeRender_allValuesAlternate.yaml covers the
+# other side of each either-or choice, and
+# kustomizeRender_allValuesExternalServices.yaml the external services. All
+# names and endpoints are placeholders.
+
+# Every generic per-component value, merged into each component below. Label
+# and annotation keys differ from the global ones in sourcegraph.
+x-component: &component
+  enabled: true
+  image:
+    tag: 1.2.3-override
+    repository: registry.example.com/override
+    defaultTagPrefix: example-
+  labels:
+    example.com/component-label: component
+  podLabels:
+    example.com/component-pod-label: component
+  podAnnotations:
+    example.com/component-pod-annotation: component
+  serviceLabels:
+    example.com/component-service-label: component
+  serviceAnnotations:
+    example.com/component-service-annotation: component
+  serviceType: NodePort
+  extraServicePorts:
+    - name: example
+      port: 9999
+      targetPort: 9999
+  storageLabels:
+    example.com/component-storage-label: component
+  storageAnnotations:
+    example.com/component-storage-annotation: component
+  storageSize: 123Gi
+  storageSubPath: example-subpath
+  volumeName: example-pv
+  extraSelectorLabels:
+    example.com/component-selector: component
+  env:
+    EXAMPLE_VALUE:
+      value: example
+    EXAMPLE_SECRET:
+      valueFrom:
+        secretKeyRef:
+          name: example-secret
+          key: EXAMPLE_SECRET
+  resources:
+    limits:
+      cpu: "3"
+      memory: 3Gi
+      ephemeral-storage: 3Gi
+    requests:
+      cpu: 300m
+      memory: 300Mi
+      ephemeral-storage: 1Gi
+  containerSecurityContext:
+    capabilities:
+      drop: [ALL]
+    seccompProfile:
+      type: RuntimeDefault
+  podSecurityContext:
+    fsGroup: 2000
+    fsGroupChangePolicy: OnRootMismatch
+  extraVolumes:
+    - name: example-extra
+      emptyDir: {}
+  extraVolumeMounts:
+    - name: example-extra
+      mountPath: /example-extra
+  extraContainers:
+    - name: example-sidecar
+      image: registry.example.com/example-sidecar:1.0.0
+  extraInitContainers:
+    - name: example-init
+      image: registry.example.com/example-init:1.0.0
+      command: [sh, -c, "true"]
+  serviceAccount:
+    create: true
+    annotations:
+      example.com/service-account-annotation: component
+  nodeSelector:
+    example.com/node-pool: component
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                example.com/anti-affinity: component
+            topologyKey: kubernetes.io/hostname
+  tolerations:
+    - key: example.com/node-pool
+      operator: Equal
+      value: component
+      effect: NoSchedule
+  priorityClassName: component-priority
+  preShutdownPause: 7s
+  gracefulShutdownTimeout: 20s
+  terminationGracePeriodSeconds: 40
+  podDisruptionBudget:
+    minAvailable: 1
+
+nameOverride: example-sourcegraph
+sourcegraph:
+  image:
+    defaultTag: 1.2.3
+    pullPolicy: Always
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  imagePullSecrets:
+  - name: registry-credentials
+  labels:
+    example.com/global-label: global
+  podLabels:
+    example.com/global-pod-label: global
+  podAnnotations:
+    example.com/global-pod-annotation: global
+  serviceLabels:
+    example.com/global-service-label: global
+  nodeSelector:
+    example.com/node-pool: global
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: example.com/node-pool
+            operator: Exists
+  tolerations:
+  - key: example.com/global
+    operator: Exists
+    effect: NoSchedule
+  priorityClassName: global-priority
+  revisionHistoryLimit: 5
+  preShutdownPause: 6s
+  gracefulShutdownTimeout: 18s
+  terminationGracePeriodSeconds: 35
+  localDevMode: false
+storageClass:
+  create: true
+  name: example-storage-class
+  provisioner: pd.csi.storage.gke.io
+  type: pd-ssd
+  parameters:
+    replication-type: regional-pd
+  allowedTopologies:
+  - matchLabelExpressions:
+    - key: topology.gke.io/zone
+      values:
+      - zone-a
+      - zone-b
+  annotations:
+    example.com/storage-class: example
+  allowVolumeExpansion: false
+  reclaimPolicy: Retain
+  volumeBindingMode: WaitForFirstConsumer
+alpine:
+  containerSecurityContext:
+    capabilities:
+      drop:
+      - ALL
+sgTestConnection:
+  enabled: true
+priorityClasses:
+- name: example-priority
+  value: 1000
+  preemptionPolicy: Never
+  description: Example priority
+extraResources:
+- apiVersion: v1
+  kind: ConfigMap
+  metadata:
+    name: example-extra
+  data:
+    key: value
+
+cadvisor:
+  <<: *component
+  name: example-cadvisor
+  serviceAccount:
+    create: true
+    name: example-cadvisor
+    annotations:
+      example.com/service-account-annotation: component
+  containerSecurityContext:
+    capabilities:
+      drop:
+      - ALL
+    privileged: true
+
+codeInsightsDB:
+  <<: *component
+  name: example-code-insights-d-b
+  serviceAccount:
+    create: true
+    name: example-code-insights-d-b
+    annotations:
+      example.com/service-account-annotation: component
+  auth:
+    host: code-insights-d-b.example.com
+    port: '6543'
+    user: example-user
+    password: placeholder-password
+    database: example-database
+    sslmode: require
+  additionalConfig: 'max_connections = 200
+  
+    '
+  postgresExporter:
+    env:
+      EXAMPLE_EXPORTER:
+        value: example
+  init:
+    containerSecurityContext:
+      capabilities:
+        drop:
+        - ALL
+
+codeIntelDB:
+  <<: *component
+  name: example-code-intel-d-b
+  serviceAccount:
+    create: true
+    name: example-code-intel-d-b
+    annotations:
+      example.com/service-account-annotation: component
+  auth:
+    host: code-intel-d-b.example.com
+    port: '6543'
+    user: example-user
+    password: placeholder-password
+    database: example-database
+    sslmode: require
+  additionalConfig: 'max_connections = 200
+  
+    '
+  postgresExporter:
+    env:
+      EXAMPLE_EXPORTER:
+        value: example
+
+frontend:
+  <<: *component
+  name: example-frontend
+  serviceAccount:
+    create: true
+    name: example-frontend
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  command:
+  - /bin/sh
+  - -c
+  - exec /usr/local/bin/frontend serve
+  internalServiceType: NodePort
+  privileged: true
+  createRoleBinding: true
+  ingress:
+    enabled: true
+    ingressClassName: example
+    annotations:
+      kubernetes.io/ingress.class: null
+      example.com/ingress-annotation: example
+    labels:
+      example.com/ingress-label: example
+    host: sourcegraph.example.com
+    tlsSecret: example-tls
+
+migrator:
+  <<: *component
+  serviceAccount:
+    create: true
+    name: example-migrator
+    annotations:
+      example.com/service-account-annotation: component
+  command:
+  - /bin/sh
+  - -c
+  - exec /usr/local/bin/migrator up
+  databaseAuthOverrideEnvVars: false
+
+gitserver:
+  <<: *component
+  name: example-gitserver
+  serviceAccount:
+    create: true
+    name: example-gitserver
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  sshSecret: gitserver-ssh
+  storageAccessModes:
+  - ReadWriteOncePod
+
+grafana:
+  <<: *component
+  name: example-grafana
+  serviceAccount:
+    create: true
+    name: example-grafana
+    annotations:
+      example.com/service-account-annotation: component
+  auth:
+    host: grafana-db.example.com
+    port: '6543'
+    user: example-user
+    password: placeholder-password
+    database: grafana
+    sslmode: require
+
+indexedSearch:
+  <<: *component
+  name: example-indexed-search
+  serviceAccount:
+    create: true
+    name: example-indexed-search
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  indexerName: example-indexer
+  livenessProbe:
+    failureThreshold: 5
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    timeoutSeconds: 3
+  readinessProbe:
+    failureThreshold: 5
+    periodSeconds: 10
+    timeoutSeconds: 3
+
+indexedSearchIndexer:
+  <<: *component
+  serviceAccount:
+    create: true
+    name: example-indexed-search-indexer
+    annotations:
+      example.com/service-account-annotation: component
+
+blobstore:
+  <<: *component
+  name: example-blobstore
+  serviceAccount:
+    create: true
+    name: example-blobstore
+    annotations:
+      example.com/service-account-annotation: component
+
+openTelemetry:
+  <<: *component
+  serviceAccount:
+    create: true
+    name: example-open-telemetry
+    annotations:
+      example.com/service-account-annotation: component
+  gateway:
+    name: example-otel-gateway
+    args:
+    - --feature-gates=example
+    env:
+      EXAMPLE_OTEL:
+        value: gateway
+    extraInitContainers:
+    - name: otel-gateway-init
+      image: registry.example.com/example-init:1.0.0
+      command:
+      - sh
+      - -c
+      - 'true'
+    labels:
+      example.com/otel-gateway-label: gateway
+    podLabels:
+      example.com/otel-gateway-pod-label: gateway
+    podAnnotations:
+      example.com/otel-gateway-pod-annotation: gateway
+    resources:
+      limits:
+        cpu: '2'
+        memory: 2Gi
+      requests:
+        cpu: 200m
+        memory: 200Mi
+    serviceAccount:
+      create: true
+      name: example-otel-gateway
+      annotations:
+        example.com/sa: gateway
+    containerSecurityContext:
+      capabilities:
+        drop:
+        - ALL
+    command:
+    - /bin/sh
+    - -c
+    - exec /bin/otelcol-sourcegraph "$@"
+    - --
+    serviceType: NodePort
+    serviceLabels:
+      example.com/otel-gateway-service-label: gateway
+    serviceAnnotations:
+      example.com/otel-gateway-service-annotation: gateway
+    extraServicePorts:
+    - name: example
+      port: 9996
+      targetPort: 9996
+  agent:
+    name: example-otel-agent
+    args:
+    - --feature-gates=example
+    env:
+      EXAMPLE_OTEL:
+        value: agent
+    extraInitContainers:
+    - name: otel-agent-init
+      image: registry.example.com/example-init:1.0.0
+      command:
+      - sh
+      - -c
+      - 'true'
+    labels:
+      example.com/otel-agent-label: agent
+    podLabels:
+      example.com/otel-agent-pod-label: agent
+    podAnnotations:
+      example.com/otel-agent-pod-annotation: agent
+    resources:
+      limits:
+        cpu: '2'
+        memory: 2Gi
+      requests:
+        cpu: 200m
+        memory: 200Mi
+    serviceAccount:
+      create: true
+      name: example-otel-agent
+      annotations:
+        example.com/sa: agent
+    containerSecurityContext:
+      capabilities:
+        drop:
+        - ALL
+    kind: DaemonSet
+    hostPorts:
+      grpcOtlp: 14317
+      httpOtlp: 14318
+      httpZpages: 15679
+
+nodeExporter:
+  <<: *component
+  name: example-node-exporter
+  serviceAccount:
+    create: true
+    name: example-node-exporter
+    annotations:
+      example.com/service-account-annotation: component
+  hostPID: true
+  extraArgs:
+  - --collector.example
+
+pgsql:
+  <<: *component
+  name: example-pgsql
+  serviceAccount:
+    create: true
+    name: example-pgsql
+    annotations:
+      example.com/service-account-annotation: component
+  auth:
+    host: pgsql.example.com
+    port: '6543'
+    user: example-user
+    password: placeholder-password
+    database: example-database
+    sslmode: require
+  additionalConfig: 'max_connections = 200
+  
+    '
+  postgresExporter:
+    env:
+      EXAMPLE_EXPORTER:
+        value: example
+
+postgresExporter:
+  <<: *component
+  serviceAccount:
+    create: true
+    name: example-postgres-exporter
+    annotations:
+      example.com/service-account-annotation: component
+
+syntacticCodeIntel:
+  <<: *component
+  name: example-syntactic-code-intel
+  serviceAccount:
+    create: true
+    name: example-syntactic-code-intel
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  storageType: pvc
+  storageClassName: example-storage-class
+  containerSecurityContext:
+    capabilities:
+      drop:
+      - ALL
+    runAsGroup: 202
+
+preciseCodeIntel:
+  <<: *component
+  name: example-precise-code-intel
+  serviceAccount:
+    create: true
+    name: example-precise-code-intel
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  storageType: pvc
+  storageClassName: example-storage-class
+  containerSecurityContext:
+    capabilities:
+      drop:
+      - ALL
+    runAsGroup: 202
+
+prometheus:
+  <<: *component
+  name: example-prometheus
+  serviceAccount:
+    create: true
+    name: example-prometheus
+    annotations:
+      example.com/service-account-annotation: component
+  privileged: true
+  createRoleBinding: true
+
+redisCache:
+  <<: *component
+  name: example-redis-cache
+  serviceAccount:
+    create: true
+    name: example-redis-cache
+    annotations:
+      example.com/service-account-annotation: component
+  config:
+    enabled: true
+    additionalConfig: 'timeout 300
+  
+      '
+  connection:
+    endpoint: redis-cache.example.com:6380
+
+redisExporter:
+  <<: *component
+  serviceAccount:
+    create: true
+    name: example-redis-exporter
+    annotations:
+      example.com/service-account-annotation: component
+
+redisStore:
+  <<: *component
+  name: example-redis-store
+  serviceAccount:
+    create: true
+    name: example-redis-store
+    annotations:
+      example.com/service-account-annotation: component
+  config:
+    enabled: true
+    additionalConfig: 'timeout 300
+  
+      '
+  connection:
+    endpoint: redis-store.example.com:6380
+
+searcher:
+  <<: *component
+  name: example-searcher
+  serviceAccount:
+    create: true
+    name: example-searcher
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  autoCacheSize: false
+
+syntectServer:
+  <<: *component
+  name: example-syntect-server
+  serviceAccount:
+    create: true
+    name: example-syntect-server
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+
+jaeger:
+  <<: *component
+  name: example-jaeger
+  serviceAccount:
+    create: true
+    name: example-jaeger
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  args:
+  - --config=/etc/jaeger/jaeger-config.yaml
+  - --example-flag
+  collector:
+    name: example-jaeger-collector
+    serviceType: NodePort
+    serviceLabels:
+      example.com/jaeger-collector-label: collector
+    serviceAnnotations:
+      example.com/jaeger-collector-annotation: collector
+    extraServicePorts:
+    - name: example
+      port: 9998
+      targetPort: 9998
+  query:
+    name: example-jaeger-query
+    serviceType: NodePort
+    serviceLabels:
+      example.com/jaeger-query-label: query
+    serviceAnnotations:
+      example.com/jaeger-query-annotation: query
+    extraServicePorts:
+    - name: example
+      port: 9997
+      targetPort: 9997
+  config:
+    logLevel: debug
+    maxTraces: 1000
+    samplingDefaultProbability: 0.5
+
+worker:
+  <<: *component
+  name: example-worker
+  serviceAccount:
+    create: true
+    name: example-worker
+    annotations:
+      example.com/service-account-annotation: component
+  replicaCount: 3
+  replicas:
+  - jobs:
+    - codeintel-upload-janitor
+    replicaCount: 2
+    resources:
+      requests:
+        cpu: '1'
+        memory: 1Gi
+  - jobs:
+    - insights-job
+  blocklist:
+  - example-job
+

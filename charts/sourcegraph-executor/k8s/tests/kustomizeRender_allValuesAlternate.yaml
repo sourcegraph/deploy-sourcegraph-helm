@@ -1,0 +1,22 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# The other side of each either-or choice in kustomizeRender_allValues.yaml:
+# several queues, an existing Secret, the individual securityContext values,
+# no RBAC, and local development mode. All names are placeholders.
+
+sourcegraph:
+  localDevMode: true
+
+executor:
+  configureRbac: false
+  frontendUrl: https://sourcegraph.example.com
+  frontendExistingSecret: executor-credentials
+  queueNames: [batches, codeintel]
+  podSecurityContext: {}
+  securityContext:
+    runAsUser: 1000
+    runAsGroup: 1000
+    fsGroup: 1000
+    privileged: false

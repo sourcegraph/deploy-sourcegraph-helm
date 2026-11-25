@@ -13,12 +13,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
-      # Installs the Helm version in .tool-versions, the same one Buildkite uses.
-      # kubectl, with its built-in kustomize, comes with the runner image.
-      - name: Set up Helm
+      # Installs the Helm and kubeconform versions in .tool-versions, the same
+      # ones Buildkite uses. kubectl, with its built-in kustomize, comes with the
+      # runner image.
+      - name: Set up Helm and kubeconform
         uses: jdx/mise-action@924e7c586e33d7d4bae9c14e26c5d22e2beb6e78 # v5.3.0
         with:
-          install_args: helm
+          install_args: helm kubeconform
 
-      - name: Render each chart's tests/kustomizeRender_*.yaml and build it with kustomize
+      - name: Render each chart's tests/kustomizeRender_*.yaml and check the output
         run: scripts/ci/kustomize-render.sh

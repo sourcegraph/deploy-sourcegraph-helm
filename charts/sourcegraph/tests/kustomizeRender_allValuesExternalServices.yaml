@@ -1,0 +1,67 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# External Postgres databases, Redis instances, object storage, and trace
+# backend in place of the bundled ones, with no Kubernetes Secrets. All names
+# and endpoints are placeholders.
+
+sourcegraph:
+  disableKubernetesSecrets: true
+pgsql:
+  enabled: false
+  auth:
+    host: pgsql.example.com
+    port: '5432'
+    user: example-user
+    password: placeholder-password
+    database: example-database
+    sslmode: verify-full
+codeIntelDB:
+  enabled: false
+  auth:
+    host: code-intel-d-b.example.com
+    port: '5432'
+    user: example-user
+    password: placeholder-password
+    database: example-database
+    sslmode: verify-full
+codeInsightsDB:
+  enabled: false
+  auth:
+    host: code-insights-d-b.example.com
+    port: '5432'
+    user: example-user
+    password: placeholder-password
+    database: example-database
+    sslmode: verify-full
+redisCache:
+  enabled: false
+  connection:
+    endpoint: rediss://redis-cache.example.com:6380
+redisStore:
+  enabled: false
+  connection:
+    endpoint: rediss://redis-store.example.com:6380
+blobstore:
+  enabled: false
+jaeger:
+  enabled: false
+openTelemetry:
+  gateway:
+    config:
+      traces:
+        exporters:
+          otlp:
+            endpoint: otlp.example.com:4317
+            tls:
+              ca_file: /tls/ca.pem
+        exportersTlsSecretName: otel-exporter-tls
+        processors:
+          batch:
+            timeout: 5s
+          probabilistic_sampler:
+            sampling_percentage: 50
+        tracePipelineProcessors:
+        - probabilistic_sampler
+        - batch

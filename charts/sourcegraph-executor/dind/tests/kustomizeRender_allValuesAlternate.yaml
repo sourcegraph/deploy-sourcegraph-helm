@@ -1,0 +1,19 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# The other side of each either-or choice in kustomizeRender_allValues.yaml:
+# one Deployment for one queue, an inline password, a size-limited emptyDir,
+# no gVisor, and no private registry. All names and endpoints are
+# placeholders.
+
+executor:
+  frontendUrl: https://sourcegraph.example.com
+  frontendPassword: placeholder-password
+  queueName: batches
+  storage:
+    type: emptyDir
+    size: 20Gi
+
+privateDockerRegistry:
+  enabled: false

@@ -1,0 +1,132 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Sets every value the templates read to a non-default value, to catch
+# templates that break or render invalid manifests when a value is used.
+# kustomizeRender_allValuesAlternate.yaml covers the other side of each
+# either-or choice. All names and endpoints are placeholders.
+
+nameOverride: example-executor
+
+sourcegraph:
+  image:
+    defaultTag: 1.2.3
+    pullPolicy: Always
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  imagePullSecrets:
+    - name: registry-credentials
+  labels:
+    example.com/project: sourcegraph
+  podAnnotations:
+    example.com/pod-annotation: global
+  podLabels:
+    example.com/pod-label: global
+  priorityClassName: example-priority
+  # Documented, but the executor reads executor.nodeSelector, affinity, and tolerations
+  nodeSelector:
+    example.com/dedicated: sourcegraph
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: example.com/dedicated
+                operator: Exists
+  tolerations:
+    - key: example.com/dedicated
+      operator: Exists
+      effect: NoSchedule
+
+executor:
+  configureRbac: true
+  priorityClassName: example-executor-priority
+  image:
+    name: example-executor-image
+    tag: 4.5.6
+  frontendUrl: https://sourcegraph.example.com
+  frontendPassword: placeholder-password
+  queueName: batches
+  maximumNumJobs: 4
+  maximumRuntimePerJob: 1h
+  log:
+    level: debug
+    format: json
+    trace: "true"
+  namespace: sourcegraph-executors
+  kubeconfigPath: /etc/kube/config
+  labels:
+    example.com/service: executor
+  podAnnotations:
+    example.com/pod-annotation-executor: executor
+  podLabels:
+    example.com/pod-label-executor: executor
+  serviceAnnotations:
+    example.com/service-annotation: executor
+  serviceLabels:
+    example.com/service-label: executor
+  serviceType: NodePort
+  resources:
+    limits:
+      cpu: "2"
+      memory: 8Gi
+    requests:
+      cpu: "1"
+      memory: 1Gi
+  containerSecurityContext:
+    privileged: false
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+  podSecurityContext:
+    runAsNonRoot: true
+    fsGroup: 1000
+  kubernetesJob:
+    deadline: "600"
+    runAsUser: "1000"
+    runAsGroup: "1000"
+    fsGroup: "1000"
+    resources:
+      requests:
+        cpu: 500m
+        memory: 2Gi
+      limits:
+        cpu: "4"
+        memory: 16Gi
+    node:
+      name: example-node
+      selector: example.com/executors=true
+      # The template does not quote these values, so their quotes must be escaped, as values.yaml documents
+      tolerations: '[{\"key\":\"example.com/executors\",\"operator\":\"Equal\",\"value\":\"true\",\"effect\":\"NoSchedule\"}]'
+      requiredAffinityMatchExpressions: '[{\"key\":\"example.com/executors\",\"operator\":\"In\",\"values\":[\"true\"]}]'
+      requiredAffinityMatchFields: '[{\"key\":\"metadata.name\",\"operator\":\"In\",\"values\":[\"example-node\"]}]'
+    pod:
+      affinity: '[{\"labelSelector\":{\"matchExpressions\":[{\"key\":\"app\",\"operator\":\"In\",\"values\":[\"example\"]}]},\"topologyKey\":\"kubernetes.io/hostname\"}]'
+      antiAffinity: '[{\"labelSelector\":{\"matchExpressions\":[{\"key\":\"app\",\"operator\":\"In\",\"values\":[\"example\"]}]},\"topologyKey\":\"kubernetes.io/hostname\"}]'
+  debug:
+    keepJobs: "true"
+    keepWorkspaces: "true"
+  dockerAddHostGateway: "true"
+  nodeSelector:
+    example.com/executors: "true"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: example.com/executors
+                operator: In
+                values: ["true"]
+  tolerations:
+    - key: example.com/executors
+      operator: Equal
+      value: "true"
+      effect: NoSchedule
+  extraEnv:
+    - name: EXAMPLE_VALUE
+      value: example
+    - name: EXAMPLE_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: example-secret
+          key: EXAMPLE_SECRET
