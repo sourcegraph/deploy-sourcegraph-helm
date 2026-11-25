@@ -6,13 +6,13 @@ metadata:
     description: DaemonSet to ensure all nodes run a node-exporter pod.
     seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.nodeExporter.labels }}
-      {{- toYaml .Values.nodeExporter.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app: node-exporter
-    app.kubernetes.io/component: node-exporter
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.nodeExporter.labels
+      "deploy: sourcegraph"
+      "app: node-exporter"
+      "app.kubernetes.io/component: node-exporter"
+    ) | nindent 4 }}
   name: {{ .Values.nodeExporter.name }}
 spec:
   selector:
@@ -31,15 +31,13 @@ spec:
       {{- toYaml .Values.nodeExporter.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.nodeExporter) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.nodeExporter.podLabels }}
-      {{- toYaml .Values.nodeExporter.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: node-exporter
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.nodeExporter))
+          .Values.sourcegraph.podLabels
+          .Values.nodeExporter.podLabels
+          "deploy: sourcegraph"
+          "app: node-exporter"
+        ) | nindent 8 }}
     spec:
       {{- if .Values.nodeExporter.serviceAccount.create }}
       {{- include "sourcegraph.renderServiceAccountName" (list . "nodeExporter") | trim | nindent 6 }}

@@ -7,13 +7,13 @@ metadata:
   {{- toYaml .Values.jaeger.collector.serviceAnnotations | nindent 4 }}
   {{- end }}
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: all-in-one
-    app: jaeger
-    app.kubernetes.io/name: jaeger
-    {{- if .Values.jaeger.collector.serviceLabels }}
-      {{- toYaml .Values.jaeger.collector.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: all-in-one"
+      "app: jaeger"
+      "app.kubernetes.io/name: jaeger"
+      .Values.jaeger.collector.serviceLabels
+    ) | nindent 4 }}
   name: {{ default "jaeger-collector" .Values.jaeger.collector.name }}
 spec:
   ports:

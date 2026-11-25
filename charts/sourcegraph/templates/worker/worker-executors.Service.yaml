@@ -8,12 +8,12 @@ metadata:
     {{- toYaml .Values.worker.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: worker
-    deploy: sourcegraph
-    app.kubernetes.io/component: worker
-    {{- if .Values.worker.serviceLabels }}
-      {{- toYaml .Values.worker.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "app: worker"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: worker"
+      .Values.worker.serviceLabels
+    ) | nindent 4 }}
   name: worker-executors
 spec:
   ports:

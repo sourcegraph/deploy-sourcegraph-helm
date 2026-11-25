@@ -5,12 +5,12 @@ metadata:
   annotations:
     description: Receives, processes, and exports telemetry data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.openTelemetry.gateway.labels }}
-      {{- toYaml .Values.openTelemetry.gateway.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: otel-collector
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.openTelemetry.gateway.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: otel-collector"
+    ) | nindent 4 }}
   name: {{ .Values.openTelemetry.gateway.name }}
 spec:
   selector:
@@ -31,15 +31,13 @@ spec:
       {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.gateway) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.gateway.podLabels }}
-      {{- toYaml .Values.openTelemetry.gateway.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: otel-collector
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.gateway))
+          .Values.sourcegraph.podLabels
+          .Values.openTelemetry.gateway.podLabels
+          "deploy: sourcegraph"
+          "app: otel-collector"
+        ) | nindent 8 }}
     spec:
       {{- with .Values.openTelemetry.gateway.extraInitContainers }}
       initContainers:

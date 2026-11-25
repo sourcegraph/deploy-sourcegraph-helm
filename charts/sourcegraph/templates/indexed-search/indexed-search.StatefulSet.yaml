@@ -4,12 +4,12 @@ metadata:
   annotations:
     description: Backend for indexed text search operations.
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: indexed-search
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.indexedSearch.labels }}
-      {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: indexed-search"
+      (include "sourcegraph.labels" .)
+      .Values.indexedSearch.labels
+    ) | nindent 4 }}
   name: {{ .Values.indexedSearch.name }}
 spec:
   replicas: {{ .Values.indexedSearch.replicaCount }}
@@ -31,15 +31,13 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.indexedSearch.podLabels }}
-      {{- toYaml .Values.indexedSearch.podLabels | nindent 8 }}
-      {{- end }}
-        app: indexed-search
-        deploy: sourcegraph
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.indexedSearch))
+          .Values.sourcegraph.podLabels
+          .Values.indexedSearch.podLabels
+          "app: indexed-search"
+          "deploy: sourcegraph"
+        ) | nindent 8 }}
     spec:
       {{- with .Values.indexedSearch.extraInitContainers }}
       initContainers:
@@ -155,10 +153,10 @@ spec:
   volumeClaimTemplates:
   - metadata:
       labels:
-        deploy: sourcegraph
-        {{- with .Values.indexedSearch.storageLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "deploy: sourcegraph"
+          .Values.indexedSearch.storageLabels
+        ) | nindent 8 }}
       name: data
       {{- if .Values.indexedSearch.storageAnnotations }}
       annotations:

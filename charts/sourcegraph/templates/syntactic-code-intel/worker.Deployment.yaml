@@ -5,12 +5,12 @@ metadata:
   annotations:
     description: Handles syntactic code intelligence indexing
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntacticCodeIntel.labels }}
-      {{- toYaml .Values.syntacticCodeIntel.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: syntactic-code-intel
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.syntacticCodeIntel.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: syntactic-code-intel"
+    ) | nindent 4 }}
   name: {{ .Values.syntacticCodeIntel.name }}
 spec:
   minReadySeconds: 10
@@ -37,15 +37,13 @@ spec:
       {{- toYaml .Values.syntacticCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.syntacticCodeIntel) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.syntacticCodeIntel.podLabels }}
-      {{- toYaml .Values.syntacticCodeIntel.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: syntactic-code-intel-worker
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.syntacticCodeIntel))
+          .Values.sourcegraph.podLabels
+          .Values.syntacticCodeIntel.podLabels
+          "deploy: sourcegraph"
+          "app: syntactic-code-intel-worker"
+        ) | nindent 8 }}
     spec:
       {{- $storageType := .Values.syntacticCodeIntel.storageType | default "emptyDir" }}
       {{- if not (has $storageType (list "emptyDir" "pvc")) }}

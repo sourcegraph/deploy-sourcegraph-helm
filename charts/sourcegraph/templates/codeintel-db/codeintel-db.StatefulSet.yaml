@@ -5,12 +5,12 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeIntelDB.labels }}
-      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeintel-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.codeIntelDB.labels
+      "app.kubernetes.io/component: codeintel-db"
+      "deploy: sourcegraph"
+    ) | nindent 4 }}
   name: {{ .Values.codeIntelDB.name }}
 spec:
   replicas: 1
@@ -32,16 +32,14 @@ spec:
       {{- toYaml .Values.codeIntelDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.codeIntelDB) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeIntelDB.podLabels }}
-      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: codeintel-db
-        group: backend
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.codeIntelDB))
+          .Values.sourcegraph.podLabels
+          .Values.codeIntelDB.podLabels
+          "deploy: sourcegraph"
+          "app: codeintel-db"
+          "group: backend"
+        ) | nindent 8 }}
     spec:
       initContainers:
       {{- with .Values.codeIntelDB.extraInitContainers }}

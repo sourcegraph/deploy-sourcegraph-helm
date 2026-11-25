@@ -4,12 +4,12 @@ metadata:
   annotations:
     description: Backend for text search operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.searcher.labels }}
-      {{- toYaml .Values.searcher.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: searcher
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.searcher.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: searcher"
+    ) | nindent 4 }}
   name: {{ .Values.searcher.name }}
 spec:
   replicas: {{ .Values.searcher.replicaCount }}
@@ -33,15 +33,13 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.searcher) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.searcher.podLabels }}
-      {{- toYaml .Values.searcher.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: searcher
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.searcher))
+          .Values.sourcegraph.podLabels
+          .Values.searcher.podLabels
+          "deploy: sourcegraph"
+          "app: searcher"
+        ) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "searcher") | nindent 6 }}
       {{- with .Values.searcher.extraInitContainers }}

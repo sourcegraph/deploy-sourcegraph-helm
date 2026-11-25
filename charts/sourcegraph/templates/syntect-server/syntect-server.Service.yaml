@@ -8,12 +8,12 @@ metadata:
     {{- toYaml .Values.syntectServer.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: syntect-server
-    deploy: sourcegraph
-    app.kubernetes.io/component: syntect-server
-    {{- if .Values.syntectServer.serviceLabels }}
-      {{- toYaml .Values.syntectServer.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "app: syntect-server"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: syntect-server"
+      .Values.syntectServer.serviceLabels
+    ) | nindent 4 }}
   name: syntect-server
 spec:
   ports:

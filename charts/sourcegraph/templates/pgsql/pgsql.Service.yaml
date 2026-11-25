@@ -9,12 +9,12 @@ metadata:
     {{- toYaml .Values.pgsql.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: pgsql
-    deploy: sourcegraph
-    app.kubernetes.io/component: pgsql
-    {{- if .Values.pgsql.serviceLabels }}
-      {{- toYaml .Values.pgsql.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "app: pgsql"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: pgsql"
+      .Values.pgsql.serviceLabels
+    ) | nindent 4 }}
   name: pgsql
 spec:
   ports:

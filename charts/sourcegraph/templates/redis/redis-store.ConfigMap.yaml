@@ -9,12 +9,12 @@ metadata:
   annotations:
     description: Configuration for redis-store
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.redisStore.labels }}
-      {{- toYaml .Values.redisStore.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: redis
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.redisStore.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: redis"
+    ) | nindent 4 }}
   name: {{ .Values.redisStore.name }}-conf
 data:
   redis.conf: |

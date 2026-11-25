@@ -5,12 +5,12 @@ metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.grafana.labels }}
-      {{- toYaml .Values.grafana.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: grafana
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.grafana.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: grafana"
+    ) | nindent 4 }}
   name: {{ .Values.grafana.name }}
 spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -35,15 +35,13 @@ spec:
       {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.grafana) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.grafana.podLabels }}
-      {{- toYaml .Values.grafana.podLabels | nindent 8 }}
-      {{- end }}
-        app: grafana
-        deploy: sourcegraph
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" (list . .Values.grafana))
+          .Values.sourcegraph.podLabels
+          .Values.grafana.podLabels
+          "app: grafana"
+          "deploy: sourcegraph"
+        ) | nindent 8 }}
     spec:
       {{- with .Values.grafana.extraInitContainers }}
       initContainers:

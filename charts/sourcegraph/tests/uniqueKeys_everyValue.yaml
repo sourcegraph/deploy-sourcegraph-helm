@@ -1,0 +1,83 @@
+# Every label value sets the same keys, including keys the chart sets itself,
+# and every optional object is enabled. Used by uniqueKeys_test.yaml.
+sourcegraph:
+  labels: &objectLabels
+    example.com/team: platform
+    deploy: from-values
+    app: from-values
+    app.kubernetes.io/component: from-values
+    app.kubernetes.io/name: from-values
+    helm.sh/chart: from-values
+  podLabels: &podLabels
+    example.com/team: platform
+    deploy: from-values
+    app: from-values
+    app.kubernetes.io/component: from-values
+
+blobstore: &component
+  labels: *objectLabels
+  podLabels: *podLabels
+  serviceLabels: *objectLabels
+  serviceAccount:
+    create: true
+cadvisor: *component
+codeInsightsDB: *component
+codeIntelDB: *component
+grafana:
+  <<: *component
+  storageLabels: *objectLabels
+nodeExporter: *component
+pgsql: *component
+prometheus: *component
+
+frontend: &componentWithBudget
+  <<: *component
+  podDisruptionBudget:
+    minAvailable: 1
+gitserver:
+  <<: *componentWithBudget
+  storageLabels: *objectLabels
+indexedSearch:
+  <<: *componentWithBudget
+  storageLabels: *objectLabels
+searcher:
+  <<: *componentWithBudget
+  storageLabels: *objectLabels
+syntectServer: *componentWithBudget
+worker:
+  <<: *componentWithBudget
+  replicas:
+  - jobs: ["codeintel-upload-janitor"]
+  - jobs: ["insights-job"]
+
+redisCache: &redis
+  <<: *componentWithBudget
+  config:
+    enabled: true
+redisStore: *redis
+
+preciseCodeIntel: &codeIntel
+  <<: *componentWithBudget
+  enabled: true
+  storageType: pvc
+  storageSize: 10Gi
+syntacticCodeIntel: *codeIntel
+
+openTelemetry:
+  agent: *component
+  gateway: *component
+
+jaeger:
+  enabled: true
+  labels: *objectLabels
+  podLabels: *podLabels
+  collector:
+    serviceLabels: *objectLabels
+  query:
+    serviceLabels: *objectLabels
+
+storageClass:
+  create: true
+priorityClasses:
+- name: sourcegraph-high-priority
+  value: 1000

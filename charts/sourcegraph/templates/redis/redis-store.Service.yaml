@@ -9,12 +9,12 @@ metadata:
     {{- toYaml .Values.redisStore.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    app: redis-store
-    deploy: sourcegraph
-    app.kubernetes.io/component: redis
-    {{- if .Values.redisStore.serviceLabels }}
-      {{- toYaml .Values.redisStore.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.uniqueKeys" (list
+      "app: redis-store"
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: redis"
+      .Values.redisStore.serviceLabels
+    ) | nindent 4 }}
   name: redis-store
 spec:
   ports:
