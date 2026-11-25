@@ -1,0 +1,210 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Shaped like Sourcegraph Cloud: external Postgres and object storage,
+# workload identity, a sidecar, per-component pod labels and annotations, and
+# extra resources. All names and endpoints are placeholders.
+
+sourcegraph:
+  image:
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  nodeSelector:
+    example.com/node-pool: sourcegraph
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: example.com/node-pool
+                operator: In
+                values: [sourcegraph]
+
+priorityClasses:
+  - name: sourcegraph-high-priority
+    value: 1000000
+    preemptionPolicy: PreemptLowerPriority
+    description: High priority for node-level daemons
+
+storageClass:
+  create: true
+  name: sourcegraph
+  provisioner: pd.csi.storage.gke.io
+  type: pd-ssd
+  parameters:
+    replication-type: regional-pd
+  volumeBindingMode: WaitForFirstConsumer
+  reclaimPolicy: Retain
+  allowedTopologies:
+    - matchLabelExpressions:
+        - key: topology.gke.io/zone
+          values: [zone-a, zone-b]
+
+pgsql:
+  enabled: false
+  auth:
+    host: ""
+    user: database-user
+    database: pgsql
+codeIntelDB:
+  enabled: false
+  auth:
+    host: ""
+    user: database-user
+    database: codeintel-db
+codeInsightsDB:
+  enabled: false
+  auth:
+    host: ""
+    user: database-user
+    database: codeinsights-db
+blobstore:
+  enabled: false
+
+redisCache:
+  connection:
+    endpoint: rediss://10.0.0.1:6378
+redisStore:
+  connection:
+    endpoint: rediss://10.0.0.2:6379
+  podAnnotations:
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+
+frontend:
+  replicaCount: 2
+  podDisruptionBudget:
+    minAvailable: 1
+  podLabels:
+    app.kubernetes.io/component: frontend
+  podAnnotations:
+    prometheus.io/port: "6060"
+  serviceAnnotations:
+    cloud.google.com/neg: '{"ingress": true}'
+  serviceAccount:
+    annotations:
+      iam.gke.io/gcp-service-account: frontend@project-id.iam.gserviceaccount.com
+  ingress:
+    host: sourcegraph.example.com
+    annotations:
+      kubernetes.io/ingress.class: gce
+      nginx.ingress.kubernetes.io/proxy-body-size: null
+      kubernetes.io/ingress.global-static-ip-name: static-ip-name
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchLabels:
+                app: sourcegraph-frontend
+            topologyKey: kubernetes.io/hostname
+  env:
+    EXAMPLE_FEATURE_ENABLED:
+      value: "true"
+    EXAMPLE_SECRET:
+      valueFrom:
+        secretKeyRef:
+          name: example-secret
+          key: EXAMPLE_SECRET
+  extraContainers:
+    - name: example-sidecar
+      image: registry.example.com/example-sidecar:1.0.0
+      volumeMounts:
+        - name: example-sidecar-config
+          mountPath: /etc/example
+  extraVolumes:
+    - name: example-sidecar-config
+      configMap:
+        name: example-sidecar-config
+
+gitserver:
+  podLabels:
+    app.kubernetes.io/component: gitserver
+  podAnnotations:
+    prometheus.io/port: "6060"
+    cluster-autoscaler.kubernetes.io/safe-to-evict: "false"
+  serviceAccount:
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: gitserver@project-id.iam.gserviceaccount.com
+  storageSize: 200Gi
+
+worker:
+  podLabels:
+    app.kubernetes.io/component: worker
+  podAnnotations:
+    prometheus.io/port: "6060"
+  serviceAccount:
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: worker@project-id.iam.gserviceaccount.com
+
+searcher:
+  replicaCount: 2
+  podLabels:
+    app.kubernetes.io/component: searcher
+  podDisruptionBudget:
+    maxUnavailable: 1
+
+indexedSearch:
+  podLabels:
+    app.kubernetes.io/component: indexed-search
+  podAnnotations:
+    prometheus.io/port: "6070"
+  serviceAccount:
+    create: true
+    annotations:
+      iam.gke.io/gcp-service-account: indexed-search@project-id.iam.gserviceaccount.com
+
+preciseCodeIntel:
+  podLabels:
+    app.kubernetes.io/component: precise-code-intel
+  serviceAccount:
+    create: true
+
+syntacticCodeIntel:
+  enabled: true
+  podLabels:
+    app.kubernetes.io/component: syntactic-code-intel
+
+syntectServer:
+  podLabels:
+    app.kubernetes.io/component: syntax-highlighter
+
+prometheus:
+  podAnnotations:
+    prometheus.io/port: "9090"
+
+cadvisor:
+  priorityClassName: sourcegraph-high-priority
+  tolerations:
+    - key: example.com/dedicated
+      operator: Exists
+      effect: NoSchedule
+
+openTelemetry:
+  enabled: true
+
+extraResources:
+  - apiVersion: v1
+    kind: ConfigMap
+    metadata:
+      name: example-sidecar-config
+    data:
+      config.yaml: |
+        enabled: true
+  - apiVersion: v1
+    kind: Service
+    metadata:
+      name: sourcegraph-frontend-internal-lb
+      annotations:
+        networking.gke.io/load-balancer-type: Internal
+    spec:
+      type: LoadBalancer
+      selector:
+        app: sourcegraph-frontend
+      ports:
+        - name: http
+          port: 80
+          targetPort: 3080

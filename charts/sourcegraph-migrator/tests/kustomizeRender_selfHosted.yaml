@@ -1,0 +1,58 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Shaped like a self-hosted upgrade: a private registry, external database
+# credentials, organization labels, and a restricted pod. All names are
+# placeholders.
+
+sourcegraph:
+  image:
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  imagePullSecrets:
+    - name: registry-credentials
+  labels:
+    example.com/project: sourcegraph
+  podLabels:
+    example.com/project: sourcegraph
+  podAnnotations:
+    metrics.example.com/scrape: "false"
+  nodeSelector:
+    example.com/dedicated: sourcegraph
+  tolerations:
+    - key: example.com/dedicated
+      operator: Exists
+      effect: NoSchedule
+
+pgsql:
+  auth:
+    existingSecret: pgsql-credentials
+codeIntelDB:
+  auth:
+    existingSecret: codeintel-db-credentials
+codeInsightsDB:
+  auth:
+    existingSecret: codeinsights-db-credentials
+
+migrator:
+  labels:
+    example.com/service: migrator
+  podLabels:
+    example.com/service: migrator
+  env:
+    HTTPS_PROXY:
+      value: http://proxy.example.com:3128
+  podSecurityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: RuntimeDefault
+  extraVolumes:
+    - name: ca-bundle
+      configMap:
+        name: ca-bundle
+  extraVolumeMounts:
+    - name: ca-bundle
+      mountPath: /etc/ssl/certs/ca-certificates.crt
+      subPath: ca-certificates.crt
+      readOnly: true

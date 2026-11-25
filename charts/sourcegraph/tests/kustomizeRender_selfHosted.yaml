@@ -1,0 +1,197 @@
+# Used by CI: the "Render charts through kustomize" GitHub Actions job
+# (.github/workflows/kustomize_render.yml) renders this chart with this file
+# through scripts/ci/kustomize-render.sh.
+#
+# Shaped like common self-hosted deployments: a private registry, organization
+# labels and annotations at the global level, distinct per-component ones,
+# scheduling constraints, restricted security contexts, external services, and
+# a CA bundle. All names and endpoints are placeholders.
+
+sourcegraph:
+  image:
+    repository: registry.example.com/sourcegraph
+    useGlobalTagAsDefault: true
+  imagePullSecrets:
+    - name: registry-credentials
+  labels:
+    example.com/project: sourcegraph
+    example.com/environment: production
+  podLabels:
+    example.com/project: sourcegraph
+    example.com/environment: production
+    example.com/telemetry: enabled
+  podAnnotations:
+    metrics.example.com/scrape: "true"
+  nodeSelector:
+    example.com/dedicated: sourcegraph
+  tolerations:
+    - key: example.com/dedicated
+      operator: Equal
+      value: sourcegraph
+      effect: NoSchedule
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: example.com/capacity-type
+                operator: NotIn
+                values: [spot]
+  priorityClassName: sourcegraph
+
+storageClass:
+  create: true
+  name: sourcegraph
+  provisioner: ebs.csi.aws.com
+  type: gp3
+  parameters:
+    encrypted: "true"
+  reclaimPolicy: Retain
+  volumeBindingMode: WaitForFirstConsumer
+
+pgsql:
+  enabled: false
+  auth:
+    existingSecret: pgsql-credentials
+codeIntelDB:
+  enabled: false
+  auth:
+    existingSecret: codeintel-db-credentials
+codeInsightsDB:
+  enabled: false
+  auth:
+    existingSecret: codeinsights-db-credentials
+
+redisCache:
+  enabled: false
+  connection:
+    existingSecret: redis-cache-credentials
+redisStore:
+  enabled: false
+  connection:
+    existingSecret: redis-store-credentials
+
+frontend:
+  labels:
+    example.com/service: frontend
+  podLabels:
+    example.com/service: frontend
+  podAnnotations:
+    metrics.example.com/port: "6060"
+    traffic.sidecar.istio.io/excludeOutboundPorts: "5432,6379"
+  serviceLabels:
+    example.com/service: frontend
+  serviceAnnotations:
+    example.com/load-balancer: internal
+  serviceType: NodePort
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/sourcegraph-frontend
+  ingress:
+    host: sourcegraph.example.com
+    ingressClassName: nginx
+    tlsSecret: sourcegraph-tls
+    annotations:
+      kubernetes.io/ingress.class: null
+      cert-manager.io/cluster-issuer: example-issuer
+      nginx.ingress.kubernetes.io/proxy-body-size: 500m
+  env:
+    HTTPS_PROXY:
+      value: http://proxy.example.com:3128
+    NO_PROXY:
+      value: localhost,127.0.0.1,.svc,.cluster.local
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop: [ALL]
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 100
+    runAsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+  podSecurityContext:
+    fsGroup: 101
+    fsGroupChangePolicy: OnRootMismatch
+  extraVolumes:
+    - name: ca-bundle
+      configMap:
+        name: ca-bundle
+  extraVolumeMounts:
+    - name: ca-bundle
+      mountPath: /etc/ssl/certs/ca-certificates.crt
+      subPath: ca-certificates.crt
+      readOnly: true
+  extraInitContainers:
+    - name: example-init
+      image: registry.example.com/example-init:1.0.0
+      command: [sh, -c, "true"]
+  extraServicePorts:
+    - name: metrics
+      port: 6060
+      targetPort: 6060
+
+gitserver:
+  labels:
+    example.com/service: gitserver
+  podLabels:
+    example.com/service: gitserver
+  podAnnotations:
+    metrics.example.com/port: "6060"
+  serviceAccount:
+    create: true
+    annotations:
+      eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/sourcegraph-gitserver
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: gitserver
+          topologyKey: kubernetes.io/hostname
+
+worker:
+  labels:
+    example.com/service: worker
+  podLabels:
+    example.com/service: worker
+  env:
+    PRECISE_CODE_INTEL_UPLOAD_BACKEND:
+      value: S3
+    PRECISE_CODE_INTEL_UPLOAD_BUCKET:
+      value: example-bucket
+
+searcher:
+  podLabels:
+    example.com/service: searcher
+
+indexedSearch:
+  podLabels:
+    example.com/service: indexed-search
+  affinity:
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        - labelSelector:
+            matchLabels:
+              app: indexed-search
+          topologyKey: kubernetes.io/hostname
+
+migrator:
+  env:
+    HTTPS_PROXY:
+      value: http://proxy.example.com:3128
+
+prometheus:
+  privileged: false
+
+cadvisor:
+  enabled: false
+
+extraResources:
+  - apiVersion: networking.k8s.io/v1
+    kind: NetworkPolicy
+    metadata:
+      name: sourcegraph-default-deny
+    spec:
+      podSelector: {}
+      policyTypes: [Ingress]
