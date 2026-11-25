@@ -52,24 +52,24 @@ storageClass:
 pgsql:
   enabled: false
   auth:
-    existingSecret: pgsql-credentials
+    existingSecret: pgsql-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 codeIntelDB:
   enabled: false
   auth:
-    existingSecret: codeintel-db-credentials
+    existingSecret: codeintel-db-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 codeInsightsDB:
   enabled: false
   auth:
-    existingSecret: codeinsights-db-credentials
+    existingSecret: codeinsights-db-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 redisCache:
   enabled: false
   connection:
-    existingSecret: redis-cache-credentials
+    existingSecret: redis-cache-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 redisStore:
   enabled: false
   connection:
-    existingSecret: redis-store-credentials
+    existingSecret: redis-store-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 frontend:
   labels:
@@ -90,7 +90,7 @@ frontend:
   ingress:
     host: sourcegraph.example.com
     ingressClassName: nginx
-    tlsSecret: sourcegraph-tls
+    tlsSecret: sourcegraph-tls  # checkov:skip=CKV_SECRET_6: placeholder in test values
     annotations:
       kubernetes.io/ingress.class: null
       cert-manager.io/cluster-issuer: example-issuer

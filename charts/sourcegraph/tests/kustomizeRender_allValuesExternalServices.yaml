@@ -14,7 +14,7 @@ pgsql:
     host: pgsql.example.com
     port: '5432'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: example-database
     sslmode: verify-full
 codeIntelDB:
@@ -23,7 +23,7 @@ codeIntelDB:
     host: code-intel-d-b.example.com
     port: '5432'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: example-database
     sslmode: verify-full
 codeInsightsDB:
@@ -32,7 +32,7 @@ codeInsightsDB:
     host: code-insights-d-b.example.com
     port: '5432'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: example-database
     sslmode: verify-full
 redisCache:
@@ -56,7 +56,7 @@ openTelemetry:
             endpoint: otlp.example.com:4317
             tls:
               ca_file: /tls/ca.pem
-        exportersTlsSecretName: otel-exporter-tls
+        exportersTlsSecretName: otel-exporter-tls  # checkov:skip=CKV_SECRET_6: placeholder in test values
         processors:
           batch:
             timeout: 5s

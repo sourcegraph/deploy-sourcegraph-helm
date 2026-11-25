@@ -42,15 +42,15 @@ sourcegraph:
 pgsql:
   name: example-pgsql
   auth:
-    existingSecret: pgsql-credentials
+    existingSecret: pgsql-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 codeIntelDB:
   name: example-codeintel-db
   auth:
-    existingSecret: codeintel-db-credentials
+    existingSecret: codeintel-db-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 codeInsightsDB:
   name: example-codeinsights-db
   auth:
-    existingSecret: codeinsights-db-credentials
+    existingSecret: codeinsights-db-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 migrator:
   name: example-migrator

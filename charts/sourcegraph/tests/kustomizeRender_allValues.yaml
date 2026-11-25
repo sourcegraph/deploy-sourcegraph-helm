@@ -207,7 +207,7 @@ codeInsightsDB:
     host: code-insights-d-b.example.com
     port: '6543'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: example-database
     sslmode: require
   additionalConfig: 'max_connections = 200
@@ -235,7 +235,7 @@ codeIntelDB:
     host: code-intel-d-b.example.com
     port: '6543'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: example-database
     sslmode: require
   additionalConfig: 'max_connections = 200
@@ -271,7 +271,7 @@ frontend:
     labels:
       example.com/ingress-label: example
     host: sourcegraph.example.com
-    tlsSecret: example-tls
+    tlsSecret: example-tls  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 migrator:
   <<: *component
@@ -295,7 +295,7 @@ gitserver:
     annotations:
       example.com/service-account-annotation: component
   replicaCount: 3
-  sshSecret: gitserver-ssh
+  sshSecret: gitserver-ssh  # checkov:skip=CKV_SECRET_6: placeholder in test values
   storageAccessModes:
   - ReadWriteOncePod
 
@@ -311,7 +311,7 @@ grafana:
     host: grafana-db.example.com
     port: '6543'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: grafana
     sslmode: require
 
@@ -475,7 +475,7 @@ pgsql:
     host: pgsql.example.com
     port: '6543'
     user: example-user
-    password: placeholder-password
+    password: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
     database: example-database
     sslmode: require
   additionalConfig: 'max_connections = 200

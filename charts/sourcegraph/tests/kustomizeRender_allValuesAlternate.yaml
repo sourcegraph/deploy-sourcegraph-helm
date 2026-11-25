@@ -190,7 +190,7 @@ codeInsightsDB:
     annotations:
       example.com/service-account-annotation: component
   auth:
-    existingSecret: code-insights-d-b-credentials
+    existingSecret: code-insights-d-b-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   existingConfig: code-insights-d-b-config
   postgresExporter:
     env:
@@ -211,7 +211,7 @@ codeIntelDB:
     annotations:
       example.com/service-account-annotation: component
   auth:
-    existingSecret: code-intel-d-b-credentials
+    existingSecret: code-intel-d-b-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   existingConfig: code-intel-d-b-config
   postgresExporter:
     env:
@@ -249,7 +249,7 @@ frontend:
     - hosts:
       - sourcegraph.example.com
       - code.example.com
-      secretName: example-tls
+      secretName: example-tls  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 migrator:
   <<: *component
@@ -273,7 +273,7 @@ gitserver:
     annotations:
       example.com/service-account-annotation: component
   replicaCount: 3
-  sshSecret: gitserver-ssh
+  sshSecret: gitserver-ssh  # checkov:skip=CKV_SECRET_6: placeholder in test values
   storageAccessModes:
   - ReadWriteOncePod
 
@@ -286,7 +286,7 @@ grafana:
     annotations:
       example.com/service-account-annotation: component
   auth:
-    existingSecret: grafana-credentials
+    existingSecret: grafana-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   existingConfig: grafana-config
 
 indexedSearch:
@@ -446,7 +446,7 @@ pgsql:
     annotations:
       example.com/service-account-annotation: component
   auth:
-    existingSecret: pgsql-credentials
+    existingSecret: pgsql-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   existingConfig: pgsql-config
   postgresExporter:
     env:
@@ -519,7 +519,7 @@ redisCache:
     enabled: true
     existingConfig: redis-cache-config
   connection:
-    existingSecret: redis-cache-credentials
+    existingSecret: redis-cache-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 redisExporter:
   <<: *component
@@ -541,7 +541,7 @@ redisStore:
     enabled: true
     existingConfig: redis-store-config
   connection:
-    existingSecret: redis-store-credentials
+    existingSecret: redis-store-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
 
 searcher:
   <<: *component

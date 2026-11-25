@@ -46,7 +46,7 @@ executor:
     name: example-executor-image
     tag: 4.5.6
   frontendUrl: https://sourcegraph.example.com
-  frontendPassword: placeholder-password
+  frontendPassword: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
   queueName: batches
   maximumNumJobs: 4
   maximumRuntimePerJob: 1h

@@ -18,7 +18,7 @@ sourcegraph:
 
 executor:
   frontendUrl: https://sourcegraph.example.com
-  frontendPassword: placeholder-password
+  frontendPassword: placeholder-password  # checkov:skip=CKV_SECRET_6: placeholder in test values
   queueName: batches
   namespace: sourcegraph-executors
   labels:

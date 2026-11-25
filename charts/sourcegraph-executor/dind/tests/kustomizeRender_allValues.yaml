@@ -53,7 +53,7 @@ executor:
     name: example-executor-image
     tag: 4.5.6
   frontendUrl: https://sourcegraph.example.com
-  frontendExistingSecret: executor-credentials
+  frontendExistingSecret: executor-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   log:
     level: debug
     format: condensed

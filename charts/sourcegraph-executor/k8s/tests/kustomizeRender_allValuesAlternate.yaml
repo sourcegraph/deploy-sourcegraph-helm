@@ -12,7 +12,7 @@ sourcegraph:
 executor:
   configureRbac: false
   frontendUrl: https://sourcegraph.example.com
-  frontendExistingSecret: executor-credentials
+  frontendExistingSecret: executor-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   queueNames: [batches, codeintel]
   podSecurityContext: {}
   securityContext:

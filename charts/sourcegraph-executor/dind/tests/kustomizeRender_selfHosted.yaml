@@ -30,7 +30,7 @@ storageClass:
 
 executor:
   frontendUrl: https://sourcegraph.example.com
-  frontendExistingSecret: executor-credentials
+  frontendExistingSecret: executor-credentials  # checkov:skip=CKV_SECRET_6: placeholder in test values
   queueNames: [batches, codeintel]
   labels:
     example.com/service: executor
