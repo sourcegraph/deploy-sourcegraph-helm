@@ -31,6 +31,18 @@ tests:
             value: helm-dind
         template: executor/executor.Deployment.yaml
 
+  - it: should refuse EXECUTOR_DEPLOY_TYPE in env
+    template: executor/executor.Deployment.yaml
+    set:
+      executor:
+        queueName: batches
+        env:
+          EXECUTOR_DEPLOY_TYPE:
+            value: custom
+    asserts:
+      - failedTemplate:
+          errorPattern: "env must not contain managed variable EXECUTOR_DEPLOY_TYPE"
+
   - it: should render one Deployment per entry in queues
     template: executor/executor.Deployment.yaml
     set:

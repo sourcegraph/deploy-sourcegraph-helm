@@ -378,7 +378,8 @@ Usage: include "executor.validateEnv" (list $envDict "label")
     "EXECUTOR_MAXIMUM_NUM_JOBS"
     "EXECUTOR_MAXIMUM_RUNTIME_PER_JOB"
     "EXECUTOR_DOCKER_ADD_HOST_GATEWAY"
-    "EXECUTOR_KEEP_WORKSPACES" -}}
+    "EXECUTOR_KEEP_WORKSPACES"
+    "EXECUTOR_DEPLOY_TYPE" -}}
 {{- range $managed -}}
 {{- if hasKey $envDict . -}}
 {{- fail (printf "%s: env must not contain managed variable %s; use the structured executor fields instead" $label .) -}}

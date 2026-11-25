@@ -3,7 +3,7 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
-* Set `EXECUTOR_DEPLOY_TYPE` to `helm-k8s` in the `sourcegraph-executor-k8s` chart and `helm-dind` in the `sourcegraph-executor-dind` chart, so pings report which chart deployed the executors.
+* Set `EXECUTOR_DEPLOY_TYPE` to `helm-k8s` in the `sourcegraph-executor-k8s` chart and `helm-dind` in the `sourcegraph-executor-dind` chart, so pings report which chart deployed the executors. The `sourcegraph-executor-dind` chart rejects `EXECUTOR_DEPLOY_TYPE` in `executor.env` and `queues[].env`.
 
 ## 8.0.0
 
