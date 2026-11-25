@@ -281,3 +281,42 @@ tests:
   - equal:
       path: metadata.labels
       value: *prometheusRBACLabels
+
+# Kustomize and kubeconform reject a label key that is rendered twice, and so
+# does this test's YAML parser.
+- it: should render a key set in sourcegraph.labels and in a component's value once, with the component's value
+  templates:
+  - blobstore/blobstore.PersistentVolumeClaim.yaml
+  - frontend/sourcegraph-frontend.ServiceAccount.yaml
+  - frontend/sourcegraph-frontend.Role.yaml
+  - frontend/sourcegraph-frontend.RoleBinding.yaml
+  set:
+    sourcegraph.labels:
+      team: search
+      category: other
+    blobstore.storageLabels:
+      team: blobstore
+    frontend.serviceAccount.labels:
+      team: frontend
+  asserts:
+  - equal:
+      path: metadata.labels.team
+      value: blobstore
+    template: blobstore/blobstore.PersistentVolumeClaim.yaml
+  - equal:
+      path: metadata.labels.team
+      value: frontend
+    template: frontend/sourcegraph-frontend.ServiceAccount.yaml
+  - equal:
+      path: metadata.labels.team
+      value: frontend
+    template: frontend/sourcegraph-frontend.Role.yaml
+  - equal:
+      path: metadata.labels.team
+      value: frontend
+    template: frontend/sourcegraph-frontend.RoleBinding.yaml
+  # The labels the chart sets itself win over sourcegraph.labels.
+  - equal:
+      path: metadata.labels.category
+      value: rbac
+    template: frontend/sourcegraph-frontend.ServiceAccount.yaml
