@@ -3,6 +3,8 @@
 <!-- START CHANGELOG -->
 ## Unreleased
 
+* Set `EXECUTOR_DEPLOY_TYPE` to `helm-k8s` in the `sourcegraph-executor-k8s` chart and `helm-dind` in the `sourcegraph-executor-dind` chart, so pings report which chart deployed the executors. The `sourcegraph-executor-dind` chart rejects `EXECUTOR_DEPLOY_TYPE` in `executor.env` and `queues[].env`.
+
 ## 8.0.0
 
 * Added a `network-policy` example to the `sourcegraph-executor-k8s` and `sourcegraph-executor-dind` charts, with `CiliumNetworkPolicy` resources which limit Executor and job pods to the frontend API.
