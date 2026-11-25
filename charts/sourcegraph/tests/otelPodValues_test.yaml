@@ -1,0 +1,70 @@
+---
+suite: otelPodValues
+templates:
+  - otel-collector/otel-agent.DaemonSet.yaml
+  - otel-collector/otel-collector.Deployment.yaml
+tests:
+  - it: should add volumes, volume mounts, sidecars, and a pod security context after the chart's own
+    set:
+      openTelemetry:
+        gateway: &podValues
+          config:
+            traces:
+              exporters:
+                otlp:
+                  endpoint: example.com:443
+          extraVolumes:
+            - name: exporter-secrets
+              emptyDir:
+                medium: Memory
+          extraVolumeMounts:
+            - name: exporter-secrets
+              mountPath: /var/run/secrets/exporter
+          extraContainers:
+            - name: sidecar
+              image: sidecar:1.0.0
+          podSecurityContext:
+            fsGroup: 101
+            runAsUser: 100
+        agent: *podValues
+    asserts:
+      - equal:
+          path: spec.template.spec.volumes[0].name
+          value: config
+      - equal:
+          path: spec.template.spec.volumes[1]
+          value:
+            name: exporter-secrets
+            emptyDir:
+              medium: Memory
+      - lengthEqual:
+          path: spec.template.spec.volumes
+          count: 2
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[0].name
+          value: config
+      - equal:
+          path: spec.template.spec.containers[0].volumeMounts[1]
+          value:
+            name: exporter-secrets
+            mountPath: /var/run/secrets/exporter
+      - equal:
+          path: spec.template.spec.containers[1]
+          value:
+            name: sidecar
+            image: sidecar:1.0.0
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 2
+      - equal:
+          path: spec.template.spec.securityContext
+          value:
+            fsGroup: 101
+            runAsUser: 100
+  - it: should render no sidecar and no pod security context by default
+    asserts:
+      - lengthEqual:
+          path: spec.template.spec.containers
+          count: 1
+      - notExists:
+          path: spec.template.spec.securityContext

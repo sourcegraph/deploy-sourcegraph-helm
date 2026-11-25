@@ -781,6 +781,16 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Security context for the `otel-collector` pod,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+    podSecurityContext: {}
+    # -- Volumes to add to the `otel-collector` pod, e.g. the volume an `extraInitContainers`
+    # container writes an exporter API key to
+    extraVolumes: []
+    # -- Volume mounts to add to the `otel-collector` container
+    extraVolumeMounts: []
+    # -- Sidecar containers to add to the `otel-collector` pod
+    extraContainers: []
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.
@@ -812,6 +822,15 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Security context for the `otel-agent` pod,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+    podSecurityContext: {}
+    # -- Volumes to add to the `otel-agent` pod
+    extraVolumes: []
+    # -- Volume mounts to add to the `otel-agent` container
+    extraVolumeMounts: []
+    # -- Sidecar containers to add to the `otel-agent` pod
+    extraContainers: []
 
 nodeExporter:
   # -- Enable `node-exporter`

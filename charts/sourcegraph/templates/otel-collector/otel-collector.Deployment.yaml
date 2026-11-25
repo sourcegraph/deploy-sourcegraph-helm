@@ -110,6 +110,16 @@ spec:
           - name: otel-collector-tls
             mountPath: /tls
           {{- end }}
+          {{- with .Values.openTelemetry.gateway.extraVolumeMounts }}
+          {{- toYaml . | nindent 10 }}
+          {{- end }}
+      {{- with .Values.openTelemetry.gateway.extraContainers }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.openTelemetry.gateway.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       terminationGracePeriodSeconds: 120
       {{- include "sourcegraph.nodeSelector" (list . "openTelemetry" ) | trim | nindent 6 }}
       {{- include "sourcegraph.affinity" (list . "openTelemetry" ) | trim | nindent 6 }}
@@ -133,5 +143,8 @@ spec:
         - name: otel-collector-tls
           secret:
             secretName: {{ .Values.openTelemetry.gateway.config.traces.exportersTlsSecretName }}
+        {{- end }}
+        {{- with .Values.openTelemetry.gateway.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
 {{- end }}

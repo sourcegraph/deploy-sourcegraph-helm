@@ -330,9 +330,13 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.agent.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.agent.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.agent.containerSecurityContext.runAsUser | int | `100` |  |
+| openTelemetry.agent.extraContainers | list | `[]` | Sidecar containers to add to the `otel-agent` pod |
+| openTelemetry.agent.extraVolumeMounts | list | `[]` | Volume mounts to add to the `otel-agent` container |
+| openTelemetry.agent.extraVolumes | list | `[]` | Volumes to add to the `otel-agent` pod |
 | openTelemetry.agent.hostPorts | object | `{"grpcOtlp":4317,"httpOtlp":4318,"httpZpages":55679}` | Resource requests & limits for the `otel-agent` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.agent.kind | string | `"DaemonSet"` | The workload kind for the otel-agent. Valid values are `DaemonSet` and `Deployment`. Use `Deployment` in environments where DaemonSets are restricted (e.g. some managed Kubernetes offerings). When set to `Deployment`, the otel-agent DaemonSet is not created and application pods send traces directly to the existing otel-collector Deployment (otel-collector:4317) instead. |
 | openTelemetry.agent.name | string | `"otel-agent"` | Name used by resources. Does not affect service names or PVCs. |
+| openTelemetry.agent.podSecurityContext | object | `{}` | Security context for the `otel-agent` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | openTelemetry.agent.resources.limits.cpu | string | `"500m"` |  |
 | openTelemetry.agent.resources.limits.memory | string | `"500Mi"` |  |
 | openTelemetry.agent.resources.requests.cpu | string | `"100m"` |  |
@@ -348,7 +352,11 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
+| openTelemetry.gateway.extraContainers | list | `[]` | Sidecar containers to add to the `otel-collector` pod |
+| openTelemetry.gateway.extraVolumeMounts | list | `[]` | Volume mounts to add to the `otel-collector` container |
+| openTelemetry.gateway.extraVolumes | list | `[]` | Volumes to add to the `otel-collector` pod, e.g. the volume an `extraInitContainers` container writes an exporter API key to |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
+| openTelemetry.gateway.podSecurityContext | object | `{}` | Security context for the `otel-collector` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | openTelemetry.gateway.resources | object | `{"limits":{"cpu":"3","memory":"3Gi"},"requests":{"cpu":"1","memory":"1Gi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.gateway.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-collector` |
 | openTelemetry.gateway.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
