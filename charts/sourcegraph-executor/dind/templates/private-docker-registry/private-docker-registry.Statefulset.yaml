@@ -4,12 +4,12 @@ kind: StatefulSet
 metadata:
   name: private-docker-registry
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.privateDockerRegistry.labels }}
-      {{- toYaml .Values.privateDockerRegistry.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: private-docker-registry
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.privateDockerRegistry.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: private-docker-registry"
+    ) | nindent 4 }}
 spec:
   replicas: 1
   serviceName: private-docker-registry
@@ -22,23 +22,19 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: private-docker-registry
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.privateDockerRegistry.podAnnotations }}
-      {{- toYaml .Values.privateDockerRegistry.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: private-docker-registry"
+          .Values.sourcegraph.podAnnotations
+          .Values.privateDockerRegistry.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.privateDockerRegistry.podLabels }}
-      {{- toYaml .Values.privateDockerRegistry.podLabels | nindent 8 }}
-      {{- end }}
-        deploy: sourcegraph
-        app: private-docker-registry
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" .)
+          .Values.sourcegraph.podLabels
+          .Values.privateDockerRegistry.podLabels
+          "deploy: sourcegraph"
+          "app: private-docker-registry"
+        ) | nindent 8 }}
     spec:
       containers:
         - name: private-docker-registry
