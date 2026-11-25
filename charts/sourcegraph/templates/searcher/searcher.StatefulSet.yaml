@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Backend for text search operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.searcher.labels }}
-      {{- toYaml .Values.searcher.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: searcher
+    {{- include "sourcegraph.mergedLabels" (list . .Values.searcher.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "searcher")) | nindent 4 }}
   name: {{ .Values.searcher.name }}
 spec:
   replicas: {{ .Values.searcher.replicaCount }}
@@ -33,10 +28,7 @@ spec:
       {{- toYaml .Values.searcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.searcher) | nindent 8 }}
-        deploy: sourcegraph
-        app: searcher
-        app.kubernetes.io/component: searcher
+        {{- include "sourcegraph.podLabels" (list . .Values.searcher (dict "deploy" "sourcegraph" "app" "searcher" "app.kubernetes.io/component" "searcher")) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "searcher") | nindent 6 }}
       {{- with .Values.searcher.extraInitContainers }}

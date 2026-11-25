@@ -4,12 +4,7 @@ apiVersion: storage.k8s.io/v1
 metadata:
   name:  {{ .Values.storageClass.name }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- with .Values.storageClass.labels }}
-      {{- toYaml . | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph-storage
-    app.kubernetes.io/component: storage
+    {{- include "sourcegraph.mergedLabels" (list . .Values.storageClass.labels (dict "deploy" "sourcegraph-storage" "app.kubernetes.io/component" "storage")) | nindent 4 }}
   {{- if .Values.storageClass.annotations}}
   annotations:
     {{- toYaml .Values.storageClass.annotations | nindent 4 }}

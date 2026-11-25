@@ -8,12 +8,7 @@ metadata:
   annotations:
     description: Redis for storing short-lived caches.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.redisCache.labels }}
-      {{- toYaml .Values.redisCache.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: redis
+    {{- include "sourcegraph.mergedLabels" (list . .Values.redisCache.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "redis")) | nindent 4 }}
   name: {{ .Values.redisCache.name }}
 spec:
   minReadySeconds: 10
@@ -39,10 +34,7 @@ spec:
       {{- toYaml .Values.redisCache.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.redisCache) | nindent 8 }}
-        deploy: sourcegraph
-        app: redis-cache
-        app.kubernetes.io/component: redis
+        {{- include "sourcegraph.podLabels" (list . .Values.redisCache (dict "deploy" "sourcegraph" "app" "redis-cache" "app.kubernetes.io/component" "redis")) | nindent 8 }}
     spec:
       {{- with .Values.redisCache.extraInitContainers }}
       initContainers:

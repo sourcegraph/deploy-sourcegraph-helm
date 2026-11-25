@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Stores clones of repositories to perform Git operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.gitserver.labels }}
-      {{- toYaml .Values.gitserver.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: gitserver
+    {{- include "sourcegraph.mergedLabels" (list . .Values.gitserver.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "gitserver")) | nindent 4 }}
   name: {{ .Values.gitserver.name }}
 spec:
   replicas: {{ .Values.gitserver.replicaCount }}
@@ -31,12 +26,7 @@ spec:
       {{- toYaml .Values.gitserver.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.gitserver) | nindent 8 }}
-        app: gitserver
-        group: backend
-        type: gitserver
-        deploy: sourcegraph
-        app.kubernetes.io/component: gitserver
+        {{- include "sourcegraph.podLabels" (list . .Values.gitserver (dict "app" "gitserver" "group" "backend" "type" "gitserver" "deploy" "sourcegraph" "app.kubernetes.io/component" "gitserver")) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "gitserver") | nindent 6 }}
       {{- with .Values.gitserver.extraInitContainers }}

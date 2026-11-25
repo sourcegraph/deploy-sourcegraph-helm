@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: pgsql
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.pgsql.labels }}
-      {{- toYaml .Values.pgsql.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedLabels" (list . (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "pgsql") (include "sourcegraph.labels" . | fromYaml) .Values.pgsql.labels) | nindent 4 }}
   name: {{ .Values.pgsql.name }}
 spec:
   replicas: 1
@@ -32,11 +27,7 @@ spec:
       {{- toYaml .Values.pgsql.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.pgsql) | nindent 8 }}
-        deploy: sourcegraph
-        app: pgsql
-        group: backend
-        app.kubernetes.io/component: pgsql
+        {{- include "sourcegraph.podLabels" (list . .Values.pgsql (dict "deploy" "sourcegraph" "app" "pgsql" "group" "backend" "app.kubernetes.io/component" "pgsql")) | nindent 8 }}
     spec:
       initContainers:
       {{- with .Values.pgsql.extraInitContainers }}

@@ -3,12 +3,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntectServer.labels }}
-      {{- toYaml .Values.syntectServer.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: syntect-server
+    {{- include "sourcegraph.mergedLabels" (list . .Values.syntectServer.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "syntect-server")) | nindent 4 }}
   name: {{ .Values.syntectServer.name }}
 spec:
   {{- toYaml .Values.syntectServer.podDisruptionBudget | nindent 2 }}

@@ -8,12 +8,7 @@ metadata:
   annotations:
     description: Redis for storing semi-persistent data like user sessions.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.redisStore.labels }}
-      {{- toYaml .Values.redisStore.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: redis
+    {{- include "sourcegraph.mergedLabels" (list . .Values.redisStore.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "redis")) | nindent 4 }}
   name: {{ .Values.redisStore.name }}
 spec:
   minReadySeconds: 10
@@ -39,10 +34,7 @@ spec:
       {{- toYaml .Values.redisStore.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.redisStore) | nindent 8 }}
-        deploy: sourcegraph
-        app: redis-store
-        app.kubernetes.io/component: redis
+        {{- include "sourcegraph.podLabels" (list . .Values.redisStore (dict "deploy" "sourcegraph" "app" "redis-store" "app.kubernetes.io/component" "redis")) | nindent 8 }}
     spec:
       {{- with .Values.redisStore.extraInitContainers }}
       initContainers:

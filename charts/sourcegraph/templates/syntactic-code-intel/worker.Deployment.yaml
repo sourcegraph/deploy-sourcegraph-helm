@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Handles syntactic code intelligence indexing
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntacticCodeIntel.labels }}
-      {{- toYaml .Values.syntacticCodeIntel.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: syntactic-code-intel
+    {{- include "sourcegraph.mergedLabels" (list . .Values.syntacticCodeIntel.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "syntactic-code-intel")) | nindent 4 }}
   name: {{ .Values.syntacticCodeIntel.name }}
 spec:
   minReadySeconds: 10
@@ -37,10 +32,7 @@ spec:
       {{- toYaml .Values.syntacticCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.syntacticCodeIntel) | nindent 8 }}
-        deploy: sourcegraph
-        app: syntactic-code-intel-worker
-        app.kubernetes.io/component: syntactic-code-intel
+        {{- include "sourcegraph.podLabels" (list . .Values.syntacticCodeIntel (dict "deploy" "sourcegraph" "app" "syntactic-code-intel-worker" "app.kubernetes.io/component" "syntactic-code-intel")) | nindent 8 }}
     spec:
       {{- $storageType := .Values.syntacticCodeIntel.storageType | default "emptyDir" }}
       {{- if not (has $storageType (list "emptyDir" "pvc")) }}
@@ -127,12 +119,7 @@ spec:
           volumeClaimTemplate:
             metadata:
               labels:
-                {{- include "sourcegraph.labels" . | nindent 16 }}
-                {{- with .Values.syntacticCodeIntel.storageLabels }}
-                {{- toYaml . | nindent 16 }}
-                {{- end }}
-                deploy: sourcegraph
-                app.kubernetes.io/component: syntactic-code-intel
+                {{- include "sourcegraph.mergedLabels" (list . .Values.syntacticCodeIntel.storageLabels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "syntactic-code-intel")) | nindent 16 }}
             spec:
               accessModes:
               - ReadWriteOnce

@@ -8,12 +8,7 @@ metadata:
   annotations:
     description: Configuration for PostgreSQL
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeIntelDB.labels }}
-      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeintel-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.mergedLabels" (list . .Values.codeIntelDB.labels (dict "app.kubernetes.io/component" "codeintel-db" "deploy" "sourcegraph")) | nindent 4 }}
   name: {{ .Values.codeIntelDB.name }}-conf
 data:
   postgresql.conf: |

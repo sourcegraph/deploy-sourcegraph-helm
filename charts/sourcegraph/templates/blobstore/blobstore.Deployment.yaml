@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: blobstore for storing LSIF uploads.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.blobstore.labels }}
-      {{- toYaml .Values.blobstore.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: blobstore
+    {{- include "sourcegraph.mergedLabels" (list . .Values.blobstore.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "blobstore")) | nindent 4 }}
   name: {{ .Values.blobstore.name }}
 spec:
   minReadySeconds: 10
@@ -33,10 +28,7 @@ spec:
       {{- toYaml .Values.blobstore.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.blobstore) | nindent 8 }}
-        deploy: sourcegraph
-        app: blobstore
-        app.kubernetes.io/component: blobstore
+        {{- include "sourcegraph.podLabels" (list . .Values.blobstore (dict "deploy" "sourcegraph" "app" "blobstore" "app.kubernetes.io/component" "blobstore")) | nindent 8 }}
     spec:
       {{- with .Values.blobstore.extraInitContainers }}
       initContainers:

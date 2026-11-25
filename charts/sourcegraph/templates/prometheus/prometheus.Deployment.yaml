@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Collects metrics and aggregates them into graphs.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.prometheus.labels }}
-      {{- toYaml .Values.prometheus.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
+    {{- include "sourcegraph.mergedLabels" (list . .Values.prometheus.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "prometheus")) | nindent 4 }}
   name: {{ .Values.prometheus.name }}
 spec:
   minReadySeconds: 10
@@ -37,10 +32,7 @@ spec:
       {{- toYaml .Values.prometheus.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.prometheus) | nindent 8 }}
-        deploy: sourcegraph
-        app: prometheus
-        app.kubernetes.io/component: prometheus
+        {{- include "sourcegraph.podLabels" (list . .Values.prometheus (dict "deploy" "sourcegraph" "app" "prometheus" "app.kubernetes.io/component" "prometheus")) | nindent 8 }}
     spec:
       {{- with .Values.prometheus.extraInitContainers }}
       initContainers:

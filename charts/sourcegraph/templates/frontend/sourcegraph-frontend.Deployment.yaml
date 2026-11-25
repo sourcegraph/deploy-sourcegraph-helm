@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Serves the frontend of Sourcegraph via HTTP(S).
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.frontend.labels }}
-      {{- toYaml .Values.frontend.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: frontend
+    {{- include "sourcegraph.mergedLabels" (list . .Values.frontend.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "frontend")) | nindent 4 }}
   name: {{ .Values.frontend.name }}
 spec:
   minReadySeconds: 10
@@ -37,10 +32,7 @@ spec:
       {{- toYaml .Values.frontend.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.frontend) | nindent 8 }}
-        app: sourcegraph-frontend
-        deploy: sourcegraph
-        app.kubernetes.io/component: frontend
+        {{- include "sourcegraph.podLabels" (list . .Values.frontend (dict "app" "sourcegraph-frontend" "deploy" "sourcegraph" "app.kubernetes.io/component" "frontend")) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "frontend") | nindent 6 }}
       initContainers:

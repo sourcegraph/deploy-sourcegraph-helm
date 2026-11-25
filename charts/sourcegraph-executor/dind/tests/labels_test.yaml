@@ -9,6 +9,8 @@ tests:
         labels:
           example.com/installation: production
           example.com/project: sourcegraph
+          # The chart's own deploy label wins, and renders once.
+          deploy: other
       executor:
         queueName: batches
       privateDockerRegistry:

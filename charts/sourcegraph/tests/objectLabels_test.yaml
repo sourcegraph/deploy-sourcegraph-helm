@@ -290,10 +290,17 @@ tests:
   - frontend/sourcegraph-frontend.ServiceAccount.yaml
   - frontend/sourcegraph-frontend.Role.yaml
   - frontend/sourcegraph-frontend.RoleBinding.yaml
+  - frontend/sourcegraph-frontend.Deployment.yaml
+  - frontend/sourcegraph-frontend.Service.yaml
   set:
     sourcegraph.labels:
       team: search
       category: other
+      deploy: other
+    frontend.labels:
+      team: frontend
+    frontend.podLabels:
+      team: frontend-pods
     blobstore.storageLabels:
       team: blobstore
     frontend.serviceAccount.labels:
@@ -320,3 +327,18 @@ tests:
       path: metadata.labels.category
       value: rbac
     template: frontend/sourcegraph-frontend.ServiceAccount.yaml
+  - isSubset:
+      path: metadata.labels
+      content:
+        category: other
+        deploy: sourcegraph
+        team: frontend
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+  - equal:
+      path: spec.template.metadata.labels.team
+      value: frontend-pods
+    template: frontend/sourcegraph-frontend.Deployment.yaml
+  - equal:
+      path: metadata.labels.deploy
+      value: sourcegraph
+    template: frontend/sourcegraph-frontend.Service.yaml

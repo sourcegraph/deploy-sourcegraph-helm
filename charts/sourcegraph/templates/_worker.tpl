@@ -16,12 +16,7 @@ metadata:
   annotations:
     description: Manages background processes.
   labels:
-    {{- include "sourcegraph.labels" $top | nindent 4 }}
-    {{- if $top.Values.worker.labels }}
-      {{- toYaml $top.Values.worker.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: worker
+    {{- include "sourcegraph.mergedLabels" (list $top $top.Values.worker.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "worker")) | nindent 4 }}
   name: {{ $name }}
 spec:
   minReadySeconds: 10
@@ -51,13 +46,11 @@ spec:
       {{- toYaml $top.Values.worker.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list $top $top.Values.worker) | nindent 8 }}
-        deploy: sourcegraph
-        app: worker
+        {{- $workerPodLabels := dict "deploy" "sourcegraph" "app" "worker" "app.kubernetes.io/component" "worker" }}
         {{- if $suffix }}
-        worker-replica: {{ $name | quote }}
+        {{- $_ := set $workerPodLabels "worker-replica" $name }}
         {{- end }}
-        app.kubernetes.io/component: worker
+        {{- include "sourcegraph.podLabels" (list $top $top.Values.worker $workerPodLabels) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list $top "worker") | nindent 6 }}
       {{- with $top.Values.worker.extraInitContainers }}

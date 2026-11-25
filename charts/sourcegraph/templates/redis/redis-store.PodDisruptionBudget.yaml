@@ -3,12 +3,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.redisStore.labels }}
-      {{- toYaml .Values.redisStore.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: redis
+    {{- include "sourcegraph.mergedLabels" (list . .Values.redisStore.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "redis")) | nindent 4 }}
   name: {{ .Values.redisStore.name }}
 spec:
   {{- toYaml .Values.redisStore.podDisruptionBudget | nindent 2 }}

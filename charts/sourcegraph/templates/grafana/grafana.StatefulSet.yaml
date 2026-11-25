@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Metrics/monitoring dashboards and alerts.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.grafana.labels }}
-      {{- toYaml .Values.grafana.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: grafana
+    {{- include "sourcegraph.mergedLabels" (list . .Values.grafana.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "grafana")) | nindent 4 }}
   name: {{ .Values.grafana.name }}
 spec:
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
@@ -35,10 +30,7 @@ spec:
       {{- toYaml .Values.grafana.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.grafana) | nindent 8 }}
-        app: grafana
-        deploy: sourcegraph
-        app.kubernetes.io/component: grafana
+        {{- include "sourcegraph.podLabels" (list . .Values.grafana (dict "app" "grafana" "deploy" "sourcegraph" "app.kubernetes.io/component" "grafana")) | nindent 8 }}
     spec:
       {{- with .Values.grafana.extraInitContainers }}
       initContainers:

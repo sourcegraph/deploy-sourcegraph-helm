@@ -6,12 +6,7 @@ metadata:
     description: DaemonSet to ensure all nodes run a cAdvisor pod.
     seccomp.security.alpha.kubernetes.io/pod: 'docker/default'
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.cadvisor.labels }}
-      {{- toYaml .Values.cadvisor.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: cadvisor
+    {{- include "sourcegraph.mergedLabels" (list . .Values.cadvisor.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "cadvisor")) | nindent 4 }}
   name: {{ .Values.cadvisor.name }}
 spec:
   selector:
@@ -32,10 +27,7 @@ spec:
       {{- toYaml .Values.cadvisor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.cadvisor) | nindent 8 }}
-        deploy: sourcegraph
-        app: cadvisor
-        app.kubernetes.io/component: cadvisor
+        {{- include "sourcegraph.podLabels" (list . .Values.cadvisor (dict "deploy" "sourcegraph" "app" "cadvisor" "app.kubernetes.io/component" "cadvisor")) | nindent 8 }}
     spec:
       {{- include "sourcegraph.renderServiceAccountName" (list . "cadvisor") | trim | nindent 6 }}
       {{- with .Values.cadvisor.extraInitContainers }}

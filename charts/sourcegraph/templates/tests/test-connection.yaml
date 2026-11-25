@@ -5,9 +5,7 @@ metadata:
   annotations:
     "helm.sh/hook": test
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: test-connection
+    {{- include "sourcegraph.mergedLabels" (list . (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "test-connection")) | nindent 4 }}
   name: "sg-test-connection"
 spec:
   containers:

@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Handles conversion of uploaded precise code intelligence bundles.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.preciseCodeIntel.labels }}
-      {{- toYaml .Values.preciseCodeIntel.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: precise-code-intel
+    {{- include "sourcegraph.mergedLabels" (list . .Values.preciseCodeIntel.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "precise-code-intel")) | nindent 4 }}
   name: {{ .Values.preciseCodeIntel.name }}
 spec:
   minReadySeconds: 10
@@ -36,10 +31,7 @@ spec:
       {{- toYaml .Values.preciseCodeIntel.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.preciseCodeIntel) | nindent 8 }}
-        deploy: sourcegraph
-        app: precise-code-intel-worker
-        app.kubernetes.io/component: precise-code-intel
+        {{- include "sourcegraph.podLabels" (list . .Values.preciseCodeIntel (dict "deploy" "sourcegraph" "app" "precise-code-intel-worker" "app.kubernetes.io/component" "precise-code-intel")) | nindent 8 }}
     spec:
       {{- $storageType := .Values.preciseCodeIntel.storageType | default "emptyDir" }}
       {{- if not (has $storageType (list "emptyDir" "pvc")) }}
@@ -126,12 +118,7 @@ spec:
           volumeClaimTemplate:
             metadata:
               labels:
-                {{- include "sourcegraph.labels" . | nindent 16 }}
-                {{- with .Values.preciseCodeIntel.storageLabels }}
-                {{- toYaml . | nindent 16 }}
-                {{- end }}
-                deploy: sourcegraph
-                app.kubernetes.io/component: precise-code-intel
+                {{- include "sourcegraph.mergedLabels" (list . .Values.preciseCodeIntel.storageLabels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "precise-code-intel")) | nindent 16 }}
             spec:
               accessModes:
               - ReadWriteOnce

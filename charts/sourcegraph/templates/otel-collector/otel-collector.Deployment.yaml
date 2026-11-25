@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Receives, processes, and exports telemetry data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.openTelemetry.gateway.labels }}
-      {{- toYaml .Values.openTelemetry.gateway.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: otel-collector
+    {{- include "sourcegraph.mergedLabels" (list . .Values.openTelemetry.gateway.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "otel-collector")) | nindent 4 }}
   name: {{ .Values.openTelemetry.gateway.name }}
 spec:
   selector:
@@ -31,10 +26,7 @@ spec:
       {{- toYaml .Values.openTelemetry.gateway.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.openTelemetry.gateway) | nindent 8 }}
-        deploy: sourcegraph
-        app: otel-collector
-        app.kubernetes.io/component: otel-collector
+        {{- include "sourcegraph.podLabels" (list . .Values.openTelemetry.gateway (dict "deploy" "sourcegraph" "app" "otel-collector" "app.kubernetes.io/component" "otel-collector")) | nindent 8 }}
     spec:
       {{- with .Values.openTelemetry.gateway.extraInitContainers }}
       initContainers:

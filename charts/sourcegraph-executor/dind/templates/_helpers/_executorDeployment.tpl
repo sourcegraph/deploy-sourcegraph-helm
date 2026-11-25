@@ -12,14 +12,7 @@ metadata:
     description: Runs sourcegraph executors
     kubectl.kubernetes.io/default-container: executor
   labels:
-    {{- include "sourcegraph.labels" $r | nindent 4 }}
-    {{- if $r.Values.executor.labels }}
-      {{- toYaml $r.Values.executor.labels | nindent 4 }}
-    {{- end }}
-    app: {{ .name }}
-    deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
-    app.kubernetes.io/component: executor
+    {{- include "sourcegraph.mergedLabels" (list $r $r.Values.executor.labels (dict "app" .name "deploy" "sourcegraph" "sourcegraph-resource-requires" "no-cluster-admin" "app.kubernetes.io/component" "executor")) | nindent 4 }}
 spec:
   selector:
     matchLabels:
@@ -45,11 +38,7 @@ spec:
       {{- toYaml $r.Values.executor.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list $r $r.Values.executor) | nindent 8 }}
-        app: {{ .name }}
-        deploy: sourcegraph
-        sourcegraph-resource-requires: no-cluster-admin
-        app.kubernetes.io/component: executor
+        {{- include "sourcegraph.podLabels" (list $r $r.Values.executor (dict "app" .name "deploy" "sourcegraph" "sourcegraph-resource-requires" "no-cluster-admin" "app.kubernetes.io/component" "executor")) | nindent 8 }}
     spec:
       {{- with $r.Values.executor.podSecurityContext }}
       securityContext:
@@ -207,12 +196,7 @@ spec:
             volumeClaimTemplate:
               metadata:
                 labels:
-                  {{- include "sourcegraph.labels" $r | nindent 18 }}
-                  {{- with $r.Values.executor.storage.labels }}
-                  {{- toYaml . | nindent 18 }}
-                  {{- end }}
-                  deploy: sourcegraph
-                  app.kubernetes.io/component: executor
+                  {{- include "sourcegraph.mergedLabels" (list $r $r.Values.executor.storage.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "executor")) | nindent 18 }}
               spec:
                 accessModes: ["ReadWriteOnce"]
                 {{- if $r.Values.executor.storage.class }}

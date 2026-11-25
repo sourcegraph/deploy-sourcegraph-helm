@@ -11,14 +11,7 @@ metadata:
     {{- toYaml .Values.nodeExporter.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    app.kubernetes.io/component: node-exporter
-    app: node-exporter
-    deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
-    {{- if .Values.nodeExporter.serviceLabels }}
-      {{- toYaml .Values.nodeExporter.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedLabels" (list . (dict "app.kubernetes.io/component" "node-exporter" "app" "node-exporter" "deploy" "sourcegraph" "sourcegraph-resource-requires" "no-cluster-admin") .Values.nodeExporter.serviceLabels) | nindent 4 }}
   name: node-exporter
 spec:
   ports:

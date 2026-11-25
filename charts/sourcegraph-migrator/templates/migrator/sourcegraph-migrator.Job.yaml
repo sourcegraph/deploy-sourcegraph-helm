@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Performs Sourcegraph database migrations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.migrator.labels }}
-      {{- toYaml .Values.migrator.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: migrator
+    {{- include "sourcegraph.mergedLabels" (list . .Values.migrator.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "migrator")) | nindent 4 }}
   name: {{ default "migrator" .Values.migrator.name }}-{{ randAlphaNum 5 | lower }}
 spec:
   backoffLimit: 5
@@ -24,10 +19,7 @@ spec:
       {{- toYaml .Values.migrator.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.migrator) | nindent 8 }}
-        job: migrator
-        deploy: sourcegraph
-        app.kubernetes.io/component: migrator
+        {{- include "sourcegraph.podLabels" (list . .Values.migrator (dict "job" "migrator" "deploy" "sourcegraph" "app.kubernetes.io/component" "migrator")) | nindent 8 }}
     spec:
       containers:
       - name: migrator

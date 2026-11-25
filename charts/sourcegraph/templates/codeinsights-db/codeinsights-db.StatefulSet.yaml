@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Code Insights Postgresql instance.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeInsightsDB.labels }}
-      {{- toYaml .Values.codeInsightsDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeinsights-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.mergedLabels" (list . .Values.codeInsightsDB.labels (dict "app.kubernetes.io/component" "codeinsights-db" "deploy" "sourcegraph")) | nindent 4 }}
   name: {{ .Values.codeInsightsDB.name }}
 spec:
   replicas: 1
@@ -32,11 +27,7 @@ spec:
       {{- toYaml .Values.codeInsightsDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.codeInsightsDB) | nindent 8 }}
-        deploy: sourcegraph
-        app: codeinsights-db
-        group: backend
-        app.kubernetes.io/component: codeinsights-db
+        {{- include "sourcegraph.podLabels" (list . .Values.codeInsightsDB (dict "deploy" "sourcegraph" "app" "codeinsights-db" "group" "backend" "app.kubernetes.io/component" "codeinsights-db")) | nindent 8 }}
     spec:
       initContainers:
       {{- with .Values.codeInsightsDB.extraInitContainers }}

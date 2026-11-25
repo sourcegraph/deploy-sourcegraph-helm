@@ -8,13 +8,7 @@ metadata:
     {{- toYaml .Values.searcher.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    app: searcher
-    deploy: sourcegraph
-    app.kubernetes.io/component: searcher
-    {{- if .Values.searcher.serviceLabels }}
-      {{- toYaml .Values.searcher.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedLabels" (list . (dict "app" "searcher" "deploy" "sourcegraph" "app.kubernetes.io/component" "searcher") .Values.searcher.serviceLabels) | nindent 4 }}
   name: searcher
 spec:
   clusterIP: None

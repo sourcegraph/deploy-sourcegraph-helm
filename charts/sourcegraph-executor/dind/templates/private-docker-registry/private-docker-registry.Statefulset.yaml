@@ -4,12 +4,7 @@ kind: StatefulSet
 metadata:
   name: private-docker-registry
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.privateDockerRegistry.labels }}
-      {{- toYaml .Values.privateDockerRegistry.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: private-docker-registry
+    {{- include "sourcegraph.mergedLabels" (list . .Values.privateDockerRegistry.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "private-docker-registry")) | nindent 4 }}
 spec:
   replicas: 1
   serviceName: private-docker-registry
@@ -30,10 +25,7 @@ spec:
       {{- toYaml .Values.privateDockerRegistry.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.privateDockerRegistry) | nindent 8 }}
-        deploy: sourcegraph
-        app: private-docker-registry
-        app.kubernetes.io/component: private-docker-registry
+        {{- include "sourcegraph.podLabels" (list . .Values.privateDockerRegistry (dict "deploy" "sourcegraph" "app" "private-docker-registry" "app.kubernetes.io/component" "private-docker-registry")) | nindent 8 }}
     spec:
       containers:
         - name: private-docker-registry

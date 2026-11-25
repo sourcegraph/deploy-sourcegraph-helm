@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Backend for syntax highlighting operations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.syntectServer.labels }}
-      {{- toYaml .Values.syntectServer.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: syntect-server
+    {{- include "sourcegraph.mergedLabels" (list . .Values.syntectServer.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "syntect-server")) | nindent 4 }}
   name: {{ .Values.syntectServer.name }}
 spec:
   minReadySeconds: 10
@@ -35,10 +30,7 @@ spec:
       {{- toYaml .Values.syntectServer.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.syntectServer) | nindent 8 }}
-        deploy: sourcegraph
-        app: syntect-server
-        app.kubernetes.io/component: syntect-server
+        {{- include "sourcegraph.podLabels" (list . .Values.syntectServer (dict "deploy" "sourcegraph" "app" "syntect-server" "app.kubernetes.io/component" "syntect-server")) | nindent 8 }}
     spec:
       {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "syntectServer") | nindent 6 }}
       {{- with .Values.syntectServer.extraInitContainers }}

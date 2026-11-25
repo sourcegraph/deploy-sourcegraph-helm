@@ -8,13 +8,7 @@ metadata:
     {{- toYaml .Values.preciseCodeIntel.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    app: precise-code-intel-worker
-    deploy: sourcegraph
-    app.kubernetes.io/component: precise-code-intel
-    {{- if .Values.preciseCodeIntel.serviceLabels }}
-      {{- toYaml .Values.preciseCodeIntel.serviceLabels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedLabels" (list . (dict "app" "precise-code-intel-worker" "deploy" "sourcegraph" "app.kubernetes.io/component" "precise-code-intel") .Values.preciseCodeIntel.serviceLabels) | nindent 4 }}
   name: precise-code-intel-worker
 spec:
   ports:

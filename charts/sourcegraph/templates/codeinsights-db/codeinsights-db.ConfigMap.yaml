@@ -8,12 +8,7 @@ metadata:
   annotations:
     description: Configuration for Code Insights
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeInsightsDB.labels }}
-      {{- toYaml .Values.codeInsightsDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeinsights-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.mergedLabels" (list . .Values.codeInsightsDB.labels (dict "app.kubernetes.io/component" "codeinsights-db" "deploy" "sourcegraph")) | nindent 4 }}
   name: {{ .Values.codeInsightsDB.name }}-conf
 data:
   postgresql.conf: |

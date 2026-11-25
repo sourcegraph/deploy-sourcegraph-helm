@@ -5,12 +5,7 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeIntelDB.labels }}
-      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
-    {{- end }}
-    app.kubernetes.io/component: codeintel-db
-    deploy: sourcegraph
+    {{- include "sourcegraph.mergedLabels" (list . .Values.codeIntelDB.labels (dict "app.kubernetes.io/component" "codeintel-db" "deploy" "sourcegraph")) | nindent 4 }}
   name: {{ .Values.codeIntelDB.name }}
 spec:
   replicas: 1
@@ -32,11 +27,7 @@ spec:
       {{- toYaml .Values.codeIntelDB.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.codeIntelDB) | nindent 8 }}
-        deploy: sourcegraph
-        app: codeintel-db
-        group: backend
-        app.kubernetes.io/component: codeintel-db
+        {{- include "sourcegraph.podLabels" (list . .Values.codeIntelDB (dict "deploy" "sourcegraph" "app" "codeintel-db" "group" "backend" "app.kubernetes.io/component" "codeintel-db")) | nindent 8 }}
     spec:
       initContainers:
       {{- with .Values.codeIntelDB.extraInitContainers }}

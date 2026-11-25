@@ -3,12 +3,7 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.searcher.labels }}
-      {{- toYaml .Values.searcher.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: searcher
+    {{- include "sourcegraph.mergedLabels" (list . .Values.searcher.labels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "searcher")) | nindent 4 }}
   name: {{ .Values.searcher.name }}
 spec:
   {{- toYaml .Values.searcher.podDisruptionBudget | nindent 2 }}

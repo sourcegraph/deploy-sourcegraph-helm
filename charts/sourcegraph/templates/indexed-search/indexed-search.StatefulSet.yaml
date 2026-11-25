@@ -4,12 +4,7 @@ metadata:
   annotations:
     description: Backend for indexed text search operations.
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: indexed-search
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.indexedSearch.labels }}
-      {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
-    {{- end }}
+    {{- include "sourcegraph.mergedLabels" (list . (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "indexed-search") (include "sourcegraph.labels" . | fromYaml) .Values.indexedSearch.labels) | nindent 4 }}
   name: {{ .Values.indexedSearch.name }}
 spec:
   replicas: {{ .Values.indexedSearch.replicaCount }}
@@ -31,10 +26,7 @@ spec:
         {{- end }}
       {{- end }}
       labels:
-        {{- include "sourcegraph.podLabels" (list . .Values.indexedSearch) | nindent 8 }}
-        app: indexed-search
-        deploy: sourcegraph
-        app.kubernetes.io/component: indexed-search
+        {{- include "sourcegraph.podLabels" (list . .Values.indexedSearch (dict "app" "indexed-search" "deploy" "sourcegraph" "app.kubernetes.io/component" "indexed-search")) | nindent 8 }}
     spec:
       {{- with .Values.indexedSearch.extraInitContainers }}
       initContainers:
