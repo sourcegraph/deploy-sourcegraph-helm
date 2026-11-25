@@ -4,35 +4,31 @@ metadata:
   annotations:
     description: Performs Sourcegraph database migrations.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.migrator.labels }}
-      {{- toYaml .Values.migrator.labels | nindent 4 }}
-    {{- end }}
-    deploy: sourcegraph
-    app.kubernetes.io/component: migrator
+    {{- include "sourcegraph.uniqueKeys" (list
+      (include "sourcegraph.labels" .)
+      .Values.migrator.labels
+      "deploy: sourcegraph"
+      "app.kubernetes.io/component: migrator"
+    ) | nindent 4 }}
   name: {{ default "migrator" .Values.migrator.name }}-{{ randAlphaNum 5 | lower }}
 spec:
   backoffLimit: 5
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: migrator
-      {{- if .Values.sourcegraph.podAnnotations }}
-      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
-      {{- end }}
-      {{- if .Values.migrator.podAnnotations }}
-      {{- toYaml .Values.migrator.podAnnotations | nindent 8 }}
-      {{- end }}
+        {{- include "sourcegraph.uniqueKeys" (list
+          "kubectl.kubernetes.io/default-container: migrator"
+          .Values.sourcegraph.podAnnotations
+          .Values.migrator.podAnnotations
+        ) | nindent 8 }}
       labels:
-      {{- include "sourcegraph.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.migrator.podLabels }}
-      {{- toYaml .Values.migrator.podLabels | nindent 8 }}
-      {{- end }}
-        job: migrator
-        deploy: sourcegraph
+        {{- include "sourcegraph.uniqueKeys" (list
+          (include "sourcegraph.selectorLabels" .)
+          .Values.sourcegraph.podLabels
+          .Values.migrator.podLabels
+          "job: migrator"
+          "deploy: sourcegraph"
+        ) | nindent 8 }}
     spec:
       containers:
       - name: migrator
