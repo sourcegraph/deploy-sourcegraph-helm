@@ -50,7 +50,8 @@ sourcegraph:
   # -- Add extra labels to all services
   serviceLabels: {}
   # -- Labels that replace `app.kubernetes.io/name` and `app.kubernetes.io/instance` in every component's
-  # workload selector, pod labels, and Service and PodDisruptionBudget selectors.
+  # workload selector, pod labels, and Service and PodDisruptionBudget selectors. `jaeger` keeps its own selector
+  # labels and ignores this value.
   # Only for adopting workloads created outside this chart, whose selectors Kubernetes does not allow changing:
   # set it on the first install and never change it afterwards. Use `<serviceName>.extraSelectorLabels`
   # for labels that differ per component. See [Adopting existing workloads](#adopting-existing-workloads)
@@ -72,10 +73,12 @@ sourcegraph:
 #     # Override the global sourcegraph.image.repository on a service-specific basis
 #     repository:
 #
-#   # Add additional labels and annotations to various resources
+#   # Add labels to the component's Deployment, StatefulSet, or DaemonSet
 #   labels: {}
+#   # Add labels and annotations to the component's pods
 #   podLabels: {}
 #   podAnnotations: {}
+#   # Add labels and annotations to the component's Services. jaeger has collector and query values instead
 #   serviceLabels: {}
 #   serviceAnnotations: {}
 #   # Provide custom environment variables
@@ -98,7 +101,8 @@ sourcegraph:
 #   # Add ports to the component's primary Service
 #   extraServicePorts: []
 #   # Add labels to the component's workload selector, pod labels, and Service and PodDisruptionBudget selectors,
-#   # to adopt a workload created outside this chart. Never change it on an installed release
+#   # to adopt a workload created outside this chart. Never change it on an installed release.
+#   # jaeger does not support it
 #   extraSelectorLabels: {}
 #   # Toggle serviceAccount creation
 #   serviceAccount.create: true
