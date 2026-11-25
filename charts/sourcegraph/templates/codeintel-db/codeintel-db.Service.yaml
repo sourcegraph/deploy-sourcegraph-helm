@@ -11,6 +11,7 @@ metadata:
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
       "app.kubernetes.io/component: codeintel-db"
       "app: codeintel-db"
       "deploy: sourcegraph"

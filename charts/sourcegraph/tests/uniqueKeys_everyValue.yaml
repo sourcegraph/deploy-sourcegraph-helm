@@ -13,6 +13,7 @@ sourcegraph:
     deploy: from-values
     app: from-values
     app.kubernetes.io/component: from-values
+  serviceLabels: *objectLabels
   podAnnotations: &annotations
     example.com/owner: platform
     kubectl.kubernetes.io/default-container: from-values

@@ -10,6 +10,7 @@ metadata:
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
       "app: worker"
       "deploy: sourcegraph"
       "app.kubernetes.io/component: worker"

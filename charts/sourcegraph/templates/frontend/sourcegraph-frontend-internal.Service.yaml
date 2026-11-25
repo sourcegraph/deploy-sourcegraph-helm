@@ -8,6 +8,7 @@ metadata:
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
       "app: sourcegraph-frontend"
       "deploy: sourcegraph"
       "app.kubernetes.io/component: frontend"

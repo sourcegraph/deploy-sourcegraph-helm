@@ -11,6 +11,7 @@ metadata:
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
       "app: redis-store"
       "deploy: sourcegraph"
       "app.kubernetes.io/component: redis"

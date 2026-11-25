@@ -11,6 +11,7 @@ metadata:
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       (include "sourcegraph.labels" .)
+      .Values.sourcegraph.serviceLabels
       .Values.openTelemetry.gateway.serviceLabels
       "deploy: sourcegraph"
       "app.kubernetes.io/component: otel-collector"

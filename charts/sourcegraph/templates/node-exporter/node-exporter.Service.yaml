@@ -13,6 +13,7 @@ metadata:
   labels:
     {{- include "sourcegraph.uniqueKeys" (list
       .Values.sourcegraph.labels
+      .Values.sourcegraph.serviceLabels
       "app.kubernetes.io/component: node-exporter"
       "app: node-exporter"
       "deploy: sourcegraph"
