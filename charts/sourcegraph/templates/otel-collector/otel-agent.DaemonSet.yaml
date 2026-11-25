@@ -44,7 +44,7 @@ spec:
         terminationMessagePolicy: FallbackToLogsOnError
         env:
         {{- range $name, $item := .Values.openTelemetry.agent.env}}
-          - name: {{ $name }}
+        - name: {{ $name }}
           {{- $item | toYaml | nindent 10 }}
         {{- end }}
         resources:
