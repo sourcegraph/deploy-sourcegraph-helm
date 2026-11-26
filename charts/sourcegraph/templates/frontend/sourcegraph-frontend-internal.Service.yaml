@@ -1,16 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  {{- if .Values.frontend.serviceAnnotations }}
+  {{- with .Values.frontend.internalServiceAnnotations }}
   annotations:
-    {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
     app: sourcegraph-frontend
     deploy: sourcegraph
     app.kubernetes.io/component: frontend
-    {{- if .Values.frontend.serviceLabels }}
-      {{- toYaml .Values.frontend.serviceLabels | nindent 4 }}
+    {{- with .Values.frontend.internalServiceLabels }}
+    {{- toYaml . | nindent 4 }}
     {{- end }}
   name: sourcegraph-frontend-internal
 spec:
