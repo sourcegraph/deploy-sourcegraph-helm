@@ -123,7 +123,8 @@ without interrupting searches.
   and the continuity pods, which turns on continuity indexing.
 - `indexedSearch.continuity.routing` (`SRC_INDEXED_SEARCH_CONTINUITY_ROUTING`)
   chooses which fleet serves searches: `true` sends them to `indexed-searcher`,
-  `false` keeps them on `indexed-search`.
+  `false` keeps them on `indexed-search`. Only frontend, worker, and searcher
+  get it, so switching it restarts only those.
 - `indexedSearch.enabled` renders the `indexed-search` StatefulSet and its
   Services, PodDisruptionBudget, and ServiceAccount.
 - `indexedSearcher` configures the continuity webservers, and
