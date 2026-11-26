@@ -1,0 +1,51 @@
+suite: otel-collector volumes and pod security context
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- otel-collector/otel-collector.Deployment.yaml
+tests:
+- it: should add extraVolumes and extraVolumeMounts after the chart's own config volume
+  set:
+    openTelemetry.gateway.config.traces.exporters:
+      otlp:
+        endpoint: api.honeycomb.io:443
+    openTelemetry.gateway.extraVolumes:
+    - name: secrets
+      emptyDir:
+        medium: Memory
+    openTelemetry.gateway.extraVolumeMounts:
+    - name: secrets
+      mountPath: /var/run/secrets/example
+  asserts:
+  - equal:
+      path: spec.template.spec.volumes[0].name
+      value: config
+  - equal:
+      path: spec.template.spec.volumes[1]
+      value:
+        name: secrets
+        emptyDir:
+          medium: Memory
+  - equal:
+      path: spec.template.spec.containers[0].volumeMounts
+      value:
+      - name: config
+        mountPath: /etc/otel-collector
+      - name: secrets
+        mountPath: /var/run/secrets/example
+
+- it: should set the pod security context only when podSecurityContext is set
+  set:
+    openTelemetry.gateway.podSecurityContext:
+      fsGroup: 101
+  asserts:
+  - equal:
+      path: spec.template.spec.securityContext
+      value:
+        fsGroup: 101
+
+- it: should render no pod security context by default
+  asserts:
+  - notExists:
+      path: spec.template.spec.securityContext

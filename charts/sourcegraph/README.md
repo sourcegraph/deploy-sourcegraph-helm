@@ -372,7 +372,10 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
+| openTelemetry.gateway.extraVolumeMounts | list | `[]` | Volume mounts to add to the `otel-collector` container |
+| openTelemetry.gateway.extraVolumes | list | `[]` | Volumes to add to the `otel-collector` pod, e.g. one an `extraInitContainers` container writes a secret to |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
+| openTelemetry.gateway.podSecurityContext | object | `{}` | Security context for the `otel-collector` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | openTelemetry.gateway.resources | object | `{"limits":{"cpu":"3","memory":"3Gi"},"requests":{"cpu":"1","memory":"1Gi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.gateway.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-collector` |
 | openTelemetry.gateway.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
