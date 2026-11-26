@@ -14,6 +14,7 @@ metadata:
     {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.labels .Values.sourcegraph.serviceLabels .Values.openTelemetry.gateway.serviceLabels) }}
     {{- . | nindent 4 }}
     {{- end }}
+    app: otel-collector
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
   name: otel-collector
