@@ -72,6 +72,40 @@ tests:
         example.com/internal: "true"
     template: frontend/sourcegraph-frontend-internal.Service.yaml
 
+- it: should add frontend.serviceLabels to sourcegraph-frontend-internal when frontendInternal.serviceLabels is unset
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceLabels:
+      example.com/exposed: "true"
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        example.com/exposed: "true"
+
+- it: should let pod labels set app.kubernetes.io/component, as Sourcegraph Cloud does
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  set:
+    indexedSearch.podLabels:
+      app.kubernetes.io/component: indexed-searcher
+  asserts:
+  - isSubset:
+      path: spec.template.metadata.labels
+      content:
+        app.kubernetes.io/component: indexed-searcher
+  - equal:
+      path: metadata.labels["app.kubernetes.io/component"]
+      value: indexed-search
+
+- it: should fail when a pod label sets a label pod templates set
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    gitserver.podLabels:
+      group: other
+  asserts:
+  - failedTemplate:
+      errorPattern: must not set the label "group", which the chart sets itself
+
 - it: should render a label set in both sourcegraph.podLabels and the selector labels once
   template: gitserver/gitserver.StatefulSet.yaml
   set:

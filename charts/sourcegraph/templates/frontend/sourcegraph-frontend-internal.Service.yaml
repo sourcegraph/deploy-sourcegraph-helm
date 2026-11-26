@@ -6,7 +6,7 @@ metadata:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- with include "sourcegraph.serviceLabels" (list . .Values.frontendInternal) }}
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.serviceLabels (.Values.frontendInternal.serviceLabels | default .Values.frontend.serviceLabels)) }}
     {{- . | nindent 4 }}
     {{- end }}
     app: sourcegraph-frontend

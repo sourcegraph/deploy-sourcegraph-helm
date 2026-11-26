@@ -82,12 +82,24 @@ Labels for a component's Services: sourcegraph.serviceLabels, then
 Labels for a component's pods: sourcegraph.podLabels, then
 <serviceName>.podLabels, without the selector labels, which the template
 renders before them. Fails on a pod label that would change a selector label,
-so the workload's selector would no longer match its pods.
+so the workload's selector would no longer match its pods, and on a label pod
+templates set themselves. Pods do not get app.kubernetes.io/component from the
+chart: Sourcegraph Cloud sets it in podLabels, and its monitoring selects on it.
 
 {{ include "sourcegraph.podLabels" (list . .Values.frontend) }}
 */}}
 {{- define "sourcegraph.podLabels" -}}
-{{- $labels := include "sourcegraph.userLabels" (list (index . 0).Values.sourcegraph.podLabels (index . 1).podLabels) | fromYaml -}}
+{{- $labels := dict -}}
+{{- range (list (index . 0).Values.sourcegraph.podLabels (index . 1).podLabels) -}}
+{{- range $key, $value := . -}}
+{{- $_ := set $labels $key $value -}}
+{{- end -}}
+{{- end -}}
+{{- range $key := list "app" "deploy" "group" "type" "worker-replica" -}}
+{{- if hasKey $labels $key -}}
+{{- fail (printf "sourcegraph.podLabels and <serviceName>.podLabels must not set the label %q, which the chart sets itself" $key) -}}
+{{- end -}}
+{{- end -}}
 {{- range $key, $value := include "sourcegraph.selectorLabels" . | fromYaml -}}
 {{- if and (hasKey $labels $key) (ne (toString (get $labels $key)) (toString $value)) -}}
 {{- fail (printf "sourcegraph.podLabels and <serviceName>.podLabels must not change the selector label %q from %q" $key (toString $value)) -}}

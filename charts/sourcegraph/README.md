@@ -114,14 +114,16 @@ your own, set:
 | Objects | Values |
 | --- | --- |
 | Workloads, ConfigMaps, Secrets, standalone PersistentVolumeClaims, ServiceAccounts, RBAC objects, PodDisruptionBudgets, and the Ingress of a component | `sourcegraph.labels`, then `<serviceName>.labels` |
-| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; `frontendInternal.serviceLabels` for the `sourcegraph-frontend-internal` Service |
+| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; for the `sourcegraph-frontend-internal` Service, `frontendInternal.serviceLabels` if set, else `frontend.serviceLabels` |
 | Pods | `sourcegraph.podLabels`, then `<serviceName>.podLabels` |
 | Volume claim templates of StatefulSets | `<serviceName>.storageLabels` |
 
 A later value wins, and each key is rendered once. The render fails if they set
 a label the chart sets itself: `app`, `deploy`, `group`, `type`,
 `worker-replica`, `category`, `app.kubernetes.io/component`, or a standard Helm
-label, or if a pod label gives a selector label a different value. Services do not get
+label, or if a pod label gives a selector label a different value. Pods do not
+get `app.kubernetes.io/component` or the standard Helm labels from the chart, so
+pod labels may set them, except on `jaeger`. Services do not get
 `sourcegraph.labels`, because Prometheus copies a Service's labels onto the
 metrics it scrapes from it.
 
@@ -244,7 +246,7 @@ In addition to the documented values, all services also support the following va
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
 | frontendInternal.serviceAnnotations | object | `{}` | Annotations for the `sourcegraph-frontend-internal` Service. If empty, `frontend.serviceAnnotations` is used |
-| frontendInternal.serviceLabels | object | `{}` | Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`. `frontend.serviceLabels` applies to the `sourcegraph-frontend` Service only |
+| frontendInternal.serviceLabels | object | `{}` | Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`. If empty, `frontend.serviceLabels` is used |
 | frontendInternal.serviceType | string | `""` | Type of the `sourcegraph-frontend-internal` Service. If empty, `frontend.internalServiceType`, then `ClusterIP`, is used |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | gitserver.env | object | the chart will add some default environment values | Environment variables for the `gitserver` container |
