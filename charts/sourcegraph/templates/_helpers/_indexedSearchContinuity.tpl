@@ -22,8 +22,6 @@ continuity is disabled.
 {{- if $continuity.enabled -}}
 - name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
   value: "true"
-- name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
-  value: {{ $continuity.routing | quote }}
 - name: SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS
   value: {{ $continuity.replicas | quote }}
 - name: SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE
@@ -36,6 +34,19 @@ continuity is disabled.
 - name: {{ $name }}
   {{- $item | toYaml | nindent 2 }}
 {{- end }}
+{{- end -}}
+{{- end }}
+
+{{/*
+Render SRC_INDEXED_SEARCH_CONTINUITY_ROUTING for the services that search indexed search
+(frontend, worker, searcher). It is kept out of the shared environment so that switching
+routing does not restart the webservers, indexers or gitserver, which do not read it.
+Renders nothing when continuity is disabled.
+*/}}
+{{- define "sourcegraph.indexedSearchContinuity.routingEnv" -}}
+{{- if .Values.indexedSearch.continuity.enabled -}}
+- name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+  value: {{ .Values.indexedSearch.continuity.routing | quote }}
 {{- end -}}
 {{- end }}
 

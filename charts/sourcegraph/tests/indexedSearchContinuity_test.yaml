@@ -347,7 +347,7 @@ tests:
         value: "true"
     template: frontend/sourcegraph-frontend.Deployment.yaml
 
-- it: should pass routing false to every participant while continuity runs in shadow
+- it: should pass routing false to the services that search while continuity runs in shadow
   set:
     indexedSearch:
       continuity:
@@ -372,12 +372,25 @@ tests:
         name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
         value: "false"
     template: searcher/searcher.StatefulSet.yaml
-  - contains:
+  # Switching routing must not restart services that do not read it.
+  - notContains:
       path: spec.template.spec.containers[0].env
       content:
         name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
         value: "false"
     template: gitserver/gitserver.StatefulSet.yaml
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        value: "false"
+    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+  - notContains:
+      path: spec.template.spec.containers[0].env
+      content:
+        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        value: "false"
+    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
   - hasDocuments:
       count: 1
     template: indexed-search/indexed-search.StatefulSet.yaml
