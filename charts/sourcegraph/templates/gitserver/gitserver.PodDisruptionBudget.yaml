@@ -2,6 +2,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  {{- with include "sourcegraph.objectLabels" (list . .Values.gitserver) }}
+  labels:
+    {{- . | nindent 4 }}
+  {{- end }}
   name: {{ .Values.gitserver.name }}
 spec:
   {{- toYaml .Values.gitserver.podDisruptionBudget | nindent 2 }}

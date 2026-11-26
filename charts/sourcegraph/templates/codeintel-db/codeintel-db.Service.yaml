@@ -9,12 +9,12 @@ metadata:
     {{- toYaml .Values.codeIntelDB.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.codeIntelDB) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app.kubernetes.io/component: codeintel-db
     app: codeintel-db
     deploy: sourcegraph
-    {{- if .Values.codeIntelDB.serviceLabels }}
-      {{- toYaml .Values.codeIntelDB.serviceLabels | nindent 4 }}
-    {{- end }}
   name: codeintel-db
 spec:
   ports:

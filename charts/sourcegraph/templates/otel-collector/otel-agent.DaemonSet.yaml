@@ -5,9 +5,9 @@ metadata:
   annotations:
     description: Forwards telemetry data to the OpenTelemetry Collector Deployment.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.openTelemetry.agent.labels }}
-      {{- toYaml .Values.openTelemetry.agent.labels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- with include "sourcegraph.objectLabels" (list . .Values.openTelemetry.agent) }}
+    {{- . | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
@@ -30,11 +30,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.openTelemetry.agent) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.openTelemetry.agent.podLabels }}
-      {{- toYaml .Values.openTelemetry.agent.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.podLabels" (list . .Values.openTelemetry.agent) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: otel-agent

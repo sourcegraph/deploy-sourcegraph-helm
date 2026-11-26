@@ -1,0 +1,86 @@
+# Values for the label convention suites: every optional component and object
+# enabled, and a marker label in each user label value.
+sourcegraph:
+  labels:
+    example.com/object: o
+  serviceLabels:
+    example.com/service: s
+  podLabels:
+    example.com/pod: p
+jaeger:
+  enabled: true
+syntacticCodeIntel:
+  enabled: true
+  podDisruptionBudget: &id001
+    minAvailable: 1
+  serviceAccount:
+    create: true
+frontend:
+  ingress:
+    enabled: true
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+openTelemetry:
+  gateway:
+    serviceAccount:
+      create: true
+worker:
+  replicas:
+  - jobs:
+    - codeintel-upload-janitor
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+gitserver:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+indexedSearch:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+preciseCodeIntel:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+redisCache:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+redisStore:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+searcher:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+syntectServer:
+  podDisruptionBudget: *id001
+  serviceAccount:
+    create: true
+blobstore:
+  serviceAccount:
+    create: true
+cadvisor:
+  serviceAccount:
+    create: true
+codeInsightsDB:
+  serviceAccount:
+    create: true
+codeIntelDB:
+  serviceAccount:
+    create: true
+grafana:
+  serviceAccount:
+    create: true
+nodeExporter:
+  serviceAccount:
+    create: true
+pgsql:
+  serviceAccount:
+    create: true
+prometheus:
+  serviceAccount:
+    create: true

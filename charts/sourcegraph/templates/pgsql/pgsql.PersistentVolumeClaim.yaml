@@ -3,6 +3,9 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
+    {{- with include "sourcegraph.objectLabels" (list . .Values.pgsql) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: pgsql
   {{- if .Values.pgsql.storageAnnotations }}

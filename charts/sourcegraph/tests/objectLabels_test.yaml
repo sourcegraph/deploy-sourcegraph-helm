@@ -1,0 +1,169 @@
+suite: object labels
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+tests:
+- it: should add sourcegraph.labels and the component's labels to its other objects
+  templates:
+  - redis/redis-store.PersistentVolumeClaim.yaml
+  - redis/redis-store.ServiceAccount.yaml
+  - redis/redis-store.Secret.yaml
+  set:
+    sourcegraph.labels:
+      example.com/project: sourcegraph
+    redisStore.labels:
+      example.com/service: redis
+    redisStore.serviceAccount.create: true
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        example.com/project: sourcegraph
+        example.com/service: redis
+        deploy: sourcegraph
+
+- it: should add sourcegraph.serviceLabels and serviceLabels to Services, not sourcegraph.labels
+  template: redis/redis-store.Service.yaml
+  set:
+    sourcegraph.labels:
+      example.com/project: sourcegraph
+    sourcegraph.serviceLabels:
+      example.com/mesh: "on"
+    redisStore.serviceLabels:
+      example.com/service: redis
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        app: redis-store
+        app.kubernetes.io/component: redis
+        deploy: sourcegraph
+        example.com/mesh: "on"
+        example.com/service: redis
+
+- it: should add frontend.serviceLabels to sourcegraph-frontend only, and frontendInternal.serviceLabels to sourcegraph-frontend-internal only
+  templates:
+  - frontend/sourcegraph-frontend.Service.yaml
+  - frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    sourcegraph.serviceLabels:
+      example.com/project: sourcegraph
+    frontend.serviceLabels:
+      example.com/exposed: "true"
+    frontendInternal.serviceLabels:
+      example.com/internal: "true"
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        app: sourcegraph-frontend
+        app.kubernetes.io/component: frontend
+        deploy: sourcegraph
+        example.com/project: sourcegraph
+        example.com/exposed: "true"
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - equal:
+      path: metadata.labels
+      value:
+        app: sourcegraph-frontend
+        app.kubernetes.io/component: frontend
+        deploy: sourcegraph
+        example.com/project: sourcegraph
+        example.com/internal: "true"
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+
+- it: should add frontend.serviceLabels to sourcegraph-frontend-internal when frontendInternal.serviceLabels is unset
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceLabels:
+      example.com/exposed: "true"
+  asserts:
+  - isSubset:
+      path: metadata.labels
+      content:
+        example.com/exposed: "true"
+
+- it: should render no frontend.serviceLabels or serviceAnnotations on sourcegraph-frontend-internal when frontendInternal sets them to {}
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceLabels:
+      example.com/exposed: "true"
+    frontend.serviceAnnotations:
+      example.com/lb: "true"
+    frontendInternal.serviceLabels: {}
+    frontendInternal.serviceAnnotations: {}
+  asserts:
+  - notExists:
+      path: metadata.labels["example.com/exposed"]
+  - notExists:
+      path: metadata.annotations
+
+- it: should let pod labels set app.kubernetes.io/component, as Sourcegraph Cloud does
+  template: indexed-search/indexed-search.StatefulSet.yaml
+  set:
+    indexedSearch.podLabels:
+      app.kubernetes.io/component: indexed-searcher
+  asserts:
+  - isSubset:
+      path: spec.template.metadata.labels
+      content:
+        app.kubernetes.io/component: indexed-searcher
+  - equal:
+      path: metadata.labels["app.kubernetes.io/component"]
+      value: indexed-search
+
+- it: should fail when a pod label sets a label pod templates set
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    gitserver.podLabels:
+      group: other
+  asserts:
+  - failedTemplate:
+      errorPattern: must not set the label "group", which the chart sets itself
+
+- it: should render a label set in both sourcegraph.podLabels and the selector labels once
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride:
+      example.com/project: sourcegraph
+    sourcegraph.podLabels:
+      example.com/project: sourcegraph
+    sourcegraph.labels:
+      example.com/project: sourcegraph
+    gitserver.labels:
+      example.com/project: sourcegraph
+  asserts:
+  - isSubset:
+      path: spec.template.metadata.labels
+      content:
+        example.com/project: sourcegraph
+        app: gitserver
+
+- it: should add the labels to a PodDisruptionBudget only when set
+  template: frontend/sourcegraph-frontend.PodDisruptionBudget.yaml
+  set:
+    frontend.podDisruptionBudget:
+      minAvailable: 1
+  asserts:
+  - notExists:
+      path: metadata.labels
+
+- it: should fail when a label value sets a label the chart sets itself
+  template: redis/redis-store.Service.yaml
+  set:
+    redisStore.serviceLabels:
+      app: other
+  asserts:
+  - failedTemplate:
+      errorPattern: must not set the label "app", which the chart sets itself
+
+- it: should fail when a pod label changes a selector label
+  template: gitserver/gitserver.StatefulSet.yaml
+  set:
+    sourcegraph.selectorLabelsOverride:
+      example.com/project: sourcegraph
+    gitserver.podLabels:
+      example.com/project: other
+  asserts:
+  - failedTemplate:
+      errorPattern: must not change the selector label "example.com/project" from "sourcegraph"

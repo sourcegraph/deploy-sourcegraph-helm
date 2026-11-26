@@ -7,8 +7,8 @@ kind: Deployment
 metadata:
   labels:
     {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
-    {{- if .Values.jaeger.labels }}
-      {{- toYaml .Values.jaeger.labels | nindent 4 }}
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.labels .Values.jaeger.labels) }}
+    {{- . | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
@@ -41,11 +41,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.jaeger.selectorLabels" . | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.jaeger.podLabels }}
-      {{- toYaml .Values.jaeger.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.podLabels .Values.jaeger.podLabels) }}
+      {{- . | nindent 8 }}
       {{- end }}
         app.kubernetes.io/instance: {{ .Release.Name }}
         app: jaeger

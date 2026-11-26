@@ -5,9 +5,9 @@ metadata:
   annotations:
     description: Postgres database for various data.
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.codeIntelDB.labels }}
-      {{- toYaml .Values.codeIntelDB.labels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- with include "sourcegraph.objectLabels" (list . .Values.codeIntelDB) }}
+    {{- . | nindent 4 }}
     {{- end }}
     app.kubernetes.io/component: codeintel-db
     deploy: sourcegraph
@@ -33,11 +33,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list . .Values.codeIntelDB) | nindent 8 }}
-      {{- if .Values.sourcegraph.podLabels }}
-      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if .Values.codeIntelDB.podLabels }}
-      {{- toYaml .Values.codeIntelDB.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.podLabels" (list . .Values.codeIntelDB) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: codeintel-db

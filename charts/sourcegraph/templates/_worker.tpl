@@ -16,9 +16,9 @@ metadata:
   annotations:
     description: Manages background processes.
   labels:
-    {{- include "sourcegraph.labels" $top | nindent 4 }}
-    {{- if $top.Values.worker.labels }}
-      {{- toYaml $top.Values.worker.labels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" $top | nindent 4 }}
+    {{- with include "sourcegraph.objectLabels" (list $top $top.Values.worker) }}
+    {{- . | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: worker
@@ -52,11 +52,8 @@ spec:
       {{- end }}
       labels:
       {{- include "sourcegraph.selectorLabels" (list $top $top.Values.worker) | nindent 8 }}
-      {{- if $top.Values.sourcegraph.podLabels }}
-      {{- toYaml $top.Values.sourcegraph.podLabels | nindent 8 }}
-      {{- end }}
-      {{- if $top.Values.worker.podLabels }}
-      {{- toYaml $top.Values.worker.podLabels | nindent 8 }}
+      {{- with include "sourcegraph.podLabels" (list $top $top.Values.worker) }}
+      {{- . | nindent 8 }}
       {{- end }}
         deploy: sourcegraph
         app: worker

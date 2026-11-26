@@ -1,0 +1,77 @@
+# Enforces what the label convention in AGENTS.md keeps off objects, on every object
+# any template renders, except the templates listed below.
+suite: label convention, labels kept off objects
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- "**/*.yaml"
+# Templates that had the standard Helm labels, or sourcegraph.labels on a Service,
+# before this convention. Do not add to this list: new objects follow the convention.
+excludeTemplates:
+- frontend/sourcegraph-frontend.Role.yaml
+- frontend/sourcegraph-frontend.RoleBinding.yaml
+- jaeger/jaeger.ConfigMap.yaml
+# Includes jaeger.ConfigMap.yaml for its checksum; this suite checks no workloads.
+- jaeger/jaeger.Deployment.yaml
+- otel-collector/otel-collector.Service.yaml
+- redis/redis-cache.ConfigMap.yaml
+- redis/redis-store.ConfigMap.yaml
+- storageclass.yaml
+- tests/test-connection.yaml
+values:
+- labelConvention_values.yaml
+tests:
+- it: should render every template with these values
+  asserts:
+  - notFailedTemplate: {}
+
+- it: should not render sourcegraph.labels on Services
+  documentSelector: {path: kind, value: Service, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["example.com/object"]'}
+
+- it: should not render the standard Helm labels on Services
+  documentSelector: &services {path: kind, value: Service, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on ConfigMaps
+  documentSelector: {path: kind, value: ConfigMap, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on Roles
+  documentSelector: {path: kind, value: Role, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on RoleBindings
+  documentSelector: {path: kind, value: RoleBinding, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on Secrets
+  documentSelector: {path: kind, value: Secret, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on PersistentVolumeClaims
+  documentSelector: {path: kind, value: PersistentVolumeClaim, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on ServiceAccounts
+  documentSelector: {path: kind, value: ServiceAccount, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on ClusterRoles
+  documentSelector: {path: kind, value: ClusterRole, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on ClusterRoleBindings
+  documentSelector: {path: kind, value: ClusterRoleBinding, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on PodDisruptionBudgets
+  documentSelector: {path: kind, value: PodDisruptionBudget, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should not render the standard Helm labels on Ingresses
+  documentSelector: {path: kind, value: Ingress, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - notExists: {path: 'metadata.labels["helm.sh/chart"]'}

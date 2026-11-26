@@ -4,6 +4,9 @@ kind: ConfigMap
 metadata:
   labels:
     {{- include "sourcegraph.jaeger.labels" . | nindent 4 }}
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.labels .Values.jaeger.labels) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: all-in-one
     app: jaeger

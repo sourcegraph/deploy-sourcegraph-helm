@@ -2,6 +2,10 @@
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
+  {{- with include "sourcegraph.objectLabels" (list . .Values.frontend) }}
+  labels:
+    {{- . | nindent 4 }}
+  {{- end }}
   name: sourcegraph-frontend
 spec:
   {{- toYaml .Values.frontend.podDisruptionBudget | nindent 2 }}

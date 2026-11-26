@@ -408,6 +408,17 @@ frontend:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: sourcegraph-frontend
 
+# The `sourcegraph-frontend-internal` Service, which serves `frontend`'s internal gRPC API to other components
+frontendInternal:
+  # -- Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`.
+  # If null, `frontend.serviceLabels` is used; set `{}` for none
+  serviceLabels: null
+  # -- Annotations for the `sourcegraph-frontend-internal` Service.
+  # If null, `frontend.serviceAnnotations` is used; set `{}` for none
+  serviceAnnotations: null
+  # -- Type of the `sourcegraph-frontend-internal` Service. If empty, `frontend.internalServiceType`, then `ClusterIP`, is used
+  serviceType: ""
+
 migrator:
   # -- Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in
   # `frontend` deployment to perform database migration
@@ -781,6 +792,13 @@ openTelemetry:
       allowPrivilegeEscalation: false
       runAsUser: 100
       runAsGroup: 101
+    # -- Security context for the `otel-collector` pod,
+    # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+    podSecurityContext: {}
+    # -- Volumes to add to the `otel-collector` pod, e.g. one an `extraInitContainers` container writes a secret to
+    extraVolumes: []
+    # -- Volume mounts to add to the `otel-collector` container
+    extraVolumeMounts: []
 
   agent:
     # -- Name used by resources. Does not affect service names or PVCs.

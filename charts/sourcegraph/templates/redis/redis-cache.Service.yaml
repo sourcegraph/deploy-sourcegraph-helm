@@ -9,12 +9,12 @@ metadata:
     {{- toYaml .Values.redisCache.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.redisCache) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app: redis-cache
     deploy: sourcegraph
     app.kubernetes.io/component: redis
-    {{- if .Values.redisCache.serviceLabels }}
-      {{- toYaml .Values.redisCache.serviceLabels | nindent 4 }}
-    {{- end }}
   name: redis-cache
 spec:
   ports:

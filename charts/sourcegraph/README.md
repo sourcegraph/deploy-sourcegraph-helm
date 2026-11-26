@@ -106,6 +106,27 @@ Helm only takes over an existing object that has the
 and `meta.helm.sh/release-namespace` annotations, or when installing with
 `--take-ownership` (Helm 3.17 or later).
 
+### Labels
+
+To carry over labels an existing install has on its other objects, or to add
+your own, set:
+
+| Objects | Values |
+| --- | --- |
+| Workloads, ConfigMaps, Secrets, standalone PersistentVolumeClaims, ServiceAccounts, RBAC objects, PodDisruptionBudgets, and the Ingress of a component | `sourcegraph.labels`, then `<serviceName>.labels` |
+| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; for the `sourcegraph-frontend-internal` Service, `frontendInternal.serviceLabels` if set, else `frontend.serviceLabels`; `{}` for none |
+| Pods | `sourcegraph.podLabels`, then `<serviceName>.podLabels` |
+| Volume claim templates of StatefulSets | `<serviceName>.storageLabels` |
+
+A later value wins, and each key is rendered once. The render fails if they set
+a label the chart sets itself: `app`, `deploy`, `group`, `type`,
+`worker-replica`, `category`, `app.kubernetes.io/component`, or a standard Helm
+label, or if a pod label gives a selector label a different value. Pods do not
+get `app.kubernetes.io/component` or the standard Helm labels from the chart, so
+pod labels may set them, except on `jaeger`. Services do not get
+`sourcegraph.labels`, because Prometheus copies a Service's labels onto the
+metrics it scrapes from it.
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.
@@ -224,6 +245,9 @@ In addition to the documented values, all services also support the following va
 | frontend.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"4G"},"requests":{"cpu":"2","ephemeral-storage":"4Gi","memory":"2G"}}` | Resource requests & limits for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| frontendInternal.serviceAnnotations | string | `nil` | Annotations for the `sourcegraph-frontend-internal` Service. If null, `frontend.serviceAnnotations` is used; set `{}` for none |
+| frontendInternal.serviceLabels | string | `nil` | Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`. If null, `frontend.serviceLabels` is used; set `{}` for none |
+| frontendInternal.serviceType | string | `""` | Type of the `sourcegraph-frontend-internal` Service. If empty, `frontend.internalServiceType`, then `ClusterIP`, is used |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | gitserver.env | object | the chart will add some default environment values | Environment variables for the `gitserver` container |
 | gitserver.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `gitserver` image |
@@ -348,7 +372,10 @@ In addition to the documented values, all services also support the following va
 | openTelemetry.gateway.containerSecurityContext.allowPrivilegeEscalation | bool | `false` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsGroup | int | `101` |  |
 | openTelemetry.gateway.containerSecurityContext.runAsUser | int | `100` |  |
+| openTelemetry.gateway.extraVolumeMounts | list | `[]` | Volume mounts to add to the `otel-collector` container |
+| openTelemetry.gateway.extraVolumes | list | `[]` | Volumes to add to the `otel-collector` pod, e.g. one an `extraInitContainers` container writes a secret to |
 | openTelemetry.gateway.name | string | `"otel-collector"` | Name used by resources. Does not affect service names or PVCs. |
+| openTelemetry.gateway.podSecurityContext | object | `{}` | Security context for the `otel-collector` pod, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
 | openTelemetry.gateway.resources | object | `{"limits":{"cpu":"3","memory":"3Gi"},"requests":{"cpu":"1","memory":"1Gi"}}` | Resource requests & limits for the `otel-collector` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | openTelemetry.gateway.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `otel-collector` |
 | openTelemetry.gateway.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |

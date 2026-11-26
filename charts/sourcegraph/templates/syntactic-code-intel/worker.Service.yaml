@@ -9,12 +9,12 @@ metadata:
     {{- toYaml .Values.syntacticCodeIntel.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.syntacticCodeIntel) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app: syntactic-code-intel-worker
     deploy: sourcegraph
     app.kubernetes.io/component: syntactic-code-intel
-    {{- if .Values.syntacticCodeIntel.serviceLabels }}
-      {{- toYaml .Values.syntacticCodeIntel.serviceLabels | nindent 4 }}
-    {{- end }}
   name: syntactic-code-intel-worker
 spec:
   ports:

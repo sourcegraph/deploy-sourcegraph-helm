@@ -10,12 +10,12 @@ metadata:
     {{- toYaml .Values.indexedSearch.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.indexedSearch) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     app: indexed-search-indexer
     deploy: sourcegraph
     app.kubernetes.io/component: indexed-search
-    {{- if .Values.indexedSearch.serviceLabels }}
-      {{- toYaml .Values.indexedSearch.serviceLabels | nindent 4 }}
-    {{- end }}
   name: {{ default "indexed-search-indexer" .Values.indexedSearch.indexerName }}
 spec:
   clusterIP: None

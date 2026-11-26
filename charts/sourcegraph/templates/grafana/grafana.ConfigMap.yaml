@@ -28,6 +28,9 @@ data:
 kind: ConfigMap
 metadata:
   labels:
+    {{- with include "sourcegraph.objectLabels" (list . .Values.grafana) }}
+    {{- . | nindent 4 }}
+    {{- end }}
     deploy: sourcegraph
     app.kubernetes.io/component: grafana
   name: {{ .Values.grafana.name }}

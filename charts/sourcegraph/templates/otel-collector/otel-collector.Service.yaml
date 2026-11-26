@@ -9,10 +9,12 @@ metadata:
     {{- toYaml .Values.openTelemetry.gateway.serviceAnnotations | nindent 4 }}
     {{- end }}
   labels:
-    {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.openTelemetry.gateway.serviceLabels }}
-      {{- toYaml .Values.openTelemetry.gateway.serviceLabels | nindent 4 }}
+    {{- include "sourcegraph.helmLabels" . | nindent 4 }}
+    {{- /* This Service had sourcegraph.labels before sourcegraph.serviceLabels existed. */}}
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.labels .Values.sourcegraph.serviceLabels .Values.openTelemetry.gateway.serviceLabels) }}
+    {{- . | nindent 4 }}
     {{- end }}
+    app: otel-collector
     deploy: sourcegraph
     app.kubernetes.io/component: otel-collector
   name: otel-collector
