@@ -139,7 +139,7 @@ data:
       - role: endpoints
         namespaces:
           names:
-           - {{ .Release.Namespace }}
+           - {{ .Release.Namespace | quote }}
 
       relabel_configs:
       - source_labels: [__meta_kubernetes_service_annotation_sourcegraph_prometheus_scrape]
@@ -187,40 +187,6 @@ data:
         regex: ^$
         action: drop
 
-    # Example scrape config for probing services via the Blackbox Exporter.
-    #
-    # The relabeling allows the actual service scrape endpoint to be configured
-    # via the following annotations:
-    #
-    # * `prometheus.io/probe`: Only probe services that have a value of `true`
-    - job_name: 'kubernetes-services'
-
-      metrics_path: /probe
-      params:
-        module: [http_2xx]
-
-      kubernetes_sd_configs:
-      - role: service
-
-      relabel_configs:
-      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_probe]
-        action: keep
-        regex: true
-      - source_labels: [__address__]
-        target_label: __param_target
-      - target_label: __address__
-        replacement: blackbox
-      - source_labels: [__param_target]
-        target_label: instance
-      - action: labelmap
-        regex: __meta_kubernetes_service_label_(.+)
-      - source_labels: [__meta_kubernetes_service_namespace]
-        # Sourcegraph specific customization. We want a more convenient to type label.
-        # target_label: kubernetes_namespace
-        target_label: ns
-      - source_labels: [__meta_kubernetes_service_name]
-        target_label: kubernetes_name
-
     # Example scrape config for pods
     #
     # The relabeling allows the actual pod scrape endpoint to be configured via the
@@ -233,6 +199,9 @@ data:
 
       kubernetes_sd_configs:
       - role: pod
+        namespaces:
+          names:
+           - {{ .Release.Namespace | quote }}
 
       relabel_configs:
       - source_labels: [__meta_kubernetes_pod_annotation_sourcegraph_prometheus_scrape]
