@@ -101,10 +101,58 @@ Set these values on the first install and never change them on an installed
 release: Kubernetes rejects the upgrade. Before installing, compare the
 `helm template` output with `kubectl get -o yaml` for each workload.
 
+Labels on other objects can be changed, so they never block an upgrade, but
+Helm only manages the labels the chart renders. To render the labels that the
+existing PersistentVolumeClaims, ServiceAccounts, and RBAC objects have:
+
+- `sourcegraph.labels` adds labels to all of them, on every component, except
+  the PersistentVolumeClaims that Kubernetes creates from a template. See
+  [PersistentVolumeClaim labels](#persistentvolumeclaim-labels).
+- `<serviceName>.storageLabels` adds labels to the PersistentVolumeClaim of
+  `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`,
+  `redisCache`, or `redisStore`.
+- `<serviceName>.serviceAccount.labels` adds labels to one component's
+  ServiceAccount, and to the Role, RoleBinding, ClusterRole, and
+  ClusterRoleBinding of `frontend` and `prometheus`.
+
+```yaml
+sourcegraph:
+  labels:
+    example.com/project: sourcegraph
+blobstore:
+  storageLabels:
+    example.com/service: blobstore
+frontend:
+  serviceAccount:
+    labels:
+      example.com/service: frontend
+```
+
 Helm only takes over an existing object that has the
 `app.kubernetes.io/managed-by: Helm` label and the `meta.helm.sh/release-name`
 and `meta.helm.sh/release-namespace` annotations, or when installing with
 `--take-ownership` (Helm 3.17 or later).
+
+### PersistentVolumeClaim labels
+
+The values that label a PersistentVolumeClaim depend on what creates it:
+
+| Created by | Components | `<serviceName>.storageLabels` | `sourcegraph.labels` and the chart's standard labels |
+| --- | --- | --- | --- |
+| The chart, as its own object | `blobstore`, `codeInsightsDB`, `codeIntelDB`, `pgsql`, `prometheus`, `redisCache`, `redisStore` | Yes | Yes |
+| Kubernetes, from a StatefulSet's volume claim template | `gitserver`, `grafana`, `indexedSearch`, `searcher` | Yes, at install only | No |
+| Kubernetes, from a pod's ephemeral volume, when `storageType` is `pvc` | `preciseCodeIntel`, `syntacticCodeIntel` | Yes; changing them restarts the pods | No |
+
+A StatefulSet's volume claim templates get neither `sourcegraph.labels` nor the
+standard labels on purpose. Kubernetes rejects any change to them, so a chart
+version that added these labels would fail the upgrade of existing releases,
+and `helm.sh/chart` changes with every chart version.
+
+Kubernetes copies a template's labels to a PersistentVolumeClaim only when it
+creates the claim, and never updates a claim that exists. Helm does not manage
+these claims either. Label an existing StatefulSet claim with
+`kubectl label pvc`. An ephemeral volume's claim is deleted and created again
+with its pod, so it always has the labels the chart renders.
 
 ## Configuration Options
 
@@ -129,6 +177,7 @@ In addition to the documented values, all services also support the following va
 - `<serviceName>.extraSelectorLabels` - add labels to the service's workload selector, pod labels, and Service and PodDisruptionBudget selectors. See [Adopting existing workloads](#adopting-existing-workloads)
 - `<serviceName>.serivceAccount.create` - create service account for service
 - `<serviceName>.serviceAccount.annotations` - Annotations for the service-specific service account
+- `<serviceName>.serviceAccount.labels` - Labels for the service-specific service account, and for the Role, RoleBinding, ClusterRole, and ClusterRoleBinding of `frontend` and `prometheus`, in addition to `sourcegraph.labels`
 - `<serviceName>.image.repository` - override the global `sourcegraph.image.repository` (registry or prefix) for this service. Defaults to `sourcegraph.image.repository` when unset.
 
 {{ template "chart.valuesTable" . }}

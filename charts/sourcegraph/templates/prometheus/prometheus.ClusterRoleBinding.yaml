@@ -3,9 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
   labels:
-    category: rbac
-    deploy: sourcegraph
-    app.kubernetes.io/component: prometheus
+    {{- include "sourcegraph.mergedLabels" (list . (include "sourcegraph.serviceAccountLabels" (list . "prometheus") | fromYaml) (dict "category" "rbac" "deploy" "sourcegraph" "app.kubernetes.io/component" "prometheus")) | nindent 4 }}
   name: {{ .Values.prometheus.name }}
 roleRef:
   apiGroup: "rbac.authorization.k8s.io"

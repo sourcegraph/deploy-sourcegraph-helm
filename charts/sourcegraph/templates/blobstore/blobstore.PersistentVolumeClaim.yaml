@@ -3,8 +3,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   labels:
-    deploy: sourcegraph
-    app.kubernetes.io/component: blobstore
+    {{- include "sourcegraph.mergedLabels" (list . .Values.blobstore.storageLabels (dict "deploy" "sourcegraph" "app.kubernetes.io/component" "blobstore")) | nindent 4 }}
   {{- if .Values.blobstore.storageAnnotations }}
   annotations:
     {{- toYaml .Values.blobstore.storageAnnotations | nindent 4 }}
