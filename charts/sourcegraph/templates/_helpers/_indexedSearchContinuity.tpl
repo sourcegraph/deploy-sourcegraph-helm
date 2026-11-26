@@ -21,7 +21,7 @@ continuity is disabled.
 {{- if $continuity.enabled -}}
 - name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
   value: "true"
-- name: SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS
+- name: SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS
   value: {{ $continuity.replicas | quote }}
 - name: SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE
   value: {{ $continuity.activationTolerance | quote }}

@@ -70,7 +70,7 @@ tests:
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS
+        name: SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS
         value: "2"
 - it: should add the indexer and shared continuity env when enabled
   set:

@@ -654,7 +654,7 @@ indexedSearch:
     # (no `zoekt-indexserver` container), a separate `indexed-search-indexer` Deployment builds shards
     # and publishes them through object storage, and frontend, worker, and searcher use the continuity search client.
     enabled: false
-    # -- Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS`)
+    # -- Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS`)
     replicas: 2
     # -- Number of a repository's replicas that may lag when a new generation activates: activation needs the
     # replicas the repository can have now minus this many, and at least one (`SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE`)

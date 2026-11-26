@@ -278,7 +278,7 @@ In addition to the documented values, all services also support the following va
 | indexedSearch.continuity.indexerImage.name | string | `"zoekt-continuity-indexer"` | Docker image name for the continuity indexer image |
 | indexedSearch.continuity.indexerImage.repository | string | `""` | Override the global sourcegraph.image.repository for the continuity indexer image |
 | indexedSearch.continuity.indexerImage.tag | string | `""` | Override the tag of the continuity indexer image |
-| indexedSearch.continuity.replicas | int | `2` | Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICAS`) |
+| indexedSearch.continuity.replicas | int | `2` | Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS`) |
 | indexedSearch.continuity.replicationFactors | string | `""` | Comma-separated `repositoryID=replicas` entries that raise the replicas of individual repositories, such as large monorepos, and with them their slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICATION_FACTORS`) |
 | indexedSearch.continuity.terminationGracePeriodSeconds | int | `60` | Time Kubernetes allows a continuity webserver to drain before forced termination. Must be at least 30. |
 | indexedSearch.continuity.webserverArgs | list | `[]` | Arguments for the continuity webserver container |
