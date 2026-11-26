@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  {{- if .Values.frontend.serviceAnnotations }}
+  {{- with .Values.frontendInternal.serviceAnnotations | default .Values.frontend.serviceAnnotations }}
   annotations:
-    {{- toYaml .Values.frontend.serviceAnnotations | nindent 4 }}
+    {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- with include "sourcegraph.serviceLabels" (list . .Values.frontend) }}
+    {{- with include "sourcegraph.serviceLabels" (list . .Values.frontendInternal) }}
     {{- . | nindent 4 }}
     {{- end }}
     app: sourcegraph-frontend
@@ -21,4 +21,4 @@ spec:
   selector:
     {{- include "sourcegraph.selectorLabels" (list . .Values.frontend) | nindent 4 }}
     app: sourcegraph-frontend
-  type: {{ .Values.frontend.internalServiceType | default "ClusterIP" }}
+  type: {{ .Values.frontendInternal.serviceType | default .Values.frontend.internalServiceType | default "ClusterIP" }}

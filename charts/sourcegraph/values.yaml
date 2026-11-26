@@ -408,6 +408,16 @@ frontend:
     # -- Name of the ServiceAccount to be created or an existing ServiceAccount
     name: sourcegraph-frontend
 
+# The `sourcegraph-frontend-internal` Service, which serves `frontend`'s internal gRPC API to other components
+frontendInternal:
+  # -- Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`.
+  # `frontend.serviceLabels` applies to the `sourcegraph-frontend` Service only
+  serviceLabels: {}
+  # -- Annotations for the `sourcegraph-frontend-internal` Service. If empty, `frontend.serviceAnnotations` is used
+  serviceAnnotations: {}
+  # -- Type of the `sourcegraph-frontend-internal` Service. If empty, `frontend.internalServiceType`, then `ClusterIP`, is used
+  serviceType: ""
+
 migrator:
   # -- Enable [migrator](https://docs.sourcegraph.com/admin/how-to/manual_database_migrations) initContainer in
   # `frontend` deployment to perform database migration

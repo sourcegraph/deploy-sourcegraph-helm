@@ -41,6 +41,37 @@ tests:
         example.com/mesh: "on"
         example.com/service: redis
 
+- it: should add frontend.serviceLabels to sourcegraph-frontend only, and frontendInternal.serviceLabels to sourcegraph-frontend-internal only
+  templates:
+  - frontend/sourcegraph-frontend.Service.yaml
+  - frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    sourcegraph.serviceLabels:
+      example.com/project: sourcegraph
+    frontend.serviceLabels:
+      example.com/exposed: "true"
+    frontendInternal.serviceLabels:
+      example.com/internal: "true"
+  asserts:
+  - equal:
+      path: metadata.labels
+      value:
+        app: sourcegraph-frontend
+        app.kubernetes.io/component: frontend
+        deploy: sourcegraph
+        example.com/project: sourcegraph
+        example.com/exposed: "true"
+    template: frontend/sourcegraph-frontend.Service.yaml
+  - equal:
+      path: metadata.labels
+      value:
+        app: sourcegraph-frontend
+        app.kubernetes.io/component: frontend
+        deploy: sourcegraph
+        example.com/project: sourcegraph
+        example.com/internal: "true"
+    template: frontend/sourcegraph-frontend-internal.Service.yaml
+
 - it: should render a label set in both sourcegraph.podLabels and the selector labels once
   template: gitserver/gitserver.StatefulSet.yaml
   set:
