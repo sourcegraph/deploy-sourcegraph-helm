@@ -1,15 +1,11 @@
+{{- if .Values.indexedSearch.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
   annotations:
     description: Headless service that provides a stable network identity for the
       indexed-search stateful set.
-    {{- if .Values.indexedSearch.continuity.enabled }}
-    # Continuity webservers serve metrics on their debug port.
-    prometheus.io/port: "6060"
-    {{- else }}
     prometheus.io/port: "6070"
-    {{- end }}
     sourcegraph.prometheus/scrape: "true"
     {{- if .Values.indexedSearch.serviceAnnotations }}
     {{- toYaml .Values.indexedSearch.serviceAnnotations | nindent 4 }}
@@ -35,3 +31,4 @@ spec:
     {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 4 }}
     app: indexed-search
   type: {{ .Values.indexedSearch.serviceType | default "ClusterIP" }}
+{{- end }}

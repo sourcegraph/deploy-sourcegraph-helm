@@ -1,4 +1,4 @@
-{{- include "sourcegraph.indexedSearchContinuity.validate" . }}
+{{- if .Values.indexedSearch.enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -20,9 +20,6 @@ spec:
       {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 6 }}
       app: indexed-search
   serviceName: indexed-search
-  {{- if .Values.indexedSearch.continuity.enabled }}
-  podManagementPolicy: OrderedReady
-  {{- end }}
   template:
     metadata:
       {{- if or .Values.sourcegraph.podAnnotations .Values.indexedSearch.podAnnotations }}
@@ -45,88 +42,11 @@ spec:
         app: indexed-search
         deploy: sourcegraph
     spec:
-      {{- if .Values.indexedSearch.continuity.enabled }}
-      terminationGracePeriodSeconds: {{ .Values.indexedSearch.continuity.terminationGracePeriodSeconds }}
-      {{- end }}
       {{- with .Values.indexedSearch.extraInitContainers }}
       initContainers:
         {{- toYaml . | nindent 6 }}
       {{- end }}
       containers:
-      {{- if .Values.indexedSearch.continuity.enabled }}
-      - name: zoekt-continuity-webserver
-        image: {{ include "sourcegraph.indexedSearchContinuity.image" (list . .Values.indexedSearch.continuity.webserverImage) }}
-        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
-        {{- with .Values.indexedSearch.continuity.webserverCommand }}
-        command:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
-        {{- with .Values.indexedSearch.continuity.webserverArgs }}
-        args:
-          {{- toYaml . | nindent 8 }}
-        {{- end }}
-        terminationMessagePolicy: FallbackToLogsOnError
-        env:
-        {{- range $name, $item := .Values.indexedSearch.env}}
-        - name: {{ $name }}
-          {{- $item | toYaml | nindent 10 }}
-        {{- end }}
-        - name: HOSTNAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        - name: DATA_DIR
-          value: /data/index
-        - name: SRC_FRONTEND_INTERNAL
-          value: sourcegraph-frontend-internal
-        {{- if not .Values.sourcegraph.disableKubernetesSecrets }}
-        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
-        {{- end }}
-        {{- include "sourcegraph.redisConnection" . | nindent 8 }}
-        {{- include "sourcegraph.indexedSearchContinuity.env" . | nindent 8 }}
-        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
-        {{- if .Values.openTelemetry.enabled }}
-        - name: OPENTELEMETRY_DISABLED
-          value: "false"
-        {{- end }}
-        ports:
-        - name: grpc
-          containerPort: 6070
-        - name: http-debug
-          containerPort: 6060
-        livenessProbe:
-          httpGet:
-            path: /healthz
-            port: grpc
-            scheme: HTTP
-          initialDelaySeconds: {{ .Values.indexedSearch.livenessProbe.initialDelaySeconds }}
-          timeoutSeconds: {{ .Values.indexedSearch.livenessProbe.timeoutSeconds }}
-          periodSeconds: {{ .Values.indexedSearch.livenessProbe.periodSeconds }}
-          failureThreshold: {{ .Values.indexedSearch.livenessProbe.failureThreshold }}
-        readinessProbe:
-          failureThreshold: {{ .Values.indexedSearch.readinessProbe.failureThreshold }}
-          httpGet:
-            path: /ready
-            port: grpc
-            scheme: HTTP
-          periodSeconds: {{ .Values.indexedSearch.readinessProbe.periodSeconds }}
-          timeoutSeconds: {{ .Values.indexedSearch.readinessProbe.timeoutSeconds }}
-        {{- if not .Values.sourcegraph.localDevMode }}
-        resources:
-          {{- toYaml .Values.indexedSearch.resources | nindent 10 }}
-        {{- end }}
-        securityContext:
-          {{- toYaml .Values.indexedSearch.containerSecurityContext | nindent 10 }}
-        volumeMounts:
-        - mountPath: /data
-          name: data
-          {{- if .Values.indexedSearch.storageSubPath }}
-          subPath: {{ .Values.indexedSearch.storageSubPath }}
-          {{- end }}
-        {{- if .Values.indexedSearch.extraVolumeMounts }}
-        {{- toYaml .Values.indexedSearch.extraVolumeMounts | nindent 8 }}
-        {{- end }}
-      {{- else }}
       - name: zoekt-webserver
         image: {{ include "sourcegraph.image" (list . "indexedSearch") }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
@@ -212,7 +132,6 @@ spec:
         {{- if .Values.indexedSearchIndexer.extraVolumeMounts }}
         {{- toYaml .Values.indexedSearchIndexer.extraVolumeMounts | nindent 8 }}
         {{- end }}
-      {{- end }}
       {{- if .Values.indexedSearch.extraContainers }}
         {{- toYaml .Values.indexedSearch.extraContainers | nindent 6 }}
       {{- end }}
@@ -253,3 +172,4 @@ spec:
         requests:
           storage: {{ .Values.indexedSearch.storageSize }}
       storageClassName: {{ .Values.storageClass.name }}
+{{- end }}

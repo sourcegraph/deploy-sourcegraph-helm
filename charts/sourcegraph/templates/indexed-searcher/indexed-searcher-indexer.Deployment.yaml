@@ -7,19 +7,19 @@ metadata:
     description: Builds indexed search shards and publishes them through object storage for continuity webservers.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.indexedSearch.labels }}
-      {{- toYaml .Values.indexedSearch.labels | nindent 4 }}
+    {{- if .Values.indexedSearcher.labels }}
+      {{- toYaml .Values.indexedSearcher.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    app.kubernetes.io/component: indexed-search-indexer
+    app.kubernetes.io/component: indexed-searcher-indexer
   name: {{ $indexer.name }}
 spec:
   replicas: {{ $indexer.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 6 }}
-      app: indexed-search-indexer
+      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearcher) | nindent 6 }}
+      app: indexed-searcher-indexer
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -32,18 +32,18 @@ spec:
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.indexedSearch.podAnnotations }}
-      {{- toYaml .Values.indexedSearch.podAnnotations | nindent 8 }}
+      {{- if .Values.indexedSearcher.podAnnotations }}
+      {{- toYaml .Values.indexedSearcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearch) | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearcher) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-        app: indexed-search-indexer
+        app: indexed-searcher-indexer
         deploy: sourcegraph
     spec:
-      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "indexedSearch") | nindent 6 }}
+      terminationGracePeriodSeconds: {{ .Values.sourcegraph.terminationGracePeriodSeconds }}
       containers:
       - name: zoekt-continuity-indexer
         image: {{ include "sourcegraph.indexedSearchContinuity.image" (list . .Values.indexedSearch.continuity.indexerImage) }}
@@ -92,21 +92,21 @@ spec:
           {{- toYaml $indexer.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.indexedSearchIndexer.containerSecurityContext | nindent 10 }}
+          {{- toYaml .Values.indexedSearcher.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: scratch
       securityContext:
-        {{- toYaml .Values.indexedSearch.podSecurityContext | nindent 8 }}
-      {{- include "sourcegraph.nodeSelector" (list . "indexedSearch" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "indexedSearch" ) | trim | nindent 6 }}
-      {{- with include "sourcegraph.priorityClassName" (list . "indexedSearch" ) | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- include "sourcegraph.tolerations" (list . "indexedSearch" ) | trim | nindent 6 }}
+        {{- toYaml .Values.indexedSearcher.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "indexedSearcher" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "indexedSearcher" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "indexedSearcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- include "sourcegraph.tolerations" (list . "indexedSearcher" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "indexedSearch") | trim | nindent 6 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "indexedSearcher") | trim | nindent 6 }}
       volumes:
       - name: scratch
         emptyDir:

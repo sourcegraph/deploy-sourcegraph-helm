@@ -1,4 +1,4 @@
-{{- if not .Values.indexedSearch.continuity.enabled -}}
+{{- if .Values.indexedSearch.enabled -}}
 apiVersion: v1
 kind: Service
 metadata:
