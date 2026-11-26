@@ -1,0 +1,95 @@
+# Enforces the label convention in AGENTS.md on every object any template renders,
+# with every optional component and object enabled. A new template is covered
+# without being listed here.
+suite: label convention
+release:
+  name: sourcegraph
+  namespace: sourcegraph
+templates:
+- "**/*.yaml"
+values:
+- labelConvention_values.yaml
+tests:
+# Every check below skips templates that render nothing, so first make sure none fails.
+- it: should render every template with these values
+  asserts:
+  - notFailedTemplate: {}
+
+# User labels
+
+- it: should render serviceLabels on every Service
+  documentSelector: &services {path: kind, value: Service, matchMany: true, skipEmptyTemplates: true}
+  asserts:
+  - equal: {path: 'metadata.labels["example.com/service"]', value: s}
+
+- it: should render podLabels, and no other user label, on every pod template and none in selectors
+  documentSelector: &deployments {path: kind, value: Deployment, matchMany: true, skipEmptyTemplates: true}
+  asserts: &podAsserts
+  - equal: {path: 'spec.template.metadata.labels["example.com/pod"]', value: p}
+  - notExists: {path: 'spec.template.metadata.labels["example.com/object"]'}
+  - notExists: {path: 'spec.selector.matchLabels["example.com/pod"]'}
+  - notExists: {path: 'spec.selector.matchLabels["example.com/object"]'}
+- it: should render podLabels on every StatefulSet pod template and none in selectors
+  documentSelector: &statefulsets {path: kind, value: StatefulSet, matchMany: true, skipEmptyTemplates: true}
+  asserts: *podAsserts
+- it: should render podLabels on every DaemonSet pod template and none in selectors
+  documentSelector: &daemonsets {path: kind, value: DaemonSet, matchMany: true, skipEmptyTemplates: true}
+  asserts: *podAsserts
+
+- it: should render sourcegraph.labels on every Deployment
+  documentSelector: *deployments
+  asserts: &objectAsserts
+  - equal: {path: 'metadata.labels["example.com/object"]', value: o}
+  - notExists: {path: 'metadata.labels["example.com/service"]'}
+- it: should render sourcegraph.labels on every StatefulSet
+  documentSelector: *statefulsets
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every DaemonSet
+  documentSelector: *daemonsets
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every ConfigMap
+  documentSelector: &configmaps {path: kind, value: ConfigMap, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every Secret
+  documentSelector: &secrets {path: kind, value: Secret, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every PersistentVolumeClaim
+  documentSelector: &pvcs {path: kind, value: PersistentVolumeClaim, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every ServiceAccount
+  documentSelector: &serviceaccounts {path: kind, value: ServiceAccount, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every Role
+  documentSelector: &roles {path: kind, value: Role, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every RoleBinding
+  documentSelector: &rolebindings {path: kind, value: RoleBinding, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every ClusterRole
+  documentSelector: &clusterroles {path: kind, value: ClusterRole, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every ClusterRoleBinding
+  documentSelector: &clusterrolebindings {path: kind, value: ClusterRoleBinding, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every PodDisruptionBudget
+  documentSelector: &pdbs {path: kind, value: PodDisruptionBudget, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every Ingress
+  documentSelector: &ingresses {path: kind, value: Ingress, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+- it: should render sourcegraph.labels on every StorageClass
+  documentSelector: &storageclasses {path: kind, value: StorageClass, matchMany: true, skipEmptyTemplates: true}
+  asserts: *objectAsserts
+
+# Standard Helm labels (sourcegraph.helmLabels)
+
+- it: should render the standard Helm labels on every Deployment
+  documentSelector: *deployments
+  asserts: &helmLabels
+  - exists: {path: 'metadata.labels["helm.sh/chart"]'}
+- it: should render the standard Helm labels on every StatefulSet
+  documentSelector: *statefulsets
+  asserts: *helmLabels
+- it: should render the standard Helm labels on every DaemonSet
+  documentSelector: *daemonsets
+  asserts: *helmLabels
