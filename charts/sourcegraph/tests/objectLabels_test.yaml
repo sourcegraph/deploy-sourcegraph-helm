@@ -83,6 +83,21 @@ tests:
       content:
         example.com/exposed: "true"
 
+- it: should render no frontend.serviceLabels or serviceAnnotations on sourcegraph-frontend-internal when frontendInternal sets them to {}
+  template: frontend/sourcegraph-frontend-internal.Service.yaml
+  set:
+    frontend.serviceLabels:
+      example.com/exposed: "true"
+    frontend.serviceAnnotations:
+      example.com/lb: "true"
+    frontendInternal.serviceLabels: {}
+    frontendInternal.serviceAnnotations: {}
+  asserts:
+  - notExists:
+      path: metadata.labels["example.com/exposed"]
+  - notExists:
+      path: metadata.annotations
+
 - it: should let pod labels set app.kubernetes.io/component, as Sourcegraph Cloud does
   template: indexed-search/indexed-search.StatefulSet.yaml
   set:

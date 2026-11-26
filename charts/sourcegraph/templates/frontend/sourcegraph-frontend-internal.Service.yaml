@@ -1,12 +1,20 @@
 apiVersion: v1
 kind: Service
 metadata:
-  {{- with .Values.frontendInternal.serviceAnnotations | default .Values.frontend.serviceAnnotations }}
+  {{- $annotations := .Values.frontend.serviceAnnotations }}
+  {{- if kindIs "map" .Values.frontendInternal.serviceAnnotations }}
+  {{- $annotations = .Values.frontendInternal.serviceAnnotations }}
+  {{- end }}
+  {{- with $annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   labels:
-    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.serviceLabels (.Values.frontendInternal.serviceLabels | default .Values.frontend.serviceLabels)) }}
+    {{- $labels := .Values.frontend.serviceLabels }}
+    {{- if kindIs "map" .Values.frontendInternal.serviceLabels }}
+    {{- $labels = .Values.frontendInternal.serviceLabels }}
+    {{- end }}
+    {{- with include "sourcegraph.userLabels" (list .Values.sourcegraph.serviceLabels $labels) }}
     {{- . | nindent 4 }}
     {{- end }}
     app: sourcegraph-frontend

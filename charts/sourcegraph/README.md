@@ -114,7 +114,7 @@ your own, set:
 | Objects | Values |
 | --- | --- |
 | Workloads, ConfigMaps, Secrets, standalone PersistentVolumeClaims, ServiceAccounts, RBAC objects, PodDisruptionBudgets, and the Ingress of a component | `sourcegraph.labels`, then `<serviceName>.labels` |
-| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; for the `sourcegraph-frontend-internal` Service, `frontendInternal.serviceLabels` if set, else `frontend.serviceLabels` |
+| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; for the `sourcegraph-frontend-internal` Service, `frontendInternal.serviceLabels` if set, else `frontend.serviceLabels`; `{}` for none |
 | Pods | `sourcegraph.podLabels`, then `<serviceName>.podLabels` |
 | Volume claim templates of StatefulSets | `<serviceName>.storageLabels` |
 
@@ -245,8 +245,8 @@ In addition to the documented values, all services also support the following va
 | frontend.resources | object | `{"limits":{"cpu":"2","ephemeral-storage":"8Gi","memory":"4G"},"requests":{"cpu":"2","ephemeral-storage":"4Gi","memory":"2G"}}` | Resource requests & limits for the `frontend` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | frontend.serviceAccount.create | bool | `true` | Enable creation of ServiceAccount for `frontend` |
 | frontend.serviceAccount.name | string | `"sourcegraph-frontend"` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| frontendInternal.serviceAnnotations | object | `{}` | Annotations for the `sourcegraph-frontend-internal` Service. If empty, `frontend.serviceAnnotations` is used |
-| frontendInternal.serviceLabels | object | `{}` | Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`. If empty, `frontend.serviceLabels` is used |
+| frontendInternal.serviceAnnotations | string | `nil` | Annotations for the `sourcegraph-frontend-internal` Service. If null, `frontend.serviceAnnotations` is used; set `{}` for none |
+| frontendInternal.serviceLabels | string | `nil` | Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`. If null, `frontend.serviceLabels` is used; set `{}` for none |
 | frontendInternal.serviceType | string | `""` | Type of the `sourcegraph-frontend-internal` Service. If empty, `frontend.internalServiceType`, then `ClusterIP`, is used |
 | gitserver.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `gitserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
 | gitserver.env | object | the chart will add some default environment values | Environment variables for the `gitserver` container |

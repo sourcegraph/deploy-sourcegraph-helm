@@ -114,7 +114,7 @@ your own, set:
 | Objects | Values |
 | --- | --- |
 | Workloads, ConfigMaps, Secrets, standalone PersistentVolumeClaims, ServiceAccounts, RBAC objects, PodDisruptionBudgets, and the Ingress of a component | `sourcegraph.labels`, then `<serviceName>.labels` |
-| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; for the `sourcegraph-frontend-internal` Service, `frontendInternal.serviceLabels` if set, else `frontend.serviceLabels` |
+| Services | `sourcegraph.serviceLabels`, then `<serviceName>.serviceLabels`; for the `sourcegraph-frontend-internal` Service, `frontendInternal.serviceLabels` if set, else `frontend.serviceLabels`; `{}` for none |
 | Pods | `sourcegraph.podLabels`, then `<serviceName>.podLabels` |
 | Volume claim templates of StatefulSets | `<serviceName>.storageLabels` |
 

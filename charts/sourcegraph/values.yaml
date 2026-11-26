@@ -411,10 +411,11 @@ frontend:
 # The `sourcegraph-frontend-internal` Service, which serves `frontend`'s internal gRPC API to other components
 frontendInternal:
   # -- Labels for the `sourcegraph-frontend-internal` Service, rendered after `sourcegraph.serviceLabels`.
-  # If empty, `frontend.serviceLabels` is used
-  serviceLabels: {}
-  # -- Annotations for the `sourcegraph-frontend-internal` Service. If empty, `frontend.serviceAnnotations` is used
-  serviceAnnotations: {}
+  # If null, `frontend.serviceLabels` is used; set `{}` for none
+  serviceLabels: null
+  # -- Annotations for the `sourcegraph-frontend-internal` Service.
+  # If null, `frontend.serviceAnnotations` is used; set `{}` for none
+  serviceAnnotations: null
   # -- Type of the `sourcegraph-frontend-internal` Service. If empty, `frontend.internalServiceType`, then `ClusterIP`, is used
   serviceType: ""
 
