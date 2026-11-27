@@ -21,6 +21,10 @@ metadata:
   name: indexed-searcher
 spec:
   clusterIP: None
+  # A starting webserver reports not ready until it has loaded all its slots,
+  # so a rolling restart waits for it. Meanwhile the frontend already routes
+  # the slots it reports ready, which needs its DNS name to resolve.
+  publishNotReadyAddresses: true
   ports:
   - name: grpc
     port: 6070

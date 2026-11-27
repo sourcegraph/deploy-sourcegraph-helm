@@ -122,6 +122,10 @@ tests:
       value: indexed-searcher
     template: indexed-searcher/indexed-searcher.Service.yaml
   - equal:
+      path: spec.publishNotReadyAddresses
+      value: true
+    template: indexed-searcher/indexed-searcher.Service.yaml
+  - equal:
       path: metadata.name
       value: indexed-searcher-indexer
     template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
