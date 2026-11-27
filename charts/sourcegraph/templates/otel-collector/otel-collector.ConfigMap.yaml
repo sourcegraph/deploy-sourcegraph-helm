@@ -38,6 +38,19 @@ data:
         endpoint: "localhost:55679"
 
     service:
+      telemetry:
+        metrics:
+          # Serve the collector's own metrics on all interfaces, so that Prometheus can
+          # scrape them. The collector's default is 127.0.0.1:8888, which other pods
+          # cannot reach. Same setting as the image's jaeger.yaml.
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: "0.0.0.0"
+                    port: 8888
+                    without_type_suffix: true
+                    without_units: true
       extensions:
         - health_check
         - zpages
