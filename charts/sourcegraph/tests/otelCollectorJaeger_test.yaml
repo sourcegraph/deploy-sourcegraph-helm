@@ -68,6 +68,20 @@ tests:
           path: data["config.yaml"]
           pattern: "endpoint: otlp.service.com:443" # check if element of config is substituted correctly
         template: otel-collector/otel-collector.ConfigMap.yaml
+  - it: should serve the collector's own metrics on all interfaces, for Prometheus, in the config rendered for an exporter
+    template: otel-collector/otel-collector.ConfigMap.yaml
+    set:
+      openTelemetry:
+        gateway:
+          config:
+            traces:
+              exporters:
+                otlp:
+                  endpoint: "otlp.service.com:443"
+    asserts:
+      - matchRegex:
+          path: data["config.yaml"]
+          pattern: "\\nservice:\\n  telemetry:\\n    metrics:\\n(\\s*#[^\\n]*\\n)*      readers:\\n        - pull:\\n            exporter:\\n              prometheus:\\n                host: \"0\\.0\\.0\\.0\"\\n                port: 8888\\n"
   - it: should fail if a configuration is provided and jaeger is enabled
     template: otel-collector/otel-collector.ConfigMap.yaml
     set:
