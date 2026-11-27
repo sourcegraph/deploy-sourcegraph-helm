@@ -17,7 +17,6 @@ metadata:
     app.kubernetes.io/component: node-exporter
     app: node-exporter
     deploy: sourcegraph
-    sourcegraph-resource-requires: no-cluster-admin
   name: node-exporter
 spec:
   ports:

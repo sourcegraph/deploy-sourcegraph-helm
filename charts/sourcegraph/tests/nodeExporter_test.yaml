@@ -140,3 +140,19 @@ tests:
       - matchRegexRaw:
           pattern: You have set 'nodeExporter.hostPID' to 'false'
         template: NOTES.txt
+
+  - it: should not set sourcegraph-resource-requires on the Service itself, so a value for it renders once, with that value
+    set:
+      sourcegraph:
+        serviceLabels:
+          sourcegraph-resource-requires: cluster-admin
+    asserts:
+      - equal:
+          path: metadata.labels["sourcegraph-resource-requires"]
+          value: cluster-admin
+        template: node-exporter/node-exporter.Service.yaml
+  - it: should not label the Service sourcegraph-resource-requires by default
+    asserts:
+      - notExists:
+          path: metadata.labels["sourcegraph-resource-requires"]
+        template: node-exporter/node-exporter.Service.yaml
