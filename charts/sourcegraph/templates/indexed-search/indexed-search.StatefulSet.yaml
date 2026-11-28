@@ -1,3 +1,4 @@
+{{- if .Values.indexedSearch.enabled -}}
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -171,3 +172,4 @@ spec:
         requests:
           storage: {{ .Values.indexedSearch.storageSize }}
       storageClassName: {{ .Values.storageClass.name }}
+{{- end }}

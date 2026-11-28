@@ -1,0 +1,114 @@
+{{- if .Values.zoekt.enabled -}}
+{{- $indexer := .Values.zoekt.indexer -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    description: Builds indexed search shards and publishes them through object storage for Zoekt searchers.
+  labels:
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.zoektSearcher.labels }}
+      {{- toYaml .Values.zoektSearcher.labels | nindent 4 }}
+    {{- end }}
+    deploy: sourcegraph
+    app.kubernetes.io/component: zoekt-indexer
+  name: {{ $indexer.name }}
+spec:
+  replicas: {{ $indexer.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 6 }}
+      app: zoekt-indexer
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: zoekt-indexer
+      {{- if .Values.sourcegraph.podAnnotations }}
+      {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+      {{- end }}
+      {{- if .Values.zoektSearcher.podAnnotations }}
+      {{- toYaml .Values.zoektSearcher.podAnnotations | nindent 8 }}
+      {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+        app: zoekt-indexer
+        deploy: sourcegraph
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.sourcegraph.terminationGracePeriodSeconds }}
+      containers:
+      - name: zoekt-indexer
+        image: {{ include "sourcegraph.zoekt.image" (list . .Values.zoekt.indexerImage) }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with $indexer.command }}
+        command:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with $indexer.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := $indexer.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: DATA_DIR
+          value: /data
+        - name: TMPDIR
+          value: /data
+        - name: HOME
+          value: /data
+        - name: SRC_FRONTEND_INTERNAL
+          value: sourcegraph-frontend-internal
+        {{- if not .Values.sourcegraph.disableKubernetesSecrets }}
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
+        {{- end }}
+        {{- include "sourcegraph.redisConnection" . | nindent 8 }}
+        {{- include "sourcegraph.zoekt.env" . | nindent 8 }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
+        {{- if .Values.openTelemetry.enabled }}
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        {{- end }}
+        ports:
+        - name: http-debug
+          containerPort: 6060
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml $indexer.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.zoektSearcher.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        - mountPath: /data
+          name: scratch
+      securityContext:
+        {{- toYaml .Values.zoektSearcher.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "zoektSearcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- include "sourcegraph.tolerations" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "zoektSearcher") | trim | nindent 6 }}
+      volumes:
+      - name: scratch
+        emptyDir:
+          sizeLimit: {{ $indexer.scratchSizeLimit }}
+{{- end }}

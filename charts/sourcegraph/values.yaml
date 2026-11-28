@@ -576,6 +576,10 @@ grafana:
   storageLabels: {}
 
 indexedSearch:
+  # -- Enable the `indexed-search` StatefulSet (`zoekt-webserver` and `zoekt-indexserver`) and its Services,
+  # PodDisruptionBudget, and ServiceAccount. Set to `false` to remove it after searches have switched to
+  # the Zoekt indexer and searchers, see [Zoekt indexer and searchers](#zoekt-indexer-and-searchers).
+  enabled: true
   # -- Environment variables for the `zoekt-webserver` container
   # @default -- the chart will add some default environment values
   env:
@@ -586,7 +590,7 @@ indexedSearch:
     # @default -- `<appVersion>@sha256:<digest>`, pinned by each release
     defaultTag: 8.2.1283@sha256:e15e3a4dc3790692d2502bd20c92f0e1126acdbec3370dbe7ea6e9af366ec338
     # -- Docker image name for the `zoekt-webserver` image
-    name: "indexed-searcher"
+    name: "zoekt-searcher"
   # -- Security context for the `zoekt-webserver` container,
   # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
   containerSecurityContext:
@@ -649,7 +653,6 @@ indexedSearch:
   # -- Labels to add to the `data` volume claim template of the `indexed-search` StatefulSet. Kubernetes does not allow
   # changing them on an installed StatefulSet. See [Adopting existing workloads](#adopting-existing-workloads)
   storageLabels: {}
-
 indexedSearchIndexer:
   # -- Environment variables for the `zoekt-indexserver` container
   # @default -- the chart will add some default environment values
@@ -680,6 +683,139 @@ indexedSearchIndexer:
     requests:
       cpu: "4"
       memory: 4G
+
+zoekt:
+  # -- Run the Zoekt indexer and searchers next to `indexed-search`: the `zoekt-indexer` Deployment builds
+  # index generations and publishes them through object storage, and the `zoekt-searcher` StatefulSet
+  # (configured under `zoektSearcher`) downloads and serves them. Frontend, worker, and searcher get the
+  # `SRC_ZOEKT_*` settings. See [Zoekt indexer and searchers](#zoekt-indexer-and-searchers).
+  enabled: false
+  # -- Send searches to the Zoekt searchers (`SRC_ZOEKT_SEARCHER_ROUTING`). When `false`,
+  # the Zoekt indexer indexes every repository and warms the searchers while searches keep using `indexed-search`.
+  # Instances migrating from `indexed-search` set it to `false` first and to `true` once the worker metric
+  # `src_zoekt_ready_to_route` is 1.
+  routing: true
+  # -- Number of webserver replicas that hold each slot (`SRC_ZOEKT_WARM_REPLICAS`).
+  # Must not exceed `zoektSearcher.replicaCount`.
+  replicas: 2
+  # -- Number of a repository's replicas that may lag when a new generation activates: activation needs the
+  # replicas the repository can have now minus this many, and at least one (`SRC_ZOEKT_ACTIVATION_TOLERANCE`)
+  activationTolerance: 1
+  # -- Comma-separated `repositoryID=replicas` entries that raise the replicas of individual repositories, such as
+  # large monorepos, and with them their slot (`SRC_ZOEKT_REPLICATION_FACTORS`)
+  replicationFactors: ""
+  # -- Extra environment variables for the Zoekt searchers and indexers and for frontend, worker, and searcher,
+  # for example `SOURCEGRAPH_UPLOAD_*` object storage settings. By default the shared
+  # Sourcegraph object storage settings apply, which use the `blobstore` service.
+  env: {}
+  indexer:
+    # -- Number of `zoekt-indexer` pods
+    replicaCount: 2
+    # -- Name of the indexer Deployment and its metrics Service
+    name: "zoekt-indexer"
+    # -- Environment variables for the `zoekt-indexer` container
+    env:
+      DEPLOY_TYPE:
+        value: helm
+    # -- Command for the indexer container, replacing the image's entrypoint
+    command: []
+    # -- Arguments for the indexer container
+    args: []
+    # -- Size limit of the indexer's emptyDir scratch volume
+    scratchSizeLimit: 20Gi
+    # -- Resource requests & limits for the `zoekt-indexer` container
+    resources:
+      limits:
+        cpu: "4"
+        memory: 4G
+      requests:
+        cpu: "1"
+        memory: 1G
+  indexerImage:
+    # -- Docker image tag for the Zoekt indexer image
+    defaultTag: "{{ .Chart.AppVersion }}"
+    # -- Docker image name for the Zoekt indexer image
+    name: "zoekt-indexer"
+    # -- Override the global sourcegraph.image.repository for the Zoekt indexer image
+    repository: ""
+    # -- Override the tag of the Zoekt indexer image
+    tag: ""
+
+zoektSearcher:
+  # -- Environment variables for the `zoekt-searcher` container
+  env:
+    DEPLOY_TYPE:
+      value: helm
+  image:
+    # -- Docker image name for the `zoekt-searcher` image. The tag defaults to the chart's appVersion.
+    name: "zoekt-searcher"
+    # -- Override the global sourcegraph.image.repository for the `zoekt-searcher` image
+    repository: ""
+    # -- Override the tag of the `zoekt-searcher` image
+    tag: ""
+  # -- Command for the `zoekt-searcher` container, replacing the image's entrypoint
+  command: []
+  # -- Arguments for the `zoekt-searcher` container
+  args: []
+  # -- Security context for the `zoekt-searcher` and `zoekt-indexer` containers,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container)
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    runAsUser: 100
+    runAsGroup: 101
+    readOnlyRootFilesystem: true
+  # -- Name used by the `zoekt-searcher` StatefulSet, PodDisruptionBudget, and ServiceAccount. Does not affect
+  # service names or PVCs. The frontend finds the webservers through the StatefulSet named `zoekt-searcher`
+  # (`k8s+rpc://zoekt-searcher:6070?kind=sts`), so if you change it, also list the webservers in
+  # `SRC_ZOEKT_SEARCHERS` in `frontend.env`.
+  name: "zoekt-searcher"
+  # -- Number of `zoekt-searcher` pods. Rendered only when `zoekt.enabled` is `true`.
+  replicaCount: 2
+  # -- Pod disruption budget for `zoekt-searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it.
+  podDisruptionBudget: {}
+  # -- Time Kubernetes allows a Zoekt searcher to drain before forced termination. Must be at least 30.
+  terminationGracePeriodSeconds: 60
+  # -- Liveness probe tuning for the `zoekt-searcher` container (`/healthz` on port 6070)
+  livenessProbe:
+    failureThreshold: 10
+    initialDelaySeconds: 120
+    periodSeconds: 60
+    timeoutSeconds: 5
+  # -- Readiness probe tuning for the `zoekt-searcher` container (`/ready` on port 6070)
+  readinessProbe:
+    failureThreshold: 3
+    periodSeconds: 5
+    timeoutSeconds: 5
+  # -- Resource requests & limits for the `zoekt-searcher` container,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/)
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4G
+    requests:
+      cpu: 500m
+      memory: 2G
+  # -- Security context for the `zoekt-searcher` and `zoekt-indexer` pods,
+  # learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod)
+  podSecurityContext:
+    fsGroup: 101
+    fsGroupChangePolicy: "OnRootMismatch"
+  serviceAccount:
+    # -- Enable creation of ServiceAccount for `zoekt-searcher` and `zoekt-indexer`
+    create: false
+    # -- Name of the ServiceAccount to be created or an existing ServiceAccount
+    name: ""
+  # -- PVC Storage Request for the `zoekt-searcher` data volume, which caches the generations a webserver serves
+  storageSize: 200Gi
+  # -- Storage class of the `zoekt-searcher` data volume. Defaults to `storageClass.name`.
+  storageClassName: ""
+  # -- Optional subPath for the `zoekt-searcher` primary data volume mount
+  storageSubPath: ""
+  # -- Optional annotations to add to the `zoekt-searcher` PVC
+  storageAnnotations: {}
+  # -- Labels to add to the `data` volume claim template of the `zoekt-searcher` StatefulSet. Kubernetes does not
+  # allow changing them on an installed StatefulSet.
+  storageLabels: {}
 
 blobstore:
   # -- Enable `blobstore` (S3 compatible storage)

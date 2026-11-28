@@ -102,6 +102,8 @@ spec:
         {{- end }}
         {{- include "sourcegraph.redisConnection" .| nindent 8 }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
+        {{- with include "sourcegraph.zoekt.env" . }}{{ . | nindent 8 }}{{- end }}
+        {{- with include "sourcegraph.zoekt.routingEnv" . }}{{ . | nindent 8 }}{{- end }}
         terminationMessagePolicy: FallbackToLogsOnError
         livenessProbe:
           httpGet:

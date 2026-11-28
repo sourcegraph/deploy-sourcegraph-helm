@@ -106,6 +106,66 @@ Helm only takes over an existing object that has the
 and `meta.helm.sh/release-namespace` annotations, or when installing with
 `--take-ownership` (Helm 3.17 or later).
 
+## Zoekt indexer and searchers
+
+Experimental: requires Sourcegraph images that include the Zoekt indexer and
+searchers.
+
+The Zoekt indexer and searchers are a separate indexed search fleet. The
+`zoekt-indexer` Deployment builds index generations and publishes
+them through object storage, and the `zoekt-searcher` StatefulSet downloads
+and serves them. It runs next to the `indexed-search` StatefulSet, with
+different workload, Service, and PVC names, so an instance can switch over
+without interrupting searches.
+
+- `zoekt.enabled` renders the new fleet and sets `SRC_ZOEKT_*` on frontend,
+  worker, searcher, and the new pods, which turns on Zoekt indexing.
+- `zoekt.routing` (`SRC_ZOEKT_SEARCHER_ROUTING`)
+  chooses which fleet serves searches: `true` sends them to `zoekt-searcher`,
+  `false` keeps them on `indexed-search`. Only frontend, worker, and searcher
+  get it, so switching it restarts only those.
+- `indexedSearch.enabled` renders the `indexed-search` StatefulSet and its
+  Services, PodDisruptionBudget, and ServiceAccount.
+- `zoektSearcher` configures the Zoekt searchers, and
+  `zoekt.indexer` the indexers.
+
+### Migrating an existing instance
+
+1. Enable the Zoekt indexer with routing off. The new fleet indexes every
+   repository from scratch and warms its webservers while searches still go to
+   `indexed-search`:
+
+   ```yaml
+   zoekt:
+     enabled: true
+     routing: false
+   ```
+
+2. Wait until the worker metric `src_zoekt_ready_to_route` is `1`:
+   every indexable repository has an active generation and every slot is ready
+   on all webservers of its placement.
+3. Set `zoekt.routing: true` and upgrade. Searches now go to
+   `zoekt-searcher`.
+4. Set `indexedSearch.enabled: false` and upgrade to remove the
+   `indexed-search` StatefulSet. Kubernetes keeps a StatefulSet's PVCs after
+   the StatefulSet is deleted, so delete them to free their disks:
+
+   ```sh
+   kubectl get pvc -o name | grep '^persistentvolumeclaim/data-indexed-search-' | xargs kubectl delete
+   ```
+
+### New installations
+
+Instances without existing indexed search data can skip the migration:
+
+```yaml
+indexedSearch:
+  enabled: false
+zoekt:
+  enabled: true
+  routing: true
+```
+
 ## Configuration Options
 
 Reference the below chart for all available configuration parameters.

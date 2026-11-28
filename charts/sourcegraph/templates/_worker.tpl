@@ -91,6 +91,8 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         {{- include "sourcegraph.openTelemetryEnv" $top | nindent 8 }}
+        {{- with include "sourcegraph.zoekt.env" $top }}{{ . | nindent 8 }}{{- end }}
+        {{- with include "sourcegraph.zoekt.routingEnv" $top }}{{ . | nindent 8 }}{{- end }}
         image: {{ include "sourcegraph.image" (list $top "worker" ) }}
         imagePullPolicy: {{ $top.Values.sourcegraph.image.pullPolicy }}
         {{- with $top.Values.worker.args }}

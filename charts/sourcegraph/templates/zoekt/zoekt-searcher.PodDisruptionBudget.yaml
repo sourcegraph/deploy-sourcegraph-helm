@@ -1,0 +1,12 @@
+{{- if and .Values.zoekt.enabled .Values.zoektSearcher.podDisruptionBudget }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.zoektSearcher.name }}
+spec:
+  {{- toYaml .Values.zoektSearcher.podDisruptionBudget | nindent 2 }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 6 }}
+      app: zoekt-searcher
+{{- end }}
