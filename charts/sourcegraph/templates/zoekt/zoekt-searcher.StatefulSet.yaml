@@ -1,0 +1,164 @@
+{{- if .Values.zoekt.enabled -}}
+{{- include "sourcegraph.zoekt.validate" . }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  annotations:
+    description: Serves the Zoekt indexer and searchers generations that the indexers publish through object storage.
+  labels:
+    deploy: sourcegraph
+    app.kubernetes.io/component: zoekt-searcher
+    {{- include "sourcegraph.labels" . | nindent 4 }}
+    {{- if .Values.zoektSearcher.labels }}
+      {{- toYaml .Values.zoektSearcher.labels | nindent 4 }}
+    {{- end }}
+  name: {{ .Values.zoektSearcher.name }}
+spec:
+  replicas: {{ .Values.zoektSearcher.replicaCount }}
+  revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
+  selector:
+    matchLabels:
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 6 }}
+      app: zoekt-searcher
+  serviceName: zoekt-searcher
+  podManagementPolicy: OrderedReady
+  template:
+    metadata:
+      annotations:
+        kubectl.kubernetes.io/default-container: zoekt-searcher
+        {{- if .Values.sourcegraph.podAnnotations }}
+        {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
+        {{- end }}
+        {{- if .Values.zoektSearcher.podAnnotations }}
+        {{- toYaml .Values.zoektSearcher.podAnnotations | nindent 8 }}
+        {{- end }}
+      labels:
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 8 }}
+      {{- if .Values.sourcegraph.podLabels }}
+      {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
+      {{- end }}
+      {{- if .Values.zoektSearcher.podLabels }}
+      {{- toYaml .Values.zoektSearcher.podLabels | nindent 8 }}
+      {{- end }}
+        app: zoekt-searcher
+        deploy: sourcegraph
+    spec:
+      {{- include "sourcegraph.terminationGracePeriodSeconds" (list . "zoektSearcher") | nindent 6 }}
+      {{- with .Values.zoektSearcher.extraInitContainers }}
+      initContainers:
+        {{- toYaml . | nindent 6 }}
+      {{- end }}
+      containers:
+      - name: zoekt-searcher
+        image: {{ include "sourcegraph.zoekt.image" (list . .Values.zoektSearcher.image) }}
+        imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
+        {{- with .Values.zoektSearcher.command }}
+        command:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        {{- with .Values.zoektSearcher.args }}
+        args:
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+        terminationMessagePolicy: FallbackToLogsOnError
+        env:
+        {{- range $name, $item := .Values.zoektSearcher.env }}
+        - name: {{ $name }}
+          {{- $item | toYaml | nindent 10 }}
+        {{- end }}
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: DATA_DIR
+          value: /data/index
+        - name: SRC_FRONTEND_INTERNAL
+          value: sourcegraph-frontend-internal
+        {{- if not .Values.sourcegraph.disableKubernetesSecrets }}
+        {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
+        {{- end }}
+        {{- include "sourcegraph.redisConnection" . | nindent 8 }}
+        {{- include "sourcegraph.zoekt.env" . | nindent 8 }}
+        {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
+        {{- if .Values.openTelemetry.enabled }}
+        - name: OPENTELEMETRY_DISABLED
+          value: "false"
+        {{- end }}
+        ports:
+        - name: grpc
+          containerPort: 6070
+        - name: http-debug
+          containerPort: 6060
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: grpc
+            scheme: HTTP
+          initialDelaySeconds: {{ .Values.zoektSearcher.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.zoektSearcher.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.zoektSearcher.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.zoektSearcher.livenessProbe.failureThreshold }}
+        readinessProbe:
+          failureThreshold: {{ .Values.zoektSearcher.readinessProbe.failureThreshold }}
+          httpGet:
+            path: /ready
+            port: grpc
+            scheme: HTTP
+          periodSeconds: {{ .Values.zoektSearcher.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.zoektSearcher.readinessProbe.timeoutSeconds }}
+        {{- if not .Values.sourcegraph.localDevMode }}
+        resources:
+          {{- toYaml .Values.zoektSearcher.resources | nindent 10 }}
+        {{- end }}
+        securityContext:
+          {{- toYaml .Values.zoektSearcher.containerSecurityContext | nindent 10 }}
+        volumeMounts:
+        - mountPath: /data
+          name: data
+          {{- if .Values.zoektSearcher.storageSubPath }}
+          subPath: {{ .Values.zoektSearcher.storageSubPath }}
+          {{- end }}
+        {{- if .Values.zoektSearcher.extraVolumeMounts }}
+        {{- toYaml .Values.zoektSearcher.extraVolumeMounts | nindent 8 }}
+        {{- end }}
+      {{- if .Values.zoektSearcher.extraContainers }}
+        {{- toYaml .Values.zoektSearcher.extraContainers | nindent 6 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.zoektSearcher.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "zoektSearcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- include "sourcegraph.tolerations" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- with .Values.sourcegraph.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "zoektSearcher") | trim | nindent 6 }}
+      volumes:
+      - name: data
+      {{- if .Values.zoektSearcher.extraVolumes }}
+      {{- toYaml .Values.zoektSearcher.extraVolumes | nindent 6 }}
+      {{- end }}
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      labels:
+        deploy: sourcegraph
+        {{- with .Values.zoektSearcher.storageLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      name: data
+      {{- if .Values.zoektSearcher.storageAnnotations }}
+      annotations:
+        {{- toYaml .Values.zoektSearcher.storageAnnotations | nindent 8 }}
+      {{- end }}
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .Values.zoektSearcher.storageSize }}
+      storageClassName: {{ default .Values.storageClass.name .Values.zoektSearcher.storageClassName }}
+{{- end }}

@@ -1,25 +1,25 @@
-{{- if .Values.indexedSearch.continuity.enabled -}}
-{{- $indexer := .Values.indexedSearch.continuity.indexer -}}
+{{- if .Values.zoekt.enabled -}}
+{{- $indexer := .Values.zoekt.indexer -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    description: Builds indexed search shards and publishes them through object storage for continuity webservers.
+    description: Builds indexed search shards and publishes them through object storage for Zoekt searchers.
   labels:
     {{- include "sourcegraph.labels" . | nindent 4 }}
-    {{- if .Values.indexedSearcher.labels }}
-      {{- toYaml .Values.indexedSearcher.labels | nindent 4 }}
+    {{- if .Values.zoektSearcher.labels }}
+      {{- toYaml .Values.zoektSearcher.labels | nindent 4 }}
     {{- end }}
     deploy: sourcegraph
-    app.kubernetes.io/component: indexed-searcher-indexer
+    app.kubernetes.io/component: zoekt-indexer
   name: {{ $indexer.name }}
 spec:
   replicas: {{ $indexer.replicaCount }}
   revisionHistoryLimit: {{ .Values.sourcegraph.revisionHistoryLimit }}
   selector:
     matchLabels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearcher) | nindent 6 }}
-      app: indexed-searcher-indexer
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 6 }}
+      app: zoekt-indexer
   strategy:
     rollingUpdate:
       maxSurge: 1
@@ -28,25 +28,25 @@ spec:
   template:
     metadata:
       annotations:
-        kubectl.kubernetes.io/default-container: zoekt-continuity-indexer
+        kubectl.kubernetes.io/default-container: zoekt-indexer
       {{- if .Values.sourcegraph.podAnnotations }}
       {{- toYaml .Values.sourcegraph.podAnnotations | nindent 8 }}
       {{- end }}
-      {{- if .Values.indexedSearcher.podAnnotations }}
-      {{- toYaml .Values.indexedSearcher.podAnnotations | nindent 8 }}
+      {{- if .Values.zoektSearcher.podAnnotations }}
+      {{- toYaml .Values.zoektSearcher.podAnnotations | nindent 8 }}
       {{- end }}
       labels:
-      {{- include "sourcegraph.selectorLabels" (list . .Values.indexedSearcher) | nindent 8 }}
+      {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 8 }}
       {{- if .Values.sourcegraph.podLabels }}
       {{- toYaml .Values.sourcegraph.podLabels | nindent 8 }}
       {{- end }}
-        app: indexed-searcher-indexer
+        app: zoekt-indexer
         deploy: sourcegraph
     spec:
       terminationGracePeriodSeconds: {{ .Values.sourcegraph.terminationGracePeriodSeconds }}
       containers:
-      - name: zoekt-continuity-indexer
-        image: {{ include "sourcegraph.indexedSearchContinuity.image" (list . .Values.indexedSearch.continuity.indexerImage) }}
+      - name: zoekt-indexer
+        image: {{ include "sourcegraph.zoekt.image" (list . .Values.zoekt.indexerImage) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         {{- with $indexer.command }}
         command:
@@ -78,7 +78,7 @@ spec:
         {{- include "sourcegraph.databaseAuth" (list . "pgsql" "PG") | nindent 8 }}
         {{- end }}
         {{- include "sourcegraph.redisConnection" . | nindent 8 }}
-        {{- include "sourcegraph.indexedSearchContinuity.env" . | nindent 8 }}
+        {{- include "sourcegraph.zoekt.env" . | nindent 8 }}
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
         {{- if .Values.openTelemetry.enabled }}
         - name: OPENTELEMETRY_DISABLED
@@ -92,21 +92,21 @@ spec:
           {{- toYaml $indexer.resources | nindent 10 }}
         {{- end }}
         securityContext:
-          {{- toYaml .Values.indexedSearcher.containerSecurityContext | nindent 10 }}
+          {{- toYaml .Values.zoektSearcher.containerSecurityContext | nindent 10 }}
         volumeMounts:
         - mountPath: /data
           name: scratch
       securityContext:
-        {{- toYaml .Values.indexedSearcher.podSecurityContext | nindent 8 }}
-      {{- include "sourcegraph.nodeSelector" (list . "indexedSearcher" ) | trim | nindent 6 }}
-      {{- include "sourcegraph.affinity" (list . "indexedSearcher" ) | trim | nindent 6 }}
-      {{- with include "sourcegraph.priorityClassName" (list . "indexedSearcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
-      {{- include "sourcegraph.tolerations" (list . "indexedSearcher" ) | trim | nindent 6 }}
+        {{- toYaml .Values.zoektSearcher.podSecurityContext | nindent 8 }}
+      {{- include "sourcegraph.nodeSelector" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- include "sourcegraph.affinity" (list . "zoektSearcher" ) | trim | nindent 6 }}
+      {{- with include "sourcegraph.priorityClassName" (list . "zoektSearcher" ) | trim }}{{ . | nindent 6 }}{{- end }}
+      {{- include "sourcegraph.tolerations" (list . "zoektSearcher" ) | trim | nindent 6 }}
       {{- with .Values.sourcegraph.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- include "sourcegraph.renderServiceAccountName" (list . "indexedSearcher") | trim | nindent 6 }}
+      {{- include "sourcegraph.renderServiceAccountName" (list . "zoektSearcher") | trim | nindent 6 }}
       volumes:
       - name: scratch
         emptyDir:

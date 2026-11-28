@@ -1,0 +1,39 @@
+{{- if .Values.zoekt.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    description: Headless service that provides a stable network identity for the
+      zoekt-searcher stateful set.
+    # Zoekt searchers serve metrics on their debug port.
+    prometheus.io/port: "6060"
+    sourcegraph.prometheus/scrape: "true"
+    {{- if .Values.zoektSearcher.serviceAnnotations }}
+    {{- toYaml .Values.zoektSearcher.serviceAnnotations | nindent 4 }}
+    {{- end }}
+  labels:
+    app: zoekt-searcher
+    deploy: sourcegraph
+    app.kubernetes.io/component: zoekt-searcher
+    {{- if .Values.zoektSearcher.serviceLabels }}
+      {{- toYaml .Values.zoektSearcher.serviceLabels | nindent 4 }}
+    {{- end }}
+  name: zoekt-searcher
+spec:
+  clusterIP: None
+  # A starting webserver reports not ready until it has loaded all its slots,
+  # so a rolling restart waits for it. Meanwhile the frontend already routes
+  # the slots it reports ready, which needs its DNS name to resolve.
+  publishNotReadyAddresses: true
+  ports:
+  - name: grpc
+    port: 6070
+    targetPort: grpc
+  {{- with .Values.zoektSearcher.extraServicePorts }}
+  {{- toYaml . | nindent 2 }}
+  {{- end }}
+  selector:
+    {{- include "sourcegraph.selectorLabels" (list . .Values.zoektSearcher) | nindent 4 }}
+    app: zoekt-searcher
+  type: {{ .Values.zoektSearcher.serviceType | default "ClusterIP" }}
+{{- end }}

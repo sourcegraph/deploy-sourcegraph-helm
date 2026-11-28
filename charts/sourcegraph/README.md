@@ -106,48 +106,46 @@ Helm only takes over an existing object that has the
 and `meta.helm.sh/release-namespace` annotations, or when installing with
 `--take-ownership` (Helm 3.17 or later).
 
-## Indexed search continuity
+## Zoekt indexer and searchers
 
-Experimental: requires Sourcegraph images that include indexed search
-continuity.
+Experimental: requires Sourcegraph images that include the Zoekt indexer and
+searchers.
 
-Indexed search continuity is a separate indexed search fleet. The
-`indexed-searcher-indexer` Deployment builds index generations and publishes
-them through object storage, and the `indexed-searcher` StatefulSet downloads
+The Zoekt indexer and searchers are a separate indexed search fleet. The
+`zoekt-indexer` Deployment builds index generations and publishes
+them through object storage, and the `zoekt-searcher` StatefulSet downloads
 and serves them. It runs next to the `indexed-search` StatefulSet, with
 different workload, Service, and PVC names, so an instance can switch over
 without interrupting searches.
 
-- `indexedSearch.continuity.enabled` renders the continuity fleet and sets
-  `SRC_INDEXED_SEARCH_CONTINUITY_*` on frontend, worker, searcher, gitserver,
-  and the continuity pods, which turns on continuity indexing.
-- `indexedSearch.continuity.routing` (`SRC_INDEXED_SEARCH_CONTINUITY_ROUTING`)
-  chooses which fleet serves searches: `true` sends them to `indexed-searcher`,
+- `zoekt.enabled` renders the new fleet and sets `SRC_ZOEKT_*` on frontend,
+  worker, searcher, and the new pods, which turns on Zoekt indexing.
+- `zoekt.routing` (`SRC_ZOEKT_SEARCHER_ROUTING`)
+  chooses which fleet serves searches: `true` sends them to `zoekt-searcher`,
   `false` keeps them on `indexed-search`. Only frontend, worker, and searcher
   get it, so switching it restarts only those.
 - `indexedSearch.enabled` renders the `indexed-search` StatefulSet and its
   Services, PodDisruptionBudget, and ServiceAccount.
-- `indexedSearcher` configures the continuity webservers, and
-  `indexedSearch.continuity.indexer` the indexers.
+- `zoektSearcher` configures the Zoekt searchers, and
+  `zoekt.indexer` the indexers.
 
 ### Migrating an existing instance
 
-1. Enable continuity with routing off. The new fleet indexes every repository
-   from scratch and warms its webservers while searches still go to
+1. Enable the Zoekt indexer with routing off. The new fleet indexes every
+   repository from scratch and warms its webservers while searches still go to
    `indexed-search`:
 
    ```yaml
-   indexedSearch:
-     continuity:
-       enabled: true
-       routing: false
+   zoekt:
+     enabled: true
+     routing: false
    ```
 
-2. Wait until the worker metric `src_zoekt_continuity_ready_to_route` is `1`:
+2. Wait until the worker metric `src_zoekt_ready_to_route` is `1`:
    every indexable repository has an active generation and every slot is ready
    on all webservers of its placement.
-3. Set `indexedSearch.continuity.routing: true` and upgrade. Searches now go to
-   `indexed-searcher`.
+3. Set `zoekt.routing: true` and upgrade. Searches now go to
+   `zoekt-searcher`.
 4. Set `indexedSearch.enabled: false` and upgrade to remove the
    `indexed-search` StatefulSet. Kubernetes keeps a StatefulSet's PVCs after
    the StatefulSet is deleted, so delete them to free their disks:
@@ -163,9 +161,9 @@ Instances without existing indexed search data can skip the migration:
 ```yaml
 indexedSearch:
   enabled: false
-  continuity:
-    enabled: true
-    routing: true
+zoekt:
+  enabled: true
+  routing: true
 ```
 
 ## Configuration Options
@@ -326,27 +324,10 @@ In addition to the documented values, all services also support the following va
 | grafana.storageSize | string | `"2Gi"` | PVC Storage Request for `grafana` data volume |
 | grafana.storageSubPath | string | `""` | Optional subPath for the `grafana` primary data volume mount |
 | indexedSearch.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| indexedSearch.continuity.activationTolerance | int | `1` | Number of a repository's replicas that may lag when a new generation activates: activation needs the replicas the repository can have now minus this many, and at least one (`SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE`) |
-| indexedSearch.continuity.enabled | bool | `false` | Run indexed search continuity next to `indexed-search`: the `indexed-searcher-indexer` Deployment builds index generations and publishes them through object storage, and the `indexed-searcher` StatefulSet (configured under `indexedSearcher`) downloads and serves them. Frontend, worker, searcher, and gitserver get the `SRC_INDEXED_SEARCH_CONTINUITY_*` settings. See [Indexed search continuity](#indexed-search-continuity). |
-| indexedSearch.continuity.env | object | `{}` | Extra environment variables for every continuity participant (webserver, indexer, frontend, worker, searcher, gitserver), for example `SOURCEGRAPH_UPLOAD_*` object storage settings. By default the shared Sourcegraph object storage settings apply, which use the `blobstore` service. |
-| indexedSearch.continuity.indexer.args | list | `[]` | Arguments for the indexer container |
-| indexedSearch.continuity.indexer.command | list | `[]` | Command for the indexer container, replacing the image's entrypoint |
-| indexedSearch.continuity.indexer.env | object | `{"DEPLOY_TYPE":{"value":"helm"}}` | Environment variables for the `zoekt-continuity-indexer` container |
-| indexedSearch.continuity.indexer.name | string | `"indexed-searcher-indexer"` | Name of the indexer Deployment and its metrics Service |
-| indexedSearch.continuity.indexer.replicaCount | int | `2` | Number of `indexed-searcher-indexer` pods |
-| indexedSearch.continuity.indexer.resources | object | `{"limits":{"cpu":"4","memory":"4G"},"requests":{"cpu":"1","memory":"1G"}}` | Resource requests & limits for the `zoekt-continuity-indexer` container |
-| indexedSearch.continuity.indexer.scratchSizeLimit | string | `"20Gi"` | Size limit of the indexer's emptyDir scratch volume |
-| indexedSearch.continuity.indexerImage.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Docker image tag for the continuity indexer image |
-| indexedSearch.continuity.indexerImage.name | string | `"zoekt-continuity-indexer"` | Docker image name for the continuity indexer image |
-| indexedSearch.continuity.indexerImage.repository | string | `""` | Override the global sourcegraph.image.repository for the continuity indexer image |
-| indexedSearch.continuity.indexerImage.tag | string | `""` | Override the tag of the continuity indexer image |
-| indexedSearch.continuity.replicas | int | `2` | Number of webserver replicas that hold each slot (`SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS`). Must not exceed `indexedSearcher.replicaCount`. |
-| indexedSearch.continuity.replicationFactors | string | `""` | Comma-separated `repositoryID=replicas` entries that raise the replicas of individual repositories, such as large monorepos, and with them their slot (`SRC_INDEXED_SEARCH_CONTINUITY_REPLICATION_FACTORS`) |
-| indexedSearch.continuity.routing | bool | `true` | Send searches to the continuity webservers (`SRC_INDEXED_SEARCH_CONTINUITY_ROUTING`). When `false`, continuity indexes every repository and warms its webservers while searches keep using `indexed-search`. Instances migrating from `indexed-search` set it to `false` first and to `true` once the worker metric `src_zoekt_continuity_ready_to_route` is 1. |
-| indexedSearch.enabled | bool | `true` | Enable the `indexed-search` StatefulSet (`zoekt-webserver` and `zoekt-indexserver`) and its Services, PodDisruptionBudget, and ServiceAccount. Set to `false` to remove it after searches have switched to indexed search continuity, see [Indexed search continuity](#indexed-search-continuity). |
+| indexedSearch.enabled | bool | `true` | Enable the `indexed-search` StatefulSet (`zoekt-webserver` and `zoekt-indexserver`) and its Services, PodDisruptionBudget, and ServiceAccount. Set to `false` to remove it after searches have switched to the Zoekt indexer and searchers, see [Zoekt indexer and searchers](#zoekt-indexer-and-searchers). |
 | indexedSearch.env | object | the chart will add some default environment values | Environment variables for the `zoekt-webserver` container |
 | indexedSearch.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `zoekt-webserver` image |
-| indexedSearch.image.name | string | `"indexed-searcher"` | Docker image name for the `zoekt-webserver` image |
+| indexedSearch.image.name | string | `"zoekt-searcher"` | Docker image name for the `zoekt-webserver` image |
 | indexedSearch.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":120,"periodSeconds":60,"timeoutSeconds":5}` | Liveness probe tuning for the `zoekt-webserver` container. Raise `failureThreshold` or `timeoutSeconds` where memory pressure stalls `/healthz` for minutes at a time, so the container is not killed while it is still serving. Keep the window wider than zoekt's in-process watchdog (`ZOEKT_WATCHDOG_ERRORS` x `ZOEKT_WATCHDOG_TICK`) so the watchdog stays the first line of defence. |
 | indexedSearch.name | string | `"indexed-search"` | Name used by resources. Does not affect service names or PVCs. |
 | indexedSearch.podDisruptionBudget | object | `{}` | Pod disruption budget for `indexed-search`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
@@ -365,28 +346,6 @@ In addition to the documented values, all services also support the following va
 | indexedSearchIndexer.image.defaultTag | string | `<appVersion>@sha256:<digest>`, pinned by each release | Docker image tag for the `zoekt-indexserver` image |
 | indexedSearchIndexer.image.name | string | `"search-indexer"` | Docker image name for the `zoekt-indexserver` image |
 | indexedSearchIndexer.resources | object | `{"limits":{"cpu":"8","memory":"8G"},"requests":{"cpu":"4","memory":"4G"}}` | Resource requests & limits for the `zoekt-indexserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) zoekt-indexserver is CPU bound. The more CPU you allocate to it, the lower lag between a new commit and it being indexed for search. |
-| indexedSearcher.args | list | `[]` | Arguments for the `zoekt-continuity-webserver` container |
-| indexedSearcher.command | list | `[]` | Command for the `zoekt-continuity-webserver` container, replacing the image's entrypoint |
-| indexedSearcher.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-continuity-webserver` and `zoekt-continuity-indexer` containers, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
-| indexedSearcher.env | object | `{"DEPLOY_TYPE":{"value":"helm"}}` | Environment variables for the `zoekt-continuity-webserver` container |
-| indexedSearcher.image.name | string | `"zoekt-continuity-webserver"` | Docker image name for the `zoekt-continuity-webserver` image. The tag defaults to the chart's appVersion. |
-| indexedSearcher.image.repository | string | `""` | Override the global sourcegraph.image.repository for the `zoekt-continuity-webserver` image |
-| indexedSearcher.image.tag | string | `""` | Override the tag of the `zoekt-continuity-webserver` image |
-| indexedSearcher.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":120,"periodSeconds":60,"timeoutSeconds":5}` | Liveness probe tuning for the `zoekt-continuity-webserver` container (`/healthz` on port 6070) |
-| indexedSearcher.name | string | `"indexed-searcher"` | Name used by the `indexed-searcher` StatefulSet, PodDisruptionBudget, and ServiceAccount. Does not affect service names or PVCs. The frontend finds the webservers through the StatefulSet named `indexed-searcher` (`k8s+rpc://indexed-searcher:6070?kind=sts`), so if you change it, also list the webservers in `SRC_INDEXED_SEARCH_CONTINUITY_WEBSERVERS` in `frontend.env`. |
-| indexedSearcher.podDisruptionBudget | object | `{}` | Pod disruption budget for `indexed-searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
-| indexedSearcher.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `indexed-searcher` and `indexed-searcher-indexer` pods, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
-| indexedSearcher.readinessProbe | object | `{"failureThreshold":3,"periodSeconds":5,"timeoutSeconds":5}` | Readiness probe tuning for the `zoekt-continuity-webserver` container (`/ready` on port 6070) |
-| indexedSearcher.replicaCount | int | `2` | Number of `indexed-searcher` pods. Rendered only when `indexedSearch.continuity.enabled` is `true`. |
-| indexedSearcher.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `zoekt-continuity-webserver` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
-| indexedSearcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `indexed-searcher` and `indexed-searcher-indexer` |
-| indexedSearcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
-| indexedSearcher.storageAnnotations | object | `{}` | Optional annotations to add to the `indexed-searcher` PVC |
-| indexedSearcher.storageClassName | string | `""` | Storage class of the `indexed-searcher` data volume. Defaults to `storageClass.name`. |
-| indexedSearcher.storageLabels | object | `{}` | Labels to add to the `data` volume claim template of the `indexed-searcher` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. |
-| indexedSearcher.storageSize | string | `"200Gi"` | PVC Storage Request for the `indexed-searcher` data volume, which caches the generations a webserver serves |
-| indexedSearcher.storageSubPath | string | `""` | Optional subPath for the `indexed-searcher` primary data volume mount |
-| indexedSearcher.terminationGracePeriodSeconds | int | `60` | Time Kubernetes allows a continuity webserver to drain before forced termination. Must be at least 30. |
 | jaeger.args | list | `["--config=/etc/jaeger/jaeger-config.yaml"]` | Default args passed to the `jaeger` binary. Jaeger v2.16+ uses a YAML config file instead of CLI flags. See https://www.jaegertracing.io/docs/2.16/configuration/ |
 | jaeger.collector.name | string | `""` | Name of jaeger `collector` service |
 | jaeger.collector.serviceAnnotations | object | `{}` | Add extra annotations to jaeger `collector` service |
@@ -640,3 +599,42 @@ In addition to the documented values, all services also support the following va
 | worker.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `worker` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
 | worker.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `worker` |
 | worker.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| zoekt.activationTolerance | int | `1` | Number of a repository's replicas that may lag when a new generation activates: activation needs the replicas the repository can have now minus this many, and at least one (`SRC_ZOEKT_ACTIVATION_TOLERANCE`) |
+| zoekt.enabled | bool | `false` | Run the Zoekt indexer and searchers next to `indexed-search`: the `zoekt-indexer` Deployment builds index generations and publishes them through object storage, and the `zoekt-searcher` StatefulSet (configured under `zoektSearcher`) downloads and serves them. Frontend, worker, and searcher get the `SRC_ZOEKT_*` settings. See [Zoekt indexer and searchers](#zoekt-indexer-and-searchers). |
+| zoekt.env | object | `{}` | Extra environment variables for the Zoekt searchers and indexers and for frontend, worker, and searcher, for example `SOURCEGRAPH_UPLOAD_*` object storage settings. By default the shared Sourcegraph object storage settings apply, which use the `blobstore` service. |
+| zoekt.indexer.args | list | `[]` | Arguments for the indexer container |
+| zoekt.indexer.command | list | `[]` | Command for the indexer container, replacing the image's entrypoint |
+| zoekt.indexer.env | object | `{"DEPLOY_TYPE":{"value":"helm"}}` | Environment variables for the `zoekt-indexer` container |
+| zoekt.indexer.name | string | `"zoekt-indexer"` | Name of the indexer Deployment and its metrics Service |
+| zoekt.indexer.replicaCount | int | `2` | Number of `zoekt-indexer` pods |
+| zoekt.indexer.resources | object | `{"limits":{"cpu":"4","memory":"4G"},"requests":{"cpu":"1","memory":"1G"}}` | Resource requests & limits for the `zoekt-indexer` container |
+| zoekt.indexer.scratchSizeLimit | string | `"20Gi"` | Size limit of the indexer's emptyDir scratch volume |
+| zoekt.indexerImage.defaultTag | string | `"{{ .Chart.AppVersion }}"` | Docker image tag for the Zoekt indexer image |
+| zoekt.indexerImage.name | string | `"zoekt-indexer"` | Docker image name for the Zoekt indexer image |
+| zoekt.indexerImage.repository | string | `""` | Override the global sourcegraph.image.repository for the Zoekt indexer image |
+| zoekt.indexerImage.tag | string | `""` | Override the tag of the Zoekt indexer image |
+| zoekt.replicas | int | `2` | Number of webserver replicas that hold each slot (`SRC_ZOEKT_WARM_REPLICAS`). Must not exceed `zoektSearcher.replicaCount`. |
+| zoekt.replicationFactors | string | `""` | Comma-separated `repositoryID=replicas` entries that raise the replicas of individual repositories, such as large monorepos, and with them their slot (`SRC_ZOEKT_REPLICATION_FACTORS`) |
+| zoekt.routing | bool | `true` | Send searches to the Zoekt searchers (`SRC_ZOEKT_SEARCHER_ROUTING`). When `false`, the Zoekt indexer indexes every repository and warms the searchers while searches keep using `indexed-search`. Instances migrating from `indexed-search` set it to `false` first and to `true` once the worker metric `src_zoekt_ready_to_route` is 1. |
+| zoektSearcher.args | list | `[]` | Arguments for the `zoekt-searcher` container |
+| zoektSearcher.command | list | `[]` | Command for the `zoekt-searcher` container, replacing the image's entrypoint |
+| zoektSearcher.containerSecurityContext | object | `{"allowPrivilegeEscalation":false,"readOnlyRootFilesystem":true,"runAsGroup":101,"runAsUser":100}` | Security context for the `zoekt-searcher` and `zoekt-indexer` containers, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) |
+| zoektSearcher.env | object | `{"DEPLOY_TYPE":{"value":"helm"}}` | Environment variables for the `zoekt-searcher` container |
+| zoektSearcher.image.name | string | `"zoekt-searcher"` | Docker image name for the `zoekt-searcher` image. The tag defaults to the chart's appVersion. |
+| zoektSearcher.image.repository | string | `""` | Override the global sourcegraph.image.repository for the `zoekt-searcher` image |
+| zoektSearcher.image.tag | string | `""` | Override the tag of the `zoekt-searcher` image |
+| zoektSearcher.livenessProbe | object | `{"failureThreshold":10,"initialDelaySeconds":120,"periodSeconds":60,"timeoutSeconds":5}` | Liveness probe tuning for the `zoekt-searcher` container (`/healthz` on port 6070) |
+| zoektSearcher.name | string | `"zoekt-searcher"` | Name used by the `zoekt-searcher` StatefulSet, PodDisruptionBudget, and ServiceAccount. Does not affect service names or PVCs. The frontend finds the webservers through the StatefulSet named `zoekt-searcher` (`k8s+rpc://zoekt-searcher:6070?kind=sts`), so if you change it, also list the webservers in `SRC_ZOEKT_SEARCHERS` in `frontend.env`. |
+| zoektSearcher.podDisruptionBudget | object | `{}` | Pod disruption budget for `zoekt-searcher`. Configure either `minAvailable` or `maxUnavailable` to enable it. |
+| zoektSearcher.podSecurityContext | object | `{"fsGroup":101,"fsGroupChangePolicy":"OnRootMismatch"}` | Security context for the `zoekt-searcher` and `zoekt-indexer` pods, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) |
+| zoektSearcher.readinessProbe | object | `{"failureThreshold":3,"periodSeconds":5,"timeoutSeconds":5}` | Readiness probe tuning for the `zoekt-searcher` container (`/ready` on port 6070) |
+| zoektSearcher.replicaCount | int | `2` | Number of `zoekt-searcher` pods. Rendered only when `zoekt.enabled` is `true`. |
+| zoektSearcher.resources | object | `{"limits":{"cpu":"2","memory":"4G"},"requests":{"cpu":"500m","memory":"2G"}}` | Resource requests & limits for the `zoekt-searcher` container, learn more from the [Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/) |
+| zoektSearcher.serviceAccount.create | bool | `false` | Enable creation of ServiceAccount for `zoekt-searcher` and `zoekt-indexer` |
+| zoektSearcher.serviceAccount.name | string | `""` | Name of the ServiceAccount to be created or an existing ServiceAccount |
+| zoektSearcher.storageAnnotations | object | `{}` | Optional annotations to add to the `zoekt-searcher` PVC |
+| zoektSearcher.storageClassName | string | `""` | Storage class of the `zoekt-searcher` data volume. Defaults to `storageClass.name`. |
+| zoektSearcher.storageLabels | object | `{}` | Labels to add to the `data` volume claim template of the `zoekt-searcher` StatefulSet. Kubernetes does not allow changing them on an installed StatefulSet. |
+| zoektSearcher.storageSize | string | `"200Gi"` | PVC Storage Request for the `zoekt-searcher` data volume, which caches the generations a webserver serves |
+| zoektSearcher.storageSubPath | string | `""` | Optional subPath for the `zoekt-searcher` primary data volume mount |
+| zoektSearcher.terminationGracePeriodSeconds | int | `60` | Time Kubernetes allows a Zoekt searcher to drain before forced termination. Must be at least 30. |

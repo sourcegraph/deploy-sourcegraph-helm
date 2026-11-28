@@ -1,4 +1,4 @@
-suite: indexedSearchContinuity
+suite: zoekt
 release:
   name: sourcegraph
   namespace: sourcegraph
@@ -8,31 +8,31 @@ templates:
 - indexed-search/indexed-search.Service.yaml
 - indexed-search/indexed-search.PodDisruptionBudget.yaml
 - indexed-search/indexed-search.ServiceAccount.yaml
-- indexed-searcher/indexed-searcher.StatefulSet.yaml
-- indexed-searcher/indexed-searcher.Service.yaml
-- indexed-searcher/indexed-searcher.PodDisruptionBudget.yaml
-- indexed-searcher/indexed-searcher.ServiceAccount.yaml
-- indexed-searcher/indexed-searcher-indexer.Deployment.yaml
-- indexed-searcher/indexed-searcher-indexer.Service.yaml
+- zoekt/zoekt-searcher.StatefulSet.yaml
+- zoekt/zoekt-searcher.Service.yaml
+- zoekt/zoekt-searcher.PodDisruptionBudget.yaml
+- zoekt/zoekt-searcher.ServiceAccount.yaml
+- zoekt/zoekt-indexer.Deployment.yaml
+- zoekt/zoekt-indexer.Service.yaml
 - frontend/sourcegraph-frontend.Deployment.yaml
 - gitserver/gitserver.StatefulSet.yaml
 - worker/worker.Deployment.yaml
 - searcher/searcher.StatefulSet.yaml
 tests:
-- it: should render no continuity objects and the default indexed-search layout when continuity is disabled
+- it: should render no zoekt objects and the default indexed-search layout when the Zoekt indexer is disabled
   asserts:
   - hasDocuments:
       count: 0
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - hasDocuments:
       count: 0
-    template: indexed-searcher/indexed-searcher.Service.yaml
+    template: zoekt/zoekt-searcher.Service.yaml
   - hasDocuments:
       count: 0
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - hasDocuments:
       count: 0
-    template: indexed-searcher/indexed-searcher-indexer.Service.yaml
+    template: zoekt/zoekt-indexer.Service.yaml
   - equal:
       path: metadata.name
       value: indexed-search
@@ -52,13 +52,13 @@ tests:
   - notContains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        name: SRC_ZOEKT_INDEXER_ENABLED
         value: "true"
     template: frontend/sourcegraph-frontend.Deployment.yaml
 
-- it: should not render the continuity PodDisruptionBudget or ServiceAccount when continuity is disabled
+- it: should not render the zoekt-searcher PodDisruptionBudget or ServiceAccount when the Zoekt indexer is disabled
   set:
-    indexedSearcher:
+    zoektSearcher:
       podDisruptionBudget:
         maxUnavailable: 1
       serviceAccount:
@@ -66,16 +66,15 @@ tests:
   asserts:
   - hasDocuments:
       count: 0
-    template: indexed-searcher/indexed-searcher.PodDisruptionBudget.yaml
+    template: zoekt/zoekt-searcher.PodDisruptionBudget.yaml
   - hasDocuments:
       count: 0
-    template: indexed-searcher/indexed-searcher.ServiceAccount.yaml
+    template: zoekt/zoekt-searcher.ServiceAccount.yaml
 
-- it: should run both fleets with distinct names when continuity is enabled
+- it: should run both fleets with distinct names when the Zoekt indexer is enabled
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
+    zoekt:
+      enabled: true
   asserts:
   - equal:
       path: metadata.name
@@ -103,65 +102,64 @@ tests:
     template: indexed-search/indexed-search.IndexerService.yaml
   - equal:
       path: metadata.name
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.serviceName
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.selector.matchLabels.app
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: metadata.name
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.Service.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.Service.yaml
   - equal:
       path: spec.selector.app
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.Service.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.Service.yaml
   - equal:
       path: spec.publishNotReadyAddresses
       value: true
-    template: indexed-searcher/indexed-searcher.Service.yaml
+    template: zoekt/zoekt-searcher.Service.yaml
   - equal:
       path: metadata.name
-      value: indexed-searcher-indexer
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+      value: zoekt-indexer
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - equal:
       path: spec.template.metadata.labels.app
-      value: indexed-searcher-indexer
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+      value: zoekt-indexer
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - equal:
       path: metadata.name
-      value: indexed-searcher-indexer
-    template: indexed-searcher/indexed-searcher-indexer.Service.yaml
+      value: zoekt-indexer
+    template: zoekt/zoekt-indexer.Service.yaml
   - equal:
       path: spec.selector.app
-      value: indexed-searcher-indexer
-    template: indexed-searcher/indexed-searcher-indexer.Service.yaml
+      value: zoekt-indexer
+    template: zoekt/zoekt-indexer.Service.yaml
 
-- it: should run a single continuity webserver container in indexed-searcher
+- it: should run a single Zoekt searcher container in zoekt-searcher
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
-    indexedSearcher:
+    zoekt:
+      enabled: true
+    zoektSearcher:
       image:
         repository: sg-local
         tag: dev
-  template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+  template: zoekt/zoekt-searcher.StatefulSet.yaml
   asserts:
   - lengthEqual:
       path: spec.template.spec.containers
       count: 1
   - equal:
       path: spec.template.spec.containers[0].name
-      value: zoekt-continuity-webserver
+      value: zoekt-searcher
   - equal:
       path: spec.template.spec.containers[0].image
-      value: sg-local/zoekt-continuity-webserver:dev
+      value: sg-local/zoekt-searcher:dev
   - equal:
       path: spec.replicas
       value: 2
@@ -188,28 +186,26 @@ tests:
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_WARM_REPLICAS
+        name: SRC_ZOEKT_WARM_REPLICAS
         value: "2"
 
 - it: should default the webserver image tag to the chart appVersion
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
+    zoekt:
+      enabled: true
   chart:
     appVersion: 1.2.3
-  template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+  template: zoekt/zoekt-searcher.StatefulSet.yaml
   asserts:
   - equal:
       path: spec.template.spec.containers[0].image
-      value: index.docker.io/sourcegraph/zoekt-continuity-webserver:1.2.3
+      value: index.docker.io/sourcegraph/zoekt-searcher:1.2.3
 
-- it: should apply the indexedSearcher settings to the webservers
+- it: should apply the zoektSearcher settings to the webservers
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
-    indexedSearcher:
+    zoekt:
+      enabled: true
+    zoektSearcher:
       name: custom-searcher
       replicaCount: 4
       terminationGracePeriodSeconds: 120
@@ -231,184 +227,182 @@ tests:
   - equal:
       path: metadata.name
       value: custom-searcher
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.serviceName
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.replicas
       value: 4
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.spec.terminationGracePeriodSeconds
       value: 120
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.volumeClaimTemplates[0].spec.resources.requests.storage
       value: 50Gi
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.volumeClaimTemplates[0].spec.storageClassName
       value: fast
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.volumeClaimTemplates[0].metadata.labels["example.com/project"]
       value: sourcegraph
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.metadata.labels["example.com/team"]
       value: search
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.spec.nodeSelector.pool
       value: search
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.spec.containers[0].command
       value: ["/bin/webserver"]
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.spec.containers[0].args
       value: ["-v"]
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.spec.serviceAccountName
       value: custom-searcher
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - equal:
       path: spec.template.spec.serviceAccountName
       value: custom-searcher
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - equal:
       path: metadata.name
       value: custom-searcher
-    template: indexed-searcher/indexed-searcher.ServiceAccount.yaml
+    template: zoekt/zoekt-searcher.ServiceAccount.yaml
   - equal:
       path: metadata.name
       value: custom-searcher
-    template: indexed-searcher/indexed-searcher.PodDisruptionBudget.yaml
+    template: zoekt/zoekt-searcher.PodDisruptionBudget.yaml
   - equal:
       path: spec.selector.matchLabels.app
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.PodDisruptionBudget.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.PodDisruptionBudget.yaml
   - equal:
       path: metadata.name
-      value: indexed-searcher
-    template: indexed-searcher/indexed-searcher.Service.yaml
+      value: zoekt-searcher
+    template: zoekt/zoekt-searcher.Service.yaml
 
-- it: should add the indexer and shared continuity env when enabled
+- it: should add the indexer and shared zoekt env when enabled
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
+    zoekt:
+      enabled: true
   asserts:
   - equal:
       path: spec.replicas
       value: 2
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        name: SRC_ZOEKT_INDEXER_ENABLED
         value: "true"
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        name: SRC_ZOEKT_INDEXER_ENABLED
         value: "true"
     template: frontend/sourcegraph-frontend.Deployment.yaml
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        name: SRC_ZOEKT_INDEXER_ENABLED
         value: "true"
     template: worker/worker.Deployment.yaml
-  - contains:
+  # Gitserver no longer takes part: the worker queues index jobs after fetches.
+  - notContains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ENABLED
+        name: SRC_ZOEKT_INDEXER_ENABLED
         value: "true"
     template: gitserver/gitserver.StatefulSet.yaml
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ACTIVATION_TOLERANCE
+        name: SRC_ZOEKT_ACTIVATION_TOLERANCE
         value: "1"
     template: searcher/searcher.StatefulSet.yaml
 
-- it: should route searches to the continuity webservers by default
+- it: should route searches to the Zoekt searchers by default
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
+    zoekt:
+      enabled: true
   asserts:
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "true"
     template: frontend/sourcegraph-frontend.Deployment.yaml
 
-- it: should pass routing false to the services that search while continuity runs in shadow
+- it: should pass routing false to the services that search while the Zoekt searchers run in shadow
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
-        routing: false
+    zoekt:
+      enabled: true
+      routing: false
   asserts:
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "false"
     template: frontend/sourcegraph-frontend.Deployment.yaml
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "false"
     template: worker/worker.Deployment.yaml
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "false"
     template: searcher/searcher.StatefulSet.yaml
   # Switching routing must not restart services that do not read it.
   - notContains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "false"
     template: gitserver/gitserver.StatefulSet.yaml
   - notContains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "false"
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - notContains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_ROUTING
+        name: SRC_ZOEKT_SEARCHER_ROUTING
         value: "false"
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+    template: zoekt/zoekt-indexer.Deployment.yaml
   - hasDocuments:
       count: 1
     template: indexed-search/indexed-search.StatefulSet.yaml
 
 - it: should remove the indexed-search objects when indexedSearch.enabled is false
   set:
+    zoekt:
+      enabled: true
     indexedSearch:
       enabled: false
       podDisruptionBudget:
         maxUnavailable: 1
       serviceAccount:
         create: true
-      continuity:
-        enabled: true
   asserts:
   - hasDocuments:
       count: 0
@@ -427,89 +421,85 @@ tests:
     template: indexed-search/indexed-search.ServiceAccount.yaml
   - hasDocuments:
       count: 1
-    template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    template: zoekt/zoekt-searcher.StatefulSet.yaml
   - hasDocuments:
       count: 1
-    template: indexed-searcher/indexed-searcher-indexer.Deployment.yaml
+    template: zoekt/zoekt-indexer.Deployment.yaml
 
-- it: should scrape continuity metrics from the debug port
+- it: should scrape zoekt metrics from the debug port
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
+    zoekt:
+      enabled: true
   asserts:
   - equal:
       path: metadata.annotations["prometheus.io/port"]
       value: "6060"
-    template: indexed-searcher/indexed-searcher.Service.yaml
+    template: zoekt/zoekt-searcher.Service.yaml
   - equal:
       path: metadata.annotations["prometheus.io/port"]
       value: "6060"
-    template: indexed-searcher/indexed-searcher-indexer.Service.yaml
+    template: zoekt/zoekt-indexer.Service.yaml
   - equal:
       path: metadata.annotations["sourcegraph.prometheus/scrape"]
       value: "true"
-    template: indexed-searcher/indexed-searcher-indexer.Service.yaml
+    template: zoekt/zoekt-indexer.Service.yaml
 
 - it: should pass replication factors to every participant
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
-        replicationFactors: "12345=3"
+    zoekt:
+      enabled: true
+      replicationFactors: "12345=3"
   template: worker/worker.Deployment.yaml
   asserts:
   - contains:
       path: spec.template.spec.containers[0].env
       content:
-        name: SRC_INDEXED_SEARCH_CONTINUITY_REPLICATION_FACTORS
+        name: SRC_ZOEKT_REPLICATION_FACTORS
         value: "12345=3"
 
-- it: should reject more continuity replicas than indexed-searcher pods
+- it: should reject more zoekt replicas than zoekt-searcher pods
   set:
+    zoekt:
+      enabled: true
     indexedSearch:
       replicaCount: 3
-      continuity:
-        enabled: true
-    indexedSearcher:
+    zoektSearcher:
       replicaCount: 1
-  template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+  template: zoekt/zoekt-searcher.StatefulSet.yaml
   asserts:
   - failedTemplate:
-      errorMessage: indexedSearch.continuity.replicas must not exceed indexedSearcher.replicaCount
+      errorMessage: zoekt.replicas must not exceed zoektSearcher.replicaCount
 
 - it: should reject an activation tolerance as large as the replicas
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
-        replicas: 2
-        activationTolerance: 2
-  template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+    zoekt:
+      enabled: true
+      replicas: 2
+      activationTolerance: 2
+  template: zoekt/zoekt-searcher.StatefulSet.yaml
   asserts:
   - failedTemplate:
-      errorMessage: indexedSearch.continuity.activationTolerance must be less than indexedSearch.continuity.replicas
+      errorMessage: zoekt.activationTolerance must be less than zoekt.replicas
 
 - it: should reject a webserver termination grace period below 30 seconds
   set:
-    indexedSearch:
-      continuity:
-        enabled: true
-    indexedSearcher:
+    zoekt:
+      enabled: true
+    zoektSearcher:
       terminationGracePeriodSeconds: 10
-  template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+  template: zoekt/zoekt-searcher.StatefulSet.yaml
   asserts:
   - failedTemplate:
-      errorMessage: indexedSearcher.terminationGracePeriodSeconds must be at least 30
+      errorMessage: zoektSearcher.terminationGracePeriodSeconds must be at least 30
 
 - it: should reject routing false once indexed-search is removed
   set:
+    zoekt:
+      enabled: true
+      routing: false
     indexedSearch:
       enabled: false
-      continuity:
-        enabled: true
-        routing: false
-  template: indexed-searcher/indexed-searcher.StatefulSet.yaml
+  template: zoekt/zoekt-searcher.StatefulSet.yaml
   asserts:
   - failedTemplate:
-      errorMessage: "indexedSearch.continuity.routing must be true when indexedSearch.enabled is false: searches would go to the removed indexed-search StatefulSet"
+      errorMessage: "zoekt.routing must be true when indexedSearch.enabled is false: searches would go to the removed indexed-search StatefulSet"

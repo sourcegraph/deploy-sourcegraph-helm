@@ -79,8 +79,8 @@ spec:
         - name: CACHE_DIR
           value: /mnt/cache/$(POD_NAME)
         {{- include "sourcegraph.openTelemetryEnv" . | nindent 8 }}
-        {{- with include "sourcegraph.indexedSearchContinuity.env" . }}{{ . | nindent 8 }}{{- end }}
-        {{- with include "sourcegraph.indexedSearchContinuity.routingEnv" . }}{{ . | nindent 8 }}{{- end }}
+        {{- with include "sourcegraph.zoekt.env" . }}{{ . | nindent 8 }}{{- end }}
+        {{- with include "sourcegraph.zoekt.routingEnv" . }}{{ . | nindent 8 }}{{- end }}
         image: {{ include "sourcegraph.image" (list . "searcher" ) }}
         imagePullPolicy: {{ .Values.sourcegraph.image.pullPolicy }}
         terminationMessagePolicy: FallbackToLogsOnError
