@@ -92,7 +92,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /healthz
-            port: grpc
+            port: http-debug
             scheme: HTTP
           initialDelaySeconds: {{ .Values.zoektSearcher.livenessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ .Values.zoektSearcher.livenessProbe.timeoutSeconds }}
@@ -102,7 +102,7 @@ spec:
           failureThreshold: {{ .Values.zoektSearcher.readinessProbe.failureThreshold }}
           httpGet:
             path: /ready
-            port: grpc
+            port: http-debug
             scheme: HTTP
           periodSeconds: {{ .Values.zoektSearcher.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.zoektSearcher.readinessProbe.timeoutSeconds }}
